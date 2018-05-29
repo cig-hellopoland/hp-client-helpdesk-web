@@ -25,6 +25,10 @@ build_project:
   stage: build
   variables:
     NODE_ENV: "production"
+#  artifacts:
+#    name: "$CI_PROJECT_NAMESPACE_$CI_PROJECT_NAME-$CI_PIPELINE_ID"
+#    paths:
+#      - dist/
   before_script:
     - . envcfg
     - npm i

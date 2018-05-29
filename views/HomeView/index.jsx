@@ -1,3 +1,3 @@
-import HomeView from './HomeView';
+import ViewComponent from './HomeView';
 
-export default HomeView;
+export default ViewComponent;

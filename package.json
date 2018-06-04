@@ -27,6 +27,7 @@
     "jest": "^23.0.1",
     "jss": "^9.8.1",
     "next": "^6.0.3",
+    "path-match": "^1.2.4",
     "prop-types": "^15.6.1",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
@@ -50,10 +51,10 @@
   "scripts": {
     "analyze": "cross-env BUNDLE_ANALYZE=browser next build",
     "build": "next build",
-    "dev": "next",
+    "dev": "node ./server/server.js",
     "lint": "eslint . --ext .js,.jsx --ignore-path .gitignore --cache",
     "lint-fix": "npm run lint -- --fix",
-    "start": "next start",
+    "start": "NODE_ENV=production node ./server/server.js",
     "test": "jest",
     "test-watch": "npm test -- --watch"
   }

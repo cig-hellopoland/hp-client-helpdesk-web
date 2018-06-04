@@ -56,6 +56,7 @@ const fetchMoviesLogic = createLogic({
   cancelType: [FETCH_MOVIES_CANCEL],
   latest: true,
   process({ action: { payload }, httpClient }) {
+    debugger;
     return httpClient.get(payload.url)
       .then(({ data }) => fetchMoviesSuccess(data));
   },

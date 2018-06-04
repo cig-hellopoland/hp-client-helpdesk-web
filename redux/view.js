@@ -68,7 +68,7 @@ export const actions = {
  * LOGIC
  */
 
-export const logic = {};
+export const logic = [];
 
 
 /*

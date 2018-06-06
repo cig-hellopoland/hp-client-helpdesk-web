@@ -10,28 +10,7 @@ import {
 import MovieView from 'views/MovieView';
 import MoviesView from 'views/MoviesView';
 
-MovieView.getInitialProps = ({ store, query }) => {
-  const movieData = moviesSelectors.getMovie(store.getState(), query.id);
-
-  if (!movieData) {
-    store.dispatch(moviesActions.fetchMovies());
-  }
-
-  return {
-    movie: movieData || {},
-    id: query.id,
-  };
-};
-
-
-MoviesView.getInitialProps = (initialProps) => {
-  initialProps.store.dispatch(moviesActions.fetchMovies());
-
-  return {};
-};
-
-
-class MoviesIndexPage extends React.Component {
+class MoviesWrapper extends React.Component {
   static async getInitialProps(initialProps) {
     const { store, query } = initialProps;
     const { id } = query;
@@ -55,27 +34,21 @@ class MoviesIndexPage extends React.Component {
   }
 
   render() {
-    const { id, movies } = this.props;
-    return id ? <MovieView /> : <MoviesView movies={movies} />;
+    const { id } = this.props;
+
+    return id ? <MovieView id={id} /> : <MoviesView />;
   }
 }
 
-MoviesIndexPage.propTypes = {
+MoviesWrapper.propTypes = {
   id: PropTypes.string,
-  movies: PropTypes.arrayOf(PropTypes.shape({})),
 };
 
-MoviesIndexPage.defaultProps = {
+MoviesWrapper.defaultProps = {
   id: '',
-  movies: [],
 };
-
-const mapStateToProps = state => ({
-  movies: moviesSelectors.getMovies(state),
-});
-
 
 export default compose(
-  withRedux(mapStateToProps),
+  withRedux(),
   withRoot,
-)(MoviesIndexPage);
+)(MoviesWrapper);

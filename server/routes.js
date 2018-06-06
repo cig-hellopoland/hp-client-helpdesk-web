@@ -3,8 +3,12 @@
  */
 
 module.exports = [
-  '/movies/:id',
-  '/movies/add/add/:id',
-  '/movies/edit/:id',
-  '/movies/remove/:id',
+  {
+    page: '/movies',
+    pathname: '/movies/:id',
+  },
+  {
+    page: '/movies/edit',
+    pathname: '/movies/:id/edit',
+  },
 ];

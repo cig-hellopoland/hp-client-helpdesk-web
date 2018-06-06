@@ -16,5 +16,10 @@
         ]
       ]
     }
-  }
+  },
+  "plugins": [
+    ["module-resolver", {
+      "root": ["./"]
+    }]
+  ]
 }

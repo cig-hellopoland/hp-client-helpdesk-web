@@ -2,7 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import NProgressBar from '@material-ui/docs/NProgressBar';
+import NProgress from 'nprogress';
+import Router from 'next/router';
 import getPageContext from './getPageContext';
+
+Router.onRouteChangeStart = () => {
+  NProgress.start();
+};
+
+Router.onRouteChangeComplete = () => {
+  NProgress.done();
+};
+
+Router.onRouteChangeError = () => {
+  NProgress.done();
+};
 
 function withRoot(Component) {
   class WithRoot extends React.Component {
@@ -30,6 +45,7 @@ function withRoot(Component) {
           sheetsManager={this.pageContext.sheetsManager}
         >
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <NProgressBar />
           <CssBaseline />
           <Component {...this.props} />
         </MuiThemeProvider>

@@ -6,6 +6,9 @@ import { createMuiTheme, createGenerateClassName } from '@material-ui/core/style
 // It's optional.
 const theme = createMuiTheme({
   palette: {},
+  nprogress: {
+    color: '#000',
+  },
 });
 
 function createPageContext() {

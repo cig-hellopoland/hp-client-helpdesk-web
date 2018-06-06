@@ -5,8 +5,8 @@ import Link from 'next/link';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import { selectors as moviesSelectors } from '../../redux/movies';
-import Layout from '../../components/Layout';
+import { selectors as moviesSelectors } from 'redux/movies';
+import Layout from 'components/Layout';
 
 const MoviesView = ({ movies }) => (
   <Layout>

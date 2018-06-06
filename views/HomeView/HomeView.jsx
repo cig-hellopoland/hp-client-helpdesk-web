@@ -7,7 +7,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import Link from 'next/link';
-import Layout from '../../components/Layout';
+import Layout from 'components/Layout';
 import { actions, selectors } from './redux/counter';
 
 const styles = {

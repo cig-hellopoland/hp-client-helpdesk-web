@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
-import withRoot from '../../src/withRoot';
-import withRedux from '../../services/redux/withRedux';
+import withRoot from 'src/withRoot';
+import withRedux from 'services/redux/withRedux';
 import {
   actions as moviesActions,
   selectors as moviesSelectors,
-} from '../../redux/movies';
-import MovieView from '../../views/MovieView';
-import MoviesView from '../../views/MoviesView';
+} from 'redux/movies';
+import MovieView from 'views/MovieView';
+import MoviesView from 'views/MoviesView';
 
 MovieView.getInitialProps = ({ store, query }) => {
   const movieData = moviesSelectors.getMovie(store.getState(), query.id);

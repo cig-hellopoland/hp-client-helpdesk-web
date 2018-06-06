@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
 import Link from 'next/link';
-import Layout from '../../components/Layout';
+import Layout from 'components/Layout';
 
 const AboutView = () => (
   <Layout>

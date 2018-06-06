@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { selectors as viewSelectors } from 'redux/view';
 import Header from './Header';
-import { selectors as viewSelectors } from '../../redux/view';
 
 const Layout = ({ children, documentTitle }) => (
   <Fragment>

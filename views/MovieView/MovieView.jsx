@@ -6,8 +6,8 @@ import CardHeader from '@material-ui/core/CardHeader';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import { selectors as moviesSelectors } from '../../redux/movies';
-import Layout from '../../components/Layout';
+import { selectors as moviesSelectors } from 'redux/movies';
+import Layout from 'components/Layout';
 
 const MovieView = ({ movie }) => (
   <Layout>

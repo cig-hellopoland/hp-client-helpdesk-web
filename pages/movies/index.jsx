@@ -56,7 +56,6 @@ class MoviesIndexPage extends React.Component {
 
   render() {
     const { id, movies } = this.props;
-    console.log('omg', this.props);
     return id ? <MovieView /> : <MoviesView movies={movies} />;
   }
 }

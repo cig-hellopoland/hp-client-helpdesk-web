@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^1.1.0",
+    "@material-ui/docs": "^1.0.0-alpha.3",
     "@material-ui/icons": "^1.1.0",
     "@zeit/next-bundle-analyzer": "^0.1.1",
     "axios": "^0.18.0",
@@ -27,6 +28,7 @@
     "jest": "^23.0.1",
     "jss": "^9.8.1",
     "next": "^6.0.3",
+    "nprogress": "^0.2.0",
     "path-match": "^1.2.4",
     "prop-types": "^15.6.1",
     "react": "^16.4.0",

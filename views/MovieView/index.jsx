@@ -1,3 +1,1 @@
-import ViewComponent from './MovieView';
-
-export default ViewComponent;
+export { default } from './MovieView';

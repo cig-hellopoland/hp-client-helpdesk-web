@@ -1,3 +1,1 @@
-import ViewComponent from './AboutView';
-
-export default ViewComponent;
+export { default } from './AboutView';

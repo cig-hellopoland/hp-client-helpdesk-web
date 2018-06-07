@@ -11,10 +11,10 @@ import Layout from 'components/Layout';
 const MoviesView = ({ movies }) => (
   <Layout>
     <List>
-      {movies.map(movie => (
-        <Link href={`/movies/${movie.id}`} passHref key={movie.id}>
+      {movies.map(({ description, id, title }) => (
+        <Link key={id} href={`/movies?id=${id}`} as={`/movies/${id}`} passHref>
           <ListItem dense button component="a">
-            <ListItemText primary={movie.title} secondary={movie.description} />
+            <ListItemText primary={title} secondary={description} />
           </ListItem>
         </Link>
       ))}

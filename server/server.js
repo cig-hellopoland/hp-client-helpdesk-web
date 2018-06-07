@@ -17,8 +17,8 @@ app
   .then(() => {
     server = express();
 
-    routes.forEach(({ page, pathname }) => {
-      server.get(pathname, (req, res) => {
+    routes.forEach(({ page, path }) => {
+      server.get(path, (req, res) => {
         app.render(req, res, page, req.params);
       });
     });

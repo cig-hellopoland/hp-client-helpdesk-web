@@ -5,10 +5,10 @@
 module.exports = [
   {
     page: '/movies',
-    pathname: '/movies/:id',
+    path: '/movies/:id',
   },
   {
     page: '/movies/edit',
-    pathname: '/movies/:id/edit',
+    path: '/movies/:id/edit',
   },
 ];

@@ -1,4 +1,4 @@
-import client, { compose, createCancellableRequest, withRedux } from 'services/axiosClient';
+import client, { compose, cancellableRequest, withRedux } from 'services/axiosClient';
 import { selectors as configSelectors } from 'redux/config';
 
 const requestInterceptors = [];
@@ -22,7 +22,7 @@ export default function createHTTPClient(store) {
   });
 
   // Add request cancellation capabilities (not part of Axios API)
-  instance.cancellable = createCancellableRequest(instance);
+  instance.cancellable = cancellableRequest;
 
   // Initialize interceptors
   if (responseInterceptors && responseInterceptors.length) {

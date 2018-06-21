@@ -19,7 +19,7 @@ export function cancellableRequest(options, cancelled$) {
     console.error('Missing cancelled$ argument');
   }
 
-  const source = axios.CancelToken.source(); // axios.CancelToken
+  const source = axios.CancelToken.source();
 
   cancelled$.subscribe(() => {
     source.cancel();

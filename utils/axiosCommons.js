@@ -9,26 +9,27 @@ import _cloneDeep from 'lodash/cloneDeep';
  * Adds support for cancelable requests.
  *
  * @method
- * @param httpClient - axios instance
- * @return { function(*, *=): *}
+ * @param options - axios payload options
+ * @param cancelled$ - cancelled$ observable from redux-logic
+ * @return { Promise }
  */
-export const createCancellableRequest = httpClient => (options, cancelled$) => {
+export function cancellableRequest(options, cancelled$) {
   if (!cancelled$) {
     // eslint-disable-next-line no-console
     console.error('Missing cancelled$ argument');
   }
 
-  const source = axios.CancelToken.source(); // axios.CancelToken
+  const source = axios.CancelToken.source();
 
   cancelled$.subscribe(() => {
     source.cancel();
   });
 
-  return httpClient({
+  return this({
     cancelToken: source.token,
     ...options,
   });
-};
+}
 
 /**
  * Removes custom keys from axios config schema.

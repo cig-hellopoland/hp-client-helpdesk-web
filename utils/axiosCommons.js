@@ -1,38 +1,9 @@
 import axios from 'axios';
-import cloneDeep from 'lodash/cloneDeep';
-
-export default axios;
-
-// TODO: create separate library from this script
+import _cloneDeep from 'lodash/cloneDeep';
 
 /*
  * HELPER FUNCTIONS
  */
-
-/**
- * Composes single-argument functions from right to left. The rightmost
- * function can take multiple arguments as it provides the signature for
- * the resulting composite function.
- *
- * @see https://github.com/reduxjs/
- *
- * @method
- * @param {...Function} funcs - The functions to compose.
- * @returns {Function} A function obtained by composing the argument functions
- * from right to left. For example, compose(f, g, h) is identical to doing
- * (...args) => f(g(h(...args))).
- */
-export function compose(...funcs) {
-  if (funcs.length === 0) {
-    return arg => arg;
-  }
-
-  if (funcs.length === 1) {
-    return funcs[0];
-  }
-
-  return funcs.reduce((a, b) => (...args) => a(b(...args)));
-}
 
 /**
  * Adds support for cancelable requests.
@@ -60,7 +31,7 @@ export const createCancellableRequest = httpClient => (options, cancelled$) => {
 };
 
 /**
- * Removes custom key from axios config schema.
+ * Removes custom keys from axios config schema.
  *
  * @method
  * @param {Object} axiosSchema
@@ -192,22 +163,35 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
     },
   });
 
+  const appConfig = selectors.getAppConfig(state);
+  const { axios: axiosConfig } = appConfig.public;
+  let nextAccessToken;
+
   try {
-    const ax = axios.create();
+    const ax = axios.create(axiosConfig);
     const { data } = await ax(payload);
-    const { accessToken: nextAccessToken, refreshToken: nextRefreshToken } = data;
 
     store.dispatch(actions.refreshAccessTokenSuccess({
-      accessToken: nextAccessToken,
-      refreshToken: nextRefreshToken,
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
     }));
+
+    nextAccessToken = data.accessToken;
   } catch (error) {
-    store.dispatch(actions.errorUnauthorized());
+    const { data } = payload;
+
+    store.dispatch(actions.errorUnauthorized({ data }));
 
     return errorLogInterceptor(`[HTTPClient] - ${status} - Session expired.`)(error);
   }
 
-  return axios(sanitizeSchema(config));
+  return axios(sanitizeSchema({
+    ...config,
+    headers: {
+      ...config.headers,
+      authorization: `Bearer ${nextAccessToken}`,
+    },
+  }));
 }
 
 /**
@@ -232,7 +216,7 @@ function JWTInterceptor(request) {
   const token = url === '/auth/refresh' ? refreshToken : accessToken;
 
   return {
-    ...cloneDeep(sanitizeSchema(request)),
+    ..._cloneDeep(sanitizeSchema(request)),
     headers: {
       authorization: `Bearer ${token}`,
     },

@@ -1,4 +1,6 @@
-import client, { compose, createCancellableRequest, withRedux } from 'services/axiosClient';
+import axios from 'axios';
+import { compose } from 'redux';
+import { createCancellableRequest, withRedux } from 'utils/axiosCommons';
 import { selectors as configSelectors } from 'redux/config';
 
 const requestInterceptors = [];
@@ -9,15 +11,13 @@ const responseInterceptors = [];
  */
 
 export default function createHTTPClient(store) {
-  const instance = client.create();
+  const instance = axios.create();
   const state = store.getState();
   const appConfig = configSelectors.getAppConfig(state);
   const { axios: axiosConfig } = appConfig.public;
 
   // Configure axios
-  Object.entries(axiosConfig).forEach((entry) => {
-    const [key, value] = entry;
-
+  Object.entries(axiosConfig).forEach(([key, value]) => {
     instance.defaults[key] = value;
   });
 
@@ -26,9 +26,7 @@ export default function createHTTPClient(store) {
 
   // Initialize interceptors
   if (responseInterceptors && responseInterceptors.length) {
-    responseInterceptors.forEach((interceptor) => {
-      const { redux, reject, resolve } = interceptor;
-
+    responseInterceptors.forEach(({ redux, reject, resolve }) => {
       instance.interceptors.response.use(
         compose(resolve, withRedux(store, redux)),
         compose(reject, withRedux(store, redux)),
@@ -37,9 +35,7 @@ export default function createHTTPClient(store) {
   }
 
   if (requestInterceptors && requestInterceptors.length) {
-    requestInterceptors.forEach((interceptor) => {
-      const { redux, reject, resolve } = interceptor;
-
+    requestInterceptors.forEach(({ redux, reject, resolve }) => {
       instance.interceptors.request.use(
         compose(resolve, withRedux(store, redux)),
         compose(reject, withRedux(store, redux)),

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { compose } from 'redux';
-import { createCancellableRequest, withRedux } from 'utils/axiosCommons';
+import { cancellableRequest, withRedux } from 'utils/axiosCommons';
 import { selectors as configSelectors } from 'redux/config';
 
 const requestInterceptors = [];

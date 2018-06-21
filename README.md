@@ -101,3 +101,83 @@ React + Redux + Next.js + Jest + JSS
 
 ### Other common libraries
 Material UI
+
+## Using HTTPClient
+By default we use [axios](https://github.com/axios/axios) for request handling. It consists of two classes:
+- axiosCommons, which provides common methods that can be used depending on project requirements
+- httpClient, which configures axios instance
+
+### HTTPClient Interceptors
+Interceptors can be added through `requestInterceptors` and `responseInterceptors` maps. Each has the same schema, that is:
+- `resolve` - method used by interceptor when request succeeds
+- `reject` - method used by interceptor when request fails
+- `redux` - used for passing redux action creators
+
+First two keys are mandatory.
+
+#### Examples
+
+1. Logging requests in browser console:
+    ```javascript
+    import { interceptors } from 'utils/axiosCommons';
+    
+    const {
+      errorLogInterceptor,
+      responseLogInterceptor,
+      requestLogInterceptor,
+    } = interceptors;
+ 
+    const requestInterceptors = [
+     {
+       reject: errorLogInterceptor('[Request Error]'),
+       resolve: requestLogInterceptor,
+     },
+    ];
+    
+    const responseInterceptors = [
+     {
+       reject: errorLogInterceptor('[Response Error]'),
+       resolve: responseLogInterceptor,
+     },
+    ];
+    ```
+2. Adding JWT support:
+    ```javascript
+    import { interceptors } from 'utils/axiosCommons';
+    import { selectors as configSelectors } from 'redux/config';
+    import {
+      actions as profileActions,
+      selectors as profileSelectors,
+    } from 'redux/profile';
+ 
+    const {
+     errorInterceptor,
+     JWTHTTPUnauthorizedInterceptor,
+     JWTInterceptor,
+    } = interceptors;
+    
+    
+    const requestInterceptors = [
+     {
+       redux: {
+         selectors: profileSelectors,
+       },
+       reject: errorInterceptor,
+       resolve: JWTInterceptor,
+     },
+    ];
+    
+    const responseInterceptors = [
+     {
+       redux: {
+         actions: profileActions,
+         selectors: {
+           ...profileSelectors,
+           getAppConfig: configSelectors.getAppConfig,
+         },
+       },
+       reject: JWTHTTPUnauthorizedInterceptor,
+       resolve: response => response,
+     },
+    ];   
+    ```

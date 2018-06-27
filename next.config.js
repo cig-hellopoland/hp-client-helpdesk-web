@@ -7,6 +7,7 @@ const config = require(configPath);
 module.exports = {
   serverRuntimeConfig: config.server,
   publicRuntimeConfig: config.public,
+  poweredByHeader: false,
   ...withBundleAnalyzer({
     analyzeServer: ['server', 'both'].includes(process.env.BUNDLE_ANALYZE),
     analyzeBrowser: ['browser', 'both'].includes(process.env.BUNDLE_ANALYZE),

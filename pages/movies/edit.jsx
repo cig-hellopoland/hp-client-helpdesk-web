@@ -1,6 +1,3 @@
-import { compose } from 'redux';
-import withRoot from 'src/withRoot';
-import withRedux from 'services/redux/withRedux';
 import MovieEditView from 'views/MovieEditView';
 import {
   actions as moviesActions,
@@ -20,7 +17,4 @@ MovieEditView.getInitialProps = ({ store, query }) => {
   };
 };
 
-export default compose(
-  withRedux(),
-  withRoot,
-)(MovieEditView);
+export default MovieEditView;

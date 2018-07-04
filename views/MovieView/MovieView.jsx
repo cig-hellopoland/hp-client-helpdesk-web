@@ -19,7 +19,6 @@ const MovieView = ({ id, movie }) => (
       />
       <CardMedia
         component="img"
-        style={{ width: 'auto' }}
         src={movie.poster}
         title="poster"
       />

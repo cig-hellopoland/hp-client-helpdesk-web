@@ -120,16 +120,15 @@ and specify new project path and name (use [kebab-case](http://wiki.c2.com/?Keba
 ## Project stack
 ### Core packages
 - `react`
+- `next`
 - `redux` + `react-redux`
 - `redux-logic`
-- `axios`
-- `material-ui` v1 (with JSS)
-- `next`
 - `express`
-- `jest`
 
 ### Other common libraries
-Material UI
+- `material-ui` v1 (with JSS)
+- `axios`
+- `jest`
 
 ## Using HTTPClient
 By default we use [axios](https://github.com/axios/axios) for request handling. It consists of two classes:

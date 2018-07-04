@@ -1,8 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
-import withRoot from 'src/withRoot';
-import withRedux from 'services/redux/withRedux';
 import {
   actions as moviesActions,
   selectors as moviesSelectors,
@@ -48,7 +45,4 @@ MoviesWrapper.defaultProps = {
   id: '',
 };
 
-export default compose(
-  withRedux(),
-  withRoot,
-)(MoviesWrapper);
+export default MoviesWrapper;

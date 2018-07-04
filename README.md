@@ -209,3 +209,11 @@ module.exports = withPlugins([
 ]);
 
 ```
+
+## Content Security Policy
+
+This project comes with CSP enabled by default.
+
+CSP directives can be found [here](./server/server.js#L33).
+
+About CSP: https://helmetjs.github.io/docs/csp/.

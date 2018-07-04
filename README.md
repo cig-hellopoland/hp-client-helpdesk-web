@@ -1,5 +1,27 @@
-# React Web App
 Template project for web applications.
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Overview](#overview)
+  - [Project structure](#project-structure)
+  - [App config](#app-config)
+    - [Structure:](#structure)
+    - [Usage:](#usage)
+    - [Production](#production)
+- [Initializing new project](#initializing-new-project)
+- [Project stack](#project-stack)
+  - [Core packages](#core-packages)
+  - [Other common libraries](#other-common-libraries)
+- [Using HTTPClient](#using-httpclient)
+  - [HTTPClient Interceptors](#httpclient-interceptors)
+    - [Examples](#examples)
+- [Modifying `next.config.js`](#modifying-nextconfigjs)
+  - [Adding new plugins](#adding-new-plugins)
+- [Content Security Policy](#content-security-policy)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
 ### Project structure

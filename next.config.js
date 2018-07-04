@@ -23,6 +23,7 @@ const bundleAnalyzerConfig = {
 const nextConfig = {
   serverRuntimeConfig: config.server,
   publicRuntimeConfig: config.public,
+  poweredByHeader: false,
 };
 
 module.exports = withPlugins([

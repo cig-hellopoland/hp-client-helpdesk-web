@@ -1,5 +1,6 @@
 const express = require('express');
 const next = require('next');
+const helmet = require('helmet');
 const routes = require('./routes');
 
 const port = parseInt(process.env.NODE_PORT, 10) || 3000;
@@ -16,6 +17,8 @@ app
   .prepare()
   .then(() => {
     server = express();
+
+    server.use(helmet());
 
     routes.forEach(({ page, path }) => {
       server.get(path, (req, res) => {

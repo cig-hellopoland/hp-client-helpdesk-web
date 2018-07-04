@@ -97,7 +97,14 @@ and specify new project path and name (use [kebab-case](http://wiki.c2.com/?Keba
 
 ## Project stack
 ### Core packages
-React + Redux + Next.js + Jest + JSS
+- `react`
+- `redux` + `react-redux`
+- `redux-logic`
+- `axios`
+- `material-ui` v1 (with JSS)
+- `next`
+- `express`
+- `jest`
 
 ### Other common libraries
 Material UI

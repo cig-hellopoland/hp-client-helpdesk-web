@@ -15,7 +15,7 @@ const Header = ({ documentTitle }) => (
           <HomeIcon />
         </IconButton>
       </Link>
-      <Typography variant="title" color="inherit" style={{ flex: 1 }}>
+      <Typography variant="title" color="inherit">
         {documentTitle}
       </Typography>
     </Toolbar>

@@ -1,6 +1,7 @@
 const express = require('express');
 const next = require('next');
 const helmet = require('helmet');
+const uuidv4 = require('uuid/v4');
 const routes = require('./routes');
 
 const port = parseInt(process.env.NODE_PORT, 10) || 3000;
@@ -19,6 +20,30 @@ app
     server = express();
 
     server.use(helmet());
+
+    server.use((req, res, nextMiddleware) => {
+      // nonce should be base64 encoded
+      res.locals.nonce = Buffer.from(uuidv4()).toString('base64');
+      nextMiddleware();
+    });
+
+    const getNonce = (req, res) => `'nonce-${res.locals.nonce}'`;
+
+    server.use(helmet.contentSecurityPolicy({
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          getNonce,
+        ],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        styleSrc: [
+          "'self'",
+          'https://fonts.googleapis.com',
+          getNonce,
+        ],
+      },
+    }));
 
     routes.forEach(({ page, path }) => {
       server.get(path, (req, res) => {

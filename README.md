@@ -1,5 +1,27 @@
-# React Web App
 Template project for web applications.
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Overview](#overview)
+  - [Project structure](#project-structure)
+  - [App config](#app-config)
+    - [Structure:](#structure)
+    - [Usage:](#usage)
+    - [Production](#production)
+- [Initializing new project](#initializing-new-project)
+- [Project stack](#project-stack)
+  - [Core packages](#core-packages)
+  - [Other common libraries](#other-common-libraries)
+- [Using HTTPClient](#using-httpclient)
+  - [HTTPClient Interceptors](#httpclient-interceptors)
+    - [Examples](#examples)
+- [Modifying `next.config.js`](#modifying-nextconfigjs)
+  - [Adding new plugins](#adding-new-plugins)
+- [Content Security Policy](#content-security-policy)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
 ### Project structure
@@ -97,10 +119,16 @@ and specify new project path and name (use [kebab-case](http://wiki.c2.com/?Keba
 
 ## Project stack
 ### Core packages
-React + Redux + Next.js + Jest + JSS
+- `react`
+- `next`
+- `redux` + `react-redux`
+- `redux-logic`
+- `express`
 
 ### Other common libraries
-Material UI
+- `material-ui` v1 (with JSS)
+- `axios`
+- `jest`
 
 ## Using HTTPClient
 By default we use [axios](https://github.com/axios/axios) for request handling. It consists of two classes:
@@ -202,3 +230,11 @@ module.exports = withPlugins([
 ]);
 
 ```
+
+## Content Security Policy
+
+This project comes with CSP enabled by default.
+
+CSP directives can be found [here](./server/server.js#L33).
+
+About CSP: https://helmetjs.github.io/docs/csp/.

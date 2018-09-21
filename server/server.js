@@ -3,6 +3,7 @@ const next = require('next');
 const helmet = require('helmet');
 const uuidv4 = require('uuid/v4');
 const routes = require('./routes');
+const proxyMiddleware = require('./proxy');
 
 const port = parseInt(process.env.NODE_PORT, 10) || 3000;
 const host = process.env.NODE_HOST || '127.0.0.1'; // https://tinyurl.com/y8nlgmj6
@@ -20,6 +21,13 @@ app
     server = express();
 
     server.use(helmet());
+
+    // Proxy API requests to resolve problem with CORS
+    if (dev) {
+      proxyMiddleware.forEach((middleware) => {
+        server.use(middleware);
+      });
+    }
 
     server.use((req, res, nextMiddleware) => {
       // nonce should be base64 encoded

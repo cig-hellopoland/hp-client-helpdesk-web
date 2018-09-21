@@ -22,6 +22,7 @@ Template project for web applications.
 - [Modifying `next.config.js`](#modifying-nextconfigjs)
   - [Adding new plugins](#adding-new-plugins)
 - [Content Security Policy](#content-security-policy)
+- [Custom proxy](#custom-proxy)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -261,3 +262,11 @@ This project comes with CSP enabled by default.
 CSP directives can be found [here](./server/server.js#L33).
 
 About CSP: https://helmetjs.github.io/docs/csp/.
+
+## Custom proxy
+
+We use `http-proxy-middleware` for proxying API requests in dev environment to avoid CORS errors.
+Note, that only works in dev mode. In production you should usually configure proxy in Nginx/Apache.
+
+Proxy config is located in `server/proxy.js`. Feel free to customize `proxySettings` to match your project needs ;)
+

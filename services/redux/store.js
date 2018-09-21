@@ -6,7 +6,7 @@ import createHTTPClient from 'services/httpClient';
 import rootReducer from './rootReducer';
 import logic from './logic';
 
-export default function createInitializedStore(initialState = { config }) {
+export default function createInitializedStore(initialState = {}) {
   const logicMiddleware = createLogicMiddleware(logic);
 
 
@@ -26,7 +26,7 @@ export default function createInitializedStore(initialState = { config }) {
   );
 
   logicMiddleware.addDeps({
-    httpClient: createHTTPClient(store),
+    httpClient: createHTTPClient(store, config.public.axios),
   });
 
   store.logicMiddleware = logicMiddleware;

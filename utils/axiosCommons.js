@@ -127,7 +127,7 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
     return errorInterceptor(response);
   }
 
-  const { store, redux: { actions, selectors } } = response;
+  const { store, redux: { actions, selectors }, axiosConfig } = response;
   const state = store.getState();
   const credentials = selectors.getCredentials(state);
 
@@ -146,8 +146,6 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
     },
   });
 
-  const appConfig = selectors.getAppConfig(state);
-  const { axios: axiosConfig } = appConfig.public;
   let nextAccessToken;
 
   try {

@@ -172,7 +172,6 @@ First two keys are mandatory.
 2. Adding JWT support:
     ```javascript
     import { interceptors } from 'utils/axiosCommons';
-    import { selectors as configSelectors } from 'redux/config';
     import {
       actions as profileActions,
       selectors as profileSelectors,
@@ -201,7 +200,6 @@ First two keys are mandatory.
          actions: profileActions,
          selectors: {
            ...profileSelectors,
-           getAppConfig: configSelectors.getAppConfig,
          },
        },
        reject: JWTHTTPUnauthorizedInterceptor,

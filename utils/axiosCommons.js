@@ -49,24 +49,6 @@ const sanitizeSchema = (axiosSchema) => {
   return schema;
 };
 
-/**
- * Exposes redux to axios interceptors.
- *
- * @method
- * @param {Object} store - redux store
- * @param {Object} [redux] - necessary duck API
- * @param {Object} [redux.actions] - duck actions
- * @param {Object} [redux.selectors] - duck selectors
- * @return {function(*): {redux: *, store: *}}
- */
-export function withRedux(store, redux) {
-  return args => ({
-    ...args,
-    redux,
-    store,
-  });
-}
-
 
 /*
  * INTERCEPTORS

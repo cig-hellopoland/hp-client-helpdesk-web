@@ -10,6 +10,7 @@ const proxySettings = {
     target: baseURL,
     pathRewrite: { '^/api': '/' },
     changeOrigin: true,
+    // logLevel: 'debug',
   },
 };
 

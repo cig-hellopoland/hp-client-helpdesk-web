@@ -49,24 +49,6 @@ const sanitizeSchema = (axiosSchema) => {
   return schema;
 };
 
-/**
- * Exposes redux to axios interceptors.
- *
- * @method
- * @param {Object} store - redux store
- * @param {Object} [redux] - necessary duck API
- * @param {Object} [redux.actions] - duck actions
- * @param {Object} [redux.selectors] - duck selectors
- * @return {function(*): {redux: *, store: *}}
- */
-export function withRedux(store, redux) {
-  return args => ({
-    ...args,
-    redux,
-    store,
-  });
-}
-
 
 /*
  * INTERCEPTORS
@@ -145,7 +127,7 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
     return errorInterceptor(response);
   }
 
-  const { store, redux: { actions, selectors } } = response;
+  const { store, redux: { actions, selectors }, axiosConfig } = response;
   const state = store.getState();
   const credentials = selectors.getCredentials(state);
 
@@ -164,8 +146,6 @@ async function JWTHTTPUnauthorizedInterceptor(response) {
     },
   });
 
-  const appConfig = selectors.getAppConfig(state);
-  const { axios: axiosConfig } = appConfig.public;
   let nextAccessToken;
 
   try {

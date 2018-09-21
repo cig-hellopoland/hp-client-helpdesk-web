@@ -23,6 +23,29 @@ Template project for web applications.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## Demo
+
+### Run locally
+
+Checkout repo locally.
+
+Install dependencies:
+```
+npm i
+```
+
+Run local server:
+```
+npm run dev
+```
+
+Run mock data server:
+```
+npm run server-mock
+```
+
+Go to `localhost:3000`.
+
 ## Overview
 ### Project structure
 

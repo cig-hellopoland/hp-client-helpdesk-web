@@ -1,7 +1,6 @@
 const express = require('express');
 const next = require('next');
-const helmet = require('helmet');
-const uuidv4 = require('uuid/v4');
+const helmetMiddleware = require('./helmet');
 const routes = require('./routes');
 const proxyMiddleware = require('./proxy');
 
@@ -20,7 +19,7 @@ app
   .then(() => {
     server = express();
 
-    server.use(helmet());
+    helmetMiddleware(server);
 
     // Proxy API requests to resolve problem with CORS
     if (dev) {
@@ -28,37 +27,6 @@ app
         server.use(middleware);
       });
     }
-
-    server.use((req, res, nextMiddleware) => {
-      // nonce should be base64 encoded
-      res.locals.nonce = Buffer.from(uuidv4()).toString('base64');
-      nextMiddleware();
-    });
-
-    const getNonce = (req, res) => `'nonce-${res.locals.nonce}'`;
-
-    const scriptSrc = [
-      "'self'",
-      getNonce,
-    ];
-
-    // In dev we allow 'unsafe-eval', so HMR doesn't trigger the CSP
-    if (dev) {
-      scriptSrc.push("'unsafe-eval'");
-    }
-
-    server.use(helmet.contentSecurityPolicy({
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc,
-        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-        styleSrc: [
-          "'self'",
-          'https://fonts.googleapis.com',
-          getNonce,
-        ],
-      },
-    }));
 
     routes.forEach(({ page, path }) => {
       server.get(path, (req, res) => {

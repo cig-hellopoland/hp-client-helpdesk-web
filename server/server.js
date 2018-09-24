@@ -43,7 +43,7 @@ app
     ];
 
     // In dev we allow 'unsafe-eval', so HMR doesn't trigger the CSP
-    if (process.env.NODE_ENV !== 'production') {
+    if (dev) {
       scriptSrc.push("'unsafe-eval'");
     }
 

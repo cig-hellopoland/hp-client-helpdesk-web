@@ -37,13 +37,20 @@ app
 
     const getNonce = (req, res) => `'nonce-${res.locals.nonce}'`;
 
+    const scriptSrc = [
+      "'self'",
+      getNonce,
+    ];
+
+    // In dev we allow 'unsafe-eval', so HMR doesn't trigger the CSP
+    if (process.env.NODE_ENV !== 'production') {
+      scriptSrc.push("'unsafe-eval'");
+    }
+
     server.use(helmet.contentSecurityPolicy({
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: [
-          "'self'",
-          getNonce,
-        ],
+        scriptSrc,
         fontSrc: ["'self'", 'https://fonts.gstatic.com'],
         styleSrc: [
           "'self'",

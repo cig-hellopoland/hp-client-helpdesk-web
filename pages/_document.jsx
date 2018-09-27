@@ -8,6 +8,7 @@ class MyDocument extends Document {
   render() {
     const { pageContext, nonce } = this.props;
     const { name } = config.public;
+    const { theme } = pageContext || {};
 
     return (
       <html lang="en">
@@ -24,7 +25,9 @@ class MyDocument extends Document {
           />
           <meta property="csp-nonce" content={nonce} />
           <link rel="manifest" href="/static/manifest.json" />
-          <meta name="theme-color" content={pageContext.theme.palette.primary.main} />
+          {theme
+            && <meta name="theme-color" content={pageContext.theme.palette.primary.main} />
+          }
           <link
             nonce={nonce}
             rel="stylesheet"
@@ -90,7 +93,7 @@ MyDocument.getInitialProps = (ctx) => {
           nonce={nonce}
           id="jss-server-side"
           // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: pageContext.sheetsRegistry.toString() }}
+          dangerouslySetInnerHTML={{ __html: pageContext ? pageContext.sheetsRegistry.toString() : '' }}
         />
         {flush() || null}
       </Fragment>

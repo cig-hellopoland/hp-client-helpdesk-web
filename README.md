@@ -257,9 +257,14 @@ module.exports = withPlugins([
 
 ## Content Security Policy
 
-This project comes with CSP enabled by default.
+This project supports CSP out of the box, but it's disabled by default.
+In order to enable CSP, set [helmetMiddleware `csp` option to `true`](./server/server.js#L22):
 
-CSP directives can be found [here](./server/server.js#L33).
+```js
+helmetMiddleware(server, { csp: true });
+```
+
+CSP directives can be found [here](./server/helmet.js#L23).
 
 About CSP: https://helmetjs.github.io/docs/csp/.
 

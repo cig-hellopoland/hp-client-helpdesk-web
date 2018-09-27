@@ -26,7 +26,7 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "express": "^4.16.3",
-    "helmet": "^3.12.1",
+    "helmet": "^3.13.0",
     "http-proxy-middleware": "^0.19.0",
     "jest": "^23.0.1",
     "jss": "^9.8.1",

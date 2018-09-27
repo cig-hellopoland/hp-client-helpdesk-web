@@ -19,8 +19,8 @@ class MyDocument extends Document {
           <meta
             name="viewport"
             content={
-              'user-scalable=0, initial-scale=1, ' +
-              'minimum-scale=1, width=device-width, height=device-height'
+              'user-scalable=0, initial-scale=1, '
+              + 'minimum-scale=1, width=device-width, height=device-height'
             }
           />
           <meta property="csp-nonce" content={nonce} />
@@ -71,7 +71,7 @@ MyDocument.getInitialProps = (ctx) => {
   const { nonce } = ctx.res.locals;
   const page = ctx.renderPage((Component) => {
     const WrappedComponent = (props) => {
-      // eslint-disable-next-line prefer-destructuring
+      // eslint-disable-next-line prefer-destructuring,react/destructuring-assignment
       pageContext = props.pageContext;
       return <Component {...props} />;
     };

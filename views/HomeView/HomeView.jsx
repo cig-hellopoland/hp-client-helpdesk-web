@@ -22,7 +22,11 @@ const HomeView = ({
   <Layout>
     <div className={classes.content}>
       <Typography variant="subheading">
-        You can edit <code>pages/index.js</code> now and app will automatically refresh :)
+        You can edit
+        {' '}
+        <code>pages/index.js</code>
+        {' '}
+        now and app will automatically refresh :)
       </Typography>
       <Link href="/about" passHref>
         <Button component="a" variant="raised" color="primary">About</Button>
@@ -32,7 +36,10 @@ const HomeView = ({
       </Link>
       <Divider />
       <div>
-        <Typography>Count: {count}</Typography>
+        <Typography>
+          Count:
+          {count}
+        </Typography>
       </div>
       <Button onClick={add}>Add</Button>
       <Button onClick={subtract}>Subtract</Button>

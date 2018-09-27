@@ -40,8 +40,7 @@ const fetchMoviesCancel = () => ({
 
 const reducer = (state = [], action) => {
   const actions = {
-    [FETCH_MOVIES_SUCCESS]: () =>
-      action.data,
+    [FETCH_MOVIES_SUCCESS]: () => action.data,
   };
 
   return (actions[action.type] && actions[action.type]()) || state;

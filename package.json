@@ -59,6 +59,7 @@
   },
   "scripts": {
     "analyze": "cross-env BUNDLE_ANALYZE=browser next build",
+    "audit": "npm audit --registry=https://registry.npmjs.org/",
     "build": "next build",
     "dev": "node ./server/server.js",
     "lint": "eslint . --ext .js,.jsx --ignore-path .gitignore --cache",

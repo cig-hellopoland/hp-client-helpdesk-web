@@ -19,7 +19,7 @@ app
   .then(() => {
     server = express();
 
-    helmetMiddleware(server);
+    helmetMiddleware(server, { csp: false });
 
     // Proxy API requests to resolve problem with CORS
     if (dev) {

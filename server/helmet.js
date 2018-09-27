@@ -1,11 +1,11 @@
-const uuidv4 = require('uuid/v4');
+const nanoid = require('nanoid');
 const helmet = require('helmet');
 
 module.exports = function helmetMiddleware(server, { csp = true }) {
   if (csp) {
     server.use((req, res, next) => {
       // nonce should be base64 encoded
-      res.locals.nonce = Buffer.from(uuidv4()).toString('base64');
+      res.locals.nonce = Buffer.from(nanoid()).toString('base64');
       next();
     });
 

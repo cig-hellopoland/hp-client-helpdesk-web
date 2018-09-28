@@ -3,11 +3,14 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { selectors as viewSelectors } from 'redux/view';
 import Header from './Header';
+import Content from './Content';
 
 const Layout = ({ children, documentTitle }) => (
   <Fragment>
     <Header documentTitle={documentTitle} />
-    {children}
+    <Content>
+      {children}
+    </Content>
   </Fragment>
 );
 

@@ -22,6 +22,7 @@
     "@material-ui/icons": "^3.0.1",
     "@zeit/next-bundle-analyzer": "^0.1.2",
     "axios": "^0.18.0",
+    "classnames": "^2.2.6",
     "cross-env": "^5.1.6",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",

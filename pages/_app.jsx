@@ -1,5 +1,6 @@
 import React from 'react';
 import App, { Container } from 'next/app';
+import Head from 'next/head';
 import JssProvider from 'react-jss/lib/JssProvider';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -9,6 +10,7 @@ import Router from 'next/router';
 import getPageContext from 'src/getPageContext';
 import withReduxStore from 'services/redux/withReduxStore';
 import { Provider } from 'react-redux';
+import config from 'config';
 
 Router.onRouteChangeStart = () => {
   NProgress.start();
@@ -52,10 +54,16 @@ class MyApp extends App {
   }
 
   render() {
-    const { Component, pageProps, reduxStore } = this.props;
+    const {
+      Component, pageProps, reduxStore,
+    } = this.props;
+    const { name } = config.public;
 
     return (
       <Container>
+        <Head>
+          <title>{name}</title>
+        </Head>
         {/* Wrap every page in redux store Provider */}
         <Provider store={reduxStore}>
           {/* Wrap every page in Jss and Theme providers */}

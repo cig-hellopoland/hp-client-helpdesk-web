@@ -55,14 +55,16 @@ class MyApp extends App {
 
   render() {
     const {
-      Component, pageProps, reduxStore,
+      Component, pageProps, reduxStore, router,
     } = this.props;
     const { name } = config.public;
+    const { asPath } = router;
+    const title = asPath === '/' ? name : asPath;
 
     return (
       <Container>
         <Head>
-          <title>{name}</title>
+          <title>{title}</title>
         </Head>
         {/* Wrap every page in redux store Provider */}
         <Provider store={reduxStore}>

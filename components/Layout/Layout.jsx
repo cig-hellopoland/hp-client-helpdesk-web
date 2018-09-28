@@ -1,13 +1,14 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { selectors as viewSelectors } from 'redux/view';
+import config from 'config';
 import Header from './Header';
 import Content from './Content';
 
-const Layout = ({ children, documentTitle }) => (
+const title = config.public.name;
+
+const Layout = ({ children }) => (
   <Fragment>
-    <Header documentTitle={documentTitle} />
+    <Header documentTitle={title} />
     <Content>
       {children}
     </Content>
@@ -19,11 +20,6 @@ Layout.propTypes = {
     PropTypes.node,
     PropTypes.object,
   ]).isRequired,
-  documentTitle: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = state => ({
-  documentTitle: viewSelectors.getDocumentTitle(state),
-});
-
-export default connect(mapStateToProps)(Layout);
+export default Layout;

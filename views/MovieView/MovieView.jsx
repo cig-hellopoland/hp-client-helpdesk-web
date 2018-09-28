@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -11,7 +13,14 @@ import Typography from '@material-ui/core/Typography';
 import { selectors as moviesSelectors } from 'redux/movies';
 import Layout from 'components/Layout';
 
-const MovieView = ({ id, movie }) => (
+const styles = {
+  image: {
+    width: 400,
+    marginLeft: 16,
+  },
+};
+
+const MovieView = ({ classes, id, movie }) => (
   <Layout>
     <Card>
       <CardHeader
@@ -20,6 +29,7 @@ const MovieView = ({ id, movie }) => (
       <CardMedia
         component="img"
         src={movie.poster}
+        className={classes.image}
         title="poster"
       />
       <CardContent>
@@ -35,6 +45,7 @@ const MovieView = ({ id, movie }) => (
 );
 
 MovieView.propTypes = {
+  classes: PropTypes.shape({}).isRequired,
   id: PropTypes.string.isRequired,
   movie: PropTypes.shape({}),
 };
@@ -47,4 +58,7 @@ const mapStateToProps = (state, { id }) => ({
   movie: moviesSelectors.getMovie(state, id),
 });
 
-export default connect(mapStateToProps)(MovieView);
+export default compose(
+  connect(mapStateToProps),
+  withStyles(styles),
+)(MovieView);

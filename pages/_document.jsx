@@ -8,6 +8,7 @@ class MyDocument extends Document {
   render() {
     const { pageContext, nonce } = this.props;
     const { name } = config.public;
+    const { theme } = pageContext || {};
 
     return (
       <html lang="en">
@@ -18,13 +19,15 @@ class MyDocument extends Document {
           <meta
             name="viewport"
             content={
-              'user-scalable=0, initial-scale=1, ' +
-              'minimum-scale=1, width=device-width, height=device-height'
+              'user-scalable=0, initial-scale=1, '
+              + 'minimum-scale=1, width=device-width, height=device-height'
             }
           />
           <meta property="csp-nonce" content={nonce} />
           <link rel="manifest" href="/static/manifest.json" />
-          <meta name="theme-color" content={pageContext.theme.palette.primary.main} />
+          {theme
+            && <meta name="theme-color" content={pageContext.theme.palette.primary.main} />
+          }
           <link
             nonce={nonce}
             rel="stylesheet"
@@ -68,7 +71,7 @@ MyDocument.getInitialProps = (ctx) => {
   const { nonce } = ctx.res.locals;
   const page = ctx.renderPage((Component) => {
     const WrappedComponent = (props) => {
-      // eslint-disable-next-line prefer-destructuring
+      // eslint-disable-next-line prefer-destructuring,react/destructuring-assignment
       pageContext = props.pageContext;
       return <Component {...props} />;
     };
@@ -90,7 +93,7 @@ MyDocument.getInitialProps = (ctx) => {
           nonce={nonce}
           id="jss-server-side"
           // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: pageContext.sheetsRegistry.toString() }}
+          dangerouslySetInnerHTML={{ __html: pageContext ? pageContext.sheetsRegistry.toString() : '' }}
         />
         {flush() || null}
       </Fragment>

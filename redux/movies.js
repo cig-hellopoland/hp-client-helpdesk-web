@@ -19,7 +19,7 @@ const FETCH_MOVIES_CANCEL = `${prefix}FETCH_MOVIES_CANCEL`;
 const fetchMovies = options => ({
   type: FETCH_MOVIES,
   payload: {
-    url: 'http://localhost:3003/movies',
+    url: '/api/movies',
     method: 'get',
     ...options,
   },
@@ -40,8 +40,7 @@ const fetchMoviesCancel = () => ({
 
 const reducer = (state = [], action) => {
   const actions = {
-    [FETCH_MOVIES_SUCCESS]: () =>
-      action.data,
+    [FETCH_MOVIES_SUCCESS]: () => action.data,
   };
 
   return (actions[action.type] && actions[action.type]()) || state;

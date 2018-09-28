@@ -4,6 +4,8 @@ Template project for web applications.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
+- [Demo](#demo)
+  - [Run locally](#run-locally)
 - [Overview](#overview)
   - [Project structure](#project-structure)
   - [App config](#app-config)
@@ -20,8 +22,32 @@ Template project for web applications.
 - [Modifying `next.config.js`](#modifying-nextconfigjs)
   - [Adding new plugins](#adding-new-plugins)
 - [Content Security Policy](#content-security-policy)
+- [Custom proxy](#custom-proxy)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Demo
+
+### Run locally
+
+Checkout repo locally.
+
+Install dependencies:
+```
+npm i
+```
+
+Run local server:
+```
+npm run dev
+```
+
+Run mock data server:
+```
+npm run server-mock
+```
+
+Go to `localhost:3000`.
 
 ## Overview
 ### Project structure
@@ -231,8 +257,21 @@ module.exports = withPlugins([
 
 ## Content Security Policy
 
-This project comes with CSP enabled by default.
+This project supports CSP out of the box, but it's disabled by default.
+In order to enable CSP, set [helmetMiddleware `csp` option to `true`](./server/server.js#L22):
 
-CSP directives can be found [here](./server/server.js#L33).
+```js
+helmetMiddleware(server, { csp: true });
+```
+
+CSP directives can be found [here](./server/helmet.js#L23).
 
 About CSP: https://helmetjs.github.io/docs/csp/.
+
+## Custom proxy
+
+We use `http-proxy-middleware` for proxying API requests in dev environment to avoid CORS errors.
+Note, that only works in dev mode. In production you should usually configure proxy in Nginx/Apache.
+
+Proxy config is located in `server/proxy.js`. Feel free to customize `proxySettings` to match your project needs ;)
+

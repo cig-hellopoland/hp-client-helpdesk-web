@@ -8,7 +8,7 @@ import HomeIcon from '@material-ui/icons/Home';
 import Link from 'next/link';
 
 const Header = ({ documentTitle }) => (
-  <AppBar position="static">
+  <AppBar>
     <Toolbar>
       <Link href="/" passHref>
         <IconButton color="inherit" aria-label="Home" component="a">

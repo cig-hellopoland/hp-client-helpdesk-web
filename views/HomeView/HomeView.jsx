@@ -45,7 +45,6 @@ const HomeView = ({
       <Button onClick={subtract}>Subtract</Button>
       <Button onClick={reset}>Reset</Button>
     </div>
-
   </Layout>
 );
 

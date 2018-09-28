@@ -14,9 +14,6 @@ export default function createInitializedStore(initialState = {}) {
     rootReducer,
     {
       ...initialState,
-      view: {
-        title: config.public.name,
-      },
     },
     composeWithDevTools((
       applyMiddleware((

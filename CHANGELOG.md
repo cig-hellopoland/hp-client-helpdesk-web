@@ -5,6 +5,7 @@
 * Update pages layout [#26](https://git.fream.pl/fream/web/react-web-app/merge_requests/26)
 * Move `title` tag from `_document` to `_app` to allow dynamic title [#27](https://git.fream.pl/fream/web/react-web-app/merge_requests/27)
 * Remove `view` duck [#28](https://git.fream.pl/fream/web/react-web-app/merge_requests/28)
+* Remove `profile` duck [#29](https://git.fream.pl/fream/web/react-web-app/merge_requests/29)
 
 ## 1.0.0
 

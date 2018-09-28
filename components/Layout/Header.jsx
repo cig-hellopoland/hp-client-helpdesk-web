@@ -7,8 +7,8 @@ import Typography from '@material-ui/core/Typography';
 import HomeIcon from '@material-ui/icons/Home';
 import Link from 'next/link';
 
-const Header = ({ documentTitle }) => (
-  <AppBar>
+const Header = ({ documentTitle, ...props }) => (
+  <AppBar {...props}>
     <Toolbar>
       <Link href="/" passHref>
         <IconButton color="inherit" aria-label="Home" component="a">

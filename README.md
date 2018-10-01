@@ -100,7 +100,7 @@ next.config.js - next.js configuration
 Default development config is located in `config/develop.config.js`.
 
 #### Structure:
-```code
+```javascript
 {
   // Will only be available on the server side
   server: {
@@ -118,7 +118,7 @@ Default development config is located in `config/develop.config.js`.
 See [Next.js docs](https://github.com/zeit/next.js#exposing-configuration-to-the-server--client-side) for more info.
 
 #### Usage:
-```code
+```javascript
 import config from 'config';
 
 const { secret } = config.server;
@@ -262,7 +262,7 @@ module.exports = withPlugins([
 This project supports CSP out of the box, but it's disabled by default.
 In order to enable CSP, set [helmetMiddleware `csp` option to `true`](./server/server.js#L22):
 
-```js
+```javascript
 helmetMiddleware(server, { csp: true });
 ```
 

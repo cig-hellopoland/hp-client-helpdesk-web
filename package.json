@@ -33,7 +33,7 @@
     "jss": "^9.8.1",
     "lodash": "^4.17.10",
     "nanoid": "^1.2.4",
-    "next": "^7.0.0",
+    "next": "^7.0.1",
     "next-compose-plugins": "^2.1.1",
     "nprogress": "^0.2.0",
     "prop-types": "^15.6.1",

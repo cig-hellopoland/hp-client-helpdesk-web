@@ -1,6 +1,7 @@
 # React Web App Changelog
 
 ## Unreleased
+* Allow to set server host in runtime config [#32](https://git.fream.pl/fream/web/react-web-app/merge_requests/32)
 
 ## 1.0.1
 

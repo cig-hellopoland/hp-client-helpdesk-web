@@ -1,5 +1,7 @@
 # React Web App Changelog
 
+## Unreleased
+
 ## 1.0.1
 
 * Update pages layout [#26](https://git.fream.pl/fream/web/react-web-app/merge_requests/26)

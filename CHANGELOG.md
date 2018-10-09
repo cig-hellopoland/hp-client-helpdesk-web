@@ -1,5 +1,10 @@
 # React Web App Changelog
 
+## Unreleased
+
+## 1.0.3
+* Add `postinstall` script with NPM packages audit [#34](https://git.fream.pl/fream/web/react-web-app/merge_requests/34)
+
 ## 1.0.2
 * Allow to set server host in runtime config [#32](https://git.fream.pl/fream/web/react-web-app/merge_requests/32)
 

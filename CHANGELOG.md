@@ -1,6 +1,8 @@
 # React Web App Changelog
 
 ## Unreleased
+* Update `movies` duck to export logic as object map instead of array [#36](https://git.fream.pl/fream/web/react-web-app/merge_requests/36)
+* Use `parseReduxLogic` util function to convert logic maps into single array [#36](https://git.fream.pl/fream/web/react-web-app/merge_requests/36)
 
 ## 1.0.3
 * Add `postinstall` script with NPM packages audit [#34](https://git.fream.pl/fream/web/react-web-app/merge_requests/34)

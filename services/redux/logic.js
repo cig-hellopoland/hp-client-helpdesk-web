@@ -1,5 +1,6 @@
+import parseReduxLogic from 'utils/parseReduxLogic';
 import { logic as moviesLogic } from 'redux/movies';
 
-export default [
-  ...moviesLogic,
-];
+export default parseReduxLogic({
+  moviesLogic,
+});

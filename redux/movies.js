@@ -86,9 +86,9 @@ export const types = {
   FETCH_MOVIES_CANCEL,
 };
 
-export const logic = [
+export const logic = {
   fetchMoviesLogic,
-];
+};
 
 export const selectors = {
   getMovies,

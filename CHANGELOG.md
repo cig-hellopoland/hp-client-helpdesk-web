@@ -1,6 +1,7 @@
 # React Web App Changelog
 
 ## Unreleased
+* Update `next` to 7.0.2, which [fixes XSS vulnerability](https://github.com/zeit/next.js/releases/tag/7.0.2) [#38](https://git.fream.pl/fream/web/react-web-app/merge_requests/38)
 
 ## 1.0.4
 * Update `movies` duck to export logic as object map instead of array [#36](https://git.fream.pl/fream/web/react-web-app/merge_requests/36)

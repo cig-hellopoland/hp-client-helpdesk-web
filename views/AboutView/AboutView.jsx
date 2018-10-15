@@ -15,7 +15,7 @@ const AboutView = ({ classes }) => (
   <Layout>
     <div className={classes.root}>
       <Link href="/" passHref>
-        <Button component="a" variant="raised" color="primary">Home</Button>
+        <Button component="a" variant="contained" color="primary">Home</Button>
       </Link>
     </div>
   </Layout>

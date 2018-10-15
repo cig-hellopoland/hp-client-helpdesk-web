@@ -21,7 +21,7 @@ const HomeView = ({
 }) => (
   <Layout>
     <div className={classes.content}>
-      <Typography variant="subheading">
+      <Typography variant="subtitle1">
         You can edit
         {' '}
         <code>pages/index.js</code>

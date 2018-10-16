@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.0.5
+* Update `next` to 7.0.2, which [fixes XSS vulnerability](https://github.com/zeit/next.js/releases/tag/7.0.2) [#38](https://git.fream.pl/fream/web/react-web-app/merge_requests/38)
+* Update `@material-ui/core` to 3.2.2 [#39](https://git.fream.pl/fream/web/react-web-app/merge_requests/39)
+
 ## 1.0.4
 * Update `movies` duck to export logic as object map instead of array [#36](https://git.fream.pl/fream/web/react-web-app/merge_requests/36)
 * Use `parseReduxLogic` util function to convert logic maps into single array [#36](https://git.fream.pl/fream/web/react-web-app/merge_requests/36)

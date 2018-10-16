@@ -1,6 +1,8 @@
 # React Web App Changelog
 
 ## Unreleased
+
+## 1.0.5
 * Update `next` to 7.0.2, which [fixes XSS vulnerability](https://github.com/zeit/next.js/releases/tag/7.0.2) [#38](https://git.fream.pl/fream/web/react-web-app/merge_requests/38)
 * Update `@material-ui/core` to 3.2.2 [#39](https://git.fream.pl/fream/web/react-web-app/merge_requests/39)
 

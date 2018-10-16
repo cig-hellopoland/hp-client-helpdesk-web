@@ -21,7 +21,7 @@ const HomeView = ({
 }) => (
   <Layout>
     <div className={classes.content}>
-      <Typography variant="subheading">
+      <Typography variant="subtitle1">
         You can edit
         {' '}
         <code>pages/index.js</code>
@@ -29,10 +29,10 @@ const HomeView = ({
         now and app will automatically refresh :)
       </Typography>
       <Link href="/about" passHref>
-        <Button component="a" variant="raised" color="primary">About</Button>
+        <Button component="a" variant="contained" color="primary">About</Button>
       </Link>
       <Link href="/movies" passHref>
-        <Button component="a" variant="raised" color="primary">Movies</Button>
+        <Button component="a" variant="contained" color="primary">Movies</Button>
       </Link>
       <Divider />
       <div>

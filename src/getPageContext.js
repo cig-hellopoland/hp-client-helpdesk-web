@@ -9,6 +9,9 @@ const theme = createMuiTheme({
   nprogress: {
     color: '#000',
   },
+  typography: {
+    useNextVariants: true,
+  },
 });
 
 function createPageContext() {

@@ -15,7 +15,7 @@ const Header = ({ documentTitle, ...props }) => (
           <HomeIcon />
         </IconButton>
       </Link>
-      <Typography variant="h6" color="inherit">
+      <Typography variant="h6" color="inherit" data-testid="title">
         {documentTitle}
       </Typography>
     </Toolbar>

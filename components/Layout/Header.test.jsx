@@ -1,11 +1,13 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render } from 'react-testing-library';
 import Header from './Header';
 
 describe('Header', () => {
-  it('should render without errors', () => {
-    expect(() => {
-      shallow(<Header documentTitle="title" />);
-    }).not.toThrow();
+  it('should render with proper title', () => {
+    const { getByTestId } = render(
+      <Header documentTitle="test title" />,
+    );
+
+    expect(getByTestId('title')).toHaveTextContent('test title');
   });
 });

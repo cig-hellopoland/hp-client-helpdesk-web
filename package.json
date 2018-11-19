@@ -27,7 +27,7 @@
     "express": "^4.16.3",
     "helmet": "^3.13.0",
     "http-proxy-middleware": "^0.19.0",
-    "jest": "^23.0.1",
+    "jest": "^23.6.0",
     "jss": "^9.8.1",
     "lodash": "^4.17.10",
     "nanoid": "^1.2.4",

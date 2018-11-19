@@ -1,6 +1,8 @@
 # React Web App Changelog
 
 ## Unreleased
+
+## 1.0.6
 * Replace `enzyme` with `react-testing-library` [#40](https://git.fream.pl/fream/web/react-web-app/merge_requests/40)
 * Update `jest` [#40](https://git.fream.pl/fream/web/react-web-app/merge_requests/40)
 

@@ -25,6 +25,7 @@ Template project for web applications.
   - [Adding new plugins](#adding-new-plugins)
 - [Content Security Policy](#content-security-policy)
 - [Custom proxy](#custom-proxy)
+- [Testing](#testing)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -277,3 +278,14 @@ Note, that only works in dev mode. In production you should usually configure pr
 
 Proxy config is located in `server/proxy.js`. Feel free to customize `proxySettings` to match your project needs ;)
 
+## Testing
+
+We use [`jest`](https://jestjs.io/) as our test runner.
+Tests are running with npm `test` script:
+
+```
+npm run test
+```
+
+For testing React components we use [`react-testing-library`](https://github.com/kentcdodds/react-testing-library).
+An example test can be found [here](./components/Layout/Header.test.jsx).

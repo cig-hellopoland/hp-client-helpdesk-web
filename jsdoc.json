@@ -1,0 +1,6 @@
+{
+  "source": {
+    "includePattern": ".+\\.jsx?$",
+    "excludePattern": ".*(\\.next|bundles|dist|node_modules).*$"
+  }
+}

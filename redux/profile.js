@@ -292,11 +292,10 @@ const logoutSuccess = () => ({
  * @method
  * @callback failureCallback
  * @callback successCallback
- * @param {Object} [params]
- * @param {Object} params.data - request data
- * @param {Object} [params.options] - request options
- * @param {failureCallback} [params.onFailure] - failure callback
- * @param {successCallback} [params.onSuccess] - success callback
+ * @param {Object} data - request data
+ * @param {Object} [options] - request options
+ * @param {failureCallback} [onFailure] - failure callback
+ * @param {successCallback} [onSuccess] - success callback
  * @return {{
  *   type: string,
  *   payload: {url: string, method: string, data: *, options: *},

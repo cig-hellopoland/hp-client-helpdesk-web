@@ -19,7 +19,7 @@ const FETCH_MOVIES_CANCEL = `${prefix}FETCH_MOVIES_CANCEL`;
 const fetchMovies = options => ({
   type: FETCH_MOVIES,
   payload: {
-    url: '/api/movies',
+    url: '/movies',
     method: 'get',
     ...options,
   },

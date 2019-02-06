@@ -52,7 +52,7 @@ class ProfileMenu extends Component {
     if (!isAuthenticated) {
       return (
         <Link href={loginURL} passHref prefetch>
-          <Button color="inherit" className={classes.loginButton}>Login</Button>
+          <Button color="inherit" className={classes.loginButton}>Sign in</Button>
         </Link>
       );
     }
@@ -95,7 +95,7 @@ class ProfileMenu extends Component {
               </Link>
             </li>
           ))}
-          <MenuItem onClick={this.handleLogout}>Logout</MenuItem>
+          <MenuItem onClick={this.handleLogout}>Sign out</MenuItem>
         </Menu>
       </Fragment>
     );
@@ -123,7 +123,7 @@ ProfileMenu.propTypes = {
 };
 
 ProfileMenu.defaultProps = {
-  loginURL: '/login',
+  loginURL: '/signin',
   logoutURL: '/',
   menuItems: [],
 };

@@ -1,6 +1,6 @@
 {
   "name": "react-web-app",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Template project for web applications.",
   "author": "Fream S.A.",
   "license": "MIT",
@@ -25,6 +25,8 @@
     "classnames": "^2.2.6",
     "cross-env": "^5.2.0",
     "express": "^4.16.4",
+    "formik": "^1.4.3",
+    "formik-material-ui": "0.0.16",
     "helmet": "^3.15.0",
     "http-proxy-middleware": "^0.19.1",
     "jss": "^9.8.7",
@@ -42,7 +44,8 @@
     "redux-devtools-extension": "^2.13.7",
     "redux-logic": "^2.1.1",
     "rxjs": "^6.4.0",
-    "styled-jsx": "^3.2.0"
+    "styled-jsx": "^3.2.0",
+    "yup": "^0.26.10"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
@@ -71,7 +74,7 @@
     "lint": "eslint . --ext .js,.jsx --ignore-path .gitignore --cache",
     "lint-fix": "npm run lint -- --fix",
     "postinstall": "npm run audit",
-    "server-mock": "json-server --watch __mocks__/db.json --port 3003 --delay 1000",
+    "server-mock": "node ./__mocks__/mock-server.js",
     "start": "cross-env NODE_ENV=production node ./server/server.js",
     "test": "jest",
     "test-watch": "npm test -- --watch"

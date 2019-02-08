@@ -8,7 +8,7 @@ const responseInterceptors = [];
  * INITIALIZE
  */
 
-export default function createHTTPClient(store, axiosConfig) {
+export default function createHTTPClient(axiosConfig, store) {
   const instance = axios.create();
 
   // Configure axios

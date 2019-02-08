@@ -5,6 +5,7 @@ import config from 'config';
 import createHTTPClient from 'services/httpClient';
 import rootReducer from './rootReducer';
 import logic from './logic';
+import getPersistedState, { subscribers as localStorageSubscribers } from './localStorage';
 
 export default function createInitializedStore(initialState = {}) {
   const logicMiddleware = createLogicMiddleware(logic);
@@ -14,6 +15,7 @@ export default function createInitializedStore(initialState = {}) {
     rootReducer,
     {
       ...initialState,
+      ...getPersistedState(initialState),
     },
     composeWithDevTools((
       applyMiddleware((
@@ -22,11 +24,19 @@ export default function createInitializedStore(initialState = {}) {
     )),
   );
 
+  const httpClient = createHTTPClient(config.public.axios, store);
+
   logicMiddleware.addDeps({
-    httpClient: createHTTPClient(store, config.public.axios),
+    httpClient,
   });
 
+  // assign httpClient to logicMiddleware instance to have an easy access to it
+  logicMiddleware.httpClient = httpClient;
+
   store.logicMiddleware = logicMiddleware;
+
+  // load LocalStorage subscribers
+  localStorageSubscribers.forEach(subscriber => store.subscribe(subscriber(store)));
 
   // Uncomment to debug redux in browser console
   // logicMiddleware.monitor$.subscribe(o$ => console.log(o$));

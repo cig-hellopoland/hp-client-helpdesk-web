@@ -34,6 +34,9 @@ const HomeView = ({
       <Link href="/movies" passHref>
         <Button component="a" variant="contained" color="primary">Movies</Button>
       </Link>
+      <Link href="/secured" passHref>
+        <Button component="a" variant="contained" color="primary">Secured</Button>
+      </Link>
       <Divider />
       <div>
         <Typography>

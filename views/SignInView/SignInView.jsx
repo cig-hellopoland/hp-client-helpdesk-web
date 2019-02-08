@@ -128,7 +128,11 @@ class SignInView extends Component {
     const { query } = Router.router;
     const url = query.redirect || '/';
 
-    Router.push(url);
+    if (url.indexOf('http') === -1) {
+      Router.push(url);
+    } else {
+      Router.push('/');
+    }
   };
 
   render() {

@@ -164,19 +164,15 @@ const fetchProfileCancel = () => ({
 /**
  * Creates action for profile request failing.
  * @method
- * @param data - response body
- * @param status - response status
+ * @param {Object[]} errors - list of errors returned from response
  * @return {{
  *   type: string,
- *   error: {data, status: number}
+ *   errors: [{details: string, status: string}]
  * }}
  */
-const fetchProfileFailure = ({ data, status } = {}) => ({
+const fetchProfileFailure = ({ errors }) => ({
   type: FETCH_PROFILE_FAILURE,
-  error: {
-    data,
-    status,
-  },
+  errors,
 });
 
 /**
@@ -223,19 +219,15 @@ const login = ({
 /**
  * Creates action for login request failing.
  * @method
- * @param data - response body
- * @param status - response status
+ * @param {Object[]} errors - list of errors returned from response
  * @return {{
  *   type: string,
- *   error: {data, status: number}
+ *   errors: [{details: string, status: string}]
  * }}
  */
-const loginFailure = ({ data, status } = {}) => ({
+const loginFailure = ({ errors }) => ({
   type: LOGIN_FAILURE,
-  error: {
-    data,
-    status,
-  },
+  errors,
 });
 
 /**
@@ -357,12 +349,12 @@ export const actions = {
 const getState = state => state[name];
 
 /**
- * Returns request error.
+ * Returns request errors.
  * @method
  * @param {Object} state
- * @return {null}
+ * @return {Object[]}
  */
-const getError = state => getState(state).error;
+const getErrors = state => getState(state).errors;
 
 /**
  * Returns user's sign in credentials.
@@ -390,7 +382,7 @@ const isAuthenticated = state => getState(state).isAuthenticated;
 
 export const selectors = {
   getCredentials,
-  getError,
+  getErrors,
   getState,
   getProfile,
   isAuthenticated,
@@ -429,14 +421,16 @@ const fetchProfileLogic = createLogic({
           onSuccess();
         }
       } else {
-        dispatch(fetchProfileFailure(response));
+        dispatch(fetchProfileFailure(data));
 
         if (onFailure) {
           onFailure();
         }
       }
     } catch ({ response }) {
-      dispatch(fetchProfileFailure(response));
+      const { data } = response;
+
+      dispatch(fetchProfileFailure(data));
 
       if (onFailure) {
         onFailure();
@@ -488,14 +482,16 @@ const loginLogic = createLogic({
           onSuccess();
         }
       } else {
-        dispatch(loginFailure(response));
+        dispatch(loginFailure(data));
 
         if (onFailure) {
           onFailure();
         }
       }
     } catch ({ response }) {
-      dispatch(loginFailure(response));
+      const { data } = response;
+
+      dispatch(loginFailure(data));
 
       if (onFailure) {
         onFailure();
@@ -582,7 +578,7 @@ export const logic = {
  */
 export const defaultInitialState = {
   credentials: {},
-  error: null,
+  errors: [],
   isAuthenticated: false,
   profile: {},
 };
@@ -598,20 +594,20 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
     case FETCH_PROFILE_SUCCESS:
       return {
         ...state,
-        error: initialState.error,
+        errors: initialState.errors,
         isAuthenticated: true,
         profile: action.data,
       };
     case LOGIN:
       return {
         ...state,
-        error: initialState.error,
+        errors: initialState.errors,
       };
     case FETCH_PROFILE_FAILURE:
     case LOGIN_FAILURE:
       return {
         ...state,
-        error: action.error,
+        errors: action.errors,
       };
     case LOGIN_SUCCESS:
       return {
@@ -619,14 +615,14 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         credentials: {
           ...action.data,
         },
-        error: initialState.error,
+        errors: initialState.errors,
         isAuthenticated: true,
       };
     case LOGOUT_SUCCESS:
       return {
         ...state,
         credentials: initialState.credentials,
-        error: initialState.error,
+        errors: initialState.errors,
         isAuthenticated: false,
         profile: initialState.profile,
       };
@@ -636,7 +632,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         credentials: {
           ...action.data,
         },
-        error: initialState.error,
+        errors: initialState.errors,
         isAuthenticated: true,
       };
     default:

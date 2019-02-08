@@ -52,8 +52,9 @@
   "users": [
     {
       "id": 1,
-      "email": "grzegorz.brzeczyszczykiewicz@example.com",
+      "email": "user@example.com",
       "name": "Grzegorz Brzęczyszczykiewicz",
+      "password": "qwerty",
       "picture": "http://www.hexatar.com/gallery/thumb/171112_020209_m07ec880448_avatar.png"
     }
   ]

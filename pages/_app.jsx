@@ -59,6 +59,7 @@ class MyApp extends App {
     } = this.props;
     const { name } = config.public;
     const { asPath } = router;
+    // TODO: leave as name from config or change accordingly to view meta information
     const title = asPath === '/' ? name : asPath;
 
     return (

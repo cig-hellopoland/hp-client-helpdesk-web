@@ -9,6 +9,11 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import Snackbar from '@material-ui/core/Snackbar';
+import SnackbarContent from '@material-ui/core/SnackbarContent';
+import CloseIcon from '@material-ui/icons/Close';
+import ErrorIcon from '@material-ui/icons/Error';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import Router from 'next/router';
@@ -16,15 +21,30 @@ import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import Layout from 'components/Layout';
 
-const styles = () => ({
+const styles = theme => ({
   root: {
     height: '100vh',
   },
   cardActions: {
     justifyContent: 'flex-end',
   },
+  close: {
+    padding: theme.spacing.unit / 2,
+  },
   container: {
     height: '100%',
+  },
+  error: {
+    backgroundColor: theme.palette.error.dark,
+  },
+  icon: {
+    fontSize: 20,
+    marginRight: theme.spacing.unit,
+    opacity: 0.9,
+  },
+  message: {
+    display: 'flex',
+    alignItems: 'center',
   },
 });
 
@@ -35,6 +55,13 @@ const commonProps = {
 };
 
 class SignInView extends Component {
+  state = {
+    snackbar: {
+      open: false,
+      message: '',
+    },
+  };
+
   initialValues = {
     login: '',
     password: '',
@@ -62,6 +89,22 @@ class SignInView extends Component {
     }
   }
 
+  handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    this.setState({ snackbar: { open: false, message: '' } });
+  };
+
+  handleSnackbarOpen = (errors = []) => {
+    const credentialError = errors.filter(error => error.status === '401')[0];
+
+    if (credentialError) {
+      this.setState({ snackbar: { open: true, message: credentialError.detail } });
+    }
+  };
+
   handleSubmit = (data, actions) => {
     const { login } = this.props;
 
@@ -73,11 +116,12 @@ class SignInView extends Component {
   };
 
   handleSubmitFailure = actions => () => {
+    const { errors } = this.props;
     const { setSubmitting } = actions;
 
-    debugger;
     setSubmitting(false);
-    // TODO: setErrors
+
+    this.handleSnackbarOpen(errors);
   };
 
   handleSubmitSuccess = () => {
@@ -88,7 +132,9 @@ class SignInView extends Component {
   };
 
   render() {
+    const { snackbar } = this.state;
     const { classes } = this.props;
+    const { open, message } = snackbar;
 
     return (
       <Layout ContentProps={{ className: classes.root }}>
@@ -115,6 +161,40 @@ class SignInView extends Component {
             )}
           </Formik>
         </Grid>
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          autoHideDuration={6000}
+          open={open}
+          onClose={this.handleSnackbarClose}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+        >
+          <SnackbarContent
+            className={classes.error}
+            aria-describedby="client-snackbar"
+            message={(
+              <span id="client-snackbar" className={classes.message}>
+                <ErrorIcon className={classes.icon} />
+                {message}
+              </span>
+            )}
+            action={[
+              <IconButton
+                key="close"
+                aria-label="Close"
+                color="inherit"
+                className={classes.close}
+                onClick={this.handleSnackbarClose}
+              >
+                <CloseIcon />
+              </IconButton>,
+            ]}
+          />
+        </Snackbar>
       </Layout>
     );
   }
@@ -122,17 +202,20 @@ class SignInView extends Component {
 
 SignInView.propTypes = {
   classes: PropTypes.shape({}).isRequired,
-  error: PropTypes.shape({}),
+  errors: PropTypes.arrayOf(PropTypes.shape({
+    status: PropTypes.string.isRequired,
+    detail: PropTypes.string.isRequired,
+  })),
   isAuthenticated: PropTypes.bool.isRequired,
   login: PropTypes.func.isRequired,
 };
 
 SignInView.defaultProps = {
-  error: null,
+  errors: [],
 };
 
 const mapStateToProps = state => ({
-  error: profileSelectors.getError(state),
+  errors: profileSelectors.getErrors(state),
   isAuthenticated: profileSelectors.isAuthenticated(state),
 });
 

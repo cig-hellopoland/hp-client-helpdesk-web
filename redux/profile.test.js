@@ -9,13 +9,7 @@ import reducer, {
 /*
  * Initial state
  */
-
-const initialState = {
-  credentials: null,
-  error: null,
-  isAuthenticated: false,
-  profile: null,
-};
+const initialState = defaultInitialState;
 
 const appState = {
   config: {},
@@ -26,10 +20,12 @@ function onFailure() {}
 function onSuccess() {}
 
 const axiosResponseError = {
-  data: {
-    a: 1,
-  },
-  status: 500,
+  errors: [
+    {
+      detail: 'details',
+      status: '500',
+    },
+  ],
 };
 
 /*
@@ -117,12 +113,12 @@ describe('actions', () => {
     const { FETCH_PROFILE_FAILURE } = types;
     const expectedValue = {
       type: FETCH_PROFILE_FAILURE,
-      error: {},
+      errors: [],
     };
 
     expect(fetchProfileFailure()).toEqual(expectedValue);
 
-    expectedValue.error = axiosResponseError;
+    expectedValue.errors = axiosResponseError.errors;
 
     expect(fetchProfileFailure(axiosResponseError)).toEqual(expectedValue);
   });
@@ -172,12 +168,12 @@ describe('actions', () => {
     const { LOGIN_FAILURE } = types;
     const expectedValue = {
       type: LOGIN_FAILURE,
-      error: {},
+      errors: [],
     };
 
     expect(loginFailure()).toEqual(expectedValue);
 
-    expectedValue.error = axiosResponseError;
+    expectedValue.errors = axiosResponseError.errors;
 
     expect(loginFailure(axiosResponseError)).toEqual(expectedValue);
   });
@@ -290,46 +286,54 @@ describe('selectors', () => {
     });
   });
 
-  describe('using getError', () => {
-    it('should return null if there was no error', () => {
-      const { getError } = selectors;
+  describe('using getErrors', () => {
+    it('should return empty array if there was no errors', () => {
+      const { getErrors } = selectors;
+      const expectedValue = [];
 
-      expect(getError(appState)).toBeNull();
+      expect(getErrors(appState)).toEqual(expectedValue);
     });
 
     it('should return some error message if there was an error', () => {
-      const { getError } = selectors;
-      const error = 'omg';
-      const state = generateAppState({ error });
+      const { getErrors } = selectors;
+      const errors = [
+        {
+          status: '401',
+          detail: 'unauthorized',
+        },
+      ];
+      const state = generateAppState({ errors });
 
-      expect(getError(state)).toEqual(error);
+      expect(getErrors(state)).toEqual(errors);
     });
   });
 
   describe('using getCredentials', () => {
-    it('should return null if there are no credentials', () => {
+    it('should return empty object if there are no credentials', () => {
       const { getCredentials } = selectors;
+      const expectedValue = {};
 
-      expect(getCredentials(appState)).toBeNull();
+      expect(getCredentials(appState)).toEqual(expectedValue);
     });
 
     it('should return user\'s credentials', () => {
       const { getCredentials } = selectors;
-      const credentials = {
+      const expectedValue = {
         accessToken: 'abc123',
         refreshToken: '123abc',
       };
-      const state = generateAppState({ credentials });
+      const state = generateAppState({ credentials: expectedValue });
 
-      expect(getCredentials(state)).toEqual(credentials);
+      expect(getCredentials(state)).toEqual(expectedValue);
     });
   });
 
   describe('using getProfile', () => {
-    it('should return null if user is not signed in', () => {
+    it('should return empty object if user is not signed in', () => {
       const { getProfile } = selectors;
+      const expectedValue = {};
 
-      expect(getProfile(appState)).toBeNull();
+      expect(getProfile(appState)).toEqual(expectedValue);
     });
 
     it('should return user\'s profile', () => {
@@ -399,13 +403,13 @@ describe('reducer', () => {
     let action = actions.fetchProfileFailure();
     const expectedValue = {
       ...defaultInitialState,
-      error: {},
+      errors: [],
     };
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
 
     action = actions.fetchProfileFailure(axiosResponseError);
-    expectedValue.error = axiosResponseError;
+    expectedValue.errors = axiosResponseError.errors;
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });
@@ -414,13 +418,13 @@ describe('reducer', () => {
     let action = actions.loginFailure();
     const expectedValue = {
       ...defaultInitialState,
-      error: {},
+      errors: [],
     };
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
 
     action = actions.loginFailure(axiosResponseError);
-    expectedValue.error = axiosResponseError;
+    expectedValue.errors = axiosResponseError.errors;
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });

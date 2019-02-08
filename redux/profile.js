@@ -170,9 +170,9 @@ const fetchProfileCancel = () => ({
  *   errors: [{details: string, status: string}]
  * }}
  */
-const fetchProfileFailure = ({ errors }) => ({
+const fetchProfileFailure = ({ errors } = {}) => ({
   type: FETCH_PROFILE_FAILURE,
-  errors,
+  errors: errors || [],
 });
 
 /**
@@ -225,9 +225,9 @@ const login = ({
  *   errors: [{details: string, status: string}]
  * }}
  */
-const loginFailure = ({ errors }) => ({
+const loginFailure = ({ errors } = {}) => ({
   type: LOGIN_FAILURE,
-  errors,
+  errors: errors || [],
 });
 
 /**

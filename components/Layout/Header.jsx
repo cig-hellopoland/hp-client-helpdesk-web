@@ -37,7 +37,7 @@ const Header = ({
             <HomeIcon />
           </IconButton>
         </Link>
-        <Typography variant="h6" color="inherit" data-testid="title">
+        <Typography variant="h6" color="inherit">
           {documentTitle}
         </Typography>
       </Grid>

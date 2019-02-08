@@ -288,4 +288,3 @@ npm run test
 ```
 
 For testing React components we use [`react-testing-library`](https://github.com/kentcdodds/react-testing-library).
-An example test can be found [here](./components/Layout/Header.test.jsx).

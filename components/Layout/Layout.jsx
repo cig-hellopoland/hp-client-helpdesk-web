@@ -6,10 +6,10 @@ import Content from './Content';
 
 const title = config.public.name;
 
-const Layout = ({ children }) => (
+const Layout = ({ children, ContentProps }) => (
   <Fragment>
     <Header documentTitle={title} />
-    <Content>
+    <Content {...ContentProps}>
       {children}
     </Content>
   </Fragment>
@@ -20,6 +20,11 @@ Layout.propTypes = {
     PropTypes.node,
     PropTypes.object,
   ]).isRequired,
+  ContentProps: PropTypes.shape({}),
+};
+
+Layout.defaultProps = {
+  ContentProps: {},
 };
 
 export default Layout;

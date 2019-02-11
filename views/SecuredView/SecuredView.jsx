@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Link from 'next/link';
+import withAuth from 'services/auth/withAuth';
 import Layout from 'components/Layout';
 
 const styles = ({
@@ -12,10 +14,10 @@ const styles = ({
   },
 });
 
-const AboutView = ({ classes }) => (
+const SecuredView = ({ classes }) => (
   <Layout>
     <div className={classes.root}>
-      <Typography>About page</Typography>
+      <Typography>Secured page</Typography>
       <Link href="/" passHref>
         <Button component="a" variant="contained" color="primary">Home</Button>
       </Link>
@@ -23,8 +25,11 @@ const AboutView = ({ classes }) => (
   </Layout>
 );
 
-AboutView.propTypes = {
+SecuredView.propTypes = {
   classes: PropTypes.shape({}).isRequired,
 };
 
-export default withStyles(styles)(AboutView);
+export default compose(
+  withStyles(styles),
+  withAuth({ redirectURL: '/signin?redirect=/secured ' }),
+)(SecuredView);

@@ -52,7 +52,7 @@ class ProfileMenu extends Component {
     if (!isAuthenticated) {
       return (
         <Link href={loginURL} passHref prefetch>
-          <Button color="inherit" className={classes.loginButton}>Sign in</Button>
+          <Button color="inherit" className={classes.loginButton}>Zaloguj</Button>
         </Link>
       );
     }
@@ -95,7 +95,7 @@ class ProfileMenu extends Component {
               </Link>
             </li>
           ))}
-          <MenuItem onClick={this.handleLogout}>Sign out</MenuItem>
+          <MenuItem onClick={this.handleLogout}>Wyloguj</MenuItem>
         </Menu>
       </Fragment>
     );

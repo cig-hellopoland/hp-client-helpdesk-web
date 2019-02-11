@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import Router from 'next/router';
 import { selectors as profileSelectors } from 'redux/profile';
 
-export default ({ redirectURL } = { redirectURL: '/signin' }) => (View) => {
+export default ({ redirectURL } = { redirectURL: '/sign-in' }) => (View) => {
   class ViewWithAuth extends React.Component {
     componentDidMount() {
       const { isAuthenticated } = this.props;

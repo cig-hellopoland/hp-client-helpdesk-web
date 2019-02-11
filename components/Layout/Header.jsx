@@ -23,7 +23,7 @@ const styles = () => ({
 });
 
 const menuItems = [
-  { disabled: true, label: 'Profile', url: '/profile' },
+  { disabled: true, label: 'Profil', url: '/account' },
 ];
 
 const Header = ({

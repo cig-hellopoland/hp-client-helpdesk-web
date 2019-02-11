@@ -118,7 +118,6 @@ const responseLogInterceptor = (response) => {
  *
  * @method
  * @param {Object} response - axios config schema
- * @return {Promise<Error> || Object}
  */
 async function JWTHTTPUnauthorizedInterceptor(response) {
   const { config, response: { status } } = response;

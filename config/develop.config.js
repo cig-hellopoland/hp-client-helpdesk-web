@@ -11,7 +11,8 @@ module.exports = {
   public: {
     name: 'Default application name',
     axios: {
-      baseURL: 'http://localhost:3000/',
+      baseURL: 'http://localhost:3000/api',
+      timeout: 5000, // ms
     },
   },
 };

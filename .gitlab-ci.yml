@@ -3,7 +3,7 @@ stages:
   - build
 
 variables:
-  NODE_VERSION: "8"
+  NODE_VERSION: "10"
 
 #
 # test stage tasks

@@ -1,5 +1,5 @@
 import responseJWTInterceptor from '@fream/axios-commons/interceptors/responseJWTInterceptor';
-import { actions as profileActions, selectors as profileSelectors } from '../../redux/profile';
+import { actions as profileActions, selectors as profileSelectors } from 'redux/profile';
 
 function getResponseInterceptors(store) {
   return [

@@ -123,7 +123,7 @@ ProfileMenu.propTypes = {
 };
 
 ProfileMenu.defaultProps = {
-  loginURL: '/signin',
+  loginURL: '/sign-in',
   logoutURL: '/',
   menuItems: [],
 };

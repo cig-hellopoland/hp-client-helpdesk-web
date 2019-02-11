@@ -32,6 +32,9 @@ const styles = theme => ({
   close: {
     padding: theme.spacing.unit / 2,
   },
+  card: {
+    width: 400,
+  },
   container: {
     height: '100%',
   },
@@ -151,7 +154,7 @@ class SignInView extends Component {
           >
             {({ isSubmitting }) => (
               <Form>
-                <Card>
+                <Card className={classes.card}>
                   <CardContent>
                     <Typography>Hint: user@example.com / qwerty</Typography>
                     <Field name="login" label="Login" component={TextField} {...commonProps} />

@@ -166,9 +166,8 @@ By default we use [axios](https://github.com/axios/axios) for request handling. 
 
 ### HTTPClient Interceptors
 Interceptors can be added through `requestInterceptors` and `responseInterceptors` maps. Each has the same schema, that is:
-- `resolve` - method used by interceptor when request succeeds
-- `reject` - method used by interceptor when request fails
-- `redux` - used for passing redux action creators
+- `onFulfilled` - method used by interceptor when request succeeds
+- `onRejected` - method used by interceptor when request fails
 
 First two keys are mandatory.
 
@@ -176,65 +175,110 @@ First two keys are mandatory.
 
 1. Logging requests in browser console:
     ```javascript
-    import { interceptors } from 'utils/axiosCommons';
+    import errorLogInterceptor from '@fream/axios-commons/interceptors/errorLogInterceptor';
+    import responseLogInterceptor from '@fream/axios-commons/interceptors/responseLogInterceptor';
+    import requestLogInterceptor from '@fream/axios-commons/interceptors/requestLogInterceptor';
     
-    const {
-      errorLogInterceptor,
-      responseLogInterceptor,
-      requestLogInterceptor,
-    } = interceptors;
- 
     const requestInterceptors = [
      {
-       reject: errorLogInterceptor('[Request Error]'),
-       resolve: requestLogInterceptor,
+       onFulfilled: requestLogInterceptor,
+       onRejected: errorLogInterceptor('[Request Error]'),
      },
     ];
     
     const responseInterceptors = [
      {
-       reject: errorLogInterceptor('[Response Error]'),
-       resolve: responseLogInterceptor,
+       onFulfilled: responseLogInterceptor,
+       onRejected: errorLogInterceptor('[Response Error]'),
      },
     ];
     ```
 2. Adding JWT support:
     ```javascript
-    import { interceptors } from 'utils/axiosCommons';
-    import {
-      actions as profileActions,
-      selectors as profileSelectors,
-    } from 'redux/profile';
+    import errorInterceptor from '@fream/axios-commons/interceptors/errorInterceptor';
+    import requestJWTInterceptor from '@fream/axios-commons/interceptors/requestJWTInterceptor';
+    import responseJWTInterceptor from '@fream/axios-commons/interceptors/responseJWTInterceptor';
+    import { actions as profileActions, selectors as profileSelectors } from 'redux/profile';
  
-    const {
-     errorInterceptor,
-     JWTHTTPUnauthorizedInterceptor,
-     JWTInterceptor,
-    } = interceptors;
+    function getRequestInterceptors(store) {
+      return [
+        { // JWT request interceptor
+          onFulfilled: requestJWTInterceptor({
+            getCredentials: () => {
+              const state = store.getState();
     
+              return Promise.resolve(profileSelectors.getCredentials(state));
+            },
+          }),
+          onRejected: errorInterceptor,
+        },
+      ];
+    }
     
-    const requestInterceptors = [
-     {
-       redux: {
-         selectors: profileSelectors,
-       },
-       reject: errorInterceptor,
-       resolve: JWTInterceptor,
-     },
-    ];
+    function getResponseInterceptors(store) {
+      return [
+        { // JWT response interceptor
+         onFulfilled: axiosResponse => axiosResponse,
+         onRejected: responseJWTInterceptor({
+           getCredentials: () => {
+             const state = store.getState();
+        
+             return Promise.resolve(profileSelectors.getCredentials(state));
+           },
+           getRefreshConfig: () => {
+             const state = store.getState();
+             const data = profileSelectors.getCredentials(state);
+             const options = {
+               headers: {
+                 authorization: `Bearer ${data.refreshToken}`,
+               },
+             };
+        
+             const { payload } = profileActions.refreshAccessToken({ data, options });
+        
+             return Promise.resolve(payload);
+           },
+           onRefreshFailure: (axiosRefreshError) => {
+             store.dispatch(profileActions.errorUnauthorized(axiosRefreshError));
+           },
+           onRefreshSuccess: (axiosRefreshResponse) => {
+             const { data } = axiosRefreshResponse;
+        
+             store.dispatch(profileActions.refreshAccessTokenSuccess(data));
+           },
+         }),
+        },
+      ];
+    }
+ 
+    function createHTTPClient(axiosConfig, store) {
+      const instance = axios.create();
+      const requestInterceptors = getRequestInterceptors(store);
+      const responseInterceptors = getResponseInterceptors(store);
     
-    const responseInterceptors = [
-     {
-       redux: {
-         actions: profileActions,
-         selectors: {
-           ...profileSelectors,
-         },
-       },
-       reject: JWTHTTPUnauthorizedInterceptor,
-       resolve: response => response,
-     },
-    ];   
+      // Configure axios
+      Object.entries(axiosConfig).forEach(([key, value]) => {
+        instance.defaults[key] = value;
+      });
+    
+      // Add request cancellation capabilities (not part of Axios API)
+      instance.cancellable = cancellableRequest;
+    
+      // Initialize interceptors
+      if (requestInterceptors && requestInterceptors.length) {
+        requestInterceptors.forEach(({ onFulfilled, onRejected }) => {
+          instance.interceptors.request.use(onFulfilled, onRejected);
+        });
+      }
+    
+      if (responseInterceptors && responseInterceptors.length) {
+        responseInterceptors.forEach(({ onFulfilled, onRejected }) => {
+          instance.interceptors.response.use(onFulfilled, onRejected);
+        });
+      }
+    
+      return instance;
+    }
     ```
 
 ## Modifying `next.config.js`

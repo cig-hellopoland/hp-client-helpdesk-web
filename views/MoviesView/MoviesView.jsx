@@ -11,7 +11,11 @@ import Layout from 'components/Layout';
 
 const MoviesView = ({ movies }) => {
   if (!Array.isArray(movies) || !movies.length) {
-    return <Typography>Movies could not be fetched</Typography>;
+    return (
+      <Layout>
+        <Typography>Movies could not be fetched</Typography>
+      </Layout>
+    );
   }
 
   return (

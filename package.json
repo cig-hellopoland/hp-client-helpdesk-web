@@ -1,16 +1,16 @@
 {
-  "name": "react-web-app",
+  "name": "@hello-poland/helpdesk-web",
   "version": "1.1.0",
-  "description": "Template project for web applications.",
+  "description": "Help Desk web application.",
   "author": "Fream S.A.",
   "license": "MIT",
-  "homepage": "https://git.fream.pl/fream/web/react-web-app/blob/master/README.md",
+  "homepage": "https://git.fream.pl/hello-poland/client/helpdesk-web/blob/master/README.md",
   "bugs": {
-    "url": "https://git.fream.pl/fream/web/react-web-app/issues"
+    "url": "https://git.fream.pl/hello-poland/client/helpdesk-web/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git@git.fream.pl:fream/web/react-web-app.git"
+    "url": "git@git.fream.pl:fream/hello-poland/client/helpdesk-web.git"
   },
   "engines": {
     "node": ">=8.15.0",

@@ -11,6 +11,7 @@ import getPageContext from 'src/getPageContext';
 import withReduxStore from 'services/redux/withReduxStore';
 import { Provider } from 'react-redux';
 import config from 'config';
+import { actions as profileActions } from 'redux/profile';
 
 Router.onRouteChangeStart = () => {
   NProgress.start();
@@ -51,7 +52,19 @@ class MyApp extends App {
     if (jssStyles && jssStyles.parentNode) {
       jssStyles.parentNode.removeChild(jssStyles);
     }
+
+    this.handleAccessTokenRefresh();
   }
+
+  handleAccessTokenRefresh = () => {
+    const { reduxStore: { dispatch, getState } } = this.props;
+    const { profile } = getState();
+    const { isAuthenticated } = profile || {};
+
+    if (isAuthenticated) {
+      dispatch(profileActions.fetchProfile());
+    }
+  };
 
   render() {
     const {

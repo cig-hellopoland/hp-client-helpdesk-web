@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import Link from 'next/link';
 import Layout from 'components/Layout';
+import { actions as profileActions } from 'redux/profile';
 import { actions, selectors } from './redux/counter';
 
 const styles = {
@@ -17,7 +18,7 @@ const styles = {
 };
 
 const HomeView = ({
-  classes, count, add, subtract, reset,
+  classes, count, add, subtract, reset, fetchProfile,
 }) => (
   <Layout>
     <div className={classes.content}>
@@ -37,6 +38,7 @@ const HomeView = ({
       <Link href="/secured" passHref>
         <Button component="a" variant="contained" color="primary">Secured</Button>
       </Link>
+      <Button component="a" variant="contained" color="primary" onClick={() => fetchProfile()}>Me</Button>
       <Divider />
       <div>
         <Typography>
@@ -57,6 +59,7 @@ HomeView.propTypes = {
   add: PropTypes.func.isRequired,
   subtract: PropTypes.func.isRequired,
   reset: PropTypes.func.isRequired,
+  fetchProfile: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -67,6 +70,7 @@ const mapDispatchToProps = dispatch => ({
   add: () => dispatch(actions.add()),
   subtract: () => dispatch(actions.subtract()),
   reset: () => dispatch(actions.reset()),
+  fetchProfile: () => dispatch(profileActions.fetchProfile()),
 });
 
 export default compose(

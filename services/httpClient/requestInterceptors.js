@@ -9,7 +9,7 @@ function getRequestInterceptors(store) {
         getCredentials: () => {
           const state = store.getState();
 
-          return Promise.resolve(profileSelectors.getCredentials(state));
+          return profileSelectors.getCredentials(state);
         },
       }),
       onRejected: errorInterceptor,

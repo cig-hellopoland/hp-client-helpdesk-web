@@ -9,7 +9,7 @@ function getResponseInterceptors(store) {
         getCredentials: () => {
           const state = store.getState();
 
-          return Promise.resolve(profileSelectors.getCredentials(state));
+          return profileSelectors.getCredentials(state);
         },
         getRefreshConfig: () => {
           const state = store.getState();
@@ -22,7 +22,7 @@ function getResponseInterceptors(store) {
 
           const { payload } = profileActions.refreshAccessToken({ data, options });
 
-          return Promise.resolve(payload);
+          return payload;
         },
         onRefreshFailure: (axiosRefreshError) => {
           store.dispatch(profileActions.errorUnauthorized(axiosRefreshError));

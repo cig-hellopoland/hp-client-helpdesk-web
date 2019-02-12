@@ -124,7 +124,7 @@ ProfileMenu.propTypes = {
 
 ProfileMenu.defaultProps = {
   loginURL: '/sign-in',
-  logoutURL: '/',
+  logoutURL: '/sign-in',
   menuItems: [],
 };
 

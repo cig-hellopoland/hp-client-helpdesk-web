@@ -5,6 +5,7 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import Typography from '@material-ui/core/Typography';
 import Layout from 'components/Layout';
 import withAuth from 'services/auth/withAuth';
+import SalesExport from './components/SalesExport';
 
 const styles = {
   content: {
@@ -15,13 +16,8 @@ const styles = {
 const HomeView = ({ classes }) => (
   <Layout>
     <div className={classes.content}>
-      <Typography variant="subtitle1">
-        You can edit
-        {' '}
-        <code>pages/index.js</code>
-        {' '}
-        now and app will automatically refresh :)
-      </Typography>
+      <Typography variant="h6" gutterBottom>Statystyki sprzedaży</Typography>
+      <SalesExport />
     </div>
   </Layout>
 );

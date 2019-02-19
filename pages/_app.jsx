@@ -68,12 +68,9 @@ class MyApp extends App {
 
   render() {
     const {
-      Component, pageProps, reduxStore, router,
+      Component, pageProps, reduxStore,
     } = this.props;
-    const { name } = config.public;
-    const { asPath } = router;
-    // TODO: leave as name from config or change accordingly to view meta information
-    const title = asPath === '/' ? name : asPath;
+    const { name: title } = config.public;
 
     return (
       <Container>

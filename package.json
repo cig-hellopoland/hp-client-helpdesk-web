@@ -80,7 +80,6 @@
     "jsdoc2md": "jsdoc2md -c ./jsdoc.json -f **/*.js **/*.jsx  > jsdoc/app-spec.md",
     "lint": "eslint . --ext .js,.jsx --ignore-path .gitignore --cache",
     "lint-fix": "npm run lint -- --fix",
-    "postinstall": "npm run audit",
     "server-mock": "node ./__mocks__/mock-server.js",
     "start": "cross-env NODE_ENV=production node ./server/server.js",
     "test": "jest",

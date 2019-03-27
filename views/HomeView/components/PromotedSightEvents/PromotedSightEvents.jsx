@@ -91,7 +91,7 @@ class PromotedSightEvents extends Component {
               )
             }
             <Button variant="outlined" onClick={this.handlePromotionModalOpen}>
-              {promotedSightEvents.length > 0 ? 'Zmień' : 'Promuj oferty'}
+              {promotedSightEvents.length === 3 ? 'Zmień' : 'Promuj oferty'}
             </Button>
           </List>
         </Grid>

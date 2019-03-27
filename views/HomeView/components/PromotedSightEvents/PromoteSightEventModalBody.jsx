@@ -39,7 +39,7 @@ PromoteSightEventsModalBody.propTypes = {
   SelectProps: PropTypes.shape({
     label: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
-    value: PropTypes.string.isRequired,
+    value: PropTypes.number.isRequired,
   }).isRequired,
   sightEvents: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };

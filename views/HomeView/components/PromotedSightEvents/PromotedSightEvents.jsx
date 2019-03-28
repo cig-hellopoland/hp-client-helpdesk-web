@@ -43,9 +43,9 @@ class PromotedSightEvents extends Component {
   handlePromotionChange = id => (e) => {
     const { changePromotion, fetchSightEventsList } = this.props;
     const value = e.target ? e.target.value : e;
+    const params = { id, value };
     changePromotion({
-      id,
-      value,
+      params,
       onSuccess: () => {
         fetchSightEventsList();
         this.handleClose();

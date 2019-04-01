@@ -38,7 +38,7 @@ class PromotedSightEvents extends Component {
     open: false,
     error: false,
     listError: false,
-    newPromotionValue: 1,
+    newPromotionValue: '1',
     newPromotionId: 0,
   }
 
@@ -52,7 +52,7 @@ class PromotedSightEvents extends Component {
       open: false,
       error: false,
       listError: false,
-      newPromotionValue: 1,
+      newPromotionValue: '1',
       newPromotionId: 0,
     });
   }
@@ -74,11 +74,9 @@ class PromotedSightEvents extends Component {
   };
 
   handlePromotionReset = (id) => {
-    const { changePromotion, fetchSightEventsList } = this.props;
-    const pathParams = { promotion: null };
-    changePromotion({
+    const { deletePromotion, fetchSightEventsList } = this.props;
+    deletePromotion({
       id,
-      pathParams,
       onSuccess: () => {
         fetchSightEventsList();
         this.handleClose();
@@ -99,7 +97,6 @@ class PromotedSightEvents extends Component {
     const {
       open, error, listError, newPromotionId, newPromotionValue,
     } = this.state;
-
     return (
       <Fragment>
         <Grid>
@@ -165,6 +162,7 @@ class PromotedSightEvents extends Component {
 PromotedSightEvents.propTypes = {
   changePromotion: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
+  deletePromotion: PropTypes.func.isRequired,
   fetchSightEventsList: PropTypes.func.isRequired,
   sightEventsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
@@ -175,6 +173,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   changePromotion: sightEventActions.changePromotion,
+  deletePromotion: sightEventActions.deletePromotion,
   fetchSightEventsList: sightEventActions.fetchList,
 };
 

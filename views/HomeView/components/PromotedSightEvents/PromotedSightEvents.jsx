@@ -2,12 +2,15 @@ import React, { Component, Fragment } from 'react';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
+import IconBlock from '@material-ui/icons/Block';
+import IconClear from '@material-ui/icons/Clear';
+import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import TextField from '@material-ui/core/TextField';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
+import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
@@ -18,10 +21,23 @@ import {
 import DialogWindow from 'components/DialogWindow';
 import PromoteSightEventsModalBody from './PromoteSightEventModalBody';
 
+const styles = {
+  error: {
+    color: 'red !important',
+  },
+  list: {
+    marginBottom: 10,
+  },
+  noOffers: {
+    height: 150,
+  },
+};
+
 class PromotedSightEvents extends Component {
   state = {
     open: false,
     error: false,
+    listError: false,
     newPromotionValue: 1,
     newPromotionId: 0,
   }
@@ -35,17 +51,18 @@ class PromotedSightEvents extends Component {
     this.setState({
       open: false,
       error: false,
+      listError: false,
       newPromotionValue: 1,
       newPromotionId: 0,
     });
   }
 
-  handlePromotionChange = id => (e) => {
+  handlePromotionChange = id => (value) => {
     const { changePromotion, fetchSightEventsList } = this.props;
-    const value = e.target ? e.target.value : e;
-    const params = { id, value };
+    const pathParams = { promotion: value };
     changePromotion({
-      params,
+      id,
+      pathParams,
       onSuccess: () => {
         fetchSightEventsList();
         this.handleClose();
@@ -56,45 +73,65 @@ class PromotedSightEvents extends Component {
     });
   };
 
+  handlePromotionReset = (id) => {
+    const { changePromotion, fetchSightEventsList } = this.props;
+    const pathParams = { promotion: null };
+    changePromotion({
+      id,
+      pathParams,
+      onSuccess: () => {
+        fetchSightEventsList();
+        this.handleClose();
+      },
+      onFailure: () => {
+        this.setState({ listError: true });
+      },
+    });
+  }
+
   handlePromotionModalOpen = () => this.setState({ open: true });
 
   render() {
-    const { sightEventsList } = this.props;
+    const { sightEventsList, classes } = this.props;
     const promotedSightEvents = sightEventsList.filter(
       item => item.promotion,
     ).sort((a, b) => a.promotion - b.promotion);
     const {
-      open, error, newPromotionId, newPromotionValue,
+      open, error, listError, newPromotionId, newPromotionValue,
     } = this.state;
+
     return (
       <Fragment>
         <Grid>
-          <List>
+          <Typography className={classes.error}>{ listError ? 'Wystąpił błąd' : ' '}</Typography>
+          <List dense className={classes.list}>
             { promotedSightEvents.length > 0
               ? (promotedSightEvents.map(({ name, promotion, id }) => (
                 <Fragment key={id}>
                   <ListItem>
-                    <ListItemText>{name}</ListItemText>
+                    <ListItemText primary={name} secondary={`Wartość promocji: ${promotion}`}>{name}</ListItemText>
                     <ListItemSecondaryAction>
-                      <TextField
-                        type="number"
-                        value={promotion}
-                        inputProps={{ min: 0, max: 3 }}
-                        onChange={this.handlePromotionChange(id)}
-                      />
+                      <IconButton
+                        onClick={() => this.handlePromotionReset(id)}
+                      >
+                        <IconClear />
+                      </IconButton>
                     </ListItemSecondaryAction>
                   </ListItem>
                   <Divider />
                 </Fragment>
               ))) : (
-                <Typography variant="subtitle2">Brak promowanych ofert</Typography>
+                <Grid container justify="center" alignItems="center" className={classes.noOffers}>
+                  <IconBlock />
+                  <Typography variant="subtitle2">Brak promowanych ofert</Typography>
+                </Grid>
               )
             }
-            <Button variant="outlined" onClick={this.handlePromotionModalOpen}>
-              {promotedSightEvents.length === 3 ? 'Zmień' : 'Promuj oferty'}
-            </Button>
           </List>
         </Grid>
+        <Button variant="outlined" onClick={this.handlePromotionModalOpen}>
+          {promotedSightEvents.length === 3 ? 'Zmień' : 'Promuj oferty'}
+        </Button>
         <DialogWindow
           open={open}
           error={error}
@@ -127,6 +164,7 @@ class PromotedSightEvents extends Component {
 
 PromotedSightEvents.propTypes = {
   changePromotion: PropTypes.func.isRequired,
+  classes: PropTypes.shape({}).isRequired,
   fetchSightEventsList: PropTypes.func.isRequired,
   sightEventsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
@@ -140,4 +178,7 @@ const mapDispatchToProps = {
   fetchSightEventsList: sightEventActions.fetchList,
 };
 
-export default compose(connect(mapStateToProps, mapDispatchToProps))(PromotedSightEvents);
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
+  withStyles(styles),
+)(PromotedSightEvents);

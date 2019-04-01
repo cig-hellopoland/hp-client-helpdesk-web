@@ -22,7 +22,8 @@ const HomeView = ({ classes }) => (
         <Typography variant="h6" gutterBottom>Statystyki sprzedaży</Typography>
         <SalesExport />
       </Grid>
-      <Grid item md={8}>
+      <Grid item md={6}>
+        <Typography variant="h6" gutterBottom>Promowane oferty</Typography>
         <PromotedSightEvents />
       </Grid>
     </Grid>

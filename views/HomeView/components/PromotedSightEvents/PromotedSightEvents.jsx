@@ -23,7 +23,7 @@ import PromoteSightEventsModalBody from './PromoteSightEventModalBody';
 
 const styles = {
   error: {
-    color: 'red !important',
+    color: 'red',
   },
   list: {
     marginBottom: 10,
@@ -71,7 +71,7 @@ class PromotedSightEvents extends Component {
         this.setState({ error: true });
       },
     });
-  };
+  }
 
   handlePromotionReset = (id) => {
     const { deletePromotion, fetchSightEventsList } = this.props;

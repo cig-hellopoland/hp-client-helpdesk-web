@@ -106,7 +106,7 @@ class PromotedSightEvents extends Component {
               ? (promotedSightEvents.map(({ name, promotion, id }) => (
                 <Fragment key={id}>
                   <ListItem>
-                    <ListItemText primary={name} secondary={`Wartość promocji: ${promotion}`}>{name}</ListItemText>
+                    <ListItemText primary={name} secondary={`Kolejność na liście: ${promotion}`}>{name}</ListItemText>
                     <ListItemSecondaryAction>
                       <IconButton
                         onClick={() => this.handlePromotionReset(id)}
@@ -142,7 +142,7 @@ class PromotedSightEvents extends Component {
             InputNumberProps={{
               inputProps: { min: 0, max: 3 },
               InputLabelProps: { shrink: true },
-              label: 'Wartość promocji',
+              label: 'Kolejność',
               value: newPromotionValue,
               onChange: e => this.setState({ newPromotionValue: e.target.value }),
             }}

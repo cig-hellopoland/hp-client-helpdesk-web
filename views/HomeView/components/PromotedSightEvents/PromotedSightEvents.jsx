@@ -140,7 +140,7 @@ class PromotedSightEvents extends Component {
         >
           <PromoteSightEventsModalBody
             InputNumberProps={{
-              inputProps: { min: 0, max: 3 },
+              inputProps: { min: 1, max: 3 },
               InputLabelProps: { shrink: true },
               label: 'Kolejność',
               value: newPromotionValue,

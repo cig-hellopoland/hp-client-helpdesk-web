@@ -28,9 +28,6 @@ const styles = {
   list: {
     marginBottom: 10,
   },
-  noOffers: {
-    height: 150,
-  },
 };
 
 class PromotedSightEvents extends Component {
@@ -118,7 +115,7 @@ class PromotedSightEvents extends Component {
                   <Divider />
                 </Fragment>
               ))) : (
-                <Grid container justify="center" alignItems="center" className={classes.noOffers}>
+                <Grid container alignItems="center">
                   <IconBlock />
                   <Typography variant="subtitle2">Brak promowanych ofert</Typography>
                 </Grid>

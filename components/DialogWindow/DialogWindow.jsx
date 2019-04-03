@@ -44,11 +44,12 @@ DialogWindow.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
 };
 
 DialogWindow.defaultProps = {
   contentText: '',
+  title: '',
 };
 
 export default DialogWindow;

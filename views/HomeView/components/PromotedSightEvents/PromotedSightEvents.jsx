@@ -57,7 +57,7 @@ class PromotedSightEvents extends Component {
     });
   }
 
-  handlePromotionChange = id => (value) => {
+  handlePromotionChange = (id, value) => {
     const { changePromotion, fetchSightEventsList } = this.props;
     const pathParams = { promotion: value };
     changePromotion({
@@ -133,7 +133,7 @@ class PromotedSightEvents extends Component {
           open={open}
           error={error}
           disabled={!newPromotionId}
-          onSubmit={() => this.handlePromotionChange(newPromotionId)(newPromotionValue)}
+          onSubmit={() => this.handlePromotionChange(newPromotionId, newPromotionValue)}
           onClose={this.handleClose}
           title="Promocja oferty"
           contentText="Wybierz ofertę, którą chcesz promować"

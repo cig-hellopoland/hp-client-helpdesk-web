@@ -7,10 +7,16 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 
-const PromoteSightEventsModalBody = ({ InputNumberProps, SelectProps, sightEvents }) => (
+const PromoteSightEventsDialogBody = ({ InputNumberProps, SelectProps, sightEvents }) => (
   <Grid container justify="space-between">
-    <TextField type="number" {...InputNumberProps} style={{ width: 130 }} />
-    <FormControl style={{ width: 130 }}>
+    <TextField
+      type="number"
+      {...InputNumberProps}
+      label="Kolejność"
+      inputProps={{ min: 1, max: 3 }}
+      InputLabelProps={{ shrink: true }}
+    />
+    <FormControl>
       <InputLabel htmlFor="sight-events-select" shrink>Oferta</InputLabel>
       <Select
         {...SelectProps}
@@ -28,20 +34,18 @@ const PromoteSightEventsModalBody = ({ InputNumberProps, SelectProps, sightEvent
   </Grid>
 );
 
-PromoteSightEventsModalBody.propTypes = {
+PromoteSightEventsDialogBody.propTypes = {
   InputNumberProps: PropTypes.shape({
-    inputProps: PropTypes.shape({}).isRequired,
-    InputLabelProps: PropTypes.shape({}).isRequired,
-    label: PropTypes.string.isRequired,
+    className: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     value: PropTypes.string.isRequired,
   }).isRequired,
   SelectProps: PropTypes.shape({
-    label: PropTypes.string.isRequired,
+    className: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     value: PropTypes.number.isRequired,
   }).isRequired,
   sightEvents: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
 
-export default PromoteSightEventsModalBody;
+export default PromoteSightEventsDialogBody;

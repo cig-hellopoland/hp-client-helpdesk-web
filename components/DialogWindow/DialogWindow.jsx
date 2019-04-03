@@ -39,8 +39,8 @@ const DialogWindow = ({
 DialogWindow.propTypes = {
   contentText: PropTypes.string,
   children: PropTypes.element.isRequired,
-  disabled: PropTypes.bool.isRequired,
-  error: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool,
+  error: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
@@ -49,6 +49,8 @@ DialogWindow.propTypes = {
 
 DialogWindow.defaultProps = {
   contentText: '',
+  disabled: false,
+  error: false,
   title: '',
 };
 

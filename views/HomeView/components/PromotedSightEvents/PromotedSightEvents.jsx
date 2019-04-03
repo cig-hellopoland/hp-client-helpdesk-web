@@ -19,7 +19,7 @@ import {
   selectors as sightEventSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import DialogWindow from 'components/DialogWindow';
-import PromoteSightEventsModalBody from './PromoteSightEventModalBody';
+import PromoteSightEventsDialogBody from './PromoteSightEventsDialogBody';
 
 const styles = {
   error: {
@@ -27,6 +27,9 @@ const styles = {
   },
   list: {
     marginBottom: 10,
+  },
+  modalInput: {
+    width: 130,
   },
 };
 
@@ -135,17 +138,15 @@ class PromotedSightEvents extends Component {
           title="Promocja oferty"
           contentText="Wybierz ofertę, którą chcesz promować"
         >
-          <PromoteSightEventsModalBody
+          <PromoteSightEventsDialogBody
             InputNumberProps={{
-              inputProps: { min: 1, max: 3 },
-              InputLabelProps: { shrink: true },
-              label: 'Kolejność',
               value: newPromotionValue,
+              className: classes.modalInput,
               onChange: e => this.setState({ newPromotionValue: e.target.value }),
             }}
             SelectProps={{
-              label: 'Oferta',
               value: newPromotionId,
+              className: classes.modalInput,
               onChange: e => this.setState({ newPromotionId: e.target.value }),
             }}
             sightEvents={sightEventsList}

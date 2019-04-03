@@ -16,6 +16,7 @@ import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import yupBoolen from 'yup/lib/boolean';
+import yupNumber from 'yup/lib/number';
 import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
 import GridItem from 'components/GridItem';
 
@@ -48,38 +49,30 @@ class SightEventForm extends Component {
   constructor(props) {
     super(props);
 
-    const { initialValues } = props;
-
     this.state = {
-      initialValues: this.getInitialValues(initialValues),
+      initialValues: this.getInitialValues(),
       isDefaultTranslation: true,
+      ushers: [],
     };
 
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
+      email: yupString()
+        .email()
+        .trim()
+        .required(),
       name: yupString()
         .min(3)
         .max(250)
         .required(),
-      published: yupBoolen(),
-      // generalAdmission: yupBoolen(),
-      lead: yupString()
-        .min(10)
-        .max(250),
-      description: yupString()
-        .min(10)
-        .max(2500)
+      commission: yupNumber()
+        .min(0)
+        .max(100)
         .required(),
-      email: yupString().email().trim(),
-      phone: yupString().min(9).trim(),
-      // location: yupObject().shape({
-      //   directions: yupString().min(5).max(255),
-      //   street: yupString().min(5),
-      //   zipCode: yupString().min(6).max(6),
-      //   city: yupString().min(3),
-      //   country: yupString().min(5),
-      // }),
+      newUser: yupString()
+        .email()
+        .trim(),
     });
   }
 
@@ -92,27 +85,12 @@ class SightEventForm extends Component {
     }
   }
 
-  getInitialValues = (initialValues) => {
-    const { location: initialLocation, pdfAttachment: files, ...details } = initialValues || {};
-    const location = initialLocation || {};
-    return {
-      id: details.id || '',
-      sightId: details.sightId || '',
-      name: details.name || '',
-      published: details.published || false,
-      lead: details.lead || '',
-      description: details.description || '',
-      email: details.email || '',
-      phone: details.phone || '',
-      location: {
-        directions: location.directions || '',
-        street: location.street || '',
-        zipCode: location.zipCode || '',
-        city: location.city || '',
-        country: location.country || 'Polska',
-      },
-    };
-  };
+  getInitialValues = () => ({
+    email: '',
+    name: '',
+    commision: 0,
+    newUser: '',
+  })
 
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues),
@@ -191,15 +169,8 @@ class SightEventForm extends Component {
     resetForm();
   };
 
-  isDefaultLanguage = (initialValues) => {
-    const { defaultLanguage } = initialValues || {};
-    const { language } = this.props;
-
-    return language === defaultLanguage;
-  };
-
   render() {
-    const { initialValues, isDefaultTranslation } = this.state;
+    const { initialValues, ushers } = this.state;
     const { FormikProps } = this.props;
 
     return (
@@ -210,45 +181,23 @@ class SightEventForm extends Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {({ isSubmitting }) => (
+        {() => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <GridItem>
                 <Typography variant="h6">Dane podstawowe</Typography>
               </GridItem>
-              <Hidden xsUp>
-                <GridItem>
-                  <Field name="id" hidden component={TextField} {...commonProps} />
-                </GridItem>
-              </Hidden>
-              <Hidden xsUp>
-                <GridItem>
-                  <Field name="sightId" hidden component={TextField} {...commonProps} />
-                </GridItem>
-              </Hidden>
               <GridItem>
-                <Field name="name" label="Nazwa oferty" required component={TextField} {...commonProps} />
-              </GridItem>
-              {isDefaultTranslation
-                && (
-                  <GridItem md={4} sm={4}>
-                    <Field
-                      name="published"
-                      render={switchProps => (
-                        <FormControlLabel
-                          control={<Switch {...fieldToSwitch(switchProps)} />}
-                          label="Publikuj"
-                        />
-                      )}
-                    />
-                  </GridItem>
-                )
-              }
-              <GridItem>
-                <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
+                <Field name="email" label="E-mail partnera" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="description" label="Opis oferty" required component={TextField} {...commonProps} multiline rowsMax={20} />
+                <Field name="commission" label="Opis oferty" required component={TextField} {...commonProps} multiline type="number" />
+              </GridItem>
+              <GridItem>
+                <Field name="newUser" />
+              </GridItem>
+              <GridItem>
+                <Button variant="contained"> elo</Button>
               </GridItem>
             </Grid>
           </Form>

@@ -73,7 +73,7 @@ class PromotedSightEvents extends Component {
     });
   }
 
-  handlePromotionReset = (id) => {
+  handleRemovePromotion = (id) => {
     const { deletePromotion, fetchSightEventsList } = this.props;
     deletePromotion({
       id,
@@ -133,7 +133,7 @@ class PromotedSightEvents extends Component {
           open={open}
           error={error}
           disabled={!newPromotionId}
-          onSubmit={() => this.handlePromotionChange(newPromotionId, newPromotionValue)}
+          onSubmit={() => this.handleRemovePromotion(newPromotionId, newPromotionValue)}
           onClose={this.handleClose}
           title="Promocja oferty"
           contentText="Wybierz ofertę, którą chcesz promować"

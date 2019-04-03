@@ -1,9 +1,19 @@
 import React from 'react';
 import Layout from 'components/Layout';
+import Link from 'next/link';
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 
 const PartnersView = () => (
   <Layout>
-    <h1>Partnerzy</h1>
+    <Link href="/" passHref>
+      <Button component="a">
+        Strona główna
+      </Button>
+    </Link>
+    <Grid style={{ padding: 10 }}>
+      <Button variant="contained">Dodaj partnera</Button>
+    </Grid>
   </Layout>
 );
 

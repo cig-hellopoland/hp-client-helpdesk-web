@@ -18,7 +18,8 @@ import {
   actions as sightEventActions,
   selectors as sightEventSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
-import DialogWindow from 'components/DialogWindow';
+import AlertDialog from 'components/AlertDialog';
+import FormDialog from 'components/FormDialog';
 import PromoteSightEventsDialogBody from './PromoteSightEventsDialogBody';
 
 const styles = {
@@ -33,14 +34,24 @@ const styles = {
   },
 };
 
-class PromotedSightEvents extends Component {
-  state = {
+const initialState = {
+  alertDialog: {
+    content: null,
+    onSuccess: null,
+    open: false,
+    title: null,
+  },
+  promotionDialog: {
     open: false,
     error: false,
-    listError: false,
-    newPromotionValue: '1',
-    newPromotionId: 0,
-  }
+  },
+  newPromotionValue: '1',
+  newPromotionId: 0,
+  listError: false,
+};
+
+class PromotedSightEvents extends Component {
+  state = initialState
 
   componentDidMount() {
     const { fetchSightEventsList } = this.props;
@@ -49,11 +60,7 @@ class PromotedSightEvents extends Component {
 
   handleClose = () => {
     this.setState({
-      open: false,
-      error: false,
-      listError: false,
-      newPromotionValue: '1',
-      newPromotionId: 0,
+      ...initialState,
     });
   }
 
@@ -68,7 +75,7 @@ class PromotedSightEvents extends Component {
         this.handleClose();
       },
       onFailure: () => {
-        this.setState({ error: true });
+        this.setState({ promotionDialog: { error: true } });
       },
     });
   }
@@ -87,7 +94,17 @@ class PromotedSightEvents extends Component {
     });
   }
 
-  handlePromotionModalOpen = () => this.setState({ open: true });
+  handleRemovePromotionDialogOpen = (id, name) => this.setState({
+    alertDialog: {
+      open: true,
+      onCancel: this.handleClose,
+      onSuccess: () => this.handleRemovePromotion(id),
+      title: 'Uwaga',
+      content: `Oferta ${name} przestanie być promowana, czy chcesz kontynuować?`,
+    },
+  });
+
+  handlePromotionDialogOpen = () => this.setState({ promotionDialog: { open: true } });
 
   render() {
     const { sightEventsList, classes } = this.props;
@@ -95,8 +112,9 @@ class PromotedSightEvents extends Component {
       item => item.promotion,
     ).sort((a, b) => a.promotion - b.promotion);
     const {
-      open, error, listError, newPromotionId, newPromotionValue,
+      alertDialog, listError, newPromotionValue, newPromotionId, promotionDialog,
     } = this.state;
+
     return (
       <Fragment>
         <Grid>
@@ -109,7 +127,7 @@ class PromotedSightEvents extends Component {
                     <ListItemText primary={name} secondary={`Kolejność na liście: ${promotion}`}>{name}</ListItemText>
                     <ListItemSecondaryAction>
                       <IconButton
-                        onClick={() => this.handlePromotionReset(id)}
+                        onClick={() => this.handleRemovePromotionDialogOpen(id, name)}
                       >
                         <IconClear />
                       </IconButton>
@@ -126,14 +144,12 @@ class PromotedSightEvents extends Component {
             }
           </List>
         </Grid>
-        <Button variant="outlined" onClick={this.handlePromotionModalOpen}>
+        <Button variant="outlined" onClick={this.handlePromotionDialogOpen}>
           {promotedSightEvents.length === 3 ? 'Zmień' : 'Promuj oferty'}
         </Button>
-        <DialogWindow
-          open={open}
-          error={error}
-          disabled={!newPromotionId}
-          onSubmit={() => this.handleRemovePromotion(newPromotionId, newPromotionValue)}
+        <FormDialog
+          {...promotionDialog}
+          onSubmit={() => this.handlePromotionChange(newPromotionId, newPromotionValue)}
           onClose={this.handleClose}
           title="Promocja oferty"
           contentText="Wybierz ofertę, którą chcesz promować"
@@ -151,7 +167,8 @@ class PromotedSightEvents extends Component {
             }}
             sightEvents={sightEventsList}
           />
-        </DialogWindow>
+        </FormDialog>
+        <AlertDialog {...alertDialog} />
       </Fragment>
     );
   }

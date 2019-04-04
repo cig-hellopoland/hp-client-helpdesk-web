@@ -5,7 +5,9 @@ import classNames from 'classnames';
 
 const styles = {
   root: {
-    paddingTop: 64,
+    width: '100%',
+    padding: [[72, 8, 8]],
+    margin: '0 auto',
   },
 };
 

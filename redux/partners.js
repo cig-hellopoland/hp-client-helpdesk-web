@@ -9,14 +9,14 @@ import { createLogic } from 'redux-logic';
  * Base API URL.
  * @type {string}
  */
-export const apiURL = '/helpdesk';
+export const apiURL = '/partners';
 
 
 /**
  * Module name.
  * @type {string}
  */
-export const name = 'helpdesk';
+export const name = 'partners';
 
 /**
  * Reducer prefix.
@@ -77,7 +77,7 @@ const createPartner = ({
 } = {}) => ({
   type: CREATE_PARTNER,
   payload: {
-    url: `${apiURL}/partners`,
+    url: `${apiURL}`,
     method: 'post',
     ...options,
     data,

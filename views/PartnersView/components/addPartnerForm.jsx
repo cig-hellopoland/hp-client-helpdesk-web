@@ -2,42 +2,26 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import _isEqual from 'lodash/isEqual';
-import _isNumber from 'lodash/isNumber';
 import withStyles from '@material-ui/core/styles/withStyles';
-import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
-import Hidden from '@material-ui/core/Hidden';
-import Switch from '@material-ui/core/Switch';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import MuiTextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography/Typography';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, FieldArray } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
-import yupBoolen from 'yup/lib/boolean';
 import yupNumber from 'yup/lib/number';
-import { actions as sightEventsActions } from '@hello-poland/commons/redux/sightEvents';
+import yupArray from 'yup/lib/array';
+import { actions as partnersActions } from 'redux/partners';
 import GridItem from 'components/GridItem';
+
 
 const commonProps = {
   fullWidth: true,
 };
-
-// TODO: remove this function and change Switch implementation after it's fixed.
-// TODO: see https://github.com/stackworx/formik-material-ui/pull/42
-const fieldToSwitch = ({
-  field,
-  form: { isSubmitting },
-  disabled = false,
-  ...props
-}) => ({
-  disabled: isSubmitting || disabled,
-  ...props,
-  ...field,
-  value: field.name,
-  checked: field.value,
-});
 
 const styles = () => ({
   title: {
@@ -45,101 +29,40 @@ const styles = () => ({
   },
 });
 
-class SightEventForm extends Component {
+class AddPartnerForm extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      initialValues: this.getInitialValues(),
-      isDefaultTranslation: true,
+      initialValues: {
+        email: '',
+        name: '',
+        commission: 0,
+        p24MerchantId: '',
+      },
+      usherEmail: '',
       ushers: [],
     };
 
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
-      email: yupString()
-        .email()
-        .trim()
-        .required(),
-      name: yupString()
-        .min(3)
-        .max(250)
-        .required(),
-      commission: yupNumber()
-        .min(0)
-        .max(100)
-        .required(),
-      newUser: yupString()
-        .email()
-        .trim(),
+      email: yupString().email().trim(),
+      name: yupString().required(),
+      commission: yupNumber().min(1).max(100).required(),
+      p24MerchantId: yupString().required(),
     });
+    this.newUsherEmail = yupString().email().trim();
   }
-
-  componentDidUpdate(prevProps) {
-    const { initialValues: prevInitialValues } = prevProps;
-    const { initialValues } = this.props;
-
-    if (!_isEqual(prevInitialValues, initialValues)) {
-      this.setInitialValues(initialValues);
-    }
-  }
-
-  getInitialValues = () => ({
-    email: '',
-    name: '',
-    commision: 0,
-    newUser: '',
-  })
-
-  setInitialValues = initialValues => this.setState({
-    initialValues: this.getInitialValues(initialValues),
-    isDefaultTranslation: this.isDefaultLanguage(initialValues),
-  });
 
   handleSubmit = (values, actions) => {
-    const { language, onSubmit } = this.props;
-    const options = {
-      headers: {
-        'Content-Language': language,
-      },
-    };
-    const pathParams = {
-      languageVersion: language,
-    };
-
-    if (onSubmit) {
-      onSubmit(values, actions, options, pathParams);
-
-      return;
-    }
-
-    const { id, ...data } = values;
-    const {
-      createItem, createTranslation, initialValues, updateItem,
-    } = this.props;
-    let action = createItem;
-    const payload = {
+    const { createPartner } = this.props;
+    const { ushers } = this.state;
+    const data = { ...values, users: ushers };
+    createPartner({
       data,
-      onFailure: this.handleSubmitFailure(actions),
-      onSuccess: this.handleSubmitSuccess(actions),
-      options,
-      pathParams,
-    };
-
-
-    if (_isNumber(id)) {
-      if (!initialValues.language) {
-        action = createTranslation;
-        payload.data.id = id;
-      } else {
-        action = updateItem;
-        payload.id = id;
-        payload.pathParams = pathParams;
-      }
-    }
-
-    action(payload);
+    });
+    console.log(values, actions)
   };
 
   handleSubmitFailure = actions => () => {
@@ -169,10 +92,29 @@ class SightEventForm extends Component {
     resetForm();
   };
 
-  render() {
-    const { initialValues, ushers } = this.state;
-    const { FormikProps } = this.props;
+  validateEmail = (value) => {
+    const { ushers } = this.state;
+    // eslint-disable-next-line no-useless-escape
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return value && !re.test(value);
+  }
 
+  handleAddUsher = (email) => {
+    const { ushers } = this.state;
+    console.log(ushers);
+    ushers.push({email, role: 'USHER'});
+    this.setState({ushers})
+  }
+
+  isUserEmailUsed = (email) => {
+    const { ushers } = this.state;
+    return ushers.some(({email}))
+  }
+
+  render() {
+    const { initialValues, usherEmail, ushers } = this.state;
+    const { FormikProps } = this.props;
+    console.log(ushers)
     return (
       <Formik
         enableReinitialize
@@ -185,20 +127,34 @@ class SightEventForm extends Component {
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <GridItem>
-                <Typography variant="h6">Dane podstawowe</Typography>
+                <Typography variant="h6">Dane partnera</Typography>
               </GridItem>
               <GridItem>
-                <Field name="email" label="E-mail partnera" component={TextField} {...commonProps} />
+                <Field name="email" label="E-mail partnera" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="commission" label="Opis oferty" required component={TextField} {...commonProps} multiline type="number" />
+                <Field name="name" label="Nazwa partnera" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="newUser" />
+                <Field name="commission" type="number" label="Prowizja" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Button variant="contained"> elo</Button>
+                <Field name="p24MerchantId" label="Merchant Id" required component={TextField} {...commonProps} />
               </GridItem>
+              <GridItem>
+              <List>
+                      {
+                        ushers.length > 0
+                        && ushers.map(({email}) => (<ListItem key={email}>
+                          <ListItemText primary={email} />
+                        </ListItem>) )
+                      }
+                    </List>
+                    <GridItem>
+                    </GridItem>
+              <MuiTextField error={Boolean(this.validateEmail(usherEmail))} onChange={(e) => this.setState({ usherEmail: e.target.value })} {...commonProps} />
+              </GridItem>
+              <button onClick={()=>this.handleAddUsher(usherEmail)}>Click</button>
             </Grid>
           </Form>
         )}
@@ -207,22 +163,17 @@ class SightEventForm extends Component {
   }
 }
 
-SightEventForm.propTypes = {
+AddPartnerForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
-  createItem: PropTypes.func.isRequired,
-  createTranslation: PropTypes.func.isRequired,
+  createPartner: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
-  initialValues: PropTypes.shape({}),
-  language: PropTypes.string.isRequired,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
-  updateItem: PropTypes.func.isRequired,
 };
 
-SightEventForm.defaultProps = {
+AddPartnerForm.defaultProps = {
   FormikProps: null,
-  initialValues: null,
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
@@ -231,12 +182,10 @@ SightEventForm.defaultProps = {
 const mapStateToProps = () => ({});
 
 const mapDispatchToProps = {
-  createItem: sightEventsActions.createItem,
-  createTranslation: sightEventsActions.createTranslation,
-  updateItem: sightEventsActions.updateItem,
+  createPartner: partnersActions.createPartner,
 };
 
 export default compose(
   withStyles(styles),
   connect(mapStateToProps, mapDispatchToProps),
-)(SightEventForm);
+)(AddPartnerForm);

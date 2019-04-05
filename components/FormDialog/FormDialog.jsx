@@ -8,7 +8,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Typography from '@material-ui/core/Typography/Typography';
 
-const DialogWindow = ({
+const FormDialog = ({
   contentText, children, disabled, error, onClose, onSubmit, open, title,
 }) => (
   <Dialog
@@ -36,20 +36,22 @@ const DialogWindow = ({
   </Dialog>
 );
 
-DialogWindow.propTypes = {
+FormDialog.propTypes = {
   contentText: PropTypes.string,
   children: PropTypes.element.isRequired,
-  disabled: PropTypes.bool.isRequired,
-  error: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool,
+  error: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   title: PropTypes.string,
 };
 
-DialogWindow.defaultProps = {
+FormDialog.defaultProps = {
   contentText: '',
+  disabled: false,
+  error: false,
   title: '',
 };
 
-export default DialogWindow;
+export default FormDialog;

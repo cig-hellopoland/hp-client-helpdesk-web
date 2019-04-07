@@ -19,8 +19,7 @@ import {
   selectors as sightEventSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import AlertDialog from 'components/AlertDialog';
-import FormDialog from 'components/FormDialog';
-import PromoteSightEventsDialogBody from './PromoteSightEventsDialogBody';
+import PromotionDialog from './PromotionDialog';
 
 const styles = {
   error: {
@@ -43,11 +42,9 @@ const initialState = {
   },
   promotionDialog: {
     open: false,
-    error: false,
+    erros: false,
   },
-  newPromotionValue: '1',
-  newPromotionId: 0,
-  listError: false,
+  erro: false,
 };
 
 class PromotedSightEvents extends Component {
@@ -112,7 +109,7 @@ class PromotedSightEvents extends Component {
       item => item.promotion,
     ).sort((a, b) => a.promotion - b.promotion);
     const {
-      alertDialog, listError, newPromotionValue, newPromotionId, promotionDialog,
+      alertDialog, listError, promotionDialog: { open, error },
     } = this.state;
 
     return (
@@ -143,31 +140,15 @@ class PromotedSightEvents extends Component {
               )
             }
           </List>
+          <Button onClick={this.handlePromotionDialogOpen}>Ustal kolejność</Button>
         </Grid>
-        <Button variant="outlined" onClick={this.handlePromotionDialogOpen}>
-          {promotedSightEvents.length === 3 ? 'Zmień' : 'Promuj oferty'}
-        </Button>
-        <FormDialog
-          {...promotionDialog}
-          onSubmit={() => this.handlePromotionChange(newPromotionId, newPromotionValue)}
+        <PromotionDialog
+          onSubmit={this.handlePromotionChange}
           onClose={this.handleClose}
-          title="Promocja oferty"
-          contentText="Wybierz ofertę, którą chcesz promować"
-        >
-          <PromoteSightEventsDialogBody
-            InputNumberProps={{
-              value: newPromotionValue,
-              className: classes.modalInput,
-              onChange: e => this.setState({ newPromotionValue: e.target.value }),
-            }}
-            SelectProps={{
-              value: newPromotionId,
-              className: classes.modalInput,
-              onChange: e => this.setState({ newPromotionId: e.target.value }),
-            }}
-            sightEvents={sightEventsList}
-          />
-        </FormDialog>
+          open={open}
+          error={error}
+          sightEvents={sightEventsList}
+        />
         <AlertDialog {...alertDialog} />
       </Fragment>
     );

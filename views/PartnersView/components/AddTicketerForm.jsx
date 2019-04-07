@@ -3,18 +3,16 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import withStyles from '@material-ui/core/styles/withStyles';
+import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import MuiTextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography/Typography';
 import { Formik, Form, Field, FieldArray } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
-import yupNumber from 'yup/lib/number';
-import yupArray from 'yup/lib/array';
 import { actions as partnersActions } from 'redux/partners';
 import GridItem from 'components/GridItem';
 
@@ -29,28 +27,21 @@ const styles = () => ({
   },
 });
 
-class AddPartnerForm extends Component {
+class AddTicketerForm extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       initialValues: {
         email: '',
-        name: '',
-        commission: 0,
-        p24MerchantId: '',
-      },
+      }
     };
 
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
       email: yupString().email().trim(),
-      name: yupString().required(),
-      commission: yupNumber().min(1).max(100).required(),
-      p24MerchantId: yupString().required(),
     });
-    this.newUsherEmail = yupString().email().trim();
   }
 
   handleSubmit = (values, actions) => {
@@ -110,8 +101,9 @@ class AddPartnerForm extends Component {
   }
 
   render() {
-    const { initialValues } = this.state;
+    const { initialValues, usherEmail, ushers } = this.state;
     const { FormikProps } = this.props;
+    console.log(ushers)
     return (
       <Formik
         enableReinitialize
@@ -121,32 +113,33 @@ class AddPartnerForm extends Component {
         onSubmit={this.handleSubmit}
       >
         {() => (
+          <Fragment>
+            <Typography variant="h6">Bileterzy</Typography>
+
+            <List>
+
+            </List>
           <Form autoComplete="off" noValidate>
-            <Grid container spacing={16}>
+            <Grid container spacing={24}>
               <GridItem>
-                <Typography variant="h6">Dane partnera</Typography>
+                <Typography variant="subtitle1">Dodaj biletera</Typography>
               </GridItem>
               <GridItem>
-                <Field name="email" label="E-mail partnera" required component={TextField} {...commonProps} />
+                <Field name="email" label="E-mail Biletera" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="name" label="Nazwa partnera" required component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="commission" type="number" label="Prowizja" required component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="p24MerchantId" label="Merchant Id" required component={TextField} {...commonProps} />
+                <Button variant="contained" color="secondary">Dodaj</Button>
               </GridItem>
             </Grid>
           </Form>
+          </Fragment>
         )}
       </Formik>
     );
   }
 }
 
-AddPartnerForm.propTypes = {
+AddTicketerForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   createPartner: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
@@ -155,7 +148,7 @@ AddPartnerForm.propTypes = {
   onSubmitSuccess: PropTypes.func,
 };
 
-AddPartnerForm.defaultProps = {
+AddTicketerForm.defaultProps = {
   FormikProps: null,
   onSubmit: null,
   onSubmitFailure: null,
@@ -171,4 +164,4 @@ const mapDispatchToProps = {
 export default compose(
   withStyles(styles),
   connect(mapStateToProps, mapDispatchToProps),
-)(AddPartnerForm);
+)(AddTicketerForm);

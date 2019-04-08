@@ -28,7 +28,7 @@ const styles = theme => ({
 const PromotionDialog = ({
   classes, error, onClose, onSubmit, open, sightEvents,
 }) => {
-  const [promotedSightEvent, setPromotedSightEvent] = useState({ id: 0, value: 0 });
+  const [promotedSightEvent, setPromotedSightEvent] = useState({ id: '', value: '' });
   const { id, value } = promotedSightEvent;
   return (
     <Dialog
@@ -52,6 +52,7 @@ const PromotionDialog = ({
               label="Kolejność"
               fullWidth
               value={value}
+              InputLabelProps={{ shrink: true }}
               inputProps={{ min: 1, max: 3 }}
               onChange={event => setPromotedSightEvent({
                 ...promotedSightEvent, value: event.target.value,

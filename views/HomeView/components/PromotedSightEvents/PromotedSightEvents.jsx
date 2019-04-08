@@ -28,9 +28,6 @@ const styles = {
   list: {
     marginBottom: 10,
   },
-  modalInput: {
-    width: 130,
-  },
 };
 
 const initialState = {
@@ -44,7 +41,7 @@ const initialState = {
     open: false,
     erros: false,
   },
-  erro: false,
+  error: false,
 };
 
 class PromotedSightEvents extends Component {

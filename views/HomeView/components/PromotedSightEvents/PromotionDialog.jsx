@@ -28,8 +28,8 @@ const styles = theme => ({
 const PromotionDialog = ({
   classes, error, onClose, onSubmit, open, sightEvents,
 }) => {
-  const [value, setValue] = useState(0);
-  const [id, setId] = useState(0);
+  const [promotedSightEvent, setPromotedSightEvent] = useState({ id: 0, value: 0 });
+  const { id, value } = promotedSightEvent;
   return (
     <Dialog
       aria-labelledby="dialog-title"
@@ -53,8 +53,9 @@ const PromotionDialog = ({
               fullWidth
               value={value}
               inputProps={{ min: 1, max: 3 }}
-              InputLabelProps={{ shrink: true }}
-              onChange={e => setValue(e.target.value)}
+              onChange={event => setPromotedSightEvent({
+                ...promotedSightEvent, value: event.target.value,
+              })}
             />
           </Grid>
           <Grid item md={6}>
@@ -63,12 +64,14 @@ const PromotionDialog = ({
               <Select
                 id="sight-events-select"
                 value={id}
-                onChange={e => setId(e.target.value)}
+                onChange={event => setPromotedSightEvent({
+                  ...promotedSightEvent, id: event.target.value,
+                })}
               >
                 {
                   sightEvents.map(({ name, id: sightEventId }) => (
                     <MenuItem key={sightEventId} value={sightEventId}>
-                      {name.substring(0, 65)}
+                      {name || ''}
                     </MenuItem>
                   ))
                 }
@@ -86,7 +89,7 @@ const PromotionDialog = ({
           )
         }
         <Button onClick={onClose} color="primary">Anuluj</Button>
-        <Button onClick={() => onSubmit(id, value)} disabled={!id} color="primary" autoFocus>Zapisz</Button>
+        <Button onClick={() => onSubmit(id, value)} disabled={!id && !value} color="primary" autoFocus>Zapisz</Button>
       </DialogActions>
     </Dialog>
   );

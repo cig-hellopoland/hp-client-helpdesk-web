@@ -10,7 +10,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { actions as partnersActions } from 'redux/partners';
-import AddPartnerForm from './components/AddPartnerForm';
+import AddPartnerForm from './components/PartnerForm';
 import AddUserForm from './components/AddUserForm';
 
 const styles = theme => ({

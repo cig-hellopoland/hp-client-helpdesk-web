@@ -1,29 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import withStyles from '@material-ui/core/styles/withStyles';
 import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography/Typography';
-import { Formik, Form, Field, FieldArray } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import yupNumber from 'yup/lib/number';
-import yupArray from 'yup/lib/array';
-import { actions as partnersActions } from 'redux/partners';
 import GridItem from 'components/GridItem';
-
 
 const commonProps = {
   fullWidth: true,
 };
 
-const styles = () => ({
-  title: {
-    marginTop: 40,
-  },
-});
 
 class AddPartnerForm extends Component {
   constructor(props) {
@@ -46,64 +36,13 @@ class AddPartnerForm extends Component {
       commission: yupNumber().min(1).max(100).required(),
       p24MerchantId: yupString().required(),
     });
-    this.newUsherEmail = yupString().email().trim();
   }
 
   handleSubmit = (values, actions) => {
-    const { createPartner } = this.props;
-    const { ushers } = this.state;
-    const data = { ...values, users: ushers };
-    createPartner({
-      data,
-    });
-    console.log(values, actions)
+    const { onSubmit } = this.props;
+    console.log(actions)
+    onSubmit(values);
   };
-
-  handleSubmitFailure = actions => () => {
-    const { onSubmitFailure } = this.props;
-
-    if (onSubmitFailure) {
-      onSubmitFailure(actions);
-    }
-
-    const { setSubmitting } = actions;
-
-    setSubmitting(false);
-  };
-
-  handleSubmitSuccess = actions => (sightId) => {
-    const { onSubmitSuccess } = this.props;
-
-    if (onSubmitSuccess) {
-      onSubmitSuccess(sightId, actions);
-
-      return;
-    }
-
-    const { resetForm, setSubmitting } = actions;
-
-    setSubmitting(false);
-    resetForm();
-  };
-
-  validateEmail = (value) => {
-    const { ushers } = this.state;
-    // eslint-disable-next-line no-useless-escape
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return value && !re.test(value);
-  }
-
-  handleAddUsher = (email) => {
-    const { ushers } = this.state;
-    console.log(ushers);
-    ushers.push({email, role: 'USHER'});
-    this.setState({ushers})
-  }
-
-  isUserEmailUsed = (email) => {
-    const { ushers } = this.state;
-    return ushers.some(({email}))
-  }
 
   render() {
     const { initialValues } = this.state;
@@ -134,6 +73,9 @@ class AddPartnerForm extends Component {
               <GridItem>
                 <Field name="p24MerchantId" label="Merchant Id" required component={TextField} {...commonProps} />
               </GridItem>
+              <GridItem>
+                <Button type="submit" variant="contained" color="primary">Utwórz partnera</Button>
+              </GridItem>
             </Grid>
           </Form>
         )}
@@ -144,7 +86,6 @@ class AddPartnerForm extends Component {
 
 AddPartnerForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
-  createPartner: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
@@ -158,13 +99,4 @@ AddPartnerForm.defaultProps = {
   onSubmitSuccess: null,
 };
 
-const mapStateToProps = () => ({});
-
-const mapDispatchToProps = {
-  createPartner: partnersActions.createPartner,
-};
-
-export default compose(
-  withStyles(styles),
-  connect(mapStateToProps, mapDispatchToProps),
-)(AddPartnerForm);
+export default AddPartnerForm;

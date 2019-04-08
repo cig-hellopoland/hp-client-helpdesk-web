@@ -25,6 +25,7 @@ class AddPartnerForm extends Component {
         name: '',
         commission: 0,
         p24MerchantId: '',
+        users: props.users || [],
       },
     };
 
@@ -38,9 +39,8 @@ class AddPartnerForm extends Component {
     });
   }
 
-  handleSubmit = (values, actions) => {
+  handleSubmit = (values) => {
     const { onSubmit } = this.props;
-    console.log(actions)
     onSubmit(values);
   };
 
@@ -68,10 +68,10 @@ class AddPartnerForm extends Component {
                 <Field name="name" label="Nazwa partnera" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="commission" type="number" label="Prowizja" required component={TextField} {...commonProps} />
+                <Field name="commission" type="number" label="Prowizja (%)" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="p24MerchantId" label="Merchant Id" required component={TextField} {...commonProps} />
+                <Field name="p24MerchantId" label="Płatności24 Merchant Id" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Button type="submit" variant="contained" color="primary">Utwórz partnera</Button>
@@ -85,8 +85,8 @@ class AddPartnerForm extends Component {
 }
 
 AddPartnerForm.propTypes = {
-  classes: PropTypes.shape({}).isRequired,
   FormikProps: PropTypes.shape({}),
+  users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,

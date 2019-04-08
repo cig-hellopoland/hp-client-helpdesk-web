@@ -32,7 +32,7 @@ describe('actions', () => {
     const expectedValue = {
       type: CREATE_PARTNER,
       payload: {
-        url: '/helpdesk/partners',
+        url: '/partners',
         method: 'post',
       },
     };

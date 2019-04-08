@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
-import { connect } from 'react-redux';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
@@ -36,7 +35,7 @@ const initialDialogState = {
   title: null,
 };
 
-class AddTicketerForm extends Component {
+class AddUserForm extends Component {
   constructor(props) {
     super(props);
 
@@ -51,7 +50,7 @@ class AddTicketerForm extends Component {
     this.validationSchema = yupObject().shape({
       email: yupString().email().trim(),
     });
-  };
+  }
 
   handleClose = () => this.setState({ alertDialog: initialDialogState });
 
@@ -71,8 +70,8 @@ class AddTicketerForm extends Component {
           this.handleClose();
           handleRemove(email);
         },
-      }
-    })
+      },
+    });
   }
 
   render() {
@@ -116,14 +115,11 @@ class AddTicketerForm extends Component {
             </List>
             <Form autoComplete="off" align="flex-start">
               <Grid container spacing={24}>
-                <Grid item xs={12}>
-                  <Typography variant="subtitle2" gutterBottom>Dodaj biletera</Typography>
-                </Grid>
-                <Grid container item xs={12} alignItems="flex-end" spacing={16}>
-                  <Grid item xs={10}>
+                <Grid container item xs={12} alignItems="flex-end" justify="space-between" spacing={16}>
+                  <Grid item xs={9}>
                     <Field name="email" label="E-mail Biletera" required component={TextField} {...commonProps} />
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid item xs={1}>
                     <Button type="submit" variant="contained" color="primary">Dodaj</Button>
                   </Grid>
                 </Grid>
@@ -137,7 +133,7 @@ class AddTicketerForm extends Component {
   }
 }
 
-AddTicketerForm.propTypes = {
+AddUserForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   handleRemove: PropTypes.func.isRequired,
   users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
@@ -145,10 +141,10 @@ AddTicketerForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
 };
 
-AddTicketerForm.defaultProps = {
+AddUserForm.defaultProps = {
   FormikProps: null,
 };
 
 export default compose(
   withStyles(styles),
-)(AddTicketerForm);
+)(AddUserForm);

@@ -22,12 +22,11 @@ const styles = theme => ({
   },
 });
 
-const initialState = {
-  users: [],
-  error: false,
-};
 class AddPartner extends Component {
-  state = initialState;
+  state = {
+    users: [],
+    error: false,
+  };
 
   createPartnerForm = React.createRef();
 
@@ -43,9 +42,9 @@ class AddPartner extends Component {
         ...values,
       },
       onSuccess: () => {
-        PartnerForm.resetForm();
+        this.setState({ users: [], error: false });
         UserForm.resetForm();
-        this.setState({ ...initialState });
+        PartnerForm.resetForm();
       },
       onFailure: () => {
         PartnerForm.setSubmitting(false);
@@ -55,10 +54,11 @@ class AddPartner extends Component {
     });
   }
 
-  handleAddTicketer = (email) => {
+  handleAddTicketer = (values) => {
     const { users } = this.state;
     const { current } = this.addUserFrom;
-    users.push({ email, roles: ['USHER'] });
+    const user = { ...values, roles: ['USHER'] };
+    users.push(user);
     this.setState({
       users,
     }, current.resetForm());

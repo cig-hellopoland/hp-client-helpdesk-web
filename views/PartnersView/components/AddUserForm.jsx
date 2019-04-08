@@ -10,6 +10,7 @@ import IconClear from '@material-ui/icons/Clear';
 import IconBlock from '@material-ui/icons/Block';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography/Typography';
+import GridItem from 'components/GridItem';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
@@ -43,12 +44,14 @@ class AddUserForm extends Component {
       alertDialog: initialDialogState,
       initialValues: {
         email: '',
+        name: '',
       },
     };
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
-      email: yupString().email().trim(),
+      email: yupString().email().trim().required(),
+      name: yupString().required(),
     });
   }
 
@@ -56,7 +59,7 @@ class AddUserForm extends Component {
 
   handleSubmit = (values) => {
     const { onSubmit } = this.props;
-    onSubmit(values.email);
+    onSubmit(values);
   };
 
   handleRemoveUserDialogOpen = (email) => {
@@ -88,14 +91,14 @@ class AddUserForm extends Component {
         {() => (
           <>
             <Typography variant="h6">Bileterzy</Typography>
-            <List className={classes.list}>
+            <List className={classes.list} dense>
               {
                 users.length > 0
                   ? (
-                    users.map(({ email }) => (
+                    users.map(({ email, name }) => (
                       <div key={email}>
                         <ListItem>
-                          <ListItemText primary={email} />
+                          <ListItemText primary={name} secondary={email} />
                           <ListItemSecondaryAction>
                             <IconButton onClick={() => this.handleRemoveUserDialogOpen(email)}>
                               <IconClear />
@@ -113,16 +116,17 @@ class AddUserForm extends Component {
                   )
               }
             </List>
-            <Form autoComplete="off" align="flex-start">
-              <Grid container spacing={24}>
-                <Grid container item xs={12} alignItems="flex-end" justify="space-between" spacing={16}>
-                  <Grid item xs={9}>
-                    <Field name="email" label="E-mail Biletera" required component={TextField} {...commonProps} />
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Button type="submit" variant="contained" color="primary">Dodaj</Button>
-                  </Grid>
-                </Grid>
+            <Form autoComplete="off">
+              <Grid container spacing={16}>
+                <GridItem>
+                  <Field name="email" label="E-mail Biletera" required component={TextField} {...commonProps} />
+                </GridItem>
+                <GridItem>
+                  <Field name="name" label="Nazwa Biletera" required component={TextField} {...commonProps} />
+                </GridItem>
+                <GridItem>
+                  <Button type="submit" variant="contained" color="primary">Dodaj</Button>
+                </GridItem>
               </Grid>
             </Form>
             <AlertDialog {...alertDialog} onCancel={this.handleClose} />

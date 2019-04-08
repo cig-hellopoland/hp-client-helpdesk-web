@@ -90,7 +90,7 @@ const PromotionDialog = ({
           )
         }
         <Button onClick={onClose} color="primary">Anuluj</Button>
-        <Button onClick={() => onSubmit(id, value)} disabled={!id && !value} color="primary" autoFocus>Zapisz</Button>
+        <Button onClick={() => onSubmit(id, value)} disabled={!id || !value} color="primary" autoFocus>Zapisz</Button>
       </DialogActions>
     </Dialog>
   );

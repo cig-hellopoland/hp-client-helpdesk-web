@@ -1,13 +1,9 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Grid from '@material-ui/core/Grid';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import MuiTextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography/Typography';
 import { Formik, Form, Field, FieldArray } from 'formik';
 import { TextField } from 'formik-material-ui';

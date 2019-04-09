@@ -30,22 +30,22 @@ const styles = {
   },
 };
 
-const initialState = {
-  alertDialog: {
-    content: null,
-    onSuccess: null,
-    open: false,
-    title: null,
-  },
-  promotionDialog: {
-    open: false,
-    erros: false,
-  },
-  error: false,
-};
-
 class PromotedSightEvents extends Component {
-  state = initialState
+  initialState = {
+    alertDialog: {
+      content: null,
+      onSuccess: null,
+      open: false,
+      title: null,
+    },
+    promotionDialog: {
+      open: false,
+      erros: false,
+    },
+    error: false,
+  };
+
+  state = this.initialState;
 
   componentDidMount() {
     const { fetchSightEventsList } = this.props;
@@ -54,12 +54,13 @@ class PromotedSightEvents extends Component {
 
   handleClose = () => {
     this.setState({
-      ...initialState,
+      ...this.initialState,
     });
   }
 
-  handlePromotionChange = (id, value) => {
+  handlePromotionChange = (id, value, callback) => {
     const { changePromotion, fetchSightEventsList } = this.props;
+    const { promotionDialog } = this.state;
     const pathParams = { promotion: value };
     changePromotion({
       id,
@@ -67,9 +68,12 @@ class PromotedSightEvents extends Component {
       onSuccess: () => {
         fetchSightEventsList();
         this.handleClose();
+        if (callback) {
+          callback();
+        }
       },
       onFailure: () => {
-        this.setState({ promotionDialog: { error: true } });
+        this.setState({ promotionDialog: { ...promotionDialog, error: true } });
       },
     });
   }

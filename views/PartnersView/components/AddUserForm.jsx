@@ -88,7 +88,7 @@ class AddUserForm extends Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {() => (
+        {resetForm => (
           <>
             <Typography variant="h6">Bileterzy</Typography>
             <List className={classes.list} dense>
@@ -124,9 +124,10 @@ class AddUserForm extends Component {
                 <GridItem>
                   <Field name="name" label="Nazwa Biletera" required component={TextField} {...commonProps} />
                 </GridItem>
-                <GridItem>
+                <Grid container item justify="flex-end">
+                  <Button variant="contained" color="primary" onClick={() => resetForm()}>Anuluj</Button>
                   <Button type="submit" variant="contained" color="primary">Dodaj</Button>
-                </GridItem>
+                </Grid>
               </Grid>
             </Form>
             <AlertDialog {...alertDialog} onCancel={this.handleClose} />

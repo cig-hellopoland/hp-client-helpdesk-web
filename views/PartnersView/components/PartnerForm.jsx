@@ -25,6 +25,7 @@ class AddPartnerForm extends Component {
         name: '',
         commission: 0,
         p24MerchantId: '',
+        affiliateCode: '',
         users: props.users || [],
       },
     };
@@ -32,10 +33,11 @@ class AddPartnerForm extends Component {
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
-      email: yupString().email().trim(),
+      email: yupString().email().trim().required(),
       name: yupString().required(),
       commission: yupNumber().min(1).max(100).required(),
       p24MerchantId: yupString().required(),
+      affiliateCode: yupString().required(),
     });
   }
 
@@ -71,7 +73,10 @@ class AddPartnerForm extends Component {
                 <Field name="commission" type="number" label="Prowizja (%)" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="p24MerchantId" label="Płatności24 Merchant Id" required component={TextField} {...commonProps} />
+                <Field name="p24MerchantId" label="Przelewy24 Merchant Id" required component={TextField} {...commonProps} />
+              </GridItem>
+              <GridItem>
+                <Field name="affiliateCode" label="Kod afiliacyjny" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Button type="submit" variant="contained" color="primary">Utwórz partnera</Button>

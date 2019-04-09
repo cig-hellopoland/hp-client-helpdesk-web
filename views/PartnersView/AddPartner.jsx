@@ -16,6 +16,8 @@ import AddUserForm from './components/AddUserForm';
 const styles = theme => ({
   root: {
     padding: theme.spacing.unit * 2,
+    maxWidth: 1200,
+    margin: '0 auto',
   },
   error: {
     color: 'red',
@@ -96,21 +98,21 @@ class AddPartner extends Component {
               && <Typography className={classes.error}>Wystąpił błąd</Typography>
             }
           </GridItem>
-          <Grid item xs={7}>
+          <GridItem>
             <AddPartnerForm
               FormikProps={{ ref: this.createPartnerForm }}
               onSubmit={this.handleCreatePartner}
               users={users}
             />
-          </Grid>
-          <Grid item xs={5}>
+          </GridItem>
+          <GridItem>
             <AddUserForm
               FormikProps={{ ref: this.addUserFrom }}
               users={users}
               onSubmit={this.handleAddTicketer}
               handleRemove={this.handleRemoveTicketer}
             />
-          </Grid>
+          </GridItem>
         </Grid>
       </Layout>
     );

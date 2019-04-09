@@ -29,19 +29,19 @@ const prefix = `${name}/`;
  */
 
 /**
- * Type used for handling change password request.
+ * Type used for handling create partner request.
  * @type {string}
  */
 const CREATE_PARTNER = `${prefix}CREATE_PARTNER`;
 
 /**
- * Type used for handling change password request failure.
+ * Type used for handling create partner request.
  * @type {string}
  */
 const CREATE_PARTNER_FAILURE = `${prefix}CREATE_PARTNER_FAILURE`;
 
 /**
- * Type used for handling change password request success.
+ * Type used for handling create partner request.
  * @type {string}
  */
 const CREATE_PARTNER_SUCCESS = `${prefix}CREATE_PARTNER_SUCCESS`;
@@ -57,7 +57,7 @@ export const types = {
  */
 
 /**
- * Creates action for password change request.
+ * Creates action for create partner request.
  * @method
  * @callback failureCallback
  * @callback successCallback
@@ -86,7 +86,7 @@ const createPartner = ({
   onSuccess,
 });
 /**
- * Creates action for password change request failing.
+ * Creates action for create partner request failing.
  * @method
  * @param {Object} params - axios response schema
  * @param params.data - response body
@@ -105,7 +105,7 @@ const createPartnerFailure = ({ data, status } = {}) => ({
 });
 
 /**
- * Creates action for successful password change request.
+ * Creates action for successful create partner request.
  * @method
  * @return {{type: string}}
  */
@@ -120,7 +120,7 @@ export const actions = {
 };
 
 /**
- * Logic used for handling entity fetching.
+ * Logic used for handling create partner request.
  * @method
  */
 const createPartnerLogic = createLogic({

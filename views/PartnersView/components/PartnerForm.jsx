@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography/Typography';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -77,9 +76,6 @@ class AddPartnerForm extends Component {
               </GridItem>
               <GridItem>
                 <Field name="affiliateCode" label="Kod afiliacyjny" required component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Button type="submit" variant="contained" color="primary">Utwórz partnera</Button>
               </GridItem>
             </Grid>
           </Form>

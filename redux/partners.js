@@ -145,16 +145,14 @@ const createPartnerLogic = createLogic({
         }
       } else {
         dispatch(createPartnerFailure(response));
-
         if (onFailure) {
           onFailure();
         }
       }
     } catch ({ response }) {
       dispatch(createPartnerFailure(response));
-
       if (onFailure) {
-        onFailure();
+        onFailure(response.message);
       }
     }
 

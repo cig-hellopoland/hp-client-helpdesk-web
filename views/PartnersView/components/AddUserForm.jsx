@@ -45,7 +45,9 @@ class AddUserForm extends Component {
       initialValues: {
         email: '',
         name: '',
+        roles: ['USHER'],
       },
+      showForm: false,
     };
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
@@ -60,6 +62,7 @@ class AddUserForm extends Component {
   handleSubmit = (values) => {
     const { onSubmit } = this.props;
     onSubmit(values);
+    this.setState({ showForm: false });
   };
 
   handleRemoveUserDialogOpen = (email) => {
@@ -77,8 +80,13 @@ class AddUserForm extends Component {
     });
   }
 
+  handleDiscard = (resetForm) => {
+    resetForm();
+    this.setState({ showForm: false });
+  }
+
   render() {
-    const { alertDialog, initialValues } = this.state;
+    const { alertDialog, initialValues, showForm } = this.state;
     const { classes, FormikProps, users } = this.props;
     return (
       <Formik
@@ -88,50 +96,62 @@ class AddUserForm extends Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {resetForm => (
-          <>
-            <Typography variant="h6">Bileterzy</Typography>
-            <List className={classes.list} dense>
+        {({ resetForm }) => (
+          <Grid container spacing={16}>
+            <Grid item container xs={12} justify="space-between">
+              <Typography variant="h6">Bileterzy</Typography>
+              <Button variant="outlined" onClick={() => this.setState({ showForm: true })}>Nowy bileter</Button>
+            </Grid>
+            <Grid item xs={12}>
+              <List className={classes.list} dense>
+                {
+                  users.length > 0
+                    ? (
+                      users.map(({ email, name }) => (
+                        <div key={email}>
+                          <ListItem>
+                            <ListItemText primary={name} secondary={email} />
+                            <ListItemSecondaryAction>
+                              <IconButton onClick={() => this.handleRemoveUserDialogOpen(email)}>
+                                <IconClear />
+                              </IconButton>
+                            </ListItemSecondaryAction>
+                          </ListItem>
+                          <Divider />
+                        </div>
+                      ))
+                    ) : (
+                      <Grid container alignItems="center">
+                        <IconBlock />
+                        <Typography variant="subtitle2">Brak bileterów</Typography>
+                      </Grid>
+                    )
+                }
+              </List>
+            </Grid>
+            <Grid item xs={12}>
               {
-                users.length > 0
-                  ? (
-                    users.map(({ email, name }) => (
-                      <div key={email}>
-                        <ListItem>
-                          <ListItemText primary={name} secondary={email} />
-                          <ListItemSecondaryAction>
-                            <IconButton onClick={() => this.handleRemoveUserDialogOpen(email)}>
-                              <IconClear />
-                            </IconButton>
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                        <Divider />
-                      </div>
-                    ))
-                  ) : (
-                    <Grid container justify="center" alignItems="center">
-                      <IconBlock />
-                      <Typography variant="subtitle2">Brak bileterów</Typography>
+                showForm
+                && (
+                  <Form autoComplete="off">
+                    <Grid container spacing={16} justify="flex-end">
+                      <GridItem>
+                        <Field name="email" label="E-mail Biletera" required component={TextField} {...commonProps} />
+                      </GridItem>
+                      <GridItem>
+                        <Field name="name" label="Nazwa Biletera" required component={TextField} {...commonProps} />
+                      </GridItem>
+                      <Grid container item justify="space-between" xs={2}>
+                        <Button variant="contained" color="primary" onClick={() => this.handleDiscard(resetForm)}>Anuluj</Button>
+                        <Button type="submit" variant="contained" color="primary">Dodaj</Button>
+                      </Grid>
                     </Grid>
-                  )
+                  </Form>
+                )
               }
-            </List>
-            <Form autoComplete="off">
-              <Grid container spacing={16}>
-                <GridItem>
-                  <Field name="email" label="E-mail Biletera" required component={TextField} {...commonProps} />
-                </GridItem>
-                <GridItem>
-                  <Field name="name" label="Nazwa Biletera" required component={TextField} {...commonProps} />
-                </GridItem>
-                <Grid container item justify="flex-end">
-                  <Button variant="contained" color="primary" onClick={() => resetForm()}>Anuluj</Button>
-                  <Button type="submit" variant="contained" color="primary">Dodaj</Button>
-                </Grid>
-              </Grid>
-            </Form>
+            </Grid>
             <AlertDialog {...alertDialog} onCancel={this.handleClose} />
-          </>
+          </Grid>
         )}
       </Formik>
     );

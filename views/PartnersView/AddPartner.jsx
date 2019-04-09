@@ -22,17 +22,26 @@ const styles = theme => ({
   error: {
     color: 'red',
   },
+  sectionWrapper: {
+    marginTop: 40,
+  },
 });
 
 class AddPartner extends Component {
   state = {
     users: [],
     error: false,
+    errorMessage: false,
   };
 
   createPartnerForm = React.createRef();
 
   addUserFrom = React.createRef();
+
+  handleSubmit = () => {
+    const { current } = this.createPartnerForm;
+    current.submitForm();
+  }
 
   handleCreatePartner = (values) => {
     const { createPartner } = this.props;
@@ -48,18 +57,17 @@ class AddPartner extends Component {
         UserForm.resetForm();
         PartnerForm.resetForm();
       },
-      onFailure: () => {
+      onFailure: (message) => {
         PartnerForm.setSubmitting(false);
         UserForm.setSubmitting(false);
-        this.setState({ error: true });
+        this.setState({ error: true, errorMessage: message });
       },
     });
   }
 
-  handleAddTicketer = (values) => {
+  handleAddTicketer = (user) => {
     const { users } = this.state;
     const { current } = this.addUserFrom;
-    const user = { ...values, roles: ['USHER'] };
     users.push(user);
     this.setState({
       users,
@@ -78,7 +86,7 @@ class AddPartner extends Component {
 
   render() {
     const { classes } = this.props;
-    const { users, error } = this.state;
+    const { users, error, errorMessage } = this.state;
     return (
       <Layout>
         <Link href="/" passHref prefetch>
@@ -93,19 +101,13 @@ class AddPartner extends Component {
         </Link>
         <Grid className={classes.root} container spacing={16}>
           <GridItem>
-            {
-              error
-              && <Typography className={classes.error}>Wystąpił błąd</Typography>
-            }
-          </GridItem>
-          <GridItem>
             <AddPartnerForm
               FormikProps={{ ref: this.createPartnerForm }}
               onSubmit={this.handleCreatePartner}
               users={users}
             />
           </GridItem>
-          <GridItem>
+          <GridItem className={classes.sectionWrapper}>
             <AddUserForm
               FormikProps={{ ref: this.addUserFrom }}
               users={users}
@@ -113,6 +115,17 @@ class AddPartner extends Component {
               handleRemove={this.handleRemoveTicketer}
             />
           </GridItem>
+          <Grid className={classes.sectionWrapper} container spacing={16} item direction="row-reverse" justify="space-between">
+            <Grid item>
+              <Button variant="contained" color="primary" onClick={this.handleSubmit}>Utwórz partnera</Button>
+            </Grid>
+            <Grid item>
+              {
+                error
+                && <Typography className={classes.error}>{errorMessage || 'Wystąpił nieznany błąd'}</Typography>
+              }
+            </Grid>
+          </Grid>
         </Grid>
       </Layout>
     );

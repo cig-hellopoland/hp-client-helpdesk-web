@@ -33,7 +33,7 @@ const PromotionDialog = ({
   const handleClose = () => {
     onClose();
     setPromotedSightEvent({ id: '', value: '' });
-  }
+  };
   return (
     <Dialog
       aria-labelledby="dialog-title"

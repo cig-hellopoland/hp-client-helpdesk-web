@@ -58,7 +58,7 @@ class PromotedSightEvents extends Component {
     });
   }
 
-  handlePromotionChange = (id, value, callback) => {
+  handlePromotionChange = (id, value) => {
     const { changePromotion, fetchSightEventsList } = this.props;
     const { promotionDialog } = this.state;
     const pathParams = { promotion: value };
@@ -68,9 +68,6 @@ class PromotedSightEvents extends Component {
       onSuccess: () => {
         fetchSightEventsList();
         this.handleClose();
-        if (callback) {
-          callback();
-        }
       },
       onFailure: () => {
         this.setState({ promotionDialog: { ...promotionDialog, error: true } });

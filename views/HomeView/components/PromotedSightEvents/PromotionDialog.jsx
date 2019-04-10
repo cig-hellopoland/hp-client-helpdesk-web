@@ -30,11 +30,19 @@ const PromotionDialog = ({
 }) => {
   const [promotedSightEvent, setPromotedSightEvent] = useState({ id: '', value: '' });
   const { id, value } = promotedSightEvent;
+  const handleClose = () => {
+    setPromotedSightEvent({ id: '', value: '' });
+    onClose();
+  };
+  const handleSubmit = () => {
+    onSubmit(id, value);
+    setPromotedSightEvent({ id: '', value: '' });
+  };
   return (
     <Dialog
       aria-labelledby="dialog-title"
       aria-describedby="alert-dialog-description"
-      onClose={onClose}
+      onClose={handleClose}
       open={open}
     >
       <DialogTitle id="alert-dialog-title">Promocja oferty</DialogTitle>
@@ -89,8 +97,8 @@ const PromotionDialog = ({
             </Typography>
           )
         }
-        <Button onClick={onClose} color="primary">Anuluj</Button>
-        <Button onClick={() => onSubmit(id, value)} disabled={!id || !value} color="primary" autoFocus>Zapisz</Button>
+        <Button onClick={handleClose} color="primary">Anuluj</Button>
+        <Button onClick={handleSubmit} disabled={!id || !value} color="primary" autoFocus>Zapisz</Button>
       </DialogActions>
     </Dialog>
   );

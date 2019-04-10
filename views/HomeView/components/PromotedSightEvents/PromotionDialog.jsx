@@ -35,7 +35,7 @@ const PromotionDialog = ({
     onClose();
   };
   const handleSubmit = () => {
-    onSubmit();
+    onSubmit(id, value);
     setPromotedSightEvent({ id: '', value: '' });
   };
   return (

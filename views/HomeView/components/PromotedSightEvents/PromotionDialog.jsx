@@ -31,7 +31,11 @@ const PromotionDialog = ({
   const [promotedSightEvent, setPromotedSightEvent] = useState({ id: '', value: '' });
   const { id, value } = promotedSightEvent;
   const handleClose = () => {
+    setPromotedSightEvent({ id: '', value: '' });
     onClose();
+  };
+  const handleSubmit = () => {
+    onSubmit();
     setPromotedSightEvent({ id: '', value: '' });
   };
   return (
@@ -94,7 +98,7 @@ const PromotionDialog = ({
           )
         }
         <Button onClick={handleClose} color="primary">Anuluj</Button>
-        <Button onClick={() => onSubmit(id, value, handleClose)} disabled={!id || !value} color="primary" autoFocus>Zapisz</Button>
+        <Button onClick={handleSubmit} disabled={!id || !value} color="primary" autoFocus>Zapisz</Button>
       </DialogActions>
     </Dialog>
   );

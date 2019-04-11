@@ -21,6 +21,9 @@ const styles = theme => ({
   error: {
     color: 'red',
   },
+  success: {
+    color: 'green',
+  },
   sectionWrapper: {
     marginTop: 40,
   },
@@ -30,6 +33,7 @@ class AddPartner extends Component {
   state = {
     error: false,
     errorMessage: false,
+    success: false,
   };
 
   createPartnerForm = React.createRef();
@@ -48,17 +52,18 @@ class AddPartner extends Component {
       },
       onSuccess: () => {
         PartnerForm.resetForm();
+        this.setState({ success: true, error: false, errorMessage: false });
       },
       onFailure: (message) => {
         PartnerForm.setSubmitting(false);
-        this.setState({ error: true, errorMessage: message });
+        this.setState({ error: true, errorMessage: message, success: false });
       },
     });
   }
 
   render() {
     const { classes } = this.props;
-    const { error, errorMessage } = this.state;
+    const { error, errorMessage, success } = this.state;
     return (
       <Layout>
         <Link href="/" passHref prefetch>
@@ -72,6 +77,16 @@ class AddPartner extends Component {
           </Button>
         </Link>
         <Grid className={classes.root} container spacing={16}>
+          <GridItem>
+            {
+              success
+              && (
+                <Typography className={classes.success}>
+                    Pomyślnie założono konto partnera
+                </Typography>
+              )
+            }
+          </GridItem>
           <GridItem>
             <AddPartnerForm
               FormikProps={{ ref: this.createPartnerForm }}

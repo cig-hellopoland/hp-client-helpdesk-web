@@ -11,7 +11,6 @@ import Typography from '@material-ui/core/Typography/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { actions as partnersActions } from 'redux/partners';
 import AddPartnerForm from './components/PartnerForm';
-import AddUserForm from './components/AddUserForm';
 
 const styles = theme => ({
   root: {
@@ -29,14 +28,11 @@ const styles = theme => ({
 
 class AddPartner extends Component {
   state = {
-    users: [],
     error: false,
     errorMessage: false,
   };
 
   createPartnerForm = React.createRef();
-
-  addUserFrom = React.createRef();
 
   handleSubmit = () => {
     const { current } = this.createPartnerForm;
@@ -46,47 +42,23 @@ class AddPartner extends Component {
   handleCreatePartner = (values) => {
     const { createPartner } = this.props;
     const { current: PartnerForm } = this.createPartnerForm;
-    const { current: UserForm } = this.addUserFrom;
-    UserForm.setSubmitting(true);
     createPartner({
       data: {
         ...values,
       },
       onSuccess: () => {
-        this.setState({ users: [], error: false });
-        UserForm.resetForm();
         PartnerForm.resetForm();
       },
       onFailure: (message) => {
         PartnerForm.setSubmitting(false);
-        UserForm.setSubmitting(false);
         this.setState({ error: true, errorMessage: message });
       },
     });
   }
 
-  handleAddTicketer = (user) => {
-    const { users } = this.state;
-    const { current } = this.addUserFrom;
-    users.push(user);
-    this.setState({
-      users,
-    }, current.resetForm());
-  }
-
-  handleRemoveTicketer = (val) => {
-    const { users } = this.state;
-    const { current } = this.addUserFrom;
-
-    const filteredUsers = users.filter(({ email }) => email !== val);
-    this.setState({
-      users: filteredUsers,
-    }, current.resetForm());
-  }
-
   render() {
     const { classes } = this.props;
-    const { users, error, errorMessage } = this.state;
+    const { error, errorMessage } = this.state;
     return (
       <Layout>
         <Link href="/" passHref prefetch>
@@ -104,15 +76,6 @@ class AddPartner extends Component {
             <AddPartnerForm
               FormikProps={{ ref: this.createPartnerForm }}
               onSubmit={this.handleCreatePartner}
-              users={users}
-            />
-          </GridItem>
-          <GridItem className={classes.sectionWrapper}>
-            <AddUserForm
-              FormikProps={{ ref: this.addUserFrom }}
-              users={users}
-              onSubmit={this.handleAddTicketer}
-              handleRemove={this.handleRemoveTicketer}
             />
           </GridItem>
           <Grid className={classes.sectionWrapper} container spacing={16} item direction="row-reverse" justify="space-between">

@@ -151,8 +151,9 @@ const createPartnerLogic = createLogic({
       }
     } catch ({ response }) {
       dispatch(createPartnerFailure(response));
+      const message = response && response.data && response.data.message;
       if (onFailure) {
-        onFailure(response.message);
+        onFailure(message);
       }
     }
 

@@ -1,6 +1,8 @@
 import reducer, {
   actions,
+  name,
   types,
+  selectors,
   defaultInitialState,
 } from './partners';
 
@@ -8,6 +10,11 @@ import reducer, {
  * Initial state
  */
 const initialState = defaultInitialState;
+
+const appState = {
+  config: {},
+  [name]: initialState,
+};
 
 function onFailure() {}
 function onSuccess() {}
@@ -20,24 +27,44 @@ const axiosResponseError = {
 };
 
 /*
+ * Helper functions
+ */
+
+function generateState(data) {
+  return {
+    ...initialState,
+    ...data,
+  };
+}
+
+function generateAppState(data) {
+  return {
+    ...appState,
+    [name]: {
+      ...generateState(data),
+    },
+  };
+}
+
+/*
  * Tests
  */
 
 describe('actions', () => {
-  it('should create an action to make create partner request', () => {
-    const { createPartner } = actions;
-    const { CREATE_PARTNER } = types;
+  it('should create an action to make create item request', () => {
+    const { createItem } = actions;
+    const { CREATE_ITEM } = types;
     const options = { b: 2 };
     const data = {};
     const expectedValue = {
-      type: CREATE_PARTNER,
+      type: CREATE_ITEM,
       payload: {
         url: '/partners',
         method: 'post',
       },
     };
 
-    expect(createPartner()).toEqual(expectedValue);
+    expect(createItem()).toEqual(expectedValue);
 
     expectedValue.payload = {
       ...expectedValue.payload,
@@ -45,39 +72,64 @@ describe('actions', () => {
       data,
     };
 
-    expect(createPartner({ options, data })).toEqual(expectedValue);
+    expect(createItem({ options, data })).toEqual(expectedValue);
 
     expectedValue.onFailure = onFailure;
     expectedValue.onSuccess = onSuccess;
 
-    expect(createPartner({
+    expect(createItem({
       data, options, onFailure, onSuccess,
     })).toEqual(expectedValue);
   });
 
   it('should create an action to fail profile request', () => {
-    const { createPartnerFailure } = actions;
-    const { CREATE_PARTNER_FAILURE } = types;
+    const { createItemFailure } = actions;
+    const { CREATE_ITEM_FAILURE } = types;
     const expectedValue = {
-      type: CREATE_PARTNER_FAILURE,
+      type: CREATE_ITEM_FAILURE,
       error: {},
     };
 
-    expect(createPartnerFailure()).toEqual(expectedValue);
+    expect(createItemFailure()).toEqual(expectedValue);
 
     expectedValue.error = axiosResponseError;
 
-    expect(createPartnerFailure(axiosResponseError)).toEqual(expectedValue);
+    expect(createItemFailure(axiosResponseError)).toEqual(expectedValue);
   });
 
   it('should create an action to succeed profile request', () => {
-    const { createPartnerSuccess } = actions;
-    const { CREATE_PARTNER_SUCCESS } = types;
+    const { createItemSuccess } = actions;
+    const { CREATE_ITEM_SUCCESS } = types;
     const expectedValue = {
-      type: CREATE_PARTNER_SUCCESS,
+      type: CREATE_ITEM_SUCCESS,
     };
 
-    expect(createPartnerSuccess()).toEqual(expectedValue);
+    expect(createItemSuccess()).toEqual(expectedValue);
+  });
+});
+
+describe('selectors', () => {
+  describe('using getState', () => {
+    const { getState } = selectors;
+
+    it(`should return ${name} state`, () => {
+      expect(getState(appState)).toEqual(initialState);
+    });
+  });
+
+  describe('using getError', () => {
+    const { getError } = selectors;
+
+    it('should return null if there was no error', () => {
+      expect(getError(appState)).toBeNull();
+    });
+
+    it('should return some error message if there was an error', () => {
+      const error = 'omg';
+      const state = generateAppState({ error });
+
+      expect(getError(state)).toEqual(error);
+    });
   });
 });
 
@@ -94,8 +146,8 @@ describe('reducer', () => {
     expect(reducer()(undefined, { type: 'INVALID_TYPE' })).toEqual(defaultInitialState);
   });
 
-  it('should handle CREATE_PARTNER_SUCCESS', () => {
-    const action = actions.createPartnerSuccess();
+  it('should handle CREATE_ITEM_SUCCESS', () => {
+    const action = actions.createItemSuccess();
     const expectedValue = {
       ...defaultInitialState,
     };
@@ -103,8 +155,8 @@ describe('reducer', () => {
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });
 
-  it('should handle CREATE_PARTNER_FAILURE', () => {
-    let action = actions.createPartnerFailure();
+  it('should handle CREATE_ITEM_FAILURE', () => {
+    let action = actions.createItemFailure();
     const expectedValue = {
       ...defaultInitialState,
       error: {},
@@ -112,7 +164,7 @@ describe('reducer', () => {
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
 
-    action = actions.createPartnerFailure(axiosResponseError);
+    action = actions.createItemFailure(axiosResponseError);
     expectedValue.error = axiosResponseError;
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);

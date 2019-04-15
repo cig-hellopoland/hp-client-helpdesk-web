@@ -29,27 +29,27 @@ const prefix = `${name}/`;
  */
 
 /**
- * Type used for handling create partner request.
+ * Type used for handling create item request.
  * @type {string}
  */
-const CREATE_PARTNER = `${prefix}CREATE_PARTNER`;
+const CREATE_ITEM = `${prefix}CREATE_ITEM`;
 
 /**
- * Type used for handling create partner request.
+ * Type used for handling create item request.
  * @type {string}
  */
-const CREATE_PARTNER_FAILURE = `${prefix}CREATE_PARTNER_FAILURE`;
+const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
 
 /**
- * Type used for handling create partner request.
+ * Type used for handling create item request.
  * @type {string}
  */
-const CREATE_PARTNER_SUCCESS = `${prefix}CREATE_PARTNER_SUCCESS`;
+const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
 
 export const types = {
-  CREATE_PARTNER,
-  CREATE_PARTNER_FAILURE,
-  CREATE_PARTNER_SUCCESS,
+  CREATE_ITEM,
+  CREATE_ITEM_FAILURE,
+  CREATE_ITEM_SUCCESS,
 };
 
 /*
@@ -57,7 +57,7 @@ export const types = {
  */
 
 /**
- * Creates action for create partner request.
+ * Creates action for create item request.
  * @method
  * @callback failureCallback
  * @callback successCallback
@@ -72,10 +72,10 @@ export const types = {
  *   onSuccess: successCallback
  * }}
  */
-const createPartner = ({
+const createItem = ({
   options, data, onFailure, onSuccess,
 } = {}) => ({
-  type: CREATE_PARTNER,
+  type: CREATE_ITEM,
   payload: {
     url: `${apiURL}`,
     method: 'post',
@@ -86,7 +86,7 @@ const createPartner = ({
   onSuccess,
 });
 /**
- * Creates action for create partner request failing.
+ * Creates action for create item request failing.
  * @method
  * @param {Object} params - axios response schema
  * @param params.data - response body
@@ -96,8 +96,8 @@ const createPartner = ({
  *   error: {data, status: number}
  * }}
  */
-const createPartnerFailure = ({ data, status } = {}) => ({
-  type: CREATE_PARTNER_FAILURE,
+const createItemFailure = ({ data, status } = {}) => ({
+  type: CREATE_ITEM_FAILURE,
   error: {
     data,
     status,
@@ -109,23 +109,23 @@ const createPartnerFailure = ({ data, status } = {}) => ({
  * @method
  * @return {{type: string}}
  */
-const createPartnerSuccess = () => ({
-  type: CREATE_PARTNER_SUCCESS,
+const createItemSuccess = () => ({
+  type: CREATE_ITEM_SUCCESS,
 });
 
 export const actions = {
-  createPartner,
-  createPartnerFailure,
-  createPartnerSuccess,
+  createItem,
+  createItemFailure,
+  createItemSuccess,
 };
 
 /**
- * Logic used for handling create partner request.
+ * Logic used for handling create item request.
  * @method
  */
-const createPartnerLogic = createLogic({
+const createItemLogic = createLogic({
   type: [
-    CREATE_PARTNER,
+    CREATE_ITEM,
   ],
   latest: true,
   async process(
@@ -138,22 +138,21 @@ const createPartnerLogic = createLogic({
       const { data, status } = response;
 
       if (status === 200 || status === 204) {
-        dispatch(createPartnerSuccess(data));
+        dispatch(createItemSuccess(data));
 
         if (onSuccess) {
           onSuccess();
         }
       } else {
-        dispatch(createPartnerFailure(response));
+        dispatch(createItemFailure(response));
         if (onFailure) {
           onFailure();
         }
       }
     } catch ({ response }) {
-      dispatch(createPartnerFailure(response));
-      const message = response && response.data && response.data.message;
+      dispatch(createItemFailure(response));
       if (onFailure) {
-        onFailure(message);
+        onFailure();
       }
     }
 
@@ -162,7 +161,33 @@ const createPartnerLogic = createLogic({
 });
 
 export const logic = {
-  createPartnerLogic,
+  createItemLogic,
+};
+
+
+/*
+ * SELECTORS
+ */
+
+/**
+ * Returns current state.
+ * @method
+ * @param {Object} state - redux state
+ * @return {*}
+ */
+const getState = state => state[name];
+
+/**
+ * Returns request error.
+ * @method
+ * @param {Object} state - redux state
+ * @return {*}
+ */
+const getError = state => getState(state).error;
+
+export const selectors = {
+  getError,
+  getState,
 };
 
 /*
@@ -190,12 +215,12 @@ export const defaultInitialState = {
  */
 const reducer = (initialState = defaultInitialState) => (state = initialState, action) => {
   switch (action.type) {
-    case CREATE_PARTNER_FAILURE:
+    case CREATE_ITEM_FAILURE:
       return {
         ...state,
         error: action.error,
       };
-    case CREATE_PARTNER_SUCCESS:
+    case CREATE_ITEM_SUCCESS:
       return {
         ...state,
         error: initialState.error,

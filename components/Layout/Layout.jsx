@@ -1,17 +1,38 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import Grid from '@material-ui/core/Grid';
+import Dashboard from '@material-ui/icons/Dashboard';
+import Work from '@material-ui/icons/Work';
+import { withRouter } from 'next/router';
 import config from 'config';
-import Header from './Header';
 import Content from './Content';
+import Header from './Header';
+import MenuDrawer from './MenuDrawer';
 
 const title = config.public.name;
 
-const Layout = ({ children, ContentProps }) => (
+const MENU_ITEMS = [
+  {
+    label: 'Dashboard', href: '/', Icon: Dashboard,
+  },
+  {
+    label: 'Partnerzy', href: '/partners', Icon: Work,
+  },
+];
+
+
+const Layout = ({ children, ContentProps, router }) => (
   <Fragment>
     <Header documentTitle={title} />
-    <Content {...ContentProps}>
-      {children}
-    </Content>
+    <Grid container>
+      <MenuDrawer
+        currentPath={router.asPath}
+        menuItems={MENU_ITEMS}
+      />
+      <Content {...ContentProps}>
+        {children}
+      </Content>
+    </Grid>
   </Fragment>
 );
 
@@ -21,10 +42,11 @@ Layout.propTypes = {
     PropTypes.object,
   ]).isRequired,
   ContentProps: PropTypes.shape({}),
+  router: PropTypes.shape({}).isRequired,
 };
 
 Layout.defaultProps = {
   ContentProps: {},
 };
 
-export default Layout;
+export default withRouter(Layout);

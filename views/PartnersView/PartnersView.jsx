@@ -6,11 +6,6 @@ import Grid from '@material-ui/core/Grid';
 
 const PartnersView = () => (
   <Layout>
-    <Link href="/" passHref>
-      <Button component="a">
-        Strona główna
-      </Button>
-    </Link>
     <Grid style={{ padding: 10 }}>
       <Link href="/partners/add" passHref>
         <Button variant="contained" component="a">

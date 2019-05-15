@@ -19,11 +19,6 @@ const styles = {
 
 const HomeView = ({ classes }) => (
   <Layout>
-    <Link href="/partners" passHref prefetch>
-      <Button component="a">
-        Partnerzy
-      </Button>
-    </Link>
     <Grid container className={classes.content}>
       <Grid item md={4}>
         <Typography variant="h6" gutterBottom>Statystyki sprzedaży</Typography>

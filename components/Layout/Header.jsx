@@ -11,11 +11,13 @@ import IconButton from '@material-ui/core/IconButton';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import NoSsr from '@material-ui/core/NoSsr';
-import HomeIcon from '@material-ui/icons/Home';
-import Link from 'next/link';
+import MenuIcon from '@material-ui/icons/Menu';
 import ProfileMenu from './ProfileMenu';
 
-const styles = () => ({
+const styles = theme => ({
+  root: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
   grow: {
     display: 'flex',
     flexGrow: 1,
@@ -29,17 +31,11 @@ const menuItems = [
 const Header = ({
   classes, documentTitle, isAuthenticated, logout, profile, ...props
 }) => (
-  <AppBar {...props}>
+  <AppBar className={classes.root} {...props}>
     <Toolbar>
       <Grid container alignItems="center">
-        <Link href="/" passHref>
-          <IconButton color="inherit" aria-label="Home" component="a">
-            <HomeIcon />
-          </IconButton>
-        </Link>
-        <Typography variant="h6" color="inherit">
-          {documentTitle}
-        </Typography>
+        <IconButton><MenuIcon /></IconButton>
+        <Typography variant="h6" color="inherit">{documentTitle}</Typography>
       </Grid>
       <Grid container alignItems="center" justify="flex-end">
         <NoSsr fallback={<CircularProgress color="secondary" />}>

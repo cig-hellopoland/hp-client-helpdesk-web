@@ -99,16 +99,6 @@ class AddPartner extends Component {
     } = this.state;
     return (
       <Layout>
-        <Link href="/" passHref prefetch>
-          <Button component="a">
-            Strona główna
-          </Button>
-        </Link>
-        <Link href="/partners" passHref prefetch>
-          <Button component="a">
-            Partnerzy
-          </Button>
-        </Link>
         <Grid className={classes.root} container spacing={16}>
           <GridItem>
             <AddPartnerForm

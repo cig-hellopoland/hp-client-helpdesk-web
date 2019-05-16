@@ -1,35 +1,130 @@
 stages:
+  - install
   - test
   - build
+  - docker
+  - deploy
 
 variables:
-  NODE_VERSION: "10"
+  NODE_VERSION: "8"
+  ARTIFACT_NAME: "${CI_PROJECT_NAME}_${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_ID}"
+  DOCKER_IMAGE_NAME: "${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_REF_SLUG}"
+
+before_script:
+  - . envcfg
+
+#
+# install stage tasks
+#
+node_modules:
+  stage: install
+  only:
+    - merge_requests
+    - web
+  artifacts:
+    name: "${ARTIFACT_NAME}-node_modules"
+    expire_in: 30 mins
+    paths:
+      - node_modules
+  script:
+    - npm install
+
 
 #
 # test stage tasks
 #
-test_project:
+audit:
   stage: test
-  before_script:
-    - . envcfg
-    - npm i
+  only:
+    - merge_requests
+    - web
+  allow_failure: true
+  dependencies:
+    - node_modules
+  script:
+    - npm run audit
+
+linter:
+  stage: test
+  only:
+    - merge_requests
+    - web
+  dependencies:
+    - node_modules
   script:
     - npm run lint
-    - npm run test
 
+unit_tests:
+  stage: test
+  only:
+    - merge_requests
+    - web
+  dependencies:
+    - node_modules
+  script:
+    - npm run test
 
 #
 # build stage tasks
 #
-build_project:
+next_build:
   stage: build
-  variables:
-#  artifacts:
-#    name: "$CI_PROJECT_NAMESPACE_$CI_PROJECT_NAME-$CI_PIPELINE_ID"
-#    paths:
-#      - dist/
-  before_script:
-    - . envcfg
-    - npm i
+  only:
+    - merge_requests
+    - web
+  dependencies:
+    - node_modules
+  artifacts:
+    name: "${ARTIFACT_NAME}-next_build"
+    expire_in: 30 mins
+    paths:
+      - .next
   script:
-    - npm run build
+    - NODE_ENV="production" npm run build
+
+#
+# build stage tasks
+#
+docker_image:
+  stage: docker
+  only:
+    - merge_requests
+    - web
+  dependencies:
+    - next_build
+  script:
+    - docker build -t "${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}" --build-arg NPM_REGISTRY="$(cat ~/.npmrc)" .
+    - docker push "${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}"
+
+
+#
+# deploy stage tasks
+#
+#deploy_feature:
+#  stage: deploy
+#  only:
+#    - /^feature\/.*$/
+#    - merge-requests
+#    - web
+#  allow_failure: false
+#  when: manual
+#  environment:
+#    name: ${CI_COMMIT_REF_NAME}
+#    url: https://${ENV_URL_TESTING}
+#    on_stop: stop_deploy_feature
+#  script:
+#    - ssh ${ENV_USER_TESTING}@${ENV_HOST_TESTING} "docker pull ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}"
+##    - ssh ${ENV_USER_TESTING}@${ENV_HOST_TESTING} "docker run -d -p ${DOCKER_PORT_TESTING}:3000 -v ${DOCKER_VOLUME_TESTING}:/data ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}"
+#
+#stop_deploy_feature:
+#  stage: deploy
+#  only:
+#    - /^feature\/.*$/
+#    - merge-requests
+#    - web
+#  when: manual
+#  environment:
+#    name: ${CI_COMMIT_REF_NAME}
+#    action: stop
+#  script:
+#    - ssh ${ENV_USER_TESTING}@${ENV_HOST_TESTING} "rm deployment"

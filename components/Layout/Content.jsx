@@ -9,12 +9,18 @@ const styles = {
     padding: [[72, 8, 8]],
     margin: '0 auto 0 240px',
   },
+  authenticated: {
+    margin: '0 auto',
+  },
 };
 
 const Content = ({
-  classes, className, children, ...props
+  classes, className, children, isAuthenticated, ...props
 }) => (
-  <div className={classNames(classes.root, className)} {...props}>
+  <div
+    className={classNames(classes.root, className)}
+    {...props}
+  >
     {children}
   </div>
 );
@@ -26,6 +32,7 @@ Content.propTypes = {
     PropTypes.node,
     PropTypes.object,
   ]),
+  isAuthenticated: PropTypes.bool.isRequired,
 };
 
 Content.defaultProps = {

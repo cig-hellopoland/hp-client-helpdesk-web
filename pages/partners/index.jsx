@@ -1,3 +1,3 @@
-import PartnersView from 'views/PartnersView';
+import PartnersList from 'views/Partners';
 
-export default PartnersView;
+export default PartnersList;

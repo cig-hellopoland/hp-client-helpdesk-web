@@ -32,9 +32,11 @@ const MenuDrawer = ({
     <div className={classes.toolbar} />
     <nav>
       <List>
-        {menuItems.map(({ label, href, Icon }) => (
+        {menuItems.map(({
+          disabled, label, href, Icon,
+        }) => (
           <Link key={label} href={href} passHref>
-            <ListItem button selected={currentPath === href}>
+            <ListItem button disabled={disabled} selected={currentPath === href}>
               <ListItemIcon><Icon /></ListItemIcon>
               <ListItemText primary={label} />
             </ListItem>

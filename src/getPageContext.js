@@ -1,11 +1,16 @@
 /* eslint-disable no-underscore-dangle */
 import { SheetsRegistry } from 'jss';
 import { createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
+import teal from '@material-ui/core/colors/teal';
+import deepOrange from '@material-ui/core/colors/deepOrange';
 
 // A theme with custom primary and secondary color.
 // It's optional.
 const theme = createMuiTheme({
-  palette: {},
+  palette: {
+    primary: teal,
+    secondary: deepOrange,
+  },
   nprogress: {
     color: '#000',
   },

@@ -73,7 +73,7 @@ Go to `localhost:3000`.
     edit.jsx
   /movies
     index.jsx - resolves list and item routes (/movies - list view, /movies/:id - item view)
-    add.jsx
+    create.jsx
     edit.jsc
   example-view.jsx
 /redux - global reducers

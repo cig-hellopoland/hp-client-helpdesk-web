@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import withAuth from 'services/auth/withAuth';
 import { withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Layout from 'components/Layout';
 import AddPartnerForm from './components/PartnerForm';

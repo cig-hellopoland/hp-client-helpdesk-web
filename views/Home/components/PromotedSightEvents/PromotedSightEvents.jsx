@@ -15,8 +15,8 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import {
-  actions as sightEventActions,
-  selectors as sightEventSelectors,
+  actions as sightEventsActions,
+  selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import AlertDialog from 'components/AlertDialog';
 import PromotionDialog from './PromotionDialog';
@@ -56,7 +56,7 @@ class PromotedSightEvents extends Component {
     this.setState({
       ...this.initialState,
     });
-  }
+  };
 
   handlePromotionChange = (id, value) => {
     const { changePromotion, fetchSightEventsList } = this.props;
@@ -73,7 +73,7 @@ class PromotedSightEvents extends Component {
         this.setState({ promotionDialog: { ...promotionDialog, error: true } });
       },
     });
-  }
+  };
 
   handleRemovePromotion = (id) => {
     const { deletePromotion, fetchSightEventsList } = this.props;
@@ -87,7 +87,7 @@ class PromotedSightEvents extends Component {
         this.setState({ listError: true });
       },
     });
-  }
+  };
 
   handleRemovePromotionDialogOpen = (id, name) => this.setState({
     alertDialog: {
@@ -162,13 +162,13 @@ PromotedSightEvents.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  sightEventsList: sightEventSelectors.getSightEvents(state),
+  sightEventsList: sightEventsSelectors.getSightEvents(state),
 });
 
 const mapDispatchToProps = {
-  changePromotion: sightEventActions.changePromotion,
-  deletePromotion: sightEventActions.deletePromotion,
-  fetchSightEventsList: sightEventActions.fetchList,
+  changePromotion: sightEventsActions.changePromotion,
+  deletePromotion: sightEventsActions.deletePromotion,
+  fetchSightEventsList: sightEventsActions.fetchList,
 };
 
 export default compose(

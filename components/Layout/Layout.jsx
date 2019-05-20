@@ -53,7 +53,7 @@ const Layout = ({
           )
         }
       </NoSsr>
-      <Content {...ContentProps} isAuthenticated={isAuthenticated}>
+      <Content {...ContentProps}>
         {children}
       </Content>
     </Grid>

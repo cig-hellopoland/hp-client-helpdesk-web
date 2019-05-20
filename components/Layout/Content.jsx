@@ -15,12 +15,9 @@ const styles = {
 };
 
 const Content = ({
-  classes, className, children, isAuthenticated, ...props
+  classes, className, children, ...props
 }) => (
-  <div
-    className={classNames(classes.root, className)}
-    {...props}
-  >
+  <div className={classNames(classes.root, className)} {...props}>
     {children}
   </div>
 );
@@ -32,7 +29,6 @@ Content.propTypes = {
     PropTypes.node,
     PropTypes.object,
   ]),
-  isAuthenticated: PropTypes.bool.isRequired,
 };
 
 Content.defaultProps = {

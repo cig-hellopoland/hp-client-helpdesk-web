@@ -1,52 +1,33 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
-import { withRouter } from 'next/router';
 import withAuth from 'services/auth/withAuth';
-import Layout from 'components/Layout';
+import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import ContentTabWrapper from './components/ContentTabWrapper';
+import Paper from '@material-ui/core/Paper';
+import Layout from 'components/Layout';
 import AddPartnerForm from './components/PartnerForm';
-import CONTENT_TABS, { getURLByTabType, types as tabListTypes } from './tabList';
 
-class PartnerCreate extends Component {
-  handleTabChange = (selectedTabType) => {
-    const { partnerId, router } = this.props;
+const styles = theme => ({
+  root: {
+    flex: 1,
+    padding: theme.spacing.unit * 2,
+  },
+});
 
-    const { URL, URLAs } = getURLByTabType(selectedTabType, CONTENT_TABS, { partnerId });
-
-    if (URL && URLAs) {
-      router.push(URL, URLAs);
-    }
-  };
-
-  render() {
-    return (
-      <Layout>
-        <Grid container>
-          <ContentTabWrapper
-            activeTab={tabListTypes.PARTNER_CREATE}
-            onChange={this.handleTabChange}
-            tabList={CONTENT_TABS}
-          >
-            <AddPartnerForm />
-          </ContentTabWrapper>
-        </Grid>
-      </Layout>
-    );
-  }
-}
+const PartnerCreate = ({ classes }) => (
+  <Layout>
+    <Paper className={classes.root}>
+      <AddPartnerForm />
+    </Paper>
+  </Layout>
+);
 
 PartnerCreate.propTypes = {
-  partnerId: PropTypes.number,
-  router: PropTypes.shape({}).isRequired,
-};
-
-PartnerCreate.defaultProps = {
-  partnerId: null,
+  classes: PropTypes.shape({}).isRequired,
 };
 
 export default compose(
   withAuth(),
-  withRouter,
+  withStyles(styles),
 )(PartnerCreate);

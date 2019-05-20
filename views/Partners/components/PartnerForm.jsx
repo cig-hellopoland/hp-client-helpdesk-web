@@ -73,11 +73,11 @@ class AddPartnerForm extends Component {
         onFailure();
       },
     });
-  }
+  };
 
   render() {
     const { initialValues } = this.state;
-    const { classes, FormikProps, listAction } = this.props;
+    const { classes, FormikProps } = this.props;
     return (
       <Formik
         {...FormikProps}
@@ -86,9 +86,9 @@ class AddPartnerForm extends Component {
         onSubmit={this.handleSubmit}
         enableReinitialize
       >
-        { form => (
+        { ({ isSubmitting }) => (
           <Form autoComplete="off" noValidate>
-            <Grid container spacing={16}>
+            <Grid container>
               <GridItem>
                 <Typography variant="h6">Dane partnera</Typography>
               </GridItem>
@@ -106,22 +106,6 @@ class AddPartnerForm extends Component {
               </GridItem>
               <GridItem>
                 <Field name="affiliateCode" label="Kod afiliacyjny" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem className={classes.sectionWrapper}>
-                <Grid item container xs={12} justify="space-between">
-                  <Typography variant="h6">Bileterzy</Typography>
-                  {
-                    listAction
-                    && <Button variant="outlined" onClick={listAction}>Nowy bileter</Button>
-                  }
-                </Grid>
-                <FieldArray
-                  name="users"
-                  render={
-                    arrayHelpers => (
-                      <UserList users={form.values.users} actions={arrayHelpers} />
-                    )}
-                />
               </GridItem>
             </Grid>
           </Form>

@@ -1,18 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
-import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { Formik, Form, Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { Select, TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import yupNumber from 'yup/lib/number';
@@ -142,35 +140,18 @@ class AddPartnerForm extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      initialValues: {
-        email: '',
-        name: '',
-        commission: 0,
-        p24MerchantId: '',
-        affiliateCode: '',
-        users: [],
-      },
-    };
-
     this.validationSchema = yupObject().shape({
+      commission: yupNumber().min(0).max(100).required(),
       email: yupString().email().trim().required(),
       name: yupString().required(),
-      commission: yupNumber().min(0).max(100).required(),
-      p24MerchantId: yupString().required(),
       affiliateCode: yupString(),
     });
   }
 
-
-  handleSubmit = (values) => {
-    const { onSubmit } = this.props;
-    onSubmit(values);
-  };
-
   handleSubmit = (values, actions) => {
     const { createPartner, onSuccess, onFailure } = this.props;
     const { resetForm, setSubmitting } = actions;
+
     createPartner({
       data: {
         ...values,
@@ -187,17 +168,15 @@ class AddPartnerForm extends Component {
   };
 
   render() {
-    const { initialValues } = this.state;
     const { buttons, classes, FormikProps } = this.props;
+
     return (
       <Formik
         {...FormikProps}
-        initialValues={initialValues}
-        validationSchema={this.validationSchema}
+        // validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
-        enableReinitialize
       >
-        { ({ isSubmitting }) => (
+        { ({ isSubmitting, values } = {}) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <GridItem>
@@ -207,16 +186,16 @@ class AddPartnerForm extends Component {
                 <Field name="name" label="Nazwa" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="street" label="Ulica" required component={TextField} {...commonProps} />
+                <Field name="address.street" label="Ulica" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={3} sm={3}>
-                <Field name="zipCode" label="Kod pocztowy" required component={TextField} {...commonProps} />
+                <Field name="address.zipCode" label="Kod pocztowy" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={6} sm={6}>
-                <Field name="city" label="Miasto" required component={TextField} {...commonProps} />
+                <Field name="address.city" label="Miasto" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={3} sm={3}>
-                <Field name="country" label="Kraj" required component={TextField} {...commonProps} />
+                <Field name="address.country" label="Kraj" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
                 <Field name="phone" label="Telefon" required component={TextField} {...commonProps} />
@@ -229,46 +208,60 @@ class AddPartnerForm extends Component {
                 <Typography variant="h6">Informacje o działalności</Typography>
               </GridItem>
               <GridItem md={3} sm={3}>
-                <FormControl className={classes.formControl}>
+                <FormControl className={classes.formControl} required>
                   <InputLabel htmlFor="business-type">Rodzaj działalności</InputLabel>
-                  <Select
-                    value=""
-                    onChange={this.handleChange}
-                    input={<Input name="businessType" id="business-type" />}
-                    autoWidth
+                  <Field
+                    component={Select}
+                    inputProps={{
+                      id: 'business-type',
+                      name: 'businessType',
+                    }}
+                    name="businessType"
+                    required
                   >
                     {businesTypes.map(({ label, value }) => (
                       <MenuItem key={label} value={value}>{label}</MenuItem>
                     ))}
-                  </Select>
+                  </Field>
                 </FormControl>
               </GridItem>
-              <GridItem md={3} sm={3} />
-              <GridItem md={3} sm={3} />
-              <GridItem md={3} sm={3} />
-              <GridItem md={3} sm={3}>
-                <Field name="taxNumber" label="NIP" required component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={3} sm={3}>
-                <Field name="employerId" label="REGON" required component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={3} sm={3}>
-                <Field name="socialNumber" label="PESEL" required component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={3} sm={3}>
-                <Field name="natoinalCourtRegister" label="KRS" required component={TextField} {...commonProps} />
-              </GridItem>
+              {values.businessType && values.businessType !== 1
+                && (
+                  <Fragment>
+                    <GridItem md={3} sm={3}>
+                      <Field name="taxNumber" label="NIP" required component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={3} sm={3}>
+                      <Field name="employerId" label="REGON" required component={TextField} {...commonProps} />
+                    </GridItem>
+                  </Fragment>
+                )
+              }
+              {values.businessType && values.businessType > 3
+                && (
+                  <GridItem md={3} sm={3}>
+                    <Field name="natoinalCourtRegister" label="KRS" required component={TextField} {...commonProps} />
+                  </GridItem>
+                )
+              }
+              {values.businessType && values.businessType === 1
+                && (
+                  <GridItem md={3} sm={3}>
+                    <Field name="socialNumber" label="PESEL" required component={TextField} {...commonProps} />
+                  </GridItem>
+                )
+              }
               <GridItem className={classes.section}>
                 <Typography variant="h6">Osoba reprezentująca</Typography>
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="contactName" label="Imię i nazwisko" required component={TextField} {...commonProps} />
+                <Field name="contact.name" label="Imię i nazwisko" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="contactPhone" label="Telefon" required component={TextField} {...commonProps} />
+                <Field name="contact.phone" label="Telefon" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="contactEmail" label="E-mail" required component={TextField} {...commonProps} />
+                <Field name="contact.email" label="E-mail" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem className={classes.section}>
                 <Typography variant="h6">Płatności</Typography>
@@ -291,18 +284,20 @@ class AddPartnerForm extends Component {
                 <Typography variant="h6">Przelewy24</Typography>
               </GridItem>
               <GridItem md={4} sm={4}>
-                <FormControl className={classes.formControl}>
+                <FormControl className={classes.formControl} required>
                   <InputLabel htmlFor="trade-type">Branża</InputLabel>
-                  <Select
-                    value=""
-                    onChange={this.handleChange}
-                    input={<Input name="trade" id="trade-type" />}
-                    autoWidth
+                  <Field
+                    component={Select}
+                    inputProps={{
+                      id: 'trade-type',
+                      name: 'trade',
+                    }}
+                    name="trade"
                   >
                     {trades.map(({ label, value }) => (
                       <MenuItem key={label} value={value}>{label}</MenuItem>
                     ))}
-                  </Select>
+                  </Field>
                 </FormControl>
               </GridItem>
               <GridItem md={4} sm={4}>
@@ -314,7 +309,7 @@ class AddPartnerForm extends Component {
             </Grid>
             {buttons
               && (
-              <Grid container spacing={16} justify="flex-end">
+              <Grid container spacing={16} justify="flex-end" className={classes.section}>
                 <GridItem container md={3} sm={3} justify="flex-end">
                   <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
                     Zapisz

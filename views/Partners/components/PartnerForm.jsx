@@ -11,9 +11,10 @@ import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { Formik, Form, Field } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-material-ui';
+import yupBoolean from 'yup/lib/boolean';
+import yupNumber from 'yup/lib/number';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
-import yupNumber from 'yup/lib/number';
 import GridItem from 'components/GridItem';
 import { actions as partnersActions } from 'redux/partners';
 
@@ -75,10 +76,30 @@ class AddPartnerForm extends Component {
     };
 
     this.validationSchema = yupObject().shape({
+      address: yupObject().shape({
+        city: yupString().required(),
+        country: yupString().required(),
+        street: yupString().required(),
+        zipCode: yupString().required(),
+      }),
+      affiliateCode: yupBoolean.required(),
+      bankAccount: yupString().trim().required(),
+      businessType: yupNumber().required(),
       commission: yupNumber().min(0).max(100).required(),
+      contact: yupObject().shape({
+        email: yupString().email().trim().required(),
+        name: yupString().required(),
+        phone: yupString().required(),
+      }),
       email: yupString().email().trim().required(),
+      employerId: yupString().required(),
+      invoiceEmail: yupString().email().trim().required(),
       name: yupString().required(),
-      affiliateCode: yupString(),
+      phone: yupString().required(),
+      serviceDescription: yupString().required(),
+      socialNumber: yupString().required(),
+      natoinalCourtRegister: yupString().required(),
+      taxNumber: yupString().required(),
     });
   }
 

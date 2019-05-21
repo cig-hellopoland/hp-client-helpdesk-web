@@ -31,7 +31,6 @@ class ProfileMenu extends Component {
 
     onLogout({
       onSuccess: () => {
-        console.log('logout', logoutURL);
         Router.push(logoutURL);
       },
     });

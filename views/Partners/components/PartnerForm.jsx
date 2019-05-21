@@ -12,7 +12,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { Formik, Form, Field } from 'formik';
-import { Select, TextField } from 'formik-material-ui';
+import { CheckboxWithLabel, Select, TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import yupNumber from 'yup/lib/number';
@@ -36,99 +36,6 @@ const businesTypes = [
   { label: 'Spółdzielnia', value: 10 },
 ];
 
-const trades = [
-  { value: 'agd', label: 'AGD' },
-  { value: 'agdrtv', label: 'AGD i RTV' },
-  { value: 'alkoh', label: 'Alkohole' },
-  { value: 'apteki', label: 'Apteki' },
-  { value: 'artlab', label: 'Artykuły laboratoryjne' },
-  { value: 'artmed', label: 'Artykuły medyczne' },
-  { value: 'artspoz', label: 'Artykuły spożywcze' },
-  { value: 'aukcje', label: 'Aukcje' },
-  { value: 'behape', label: 'BHP' },
-  { value: 'blizna', label: 'Bielizna' },
-  { value: 'bilety', label: 'Bilety' },
-  { value: 'buki', label: 'Bukmacher' },
-  { value: 'biz', label: 'Biżuteria i zegarki' },
-  { value: 'budow', label: 'Budownictwo' },
-  { value: 'chemia', label: 'Chemia' },
-  { value: 'czaspis', label: 'Czasopisma' },
-  { value: 'dekor', label: 'Dekoracje' },
-  { value: 'dewoc', label: 'Dewocjonalia' },
-  { value: 'domiogr', label: 'Dom i ogród' },
-  { value: 'dziecko', label: 'Dziecko' },
-  { value: 'elektronika', label: 'Elektronika' },
-  { value: 'epapier', label: 'E-papierosy' },
-  { value: 'ezoter', label: 'Ezoteryka' },
-  { value: 'filatel', label: 'Filatelistyka' },
-  { value: 'finanse', label: 'Finanse' },
-  { value: 'fotogr', label: 'Fotografia' },
-  { value: 'fundacja', label: 'Fundacja' },
-  { value: 'galant', label: 'Galanteria' },
-  { value: 'gadzet', label: 'Gadżety' },
-  { value: 'gry', label: 'Gry' },
-  { value: 'komphost', label: 'Hosting' },
-  { value: 'hotel', label: 'Hotelarstwo' },
-  { value: 'instyt', label: 'Instytucje' },
-  { value: 'komputery', label: 'Komputery' },
-  { value: 'ksiazki', label: 'Książki' },
-  { value: 'kosmetyki', label: 'Kosmetyki' },
-  { value: 'ksieg', label: 'Księgarnia' },
-  { value: 'kip', label: 'Kwiaty i prezenty' },
-  { value: 'mwf', label: 'Masowi Wystawcy Faktur' },
-  { value: 'maszyny', label: 'Maszyny' },
-  { value: 'matbiur', label: 'Materiały biurowe' },
-  { value: 'matfol', label: 'Materiały foliowe' },
-  { value: 'matpap', label: 'Materiały papierowe' },
-  { value: 'militaria', label: 'Militaria' },
-  { value: 'motoryz', label: 'Motoryzacja' },
-  { value: 'mim', label: 'Multimedia i muzyka' },
-  { value: 'nagrob', label: 'Nagrobki' },
-  { value: 'narzedzia', label: 'Narzędzia' },
-  { value: 'nis', label: 'Nauka i szkolnictwo' },
-  { value: 'numiz', label: 'Numizmatyka' },
-  { value: 'obuwie', label: 'Obuwie' },
-  { value: 'odziez', label: 'Odzież' },
-  { value: 'ogl', label: 'Ogłoszenia' },
-  { value: 'ogrod', label: 'Ogród' },
-  { value: 'oprogra', label: 'Oprogramowanie' },
-  { value: 'oswietl', label: 'Oświetlenie' },
-  { value: 'pasman', label: 'Pasmanteria' },
-  { value: 'podroze', label: 'Podróże' },
-  { value: 'randki', label: 'Portal randkowy' },
-  { value: 'portfel', label: 'Portfel elektroniczny' },
-  { value: 'prasa', label: 'Prasa' },
-  { value: 'prawo', label: 'Prawo' },
-  { value: 'kurier', label: 'Przesyłki kurierskie' },
-  { value: 'reklama', label: 'Reklama' },
-  { value: 'rekodz', label: 'Rękodzieło' },
-  { value: 'rodzice', label: 'Rodzice' },
-  { value: 'rtv', label: 'RTV' },
-  { value: 'serint', label: 'Serwis internetowy' },
-  { value: 'sklmuz', label: 'Sklep muzyczny' },
-  { value: 'siw', label: 'Sport i wypoczynek' },
-  { value: 'suplem', label: 'Suplementy diety' },
-  { value: 'szklo', label: 'Szkło' },
-  { value: 'szkol', label: 'Szkolenia' },
-  { value: 'sztuka', label: 'Sztuka' },
-  { value: 'slubne', label: 'Ślubne' },
-  { value: 'tif', label: 'Teatr i film' },
-  { value: 'telek', label: 'Telekomunikacja' },
-  { value: 'tkan', label: 'Tkaniny' },
-  { value: 'twstrwww', label: 'Tworzenie stron WWW' },
-  { value: 'ubezp', label: 'Ubezpieczenia' },
-  { value: 'uslugi', label: 'Usługi' },
-  { value: 'wielob', label: 'Wielobranżowość' },
-  { value: 'wypmiesz', label: 'Wyposażenie mieszkania' },
-  { value: 'wypsklep', label: 'Wyposażenie sklepów' },
-  { value: 'wyrtyt', label: 'Wyroby tytoniowe' },
-  { value: 'wio', label: 'Wzrok i okulary' },
-  { value: 'vod', label: 'VoD' },
-  { value: 'zabawki', label: 'Zabawki' },
-  { value: 'zik', label: 'Zdrowie i kosmetyki' },
-  { value: 'zwierz', label: 'Zwierzęta' },
-];
-
 const styles = {
   formControl: {
     width: '100%',
@@ -142,8 +49,31 @@ class AddPartnerForm extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      hasCorrespondenceAddress: false,
+    this.initialValues = {
+      address: {
+        city: '',
+        country: 'PL',
+        street: '',
+        zipCode: '',
+      },
+      affiliateCode: false,
+      bankAccount: '',
+      businessType: '',
+      commission: '',
+      contact: {
+        email: '',
+        name: '',
+        phone: '',
+      },
+      email: '',
+      employerId: '',
+      invoiceEmail: '',
+      name: '',
+      phone: '',
+      serviceDescription: '',
+      socialNumber: '',
+      natoinalCourtRegister: '',
+      taxNumber: '',
     };
 
     this.validationSchema = yupObject().shape({
@@ -154,38 +84,84 @@ class AddPartnerForm extends Component {
     });
   }
 
-  handleChange = fieldName => event => this.setState({ [fieldName]: event.target.checked });
+  handleBusinessTypeChange = actions => (event) => {
+    const { setFieldValue } = actions;
+    const { name, value } = event.target;
+
+    setFieldValue(name, value);
+
+    if (value === 1) {
+      setFieldValue('taxNumber', '');
+      setFieldValue('employerId', '');
+      setFieldValue('natoinalCourtRegister', '');
+    } else {
+      setFieldValue('socialNumber', '');
+    }
+
+    if (value > 1 && value < 4) {
+      setFieldValue('natoinalCourtRegister', '');
+    }
+  };
+
+  handleChange = fieldName => event => this.setState({ [fieldName]: event.target.value });
 
   handleSubmit = (values, actions) => {
-    const { createPartner, onSuccess, onFailure } = this.props;
+    const { onSubmit } = this.props;
+
+    if (onSubmit) {
+      onSubmit(values, actions);
+
+      return;
+    }
+
+    const { createPartner } = this.props;
+    const payload = {
+      data: values,
+      onFailure: this.handleSubmitFailure(actions),
+      onSuccess: this.handleSubmitSuccess(actions),
+    };
+
+    createPartner(payload);
+  };
+
+  handleSubmitFailure = actions => () => {
+    const { onSubmitFailure } = this.props;
+
+    if (onSubmitFailure) {
+      onSubmitFailure(actions);
+    }
+
+    const { setSubmitting } = actions;
+
+    setSubmitting(false);
+  };
+
+  handleSubmitSuccess = actions => (sightId) => {
+    const { onSubmitSuccess } = this.props;
+
+    if (onSubmitSuccess) {
+      onSubmitSuccess(sightId, actions);
+
+      return;
+    }
+
     const { resetForm, setSubmitting } = actions;
 
-    createPartner({
-      data: {
-        ...values,
-      },
-      onSuccess: () => {
-        resetForm();
-        onSuccess();
-      },
-      onFailure: () => {
-        setSubmitting(false);
-        onFailure();
-      },
-    });
+    setSubmitting(false);
+    resetForm();
   };
 
   render() {
-    const { hasCorrespondenceAddress } = this.state;
     const { buttons, classes, FormikProps } = this.props;
 
     return (
       <Formik
         {...FormikProps}
+        initialValues={this.initialValues}
         // validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        { ({ isSubmitting, values } = {}) => (
+        { ({ isSubmitting, values, setFieldValue } = {}) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <GridItem>
@@ -204,50 +180,27 @@ class AddPartnerForm extends Component {
                 <Field name="address.city" label="Miasto" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={3} sm={3}>
-                <Field name="address.country" label="Kraj" required component={TextField} {...commonProps} />
+                <FormControl className={classes.formControl} required>
+                  <InputLabel htmlFor="address-country">Kraj</InputLabel>
+                  <Field
+                    component={Select}
+                    inputProps={{
+                      id: 'address-country',
+                      name: 'address.country',
+                    }}
+                    name="address.country"
+                    required
+                  >
+                    <MenuItem value="PL">Polska</MenuItem>
+                  </Field>
+                </FormControl>
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="phone" label="Telefon" required component={TextField} {...commonProps} />
+                <Field name="phone" type="tel" label="Telefon" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="email" label="E-mail" required component={TextField} {...commonProps} />
+                <Field name="email" type="email" label="E-mail (login partnera)" required component={TextField} {...commonProps} />
               </GridItem>
-              <GridItem>
-                <FormControlLabel
-                  control={(
-                    <Checkbox
-                      checked={hasCorrespondenceAddress}
-                      onChange={this.handleChange('hasCorrespondenceAddress')}
-                      value="hasCorrespondenceAddress"
-                    />
-                  )}
-                  label="Ustaw adres korespondencyjny"
-                />
-              </GridItem>
-              {hasCorrespondenceAddress
-                && (
-                  <Fragment>
-                    <GridItem>
-                      <Field name="address.street" label="Ulica" required component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={3} sm={3}>
-                      <Field name="address.zipCode" label="Kod pocztowy" required component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <Field name="address.city" label="Miasto" required component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={3} sm={3}>
-                      <Field name="address.country" label="Kraj" required component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={4} sm={4}>
-                      <Field name="phone" label="Telefon" required component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={4} sm={4}>
-                      <Field name="email" label="E-mail" required component={TextField} {...commonProps} />
-                    </GridItem>
-                  </Fragment>
-                )
-              }
               <GridItem className={classes.section}>
                 <Typography variant="h6">Informacje o działalności</Typography>
               </GridItem>
@@ -259,6 +212,7 @@ class AddPartnerForm extends Component {
                     inputProps={{
                       id: 'business-type',
                       name: 'businessType',
+                      onChange: this.handleBusinessTypeChange({ setFieldValue }),
                     }}
                     name="businessType"
                     required
@@ -302,10 +256,10 @@ class AddPartnerForm extends Component {
                 <Field name="contact.name" label="Imię i nazwisko" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="contact.phone" label="Telefon" required component={TextField} {...commonProps} />
+                <Field name="contact.phone" type="tel" label="Telefon" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="contact.email" label="E-mail" required component={TextField} {...commonProps} />
+                <Field name="contact.email" type="email" label="E-mail" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem className={classes.section}>
                 <Typography variant="h6">Płatności</Typography>
@@ -314,38 +268,22 @@ class AddPartnerForm extends Component {
                 <Field name="bankAccount" label="Konto bankowe" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="invoiceEmail" label="E-mail do faktur" required component={TextField} {...commonProps} />
+                <Field name="invoiceEmail" type="email" label="E-mail do faktur" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4} />
               <GridItem md={4} sm={4}>
                 <Field name="commission" type="number" label="Prowizja (%)" required component={TextField} {...commonProps} />
               </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field name="affiliateCode" label="Kod afiliacyjny" component={TextField} {...commonProps} />
+              <GridItem container md={4} sm={4} alignItems="flex-end">
+                <Field
+                  name="affiliateCode"
+                  Label={{ label: 'Generuj kod afiliacyjny' }}
+                  component={CheckboxWithLabel}
+                />
               </GridItem>
               <GridItem md={4} sm={4} />
               <GridItem className={classes.section}>
                 <Typography variant="h6">Przelewy24</Typography>
-              </GridItem>
-              <GridItem md={4} sm={4}>
-                <FormControl className={classes.formControl} required>
-                  <InputLabel htmlFor="trade-type">Branża</InputLabel>
-                  <Field
-                    component={Select}
-                    inputProps={{
-                      id: 'trade-type',
-                      name: 'trade',
-                    }}
-                    name="trade"
-                  >
-                    {trades.map(({ label, value }) => (
-                      <MenuItem key={label} value={value}>{label}</MenuItem>
-                    ))}
-                  </Field>
-                </FormControl>
-              </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field name="shopUrl" label="Adres URL strony partnera" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Field name="serviceDescription" label="Opis usługi" required component={TextField} {...commonProps} />
@@ -374,19 +312,17 @@ AddPartnerForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   createPartner: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
-  listAction: PropTypes.func,
   onSubmit: PropTypes.func,
-  onFailure: PropTypes.func,
-  onSuccess: PropTypes.func,
+  onSubmitFailure: PropTypes.func,
+  onSubmitSuccess: PropTypes.func,
 };
 
 AddPartnerForm.defaultProps = {
   buttons: true,
   FormikProps: null,
-  listAction: null,
   onSubmit: null,
-  onFailure: null,
-  onSuccess: null,
+  onSubmitFailure: null,
+  onSubmitSuccess: null,
 };
 
 const mapDispatchToProps = {
@@ -394,6 +330,6 @@ const mapDispatchToProps = {
 };
 
 export default compose(
-  withStyles(styles),
   connect(null, mapDispatchToProps),
+  withStyles(styles),
 )(AddPartnerForm);

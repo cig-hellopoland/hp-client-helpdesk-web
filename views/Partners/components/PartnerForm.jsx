@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
 import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -140,6 +142,10 @@ class AddPartnerForm extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      hasCorrespondenceAddress: false,
+    };
+
     this.validationSchema = yupObject().shape({
       commission: yupNumber().min(0).max(100).required(),
       email: yupString().email().trim().required(),
@@ -147,6 +153,8 @@ class AddPartnerForm extends Component {
       affiliateCode: yupString(),
     });
   }
+
+  handleChange = fieldName => event => this.setState({ [fieldName]: event.target.checked });
 
   handleSubmit = (values, actions) => {
     const { createPartner, onSuccess, onFailure } = this.props;
@@ -168,6 +176,7 @@ class AddPartnerForm extends Component {
   };
 
   render() {
+    const { hasCorrespondenceAddress } = this.state;
     const { buttons, classes, FormikProps } = this.props;
 
     return (
@@ -203,7 +212,42 @@ class AddPartnerForm extends Component {
               <GridItem md={4} sm={4}>
                 <Field name="email" label="E-mail" required component={TextField} {...commonProps} />
               </GridItem>
-              <GridItem md={4} sm={4} />
+              <GridItem>
+                <FormControlLabel
+                  control={(
+                    <Checkbox
+                      checked={hasCorrespondenceAddress}
+                      onChange={this.handleChange('hasCorrespondenceAddress')}
+                      value="hasCorrespondenceAddress"
+                    />
+                  )}
+                  label="Ustaw adres korespondencyjny"
+                />
+              </GridItem>
+              {hasCorrespondenceAddress
+                && (
+                  <Fragment>
+                    <GridItem>
+                      <Field name="address.street" label="Ulica" required component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={3} sm={3}>
+                      <Field name="address.zipCode" label="Kod pocztowy" required component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={6} sm={6}>
+                      <Field name="address.city" label="Miasto" required component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={3} sm={3}>
+                      <Field name="address.country" label="Kraj" required component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={4} sm={4}>
+                      <Field name="phone" label="Telefon" required component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={4} sm={4}>
+                      <Field name="email" label="E-mail" required component={TextField} {...commonProps} />
+                    </GridItem>
+                  </Fragment>
+                )
+              }
               <GridItem className={classes.section}>
                 <Typography variant="h6">Informacje o działalności</Typography>
               </GridItem>
@@ -301,7 +345,7 @@ class AddPartnerForm extends Component {
                 </FormControl>
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="shopUrl" label="Adres URL sklepu" required component={TextField} {...commonProps} />
+                <Field name="shopUrl" label="Adres URL strony partnera" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Field name="serviceDescription" label="Opis usługi" required component={TextField} {...commonProps} />

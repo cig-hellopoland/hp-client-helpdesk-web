@@ -49,59 +49,90 @@ class AddPartnerForm extends Component {
     super(props);
 
     this.initialValues = {
-      address: {
-        city: '',
-        country: 'PL',
-        street: '',
-        zipCode: '',
-      },
       affiliateCode: false,
       bankAccount: '',
       businessType: '',
       commission: '',
-      contact: {
+      contactPerson: {
         email: '',
         name: '',
         phone: '',
       },
       email: '',
-      employerId: '',
       invoiceEmail: '',
+      krs: '',
+      location: {
+        city: '',
+        country: 'PL',
+        street: '',
+        zipCode: '',
+      },
       name: '',
       phone: '',
-      serviceDescription: '',
+      regon: '',
+      servicesDescription: '',
       socialNumber: '',
-      natoinalCourtRegister: '',
       taxNumber: '',
     };
 
     this.validationSchema = yupObject().shape({
-      address: yupObject().shape({
+      affiliateCode: yupBoolean().required(),
+      bankAccount: yupString().trim().required(),
+      businessType: yupNumber().required(),
+      commission: yupNumber().min(0).max(100).required(),
+      contactPerson: yupObject().shape({
+        email: yupString().email().trim().required(),
+        name: yupString().required(),
+        phone: yupString().trim().required(),
+      }),
+      email: yupString().email().trim().required(),
+      invoiceEmail: yupString().email().trim().required(),
+      krs: yupString().when('businessType', {
+        is: businessType => businessType > 3,
+        then: yupString().required(),
+      }),
+      location: yupObject().shape({
         city: yupString().required(),
         country: yupString().required(),
         street: yupString().required(),
         zipCode: yupString().required(),
       }),
-      affiliateCode: yupBoolean.required(),
-      bankAccount: yupString().trim().required(),
-      businessType: yupNumber().required(),
-      commission: yupNumber().min(0).max(100).required(),
-      contact: yupObject().shape({
-        email: yupString().email().trim().required(),
-        name: yupString().required(),
-        phone: yupString().required(),
-      }),
-      email: yupString().email().trim().required(),
-      employerId: yupString().required(),
-      invoiceEmail: yupString().email().trim().required(),
       name: yupString().required(),
-      phone: yupString().required(),
-      serviceDescription: yupString().required(),
-      socialNumber: yupString().required(),
-      natoinalCourtRegister: yupString().required(),
-      taxNumber: yupString().required(),
+      phone: yupString().trim().required(),
+      regon: yupString().when('businessType', {
+        is: businessType => businessType > 1,
+        then: yupString().required(),
+      }),
+      servicesDescription: yupString().required(),
+      socialNumber: yupString().when('businessType', {
+        is: businessType => businessType === 1,
+        then: yupString().required(),
+      }),
+      taxNumber: yupString().when('businessType', {
+        is: businessType => businessType > 1,
+        then: yupString().required(),
+      }),
     });
   }
+
+  getParsedValues = (values) => {
+    const {
+      krs, regon, taxNumber, socialNumber, ...parsedValues
+    } = values;
+
+    if (values.businessType === 1) {
+      parsedValues.socialNumber = socialNumber;
+    } else {
+      parsedValues.regon = regon;
+      parsedValues.taxNumber = taxNumber;
+    }
+
+    if (values.businessType > 3) {
+      parsedValues.krs = krs;
+    }
+
+    return parsedValues;
+  };
 
   handleBusinessTypeChange = actions => (event) => {
     const { setFieldValue } = actions;
@@ -111,14 +142,14 @@ class AddPartnerForm extends Component {
 
     if (value === 1) {
       setFieldValue('taxNumber', '');
-      setFieldValue('employerId', '');
-      setFieldValue('natoinalCourtRegister', '');
+      setFieldValue('regon', '');
+      setFieldValue('krs', '');
     } else {
       setFieldValue('socialNumber', '');
     }
 
     if (value > 1 && value < 4) {
-      setFieldValue('natoinalCourtRegister', '');
+      setFieldValue('krs', '');
     }
   };
 
@@ -126,16 +157,17 @@ class AddPartnerForm extends Component {
 
   handleSubmit = (values, actions) => {
     const { onSubmit } = this.props;
+    const parsedValues = this.getParsedValues(values);
 
     if (onSubmit) {
-      onSubmit(values, actions);
+      onSubmit(parsedValues, actions);
 
       return;
     }
 
     const { createPartner } = this.props;
     const payload = {
-      data: values,
+      data: parsedValues,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
     };
@@ -177,10 +209,10 @@ class AddPartnerForm extends Component {
       <Formik
         {...FormikProps}
         initialValues={this.initialValues}
-        // validationSchema={this.validationSchema}
+        validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        { ({ isSubmitting, values, setFieldValue } = {}) => (
+        {({ isSubmitting, values, setFieldValue } = {}) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <GridItem>
@@ -190,24 +222,24 @@ class AddPartnerForm extends Component {
                 <Field name="name" label="Nazwa" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="address.street" label="Ulica" required component={TextField} {...commonProps} />
+                <Field name="location.street" label="Ulica" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={3} sm={3}>
-                <Field name="address.zipCode" label="Kod pocztowy" required component={TextField} {...commonProps} />
+                <Field name="location.zipCode" label="Kod pocztowy" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={6} sm={6}>
-                <Field name="address.city" label="Miasto" required component={TextField} {...commonProps} />
+                <Field name="location.city" label="Miasto" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={3} sm={3}>
                 <FormControl className={classes.formControl} required>
-                  <InputLabel htmlFor="address-country">Kraj</InputLabel>
+                  <InputLabel htmlFor="location-country">Kraj</InputLabel>
                   <Field
                     component={Select}
                     inputProps={{
-                      id: 'address-country',
-                      name: 'address.country',
+                      id: 'location-country',
+                      name: 'location.country',
                     }}
-                    name="address.country"
+                    name="location.country"
                     required
                   >
                     <MenuItem value="PL">Polska</MenuItem>
@@ -249,7 +281,7 @@ class AddPartnerForm extends Component {
                       <Field name="taxNumber" label="NIP" required component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem md={3} sm={3}>
-                      <Field name="employerId" label="REGON" required component={TextField} {...commonProps} />
+                      <Field name="regon" label="REGON" required component={TextField} {...commonProps} />
                     </GridItem>
                   </Fragment>
                 )
@@ -257,7 +289,7 @@ class AddPartnerForm extends Component {
               {values.businessType && values.businessType > 3
                 && (
                   <GridItem md={3} sm={3}>
-                    <Field name="natoinalCourtRegister" label="KRS" required component={TextField} {...commonProps} />
+                    <Field name="krs" label="KRS" required component={TextField} {...commonProps} />
                   </GridItem>
                 )
               }
@@ -272,13 +304,13 @@ class AddPartnerForm extends Component {
                 <Typography variant="h6">Osoba reprezentująca</Typography>
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="contact.name" label="Imię i nazwisko" required component={TextField} {...commonProps} />
+                <Field name="contactPerson.name" label="Imię i nazwisko" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="contact.phone" type="tel" label="Telefon" required component={TextField} {...commonProps} />
+                <Field name="contactPerson.phone" type="tel" label="Telefon" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="contact.email" type="email" label="E-mail" required component={TextField} {...commonProps} />
+                <Field name="contactPerson.email" type="email" label="E-mail" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem className={classes.section}>
                 <Typography variant="h6">Płatności</Typography>
@@ -305,18 +337,18 @@ class AddPartnerForm extends Component {
                 <Typography variant="h6">Przelewy24</Typography>
               </GridItem>
               <GridItem>
-                <Field name="serviceDescription" label="Opis usługi" required component={TextField} {...commonProps} />
+                <Field name="servicesDescription" label="Opis usługi" required component={TextField} {...commonProps} />
               </GridItem>
             </Grid>
             {buttons
               && (
-              <Grid container spacing={16} justify="flex-end" className={classes.section}>
-                <GridItem container md={3} sm={3} justify="flex-end">
-                  <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
-                    Zapisz
-                  </Button>
-                </GridItem>
-              </Grid>
+                <Grid container spacing={16} justify="flex-end" className={classes.section}>
+                  <GridItem container md={3} sm={3} justify="flex-end">
+                    <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
+                      Zapisz
+                    </Button>
+                  </GridItem>
+                </Grid>
               )
             }
           </Form>

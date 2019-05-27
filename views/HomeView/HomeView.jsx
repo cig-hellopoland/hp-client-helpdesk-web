@@ -8,6 +8,7 @@ import Layout from 'components/Layout';
 import withAuth from 'services/auth/withAuth';
 import SalesExport from './components/SalesExport';
 import PromotedSightEvents from './components/PromotedSightEvents';
+import FormWrapper from './components/MailingForm/FormWrapper';
 
 const styles = {
   content: {
@@ -17,16 +18,15 @@ const styles = {
 
 const HomeView = ({ classes }) => (
   <Layout>
-    <Grid container className={classes.content}>
+    <Grid container direction="row" wrap="nowrap" className={classes.content}>
       <Grid item md={4}>
         <Typography variant="h6" gutterBottom>Statystyki sprzedaży</Typography>
         <SalesExport />
+        <Typography variant="h6" gutterBottom>Promowane oferty</Typography>
+        <PromotedSightEvents />
       </Grid>
-      <Grid container>
-        <Grid item md={4}>
-          <Typography variant="h6" gutterBottom>Promowane oferty</Typography>
-          <PromotedSightEvents />
-        </Grid>
+      <Grid item md={4}>
+        <FormWrapper />
       </Grid>
     </Grid>
   </Layout>

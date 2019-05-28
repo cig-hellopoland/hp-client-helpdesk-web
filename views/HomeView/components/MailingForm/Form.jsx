@@ -7,7 +7,7 @@ import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import { actions as bookingsActions } from '@hello-poland/commons/redux/bookings';
-import GridItem from '../../../../components/GridItem/GridItem';
+import Button from '@material-ui/core/Button/Button';
 
 const commonProps = {
   fullWidth: true,
@@ -79,19 +79,20 @@ class MailingForm extends Component {
   };
 
   render() {
-    const { FormikProps } = this.props;
     return (
       <Formik
-        {...FormikProps}
         validationSchema={this.validationSchema}
         initialValues={this.initialValues}
         onSubmit={this.handleSubmit}
       >
         <Form autoComplete="off" noValidate>
-          <Grid container spacing={16}>
-            <GridItem>
+          <Grid container spacing={16} wrap="nowrap" alignItems="center">
+            <Grid item>
               <Field name="p24Statement" label="Numer przelewu" component={TextField} required helperText="Wpisz numer przelewu od P24 w formacie: p24-xxx-xxx-xxx" {...commonProps} />
-            </GridItem>
+            </Grid>
+            <Grid item>
+              <Button type="submit" color="secondary">Wyślij</Button>
+            </Grid>
           </Grid>
         </Form>
       </Formik>
@@ -101,14 +102,12 @@ class MailingForm extends Component {
 
 MailingForm.propTypes = {
   sendEmail: PropTypes.func.isRequired,
-  FormikProps: PropTypes.shape({}),
   onSubmitFailure: PropTypes.func,
   onSubmit: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
 };
 
 MailingForm.defaultProps = {
-  FormikProps: null,
   onSubmitFailure: null,
   onSubmit: null,
   onSubmitSuccess: null,

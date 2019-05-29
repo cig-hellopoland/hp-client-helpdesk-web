@@ -278,7 +278,7 @@ class AddPartnerForm extends Component {
                 && (
                   <Fragment>
                     <GridItem md={3} sm={3}>
-                      <Field name="taxNumber" label="NIP" required component={TextField} {...commonProps} />
+                      <Field name="taxNumber" label="NIP" helperText="Format: tylko cyfry, bez spacji" required component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem md={3} sm={3}>
                       <Field name="regon" label="REGON" required component={TextField} {...commonProps} />
@@ -316,7 +316,7 @@ class AddPartnerForm extends Component {
                 <Typography variant="h6">Płatności</Typography>
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="bankAccount" label="Konto bankowe" required component={TextField} {...commonProps} />
+                <Field name="bankAccount" label="Konto bankowe" helperText="Format: tylko cyfry, bez spacji" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
                 <Field name="invoiceEmail" type="email" label="E-mail do faktur" required component={TextField} {...commonProps} />
@@ -337,7 +337,7 @@ class AddPartnerForm extends Component {
                 <Typography variant="h6">Przelewy24</Typography>
               </GridItem>
               <GridItem>
-                <Field name="servicesDescription" label="Opis usługi" required component={TextField} {...commonProps} />
+                <Field name="servicesDescription" label="Opis usługi partnera" required component={TextField} {...commonProps} />
               </GridItem>
             </Grid>
             {buttons

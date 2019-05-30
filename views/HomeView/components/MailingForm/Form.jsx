@@ -6,8 +6,12 @@ import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
-import { actions as bookingsActions } from '@hello-poland/commons/redux/bookings';
+import {
+  actions as bookingsActions,
+  selectors as bookingsSelectors,
+} from '@hello-poland/commons/redux/bookings';
 import Button from '@material-ui/core/Button/Button';
+import Typography from '@material-ui/core/Typography/Typography';
 
 const commonProps = {
   fullWidth: true,
@@ -17,8 +21,7 @@ class MailingForm extends Component {
   constructor(props) {
     super(props);
 
-    // TODO: nested validation seems not working
-    // TODO: see https://github.com/jaredpalmer/formik/issues/986
+
     this.validationSchema = yupObject().shape({
       p24Statement: yupString()
         .min(15)
@@ -79,6 +82,9 @@ class MailingForm extends Component {
   };
 
   render() {
+    const { error, showErrors } = this.props;
+    const { data } = error || {};
+    const { message } = data || {};
     return (
       <Formik
         validationSchema={this.validationSchema}
@@ -93,6 +99,13 @@ class MailingForm extends Component {
             <Grid item>
               <Button type="submit" color="secondary">Wyślij</Button>
             </Grid>
+            {showErrors
+              && (
+                <Typography style={{ color: 'red' }}>
+                  {message}
+                </Typography>
+              )
+            }
           </Grid>
         </Form>
       </Formik>
@@ -101,6 +114,8 @@ class MailingForm extends Component {
 }
 
 MailingForm.propTypes = {
+  showErrors: PropTypes.bool,
+  error: PropTypes.shape({}),
   sendEmail: PropTypes.func.isRequired,
   onSubmitFailure: PropTypes.func,
   onSubmit: PropTypes.func,
@@ -108,12 +123,16 @@ MailingForm.propTypes = {
 };
 
 MailingForm.defaultProps = {
+  error: null,
   onSubmitFailure: null,
   onSubmit: null,
   onSubmitSuccess: null,
+  showErrors: false,
 };
 
-const mapStateToProps = () => ({});
+const mapStateToProps = state => ({
+  error: bookingsSelectors.getError(state),
+});
 
 const mapDispatchToProps = {
   sendEmail: bookingsActions.sendTicketsEmail,

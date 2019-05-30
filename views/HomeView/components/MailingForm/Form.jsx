@@ -99,14 +99,14 @@ class MailingForm extends Component {
             <Grid item>
               <Button type="submit" color="secondary">Wyślij</Button>
             </Grid>
-            {showErrors
-              && (
-                <Typography style={{ color: 'red' }}>
-                  {message}
-                </Typography>
-              )
-            }
           </Grid>
+          {showErrors
+            && (
+              <Typography style={{ color: 'red' }}>
+                {message}
+              </Typography>
+            )
+          }
         </Form>
       </Formik>
     );

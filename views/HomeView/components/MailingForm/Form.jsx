@@ -44,14 +44,14 @@ class MailingForm extends Component {
     }
 
     const { p24Statement } = values;
-    const { sendEmail } = this.props;
+    const { sendTicketEmail } = this.props;
     const payload = {
       p24Statement,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
     };
 
-    sendEmail(payload);
+    sendTicketEmail(payload);
   };
 
   handleSubmitFailure = actions => () => {
@@ -116,7 +116,7 @@ class MailingForm extends Component {
 MailingForm.propTypes = {
   showErrors: PropTypes.bool,
   error: PropTypes.shape({}),
-  sendEmail: PropTypes.func.isRequired,
+  sendTicketEmail: PropTypes.func.isRequired,
   onSubmitFailure: PropTypes.func,
   onSubmit: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
@@ -135,7 +135,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  sendEmail: bookingsActions.sendTicketsEmail,
+  sendTicketEmail: bookingsActions.sendTicketsEmail,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MailingForm);

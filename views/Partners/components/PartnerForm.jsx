@@ -16,7 +16,10 @@ import yupNumber from 'yup/lib/number';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import GridItem from 'components/GridItem';
-import { actions as partnersActions } from 'redux/partners';
+import {
+  actions as partnersActions,
+  selectors as partnersSelectors,
+} from 'redux/partners';
 
 const commonProps = {
   fullWidth: true,
@@ -165,14 +168,14 @@ class AddPartnerForm extends Component {
       return;
     }
 
-    const { createPartner } = this.props;
+    const { createItem } = this.props;
     const payload = {
       data: parsedValues,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
     };
 
-    createPartner(payload);
+    createItem(payload);
   };
 
   handleSubmitFailure = actions => () => {
@@ -203,7 +206,10 @@ class AddPartnerForm extends Component {
   };
 
   render() {
-    const { buttons, classes, FormikProps } = this.props;
+    const {
+      classes, requestError, FormikProps, hideButtons, hideErrors,
+    } = this.props;
+    const { data: errorMessage } = requestError || {};
 
     return (
       <Formik
@@ -340,14 +346,25 @@ class AddPartnerForm extends Component {
                 <Field name="servicesDescription" label="Opis usługi partnera" required component={TextField} {...commonProps} />
               </GridItem>
             </Grid>
-            {buttons
+            {(!hideButtons || (!hideErrors && errorMessage))
               && (
                 <Grid container spacing={16} justify="flex-end" className={classes.section}>
-                  <GridItem container md={3} sm={3} justify="flex-end">
-                    <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
-                      Zapisz
-                    </Button>
-                  </GridItem>
+                  {!hideErrors && errorMessage
+                    && (
+                      <GridItem container md={9} sm={9}>
+                        <Typography color="error">{errorMessage}</Typography>
+                      </GridItem>
+                    )
+                  }
+                  {!hideButtons
+                    && (
+                      <GridItem container md={3} sm={3} justify="flex-end">
+                        <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
+                          Zapisz
+                        </Button>
+                      </GridItem>
+                    )
+                  }
                 </Grid>
               )
             }
@@ -359,28 +376,38 @@ class AddPartnerForm extends Component {
 }
 
 AddPartnerForm.propTypes = {
-  buttons: PropTypes.bool,
   classes: PropTypes.shape({}).isRequired,
-  createPartner: PropTypes.func.isRequired,
+  createItem: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
+  hideButtons: PropTypes.bool,
+  hideErrors: PropTypes.bool,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
+  requestError: PropTypes.shape({
+    message: PropTypes.string,
+  }),
 };
 
 AddPartnerForm.defaultProps = {
-  buttons: true,
   FormikProps: null,
+  hideButtons: false,
+  hideErrors: false,
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
+  requestError: null,
 };
 
+const mapStateToProps = state => ({
+  requestError: partnersSelectors.getError(state),
+});
+
 const mapDispatchToProps = {
-  createPartner: partnersActions.createItem,
+  createItem: partnersActions.createItem,
 };
 
 export default compose(
-  connect(null, mapDispatchToProps),
+  connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
 )(AddPartnerForm);

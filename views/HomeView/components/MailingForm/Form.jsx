@@ -24,8 +24,7 @@ class MailingForm extends Component {
 
     this.validationSchema = yupObject().shape({
       p24Statement: yupString()
-        .min(15)
-        .max(15)
+        .length(15)
         .required(),
     });
 
@@ -66,17 +65,26 @@ class MailingForm extends Component {
   };
 
   handleSubmitSuccess = actions => () => {
-    const { onSubmitSuccess, clearError } = this.props;
-
-    clearError();
+    const { onSubmitSuccess, onClearError, clearError } = this.props;
 
     if (onSubmitSuccess) {
       onSubmitSuccess(actions);
+      if (onClearError) {
+        onClearError();
+      } else {
+        clearError();
+      }
 
       return;
     }
 
     const { resetForm, setSubmitting } = actions;
+
+    if (onClearError) {
+      onClearError();
+    } else {
+      clearError();
+    }
 
     setSubmitting(false);
     resetForm();
@@ -103,7 +111,7 @@ class MailingForm extends Component {
           </Grid>
           {!hideErrors
             && (
-              <Typography color="secondary">
+              <Typography color="error">
                 {message}
               </Typography>
             )
@@ -117,19 +125,21 @@ class MailingForm extends Component {
 MailingForm.propTypes = {
   clearError: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
+  hideErrors: PropTypes.bool,
+  onClearError: PropTypes.func,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
-  hideErrors: PropTypes.bool,
   sendTicketEmail: PropTypes.func.isRequired,
 };
 
 MailingForm.defaultProps = {
   error: null,
+  hideErrors: false,
+  onClearError: null,
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
-  hideErrors: false,
 };
 
 const mapStateToProps = state => ({

@@ -8,7 +8,7 @@ import Layout from 'components/Layout';
 import withAuth from 'services/auth/withAuth';
 import SalesExport from './components/SalesExport';
 import PromotedSightEvents from './components/PromotedSightEvents';
-import MailingFormWrapper from './components/MailingForm/FormWrapper';
+import MailingForm from './components/MailingForm/Form';
 
 const styles = {
   content: {
@@ -26,7 +26,8 @@ const HomeView = ({ classes }) => (
         <PromotedSightEvents />
       </Grid>
       <Grid item md={4}>
-        <MailingFormWrapper />
+        <Typography variant="h6" gutterBottom>Wyślij email z biletami</Typography>
+        <MailingForm />
       </Grid>
     </Grid>
   </Layout>

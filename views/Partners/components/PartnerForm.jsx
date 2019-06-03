@@ -52,7 +52,7 @@ class AddPartnerForm extends Component {
     super(props);
 
     this.initialValues = {
-      affiliateCode: false,
+      affiliation: false,
       bankAccount: '',
       businessType: '',
       commission: '',
@@ -79,7 +79,7 @@ class AddPartnerForm extends Component {
     };
 
     this.validationSchema = yupObject().shape({
-      affiliateCode: yupBoolean().required(),
+      affiliation: yupBoolean().required(),
       bankAccount: yupString().trim().required(),
       businessType: yupNumber().required(),
       commission: yupNumber().min(0).max(100).required(),
@@ -333,7 +333,7 @@ class AddPartnerForm extends Component {
               </GridItem>
               <GridItem container md={4} sm={4} alignItems="flex-end">
                 <Field
-                  name="affiliateCode"
+                  name="affiliation"
                   Label={{ label: 'Generuj kod afiliacyjny' }}
                   component={CheckboxWithLabel}
                 />

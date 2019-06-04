@@ -52,7 +52,7 @@ class AddPartnerForm extends Component {
     super(props);
 
     this.initialValues = {
-      affiliation: false,
+      affiliation: true,
       bankAccount: '',
       businessType: '',
       commission: '',

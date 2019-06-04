@@ -209,7 +209,8 @@ class AddPartnerForm extends Component {
     const {
       classes, requestError, FormikProps, hideButtons, hideErrors,
     } = this.props;
-    const { data: errorMessage } = requestError || {};
+    const { data: errorData } = requestError || {};
+    const { message: errorMessage } = errorData || {};
 
     return (
       <Formik

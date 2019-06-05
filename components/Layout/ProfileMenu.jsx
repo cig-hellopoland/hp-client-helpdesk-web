@@ -29,7 +29,11 @@ class ProfileMenu extends Component {
       this.handleMenuClose();
     }
 
-    onLogout({ onSuccess: () => Router.push(logoutURL) });
+    onLogout({
+      onSuccess: () => {
+        Router.push(logoutURL);
+      },
+    });
   };
 
   handleMenuOpen = (event) => {

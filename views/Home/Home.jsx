@@ -8,6 +8,7 @@ import Layout from 'components/Layout';
 import withAuth from 'services/auth/withAuth';
 import SalesExport from './components/SalesExport';
 import PromotedSightEvents from './components/PromotedSightEvents';
+import MailingForm from './components/MailingForm';
 
 const styles = {
   content: {
@@ -20,15 +21,24 @@ const styles = {
 
 const Home = ({ classes }) => (
   <Layout>
-    <Grid container direction="column" className={classes.content}>
-      <Grid item md={4} className={classes.item}>
-        <Typography variant="h6" gutterBottom>Statystyki sprzedaży</Typography>
-        <SalesExport />
+    <Grid container className={classes.content}>
+      <Grid container item md={4} direction="column">
+        <Grid item className={classes.item}>
+          <Typography variant="h6" gutterBottom>Statystyki sprzedaży</Typography>
+          <SalesExport />
+        </Grid>
+        <Grid item className={classes.item}>
+          <Typography variant="h6" gutterBottom>Promowane oferty</Typography>
+          <PromotedSightEvents />
+        </Grid>
       </Grid>
-      <Grid item md={4} className={classes.item}>
-        <Typography variant="h6" gutterBottom>Promowane oferty</Typography>
-        <PromotedSightEvents />
+      <Grid container item md={4} direction="column">
+        <Grid item>
+          <Typography variant="h6" gutterBottom>Wyślij email z biletami</Typography>
+          <MailingForm />
+        </Grid>
       </Grid>
+      <Grid container item md={4} direction="column" />
     </Grid>
   </Layout>
 );

@@ -19,7 +19,7 @@ class PartnerCreate extends Component {
   constructor() {
     super();
     this.state = {
-      confirmationDialog: true,
+      confirmationDialog: false,
     };
   }
 

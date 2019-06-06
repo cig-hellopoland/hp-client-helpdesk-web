@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -8,34 +8,24 @@ import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 
 
-class SuccessDialog extends Component {
-  handleClose = () => {
-    const { onClose } = this.props;
-
-    if (onClose) {
-      onClose();
-    }
-  }
-
-  render() {
-    const { ...props } = this.props;
-    return (
-      <Dialog {...props}>
-        <DialogTitle>Informacja</DialogTitle>
-        <DialogContent>
-          <Grid container>
-            <Typography>Poprawnie dodano partnera</Typography>
-            <Grid container justify="flex-end">
-              <Grid item>
-                <Button onClick={this.handleClose} color="primary">Zamknij</Button>
-              </Grid>
+function SuccessDialog({ onClose, ...props }) {
+  return (
+    <Dialog onClose={onClose} {...props}>
+      <DialogTitle>Informacja</DialogTitle>
+      <DialogContent>
+        <Grid container>
+          <Typography>Zmiany zostały zapisane.</Typography>
+          <Grid container justify="flex-end">
+            <Grid item>
+              <Button onClick={onClose} color="primary">Zamknij</Button>
             </Grid>
           </Grid>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+        </Grid>
+      </DialogContent>
+    </Dialog>
+  );
 }
+
 
 SuccessDialog.propTypes = {
   onClose: PropTypes.func,

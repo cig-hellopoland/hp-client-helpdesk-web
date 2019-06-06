@@ -1,12 +1,15 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
+import { connect } from 'react-redux';
 import withAuth from 'services/auth/withAuth';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Layout from 'components/Layout';
+import { actions as partnersActions } from 'redux/partners';
 import AddPartnerForm from './components/PartnerForm';
 import SuccessDialog from './components/SuccessDialog';
+
 
 const styles = theme => ({
   root: {
@@ -19,36 +22,36 @@ class PartnerCreate extends Component {
   constructor() {
     super();
     this.state = {
-      confirmationDialog: false,
+      successDialog: true,
     };
   }
 
   handleSubmitSuccess = (sightId, actions) => {
     const { resetForm, setSubmitting } = actions;
+    const { clearError } = this.props;
 
+    clearError();
     setSubmitting(false);
     resetForm();
     this.handleSuccessDialogOpen();
   }
 
-  handleSuccessDialogOpen = () => this.setState({ confirmationDialog: true });
+  handleSuccessDialogOpen = () => this.setState({ successDialog: true });
 
-  handleSuccessDialogClose = () => this.setState({ confirmationDialog: false });
+  handleSuccessDialogClose = () => this.setState({ successDialog: false });
 
   render() {
     const { classes } = this.props;
-    const { confirmationDialog } = this.state;
+    const { successDialog } = this.state;
     return (
-      <Fragment>
-        <Layout>
-          <Paper className={classes.root}>
-            <AddPartnerForm
-              onSubmitSuccess={this.handleSubmitSuccess}
-            />
-          </Paper>
-        </Layout>
-        <SuccessDialog open={confirmationDialog} onClose={this.handleSuccessDialogClose} />
-      </Fragment>
+      <Layout>
+        <Paper className={classes.root}>
+          <AddPartnerForm
+            onSubmitSuccess={this.handleSubmitSuccess}
+          />
+        </Paper>
+        <SuccessDialog open={successDialog} onClose={this.handleSuccessDialogClose} />
+      </Layout>
     );
   }
 }
@@ -56,9 +59,16 @@ class PartnerCreate extends Component {
 
 PartnerCreate.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  clearError: PropTypes.func.isRequired,
 };
+
+const mapDispatchToProps = {
+  clearError: partnersActions.clearError,
+};
+
 
 export default compose(
   withAuth(),
   withStyles(styles),
+  connect(undefined, mapDispatchToProps),
 )(PartnerCreate);

@@ -1,5 +1,6 @@
 import reducer, {
   actions,
+  apiURL,
   name,
   types,
   selectors,
@@ -51,60 +52,134 @@ function generateAppState(data) {
  */
 
 describe('actions', () => {
-  it('should create an action to make create item request', () => {
-    const { createItem } = actions;
-    const { CREATE_ITEM } = types;
-    const options = { b: 2 };
-    const data = {};
-    const expectedValue = {
-      type: CREATE_ITEM,
-      payload: {
-        url: '/partners',
-        method: 'post',
-      },
-    };
+  describe('using createItem', () => {
+    it('should create an action with request payload', () => {
+      const { createItem } = actions;
+      const { CREATE_ITEM } = types;
+      const data = { a: 1 };
+      const options = { b: 2 };
+      const expectedValue = {
+        type: CREATE_ITEM,
+        payload: {
+          url: apiURL,
+          method: 'post',
+          data,
+        },
+      };
 
-    expect(createItem()).toEqual(expectedValue);
+      expect(createItem({ data })).toEqual(expectedValue);
 
-    expectedValue.payload = {
-      ...expectedValue.payload,
-      ...options,
-      data,
-    };
+      expectedValue.payload = {
+        ...expectedValue.payload,
+        ...options,
+      };
 
-    expect(createItem({ options, data })).toEqual(expectedValue);
+      expect(createItem({ data, options })).toEqual(expectedValue);
 
-    expectedValue.onFailure = onFailure;
-    expectedValue.onSuccess = onSuccess;
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
 
-    expect(createItem({
-      data, options, onFailure, onSuccess,
-    })).toEqual(expectedValue);
+      expect(createItem({
+        data, options, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+    it('should create an action for failed request', () => {
+      const { createItemFailure } = actions;
+      const { CREATE_ITEM_FAILURE } = types;
+      const expectedValue = {
+        type: CREATE_ITEM_FAILURE,
+        error: {},
+      };
+
+      expect(createItemFailure()).toEqual(expectedValue);
+
+      expectedValue.error = axiosResponseError;
+
+      expect(createItemFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action for successful request', () => {
+      const { createItemSuccess } = actions;
+      const { CREATE_ITEM_SUCCESS } = types;
+      const data = { a: 1 };
+      const expectedValue = {
+        type: CREATE_ITEM_SUCCESS,
+        data,
+      };
+
+      expect(createItemSuccess(data)).toEqual(expectedValue);
+    });
   });
 
-  it('should create an action to fail profile request', () => {
-    const { createItemFailure } = actions;
-    const { CREATE_ITEM_FAILURE } = types;
-    const expectedValue = {
-      type: CREATE_ITEM_FAILURE,
-      error: {},
-    };
+  describe('using fetchList', () => {
+    it('should create an action with request payload', () => {
+      const { fetchList } = actions;
+      const { FETCH_LIST } = types;
+      const data = { a: 1 };
+      const options = { b: 2 };
+      const expectedValue = {
+        type: FETCH_LIST,
+        payload: {
+          url: apiURL,
+          method: 'get',
+        },
+      };
 
-    expect(createItemFailure()).toEqual(expectedValue);
+      expect(fetchList()).toEqual(expectedValue);
 
-    expectedValue.error = axiosResponseError;
+      expectedValue.payload = {
+        ...expectedValue.payload,
+        data,
+        ...options,
+      };
 
-    expect(createItemFailure(axiosResponseError)).toEqual(expectedValue);
-  });
+      expect(fetchList({ data, options })).toEqual(expectedValue);
 
-  it('should create an action to succeed profile request', () => {
-    const { createItemSuccess } = actions;
-    const { CREATE_ITEM_SUCCESS } = types;
-    const expectedValue = {
-      type: CREATE_ITEM_SUCCESS,
-    };
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
 
-    expect(createItemSuccess()).toEqual(expectedValue);
+      expect(fetchList({
+        data, options, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+    it('should create an action for cancelled request', () => {
+      const { fetchListCancel } = actions;
+      const { FETCH_LIST_CANCEL } = types;
+      const expectedValue = {
+        type: FETCH_LIST_CANCEL,
+      };
+
+      expect(fetchListCancel()).toEqual(expectedValue);
+    });
+
+    it('should create an action for failed request', () => {
+      const { fetchListFailure } = actions;
+      const { FETCH_LIST_FAILURE } = types;
+      const expectedValue = {
+        type: FETCH_LIST_FAILURE,
+        error: {},
+      };
+
+      expect(fetchListFailure()).toEqual(expectedValue);
+
+      expectedValue.error = axiosResponseError;
+
+      expect(fetchListFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action for successful request', () => {
+      const { fetchListSuccess } = actions;
+      const { FETCH_LIST_SUCCESS } = types;
+      const data = { a: 1 };
+      const expectedValue = {
+        type: FETCH_LIST_SUCCESS,
+        data,
+      };
+
+      expect(fetchListSuccess(data)).toEqual(expectedValue);
+    });
   });
 });
 
@@ -131,6 +206,24 @@ describe('selectors', () => {
       expect(getError(state)).toEqual(error);
     });
   });
+
+  describe('using getList', () => {
+    const { getList } = selectors;
+
+    it('should return null if there is no list data', () => {
+      expect(getList(appState)).toBeNull();
+    });
+
+    it('should return list data', () => {
+      const expectedValue = [
+        { id: 1 },
+        { id: 2 },
+      ];
+      const state = generateAppState({ list: expectedValue });
+
+      expect(getList(state)).toEqual(expectedValue);
+    });
+  });
 });
 
 describe('reducer', () => {
@@ -146,15 +239,6 @@ describe('reducer', () => {
     expect(reducer()(undefined, { type: 'INVALID_TYPE' })).toEqual(defaultInitialState);
   });
 
-  it('should handle CREATE_ITEM_SUCCESS', () => {
-    const action = actions.createItemSuccess();
-    const expectedValue = {
-      ...defaultInitialState,
-    };
-
-    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
-  });
-
   it('should handle CREATE_ITEM_FAILURE', () => {
     let action = actions.createItemFailure();
     const expectedValue = {
@@ -166,6 +250,47 @@ describe('reducer', () => {
 
     action = actions.createItemFailure(axiosResponseError);
     expectedValue.error = axiosResponseError;
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle CREATE_ITEM_SUCCESS', () => {
+    const action = actions.createItemSuccess();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle FETCH_LIST_FAILURE', () => {
+    let action = actions.fetchListFailure();
+    const expectedValue = {
+      ...defaultInitialState,
+      error: {},
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+
+    action = actions.fetchListFailure(axiosResponseError);
+    expectedValue.error = axiosResponseError;
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle FETCH_LIST_SUCCESS', () => {
+    const data = {
+      config: {},
+      items: [
+        { id: 1 },
+        { id: 2 },
+      ],
+    };
+    const action = actions.fetchListSuccess(data);
+    const expectedValue = {
+      ...defaultInitialState,
+      list: data.items,
+    };
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });

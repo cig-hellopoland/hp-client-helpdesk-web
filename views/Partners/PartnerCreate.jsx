@@ -5,7 +5,7 @@ import withAuth from 'services/auth/withAuth';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Layout from 'components/Layout';
-import AddPartnerForm from './components/PartnerForm';
+import PartnerForm from './components/PartnerForm';
 
 const styles = theme => ({
   root: {
@@ -17,7 +17,7 @@ const styles = theme => ({
 const PartnerCreate = ({ classes }) => (
   <Layout>
     <Paper className={classes.root}>
-      <AddPartnerForm />
+      <PartnerForm />
     </Paper>
   </Layout>
 );

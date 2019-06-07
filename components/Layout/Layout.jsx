@@ -26,7 +26,7 @@ const MENU_ITEMS = [
     disabled: true, label: 'Sprzedaż', href: '/sales', Icon: ShoppingCartIcon,
   },
   {
-    label: 'Partnerzy', href: '/partners/create', Icon: DomainIcon,
+    label: 'Partnerzy', href: '/partners', Icon: DomainIcon,
   },
   {
     disabled: true, label: 'Atrakcje', href: '/sights', Icon: PlaceIcon,

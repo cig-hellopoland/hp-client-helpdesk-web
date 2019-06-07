@@ -10,14 +10,11 @@ import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
-import CallIcon from '@material-ui/icons/Call';
-import MailIcon from '@material-ui/icons/Mail';
 import Link from 'next/link';
+import SortableTableHead from './components/ListingViewTable/SortableTableHead';
 
 const styles = theme => ({
   root: {
@@ -30,6 +27,15 @@ const styles = theme => ({
     padding: theme.spacing.unit,
   },
 });
+
+const tableColumns = [
+  { id: 'item-id', label: '# ID', sortable: true },
+  { id: 'name', label: 'Nazwa', sortable: true },
+  { id: 'p24MerchantId', label: 'P24 Merchant ID', sortable: true },
+  { id: 'commission', label: 'Prowizja (%)', sortable: true },
+  { id: 'affiliation', label: 'Kod afiliacyjny' },
+  { id: 'contact', label: 'Dane kontaktowe' },
+];
 
 const PartnersList = ({ classes, list }) => (
   <Layout>
@@ -51,16 +57,11 @@ const PartnersList = ({ classes, list }) => (
           </Grid>
         </Grid>
         <Table aria-labelledby="tableTitle">
-          <TableHead>
-            <TableRow>
-              <TableCell># ID</TableCell>
-              <TableCell>Nazwa</TableCell>
-              <TableCell>P24 Merchant ID</TableCell>
-              <TableCell>Prowizja</TableCell>
-              <TableCell>Kod afiliacyjny</TableCell>
-              <TableCell>Dane kontaktowe</TableCell>
-            </TableRow>
-          </TableHead>
+          <SortableTableHead
+            columns={tableColumns}
+            orderBy="name"
+            onRequestSort={console.log}
+          />
           <TableBody>
             {
               list.map(partner => (
@@ -99,28 +100,28 @@ PartnersList.propTypes = {
 PartnersList.defaultProps = {
   list: [
     {
-      id: 1, name: 'Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
+      id: 1, name: 'A-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
     },
     {
-      id: 2, name: 'Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
+      id: 2, name: 'B-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
     },
     {
-      id: 3, name: 'Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
+      id: 3, name: 'C-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
     },
     {
-      id: 4, name: 'Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
+      id: 4, name: 'D-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
     },
     {
-      id: 5, name: 'Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
+      id: 5, name: 'E-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
     },
     {
-      id: 6, name: 'Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
+      id: 6, name: 'F-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
     },
     {
-      id: 7, name: 'Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
+      id: 7, name: 'G-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
     },
     {
-      id: 8, name: 'Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
+      id: 8, name: 'H-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
     },
   ],
 };

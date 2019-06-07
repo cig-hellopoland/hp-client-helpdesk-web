@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { actions as profileActions, selectors as profileSelectors } from 'redux/profile';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -19,11 +18,16 @@ import { TextField } from 'formik-material-ui';
 import Router from 'next/router';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
+import {
+  actions as profileActions,
+  selectors as profileSelectors,
+} from 'redux/profile';
 import Layout from 'components/Layout';
 
 const styles = theme => ({
   root: {
     height: '100vh',
+    marginLeft: 'auto',
   },
   cardActions: {
     justifyContent: 'flex-end',
@@ -57,7 +61,7 @@ const commonProps = {
   required: true,
 };
 
-class SignInView extends Component {
+class SignIn extends Component {
   state = {
     snackbar: {
       open: false,
@@ -207,7 +211,7 @@ class SignInView extends Component {
   }
 }
 
-SignInView.propTypes = {
+SignIn.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   errors: PropTypes.arrayOf(PropTypes.shape({
     status: PropTypes.string.isRequired,
@@ -217,7 +221,7 @@ SignInView.propTypes = {
   login: PropTypes.func.isRequired,
 };
 
-SignInView.defaultProps = {
+SignIn.defaultProps = {
   errors: [],
 };
 
@@ -233,4 +237,4 @@ const mapDispatchToProps = {
 export default compose(
   withStyles(styles),
   connect(mapStateToProps, mapDispatchToProps),
-)(SignInView);
+)(SignIn);

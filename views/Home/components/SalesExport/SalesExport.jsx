@@ -18,8 +18,8 @@ const REPORT_TYPES = {
 
 const styles = theme => ({
   datePicker: {
-    width: 90,
     marginRight: 20,
+    width: 100,
   },
   downloadBtn: {
     alignSelf: 'flex-end',

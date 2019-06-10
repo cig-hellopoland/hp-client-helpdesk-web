@@ -51,6 +51,18 @@ function generateAppState(data) {
  */
 
 describe('actions', () => {
+  describe('using clearError', () => {
+    it('should create an action to clear error from state', () => {
+      const { clearError } = actions;
+      const { CLEAR_ERROR } = types;
+      const expectedValue = {
+        type: CLEAR_ERROR,
+      };
+
+      expect(clearError()).toEqual(expectedValue);
+    });
+  });
+
   it('should create an action to make create item request', () => {
     const { createItem } = actions;
     const { CREATE_ITEM } = types;
@@ -144,6 +156,15 @@ describe('reducer', () => {
 
   it('should return current state if action type was not found', () => {
     expect(reducer()(undefined, { type: 'INVALID_TYPE' })).toEqual(defaultInitialState);
+  });
+
+  it('should handle CLEAR_ERROR', () => {
+    const action = actions.clearError();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });
 
   it('should handle CREATE_ITEM_SUCCESS', () => {

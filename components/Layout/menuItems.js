@@ -31,6 +31,6 @@ export default [
     label: 'Help Desk',
   },
   {
-    disabled: true, label: 'Użytkownicy', href: '/helpdesk/users', Icon: PeopleIcon,
+    label: 'Użytkownicy', href: '/helpdesk/users', Icon: PeopleIcon,
   },
 ];

@@ -19,9 +19,9 @@ import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import DomainIcon from '@material-ui/icons/Domain';
 import Link from 'next/link';
 import {
-  actions as partnersActions,
-  selectors as partnersSelectors,
-} from 'redux/partners';
+  actions as usersActions,
+  selectors as usersSelectors,
+} from 'redux/users';
 import SortableTableHead from '../../../components/SortableTableHead/SortableTableHead';
 
 const styles = theme => ({
@@ -53,37 +53,34 @@ const styles = theme => ({
 });
 
 const tableColumns = [
-  { id: 'item-id', label: '# ID' },
   { id: 'name', label: 'Nazwa' },
-  { id: 'p24MerchantId', label: 'P24 Merchant ID' },
-  { id: 'commission', label: 'Prowizja (%)' },
-  { id: 'affiliation', label: 'Kod afiliacyjny' },
-  { id: 'contact', label: 'Dane kontaktowe' },
+  { id: 'email', label: 'Email' },
+  { id: 'role', label: 'Rola' },
 ];
 
-class PartnersList extends Component {
+class UsersList extends Component {
   state = {
     isFetching: false,
   };
 
   componentDidMount() {
-    this.handleFetchPartners();
+    this.handleFetchUsers();
   }
 
-  handleFetchPartners = () => {
+  handleFetchUsers = () => {
     const { fetchList } = this.props;
 
     fetchList({
-      onFailure: this.handleFetchPartnersFailure,
-      onSuccess: this.handleFetchPartnersSuccess,
+      onFailure: this.handleFetchUsersFailure,
+      onSuccess: this.handleFetchUsersSuccess,
     });
 
     this.setState({ isFetching: true });
   };
 
-  handleFetchPartnersFailure = () => this.setState({ isFetching: false });
+  handleFetchUsersFailure = () => this.setState({ isFetching: false });
 
-  handleFetchPartnersSuccess = () => this.setState({ isFetching: false });
+  handleFetchUsersSuccess = () => this.setState({ isFetching: false });
 
   render() {
     const { isFetching } = this.state;
@@ -96,7 +93,7 @@ class PartnersList extends Component {
             <Grid container direction="column" className={classes.toolbar}>
               <Grid container item justify="flex-end">
                 <Grid item>
-                  <Link href="/market/partners/create" passHref prefetch>
+                  <Link href="/market/users/create" passHref prefetch>
                     <Button component="a">
                       <AddIcon className={classes.icon} />
                       Dodaj
@@ -118,11 +115,11 @@ class PartnersList extends Component {
                   : (
                     <Fragment>
                       <DomainIcon className={classes.placeholderIcon} />
-                      <Typography variant="h6">Brak partnerów</Typography>
+                      <Typography variant="h6">Brak użytkowników</Typography>
                       <Typography>
-                        Dodaj partnera lub ponów zapytanie aby wyświetlić listę.
+                        Dodaj użytkowników lub ponów zapytanie aby wyświetlić listę.
                       </Typography>
-                      <Button className={classes.fetchButton} variant="outlined" onClick={this.handleFetchPartners}>
+                      <Button className={classes.fetchButton} variant="outlined" onClick={this.handleFetchUsers}>
                         Ponów
                       </Button>
                     </Fragment>
@@ -137,17 +134,11 @@ class PartnersList extends Component {
                   <SortableTableHead columns={tableColumns} orderBy="name" />
                   <TableBody>
                     {
-                      sortedList.map(partner => (
-                        <TableRow key={partner.id} hover>
-                          <TableCell>{partner.id}</TableCell>
-                          <TableCell>{partner.name}</TableCell>
-                          <TableCell>{partner.p24MerchantId}</TableCell>
-                          <TableCell>{`${partner.commission} %`}</TableCell>
-                          <TableCell>{partner.affiliateCode}</TableCell>
-                          <TableCell>
-                            <Typography>{partner.email}</Typography>
-                            <Typography>{partner.phone}</Typography>
-                          </TableCell>
+                      sortedList.map(user => (
+                        <TableRow key={user.id} hover>
+                          <TableCell>{user.name}</TableCell>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>{user.role}</TableCell>
                         </TableRow>
                       ))
                     }
@@ -162,29 +153,27 @@ class PartnersList extends Component {
   }
 }
 
-PartnersList.propTypes = {
+UsersList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   fetchList: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({
-    affiliateCode: PropTypes.string,
-    commission: PropTypes.number,
     email: PropTypes.string,
     id: PropTypes.number,
     name: PropTypes.string,
-    p24MerchantId: PropTypes.number,
+    role: PropTypes.string,
   })).isRequired,
 };
 
 const mapStateToProps = state => ({
-  items: partnersSelectors.getList(state),
+  items: usersSelectors.getList(state),
 });
 
 const mapDispatchToProps = {
-  fetchList: partnersActions.fetchList,
+  fetchList: usersActions.fetchList,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withAuth(),
   withStyles(styles),
-)(PartnersList);
+)(UsersList);

@@ -44,7 +44,7 @@ class PartnerCreate extends Component {
   render() {
     const { classes } = this.props;
     const { successDialog } = this.state;
-    
+
     return (
       <Layout>
         <Paper className={classes.root}>

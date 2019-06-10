@@ -51,6 +51,18 @@ function generateAppState(data) {
  */
 
 describe('actions', () => {
+  describe('using clearError', () => {
+    it('should create an action to clear error from state', () => {
+      const { clearError } = actions;
+      const { CLEAR_ERROR } = types;
+      const expectedValue = {
+        type: CLEAR_ERROR,
+      };
+
+      expect(clearError()).toEqual(expectedValue);
+    });
+  });
+
   it('should create an action to make create item request', () => {
     const { createItem } = actions;
     const { CREATE_ITEM } = types;

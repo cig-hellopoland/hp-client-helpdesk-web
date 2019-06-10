@@ -10,7 +10,6 @@ import { actions as partnersActions } from 'redux/partners';
 import AddPartnerForm from './components/PartnerForm';
 import SuccessDialog from './components/SuccessDialog';
 
-
 const styles = theme => ({
   root: {
     flex: 1,
@@ -19,10 +18,11 @@ const styles = theme => ({
 });
 
 class PartnerCreate extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+
     this.state = {
-      successDialog: true,
+      successDialog: false,
     };
   }
 
@@ -33,8 +33,9 @@ class PartnerCreate extends Component {
     clearError();
     setSubmitting(false);
     resetForm();
+
     this.handleSuccessDialogOpen();
-  }
+  };
 
   handleSuccessDialogOpen = () => this.setState({ successDialog: true });
 
@@ -43,6 +44,7 @@ class PartnerCreate extends Component {
   render() {
     const { classes } = this.props;
     const { successDialog } = this.state;
+    
     return (
       <Layout>
         <Paper className={classes.root}>

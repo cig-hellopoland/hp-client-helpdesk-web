@@ -96,7 +96,7 @@ class PartnersList extends Component {
             <Grid container direction="column" className={classes.toolbar}>
               <Grid container item justify="flex-end">
                 <Grid item>
-                  <Link href="/partners/create" passHref prefetch>
+                  <Link href="/market/partners/create" passHref prefetch>
                     <Button component="a">
                       <AddIcon className={classes.icon} />
                       Dodaj

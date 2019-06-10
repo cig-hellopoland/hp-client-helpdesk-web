@@ -6,6 +6,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import Link from 'next/link';
 
 const drawerWidth = 240;
@@ -34,14 +35,17 @@ const MenuDrawer = ({
       <List>
         {menuItems.map(({
           disabled, label, href, Icon,
-        }) => (
-          <Link key={label} href={href} passHref>
-            <ListItem button disabled={disabled} selected={currentPath === href}>
-              <ListItemIcon><Icon /></ListItemIcon>
-              <ListItemText primary={label} />
-            </ListItem>
-          </Link>
-        ))}
+        }) => href
+          ? (
+            <Link key={label} href={href} passHref>
+              <ListItem button disabled={disabled} selected={currentPath === href}>
+                <ListItemIcon><Icon /></ListItemIcon>
+                <ListItemText primary={label} />
+              </ListItem>
+            </Link>
+          )
+          : <ListSubheader>{label}</ListSubheader>
+        )}
       </List>
     </nav>
   </Drawer>

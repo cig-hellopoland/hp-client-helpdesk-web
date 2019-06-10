@@ -172,36 +172,7 @@ PartnersList.propTypes = {
     id: PropTypes.number,
     name: PropTypes.string,
     p24MerchantId: PropTypes.number,
-  })),
-};
-
-PartnersList.defaultProps = {
-  items: [
-  //   {
-  //     id: 1, name: 'A-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
-  //   },
-  //   {
-  //     id: 2, name: 'B-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
-  //   },
-  //   {
-  //     id: 3, name: 'C-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
-  //   },
-  //   {
-  //     id: 4, name: 'D-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
-  //   },
-  //   {
-  //     id: 5, name: 'E-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
-  //   },
-  //   {
-  //     id: 6, name: 'F-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
-  //   },
-  //   {
-  //     id: 7, name: 'G-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
-  //   },
-  //   {
-  //     id: 8, name: 'H-Kolejkowo', p24MerchantId: 123, commission: 20, affiliateCode: 'ad01c10b', email: 'partner@example.com', phone: '+48 123 456 789',
-  //   },
-  ],
+  })).isRequired,
 };
 
 const mapStateToProps = state => ({

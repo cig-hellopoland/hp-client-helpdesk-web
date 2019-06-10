@@ -35,7 +35,7 @@ const MenuDrawer = ({
       <List>
         {menuItems.map(({
           disabled, label, href, Icon,
-        }) => href
+        }) => (href
           ? (
             <Link key={label} href={href} passHref>
               <ListItem button disabled={disabled} selected={currentPath === href}>
@@ -44,8 +44,9 @@ const MenuDrawer = ({
               </ListItem>
             </Link>
           )
-          : <ListSubheader>{label}</ListSubheader>
-        )}
+          : (
+            <ListSubheader>{label}</ListSubheader>
+          )))}
       </List>
     </nav>
   </Drawer>

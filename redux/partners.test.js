@@ -210,8 +210,10 @@ describe('selectors', () => {
   describe('using getList', () => {
     const { getList } = selectors;
 
-    it('should return null if there is no list data', () => {
-      expect(getList(appState)).toBeNull();
+    it('should return empty array if there is no list data', () => {
+      const expectedValue = [];
+
+      expect(getList(appState)).toEqual(expectedValue);
     });
 
     it('should return list data', () => {

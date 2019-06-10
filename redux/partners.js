@@ -371,7 +371,7 @@ export const logic = {
 export const defaultInitialState = {
   error: null,
   item: null,
-  list: null,
+  list: [],
 };
 
 /**

@@ -29,6 +29,12 @@ const prefix = `${name}/`;
  */
 
 /**
+ * Type used for clear error.
+ * @type {string}
+ */
+const CLEAR_ERROR = `${prefix}CLEAR_ERROR`;
+
+/**
  * Type used for handling create item request.
  * @type {string}
  */
@@ -72,6 +78,7 @@ const FETCH_LIST_SUCCESS = `${prefix}FETCH_LIST_SUCCESS`;
 
 
 export const types = {
+  CLEAR_ERROR,
   CREATE_ITEM,
   CREATE_ITEM_FAILURE,
   CREATE_ITEM_SUCCESS,
@@ -84,6 +91,14 @@ export const types = {
 /*
  * ACTIONS
  */
+
+/**
+ * Creates action for clear error
+ * @method
+ * @return {{type: string}}
+ */
+const clearError = () => ({ type: CLEAR_ERROR });
+
 
 /**
  * Creates action for create item request.
@@ -213,6 +228,7 @@ const fetchListSuccess = data => ({
 });
 
 export const actions = {
+  clearError,
   createItem,
   createItemFailure,
   createItemSuccess,
@@ -388,6 +404,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         ...state,
         error: action.error,
       };
+    case CLEAR_ERROR:
     case CREATE_ITEM_SUCCESS:
       return {
         ...state,

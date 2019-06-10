@@ -241,6 +241,15 @@ describe('reducer', () => {
     expect(reducer()(undefined, { type: 'INVALID_TYPE' })).toEqual(defaultInitialState);
   });
 
+  it('should handle CLEAR_ERROR', () => {
+    const action = actions.clearError();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
   it('should handle CREATE_ITEM_FAILURE', () => {
     let action = actions.createItemFailure();
     const expectedValue = {

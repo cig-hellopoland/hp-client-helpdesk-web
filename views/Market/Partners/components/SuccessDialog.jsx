@@ -14,7 +14,7 @@ function SuccessDialog({ onClose, ...props }) {
       <DialogTitle>Informacja</DialogTitle>
       <DialogContent>
         <Grid container>
-          <Typography>Zmiany zostały zapisane.</Typography>
+          <Typography>Partner został dodany prawidłowo.</Typography>
           <Grid container justify="flex-end">
             <Grid item>
               <Button onClick={onClose} color="primary">Zamknij</Button>

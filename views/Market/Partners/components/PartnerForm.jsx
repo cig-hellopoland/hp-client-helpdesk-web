@@ -191,7 +191,7 @@ class AddPartnerForm extends Component {
   };
 
   handleSubmitSuccess = actions => (sightId) => {
-    const { onSubmitSuccess } = this.props;
+    const { onSubmitSuccess, clearError } = this.props;
 
     if (onSubmitSuccess) {
       onSubmitSuccess(sightId, actions);
@@ -200,7 +200,7 @@ class AddPartnerForm extends Component {
     }
 
     const { resetForm, setSubmitting } = actions;
-
+    clearError();
     setSubmitting(false);
     resetForm();
   };
@@ -378,6 +378,7 @@ class AddPartnerForm extends Component {
 
 AddPartnerForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  clearError: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   hideButtons: PropTypes.bool,
@@ -405,6 +406,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
+  clearError: partnersActions.clearError,
   createItem: partnersActions.createItem,
 };
 

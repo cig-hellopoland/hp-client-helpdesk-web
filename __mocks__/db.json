@@ -1,4 +1,33 @@
 {
+  "categories": [
+    {
+      "defaultLanguage": "pl-pl",
+      "iconName": "AccountBalance",
+      "iconURL": "https://github.com/google/material-design-icons/blob/3.0.1/action/svg/production/ic_account_balance_48px.svg",
+      "label": "Zwiedzanie",
+      "language": "pl-PL",
+      "public": true,
+      "recommended": false
+    },
+    {
+      "defaultLanguage": "pl-pl",
+      "iconName": "Nature",
+      "iconURL": "https://github.com/google/material-design-icons/blob/3.0.1/image/svg/production/ic_nature_48px.svg",
+      "label": "Natura",
+      "language": "pl-PL",
+      "public": true,
+      "recommended": false
+    },
+    {
+      "defaultLanguage": "pl-pl",
+      "iconName": "PartyMode",
+      "iconURL": "https://github.com/google/material-design-icons/blob/3.0.1/social/svg/production/ic_party_mode_48px.svg",
+      "label": "Interaktywne",
+      "language": "pl-PL",
+      "public": true,
+      "recommended": false
+    }
+  ],
   "users": [
     {
       "id": 1,

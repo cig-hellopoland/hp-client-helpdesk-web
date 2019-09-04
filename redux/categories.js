@@ -53,6 +53,24 @@ const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
 const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
 
 /**
+ * Type used for handling entity deletion.
+ * @type {string}
+ */
+const DELETE_ITEM = `${prefix}DELETE_ITEM`;
+
+/**
+ * Type used for handling entity deletion failure.
+ * @type {string}
+ */
+const DELETE_ITEM_FAILURE = `${prefix}DELETE_ITEM_FAILURE`;
+
+/**
+ * Type used for handling entity deletion success.
+ * @type {string}
+ */
+const DELETE_ITEM_SUCCESS = `${prefix}DELETE_ITEM_SUCCESS`;
+
+/**
  * Type used for handling entity list fetching.
  * @type {string}
  */
@@ -82,6 +100,9 @@ export const types = {
   CREATE_ITEM,
   CREATE_ITEM_FAILURE,
   CREATE_ITEM_SUCCESS,
+  DELETE_ITEM,
+  DELETE_ITEM_FAILURE,
+  DELETE_ITEM_SUCCESS,
   FETCH_LIST,
   FETCH_LIST_CANCEL,
   FETCH_LIST_FAILURE,
@@ -160,6 +181,63 @@ const createItemSuccess = data => ({
 });
 
 /**
+ * Creates action with item deletion request details.
+ * @method
+ * @param {Object} params
+ * @param {number} params.id - item id
+ * @param {Object} [params.options] - request config
+ * @param {failureCallback} [params.onFailure] - failure callback
+ * @param {successCallback} [params.onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string, options: *},
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const deleteItem = ({
+  id, options, onFailure, onSuccess,
+} = {}) => ({
+  type: DELETE_ITEM,
+  payload: {
+    url: `${apiURL}/${id}`,
+    method: 'delete',
+    ...options,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for item deletion request failing.
+ * @method
+ * @param {Object} params - axios response schema
+ * @param params.data - response body
+ * @param params.status - response status
+ * @return {{
+ *   type: string,
+ *   error: {data, status: number}
+ * }}
+ */
+const deleteItemFailure = ({ data, status } = {}) => ({
+  type: DELETE_ITEM_FAILURE,
+  error: {
+    data,
+    status,
+  },
+});
+
+/**
+ * Creates action for successful item deletion request.
+ * @method
+ * @return {{type: string}}
+ */
+const deleteItemSuccess = () => ({
+  type: DELETE_ITEM_SUCCESS,
+});
+
+
+/**
  * Creates action with list request details.
  * @method
  * @param {Object} params
@@ -232,6 +310,9 @@ export const actions = {
   createItem,
   createItemFailure,
   createItemSuccess,
+  deleteItem,
+  deleteItemFailure,
+  deleteItemSuccess,
   fetchList,
   fetchListCancel,
   fetchListFailure,
@@ -322,6 +403,49 @@ const createItemLogic = createLogic({
 });
 
 /**
+ * Logic used for handling entity deletion.
+ * @method
+ */
+const deleteItemLogic = createLogic({
+  type: [
+    DELETE_ITEM,
+  ],
+  latest: true,
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(deleteItemSuccess());
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(deleteItemFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(deleteItemFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    }
+
+    done();
+  },
+});
+
+/**
  * Logic used for handling entity list fetching.
  * @method
  */
@@ -369,6 +493,7 @@ const fetchListLogic = createLogic({
 
 export const logic = {
   createItemLogic,
+  deleteItemLogic,
   fetchListLogic,
 };
 
@@ -399,6 +524,7 @@ export const defaultInitialState = {
 const reducer = (initialState = defaultInitialState) => (state = initialState, action) => {
   switch (action.type) {
     case CREATE_ITEM_FAILURE:
+    case DELETE_ITEM_FAILURE:
     case FETCH_LIST_FAILURE:
       return {
         ...state,

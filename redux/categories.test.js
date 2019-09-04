@@ -5,7 +5,7 @@ import reducer, {
   types,
   selectors,
   defaultInitialState,
-} from './partners';
+} from './categories';
 
 /*
  * Initial state
@@ -121,6 +121,63 @@ describe('actions', () => {
       };
 
       expect(createItemSuccess(data)).toEqual(expectedValue);
+    });
+  });
+
+  describe('using deleteItem', () => {
+    it('should create an action with request payload', () => {
+      const { deleteItem } = actions;
+      const { DELETE_ITEM } = types;
+      const id = 1;
+      const options = { b: 2 };
+      const expectedValue = {
+        type: DELETE_ITEM,
+        payload: {
+          url: `${apiURL}/${id}`,
+          method: 'delete',
+        },
+      };
+
+      expect(deleteItem({ id })).toEqual(expectedValue);
+
+      expectedValue.payload = {
+        ...expectedValue.payload,
+        ...options,
+      };
+
+      expect(deleteItem({ id, options })).toEqual(expectedValue);
+
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
+
+      expect(deleteItem({
+        id, options, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+    it('should create an action for failed request', () => {
+      const { deleteItemFailure } = actions;
+      const { DELETE_ITEM_FAILURE } = types;
+      const expectedValue = {
+        type: DELETE_ITEM_FAILURE,
+        error: {},
+      };
+
+      expect(deleteItemFailure()).toEqual(expectedValue);
+
+      expectedValue.error = axiosResponseError;
+
+      expect(deleteItemFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action for successful request', () => {
+      const { deleteItemSuccess } = actions;
+      const { DELETE_ITEM_SUCCESS } = types;
+      const expectedValue = {
+        type: DELETE_ITEM_SUCCESS,
+      };
+
+      expect(deleteItemSuccess()).toEqual(expectedValue);
     });
   });
 
@@ -282,6 +339,21 @@ describe('reducer', () => {
     const expectedValue = {
       ...defaultInitialState,
     };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle DELETE_ITEM_FAILURE', () => {
+    let action = actions.deleteItemFailure();
+    const expectedValue = {
+      ...defaultInitialState,
+      error: {},
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+
+    action = actions.deleteItemFailure(axiosResponseError);
+    expectedValue.error = axiosResponseError;
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });

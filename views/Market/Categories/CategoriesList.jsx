@@ -3,11 +3,18 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
+import Snackbar from '@material-ui/core/Snackbar';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -46,13 +53,70 @@ const styles = () => ({
 
 class CategoriesList extends React.Component {
   state = {
-    isFetching: true,
+    dialogOpen: false,
+    dialogProps: {},
+    isFetching: false,
     menuAnchor: null,
+    menuCategoryId: null,
+    snackbarOpen: false,
+    snackbarMessage: '',
   };
 
   componentDidMount() {
     this.handleFetchCategories();
   }
+
+  handleDialogOpen = () => {
+    const { menuCategoryId } = this.state;
+    const { items } = this.props;
+
+    const selectedCategory = items.find(item => item.id === menuCategoryId);
+
+    if (selectedCategory) {
+      this.setState({
+        dialogOpen: true,
+        dialogProps: {
+          categoryId: menuCategoryId,
+          categoryName: selectedCategory.label,
+        },
+      });
+    }
+
+    this.handleMenuClose();
+  };
+
+  handleDialogClose = () => this.setState({
+    dialogOpen: false,
+    dialogProps: {},
+  });
+
+  handleDeleteCategoryFailure = () => {
+    this.handleDialogClose();
+    this.handleSnackbarOpen('Rany boskie jestem kioskiem!'); // TODO: Fix me!
+  };
+
+  handleDeleteCategorySuccess = () => {
+    this.handleDialogClose();
+    this.handleFetchCategories();
+  };
+
+  handleDeleteCategory = (id) => {
+    const { deleteItem } = this.props;
+
+    this.setState(state => ({
+      ...state,
+      dialogProps: {
+        ...state.dialogProps,
+        deleting: true,
+      },
+    }));
+
+    deleteItem({
+      id,
+      onFailure: this.handleDeleteCategoryFailure,
+      onSuccess: this.handleDeleteCategorySuccess,
+    });
+  };
 
   handleFetchCategoriesFailure = () => this.setState({ isFetching: false });
 
@@ -69,12 +133,30 @@ class CategoriesList extends React.Component {
     this.setState({ isFetching: true });
   };
 
-  handleMenuOpen = event => this.setState({ menuAnchor: event.currentTarget });
+  handleMenuOpen = (event, categoryId) => this.setState({
+    menuAnchor: event.currentTarget,
+    menuCategoryId: categoryId,
+  });
 
-  handleMenuClose = () => this.setState({ menuAnchor: null });
+  handleMenuClose = () => this.setState({
+    menuAnchor: null,
+    menuCategoryId: null,
+  });
+
+  handleSnackbarOpen = message => this.setState({
+    snackbarOpen: true,
+    snackbarMessage: typeof message === 'string' ? message : 'Wystąpił nieznany błąd',
+  });
+
+  handleSnackbarClose = () => this.setState({
+    snackbarOpen: false,
+    snackbarMessage: '',
+  });
 
   render() {
-    const { isFetching, menuAnchor } = this.state;
+    const {
+      dialogOpen, dialogProps, isFetching, menuAnchor, snackbarMessage, snackbarOpen,
+    } = this.state;
     const { classes, items: sortedList } = this.props;
 
     const colorActive = 'primary';
@@ -103,9 +185,9 @@ class CategoriesList extends React.Component {
                     <TableBody>
                       {
                         sortedList.map(({
-                          label, iconName, iconURL, id, restricted, recommended,
+                          label, iconName, iconURL, id: categoryId, restricted, recommended,
                         }) => (
-                          <TableRow key={id} hover>
+                          <TableRow key={categoryId} hover>
                             <TableCell className={classes.iconCell}>
                               <img src={iconURL} alt={iconName} />
                             </TableCell>
@@ -122,7 +204,7 @@ class CategoriesList extends React.Component {
                               <IconButton
                                 aria-owns={menuAnchor ? 'category-menu' : undefined}
                                 aria-haspopup="true"
-                                onClick={this.handleMenuOpen}
+                                onClick={event => this.handleMenuOpen(event, categoryId)}
                               >
                                 <MoreVertIcon />
                               </IconButton>
@@ -138,9 +220,45 @@ class CategoriesList extends React.Component {
                     open={Boolean(menuAnchor)}
                     onClose={this.handleMenuClose}
                   >
-                    <MenuItem onClick={this.handleMenuClose}>Edytuj</MenuItem>
-                    <MenuItem onClick={this.handleMenuClose}>Usuń</MenuItem>
+                    <MenuItem onClick={this.handleMenuClose}>
+                      Edytuj
+                    </MenuItem>
+                    <MenuItem onClick={() => this.handleDialogOpen(menuAnchor)}>
+                      Usuń
+                    </MenuItem>
                   </Menu>
+                  <Dialog
+                    open={dialogOpen}
+                    onClose={this.handleDialogClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                  >
+                    <DialogTitle id="alert-dialog-title">
+                      Usuń kategorię
+                    </DialogTitle>
+                    <DialogContent>
+                      <DialogContentText id="alert-dialog-description">
+                        {`Czy napewno usunąć kategorię "${dialogProps.categoryName}"?`}
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={this.handleDialogClose} color="primary" disabled={dialogProps.deleting}>
+                        Anuluj
+                      </Button>
+                      <Button onClick={() => this.handleDeleteCategory(dialogProps.categoryId)} color="primary" disabled={dialogProps.deleting}>
+                        OK
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                  <Snackbar
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                    open={snackbarOpen}
+                    onClose={this.handleSnackbarClose}
+                    ContentProps={{
+                      'aria-describedby': 'message-id',
+                    }}
+                    message={snackbarMessage}
+                  />
                 </React.Fragment>
               )
             }
@@ -153,6 +271,7 @@ class CategoriesList extends React.Component {
 
 CategoriesList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  deleteItem: PropTypes.func.isRequired,
   fetchList: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number.isRequired,
@@ -165,6 +284,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
+  deleteItem: categoriesActions.deleteItem,
   fetchList: categoriesActions.fetchList,
 };
 

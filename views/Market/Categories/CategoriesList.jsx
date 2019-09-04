@@ -36,6 +36,8 @@ import SortableTableHead from '../Partners/components/ListingViewTable/SortableT
 const tableColumns = [
   { id: 'icon', label: 'Ikona' },
   { id: 'name', label: 'Nazwa kategorii' },
+  { id: 'count', label: 'Liczba ofert' },
+  { id: 'language', label: 'Wersje językowe' },
   { id: 'details', label: '' },
 ];
 
@@ -185,7 +187,8 @@ class CategoriesList extends React.Component {
                     <TableBody>
                       {
                         sortedList.map(({
-                          label, iconName, iconURL, id: categoryId, restricted, recommended,
+                          assignedItemsCount, availableLanguageVersions, label, iconName, iconURL,
+                          id: categoryId, restricted, recommended,
                         }) => (
                           <TableRow key={categoryId} hover>
                             <TableCell className={classes.iconCell}>
@@ -193,6 +196,14 @@ class CategoriesList extends React.Component {
                             </TableCell>
                             <TableCell>
                               <Typography>{label}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography>{assignedItemsCount}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography>
+                                {availableLanguageVersions && availableLanguageVersions.join(', ')}
+                              </Typography>
                             </TableCell>
                             <TableCell align="right">
                               <IconButton disabled>

@@ -1,31 +1,52 @@
 {
   "categories": [
     {
-      "defaultLanguage": "pl-pl",
-      "iconName": "AccountBalance",
-      "iconURL": "https://github.com/google/material-design-icons/blob/3.0.1/action/svg/production/ic_account_balance_48px.svg",
+      "assignedItemsCount": 5,
+      "availableLanguageVersions": [
+        "pl-PL", "en-GB", "de-DE"
+      ],
+      "defaultLanguage": "pl-PL",
+      "iconURL": "http://localhost:3000/static/images/icons/ic_account_balance_48px.svg",
+      "id": 1,
       "label": "Zwiedzanie",
       "language": "pl-PL",
-      "public": true,
-      "recommended": false
+      "recommended": false,
+      "restricted": true
     },
     {
-      "defaultLanguage": "pl-pl",
-      "iconName": "Nature",
-      "iconURL": "https://github.com/google/material-design-icons/blob/3.0.1/image/svg/production/ic_nature_48px.svg",
+      "assignedItemsCount": 0,
+      "availableLanguageVersions": [
+        "pl-PL"
+      ],
+      "defaultLanguage": "pl-PL",
+      "iconURL": "http://localhost:3000/static/images/icons/ic_nature_48px.svg",
+      "id": 2,
       "label": "Natura",
       "language": "pl-PL",
-      "public": true,
-      "recommended": false
+      "recommended": false,
+      "restricted": false
     },
     {
-      "defaultLanguage": "pl-pl",
-      "iconName": "PartyMode",
-      "iconURL": "https://github.com/google/material-design-icons/blob/3.0.1/social/svg/production/ic_party_mode_48px.svg",
+      "defaultLanguage": "pl-PL",
+      "iconURL": "http://localhost:3000/static/images/icons/ic_party_mode_48px.svg",
+      "id": 3,
       "label": "Interaktywne",
       "language": "pl-PL",
-      "public": true,
-      "recommended": false
+      "recommended": true,
+      "restricted": true
+    },
+    {
+      "assignedItemsCount": 1234567890,
+      "availableLanguageVersions": [
+        "pl-PL", "de-DE"
+      ],
+      "defaultLanguage": "pl-PL",
+      "iconURL": "http://localhost:3000/static/images/icons/ic_build_48px.svg",
+      "id": 4,
+      "label": "Warsztaty",
+      "language": "pl-PL",
+      "recommended": true,
+      "restricted": false
     }
   ],
   "users": [

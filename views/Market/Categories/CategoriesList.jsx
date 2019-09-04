@@ -1,155 +1,147 @@
-import React, { Component, Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import withAuth from 'services/auth/withAuth';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import Layout from 'components/Layout';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
-import AddIcon from '@material-ui/icons/Add';
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
-import DomainIcon from '@material-ui/icons/Domain';
-import Link from 'next/link';
+import CategoryIcon from '@material-ui/icons/Category';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import PublicIcon from '@material-ui/icons/Public';
+import StarIcon from '@material-ui/icons/Star';
 import {
-  actions as partnersActions,
-  selectors as partnersSelectors,
-} from 'redux/partners';
+  actions as categoriesActions,
+  selectors as categoriesSelectors,
+} from 'redux/categories';
+import withAuth from 'services/auth/withAuth';
+import Layout from 'components/Layout';
+import EmptyView from './components/EmptyView';
 import SortableTableHead from '../Partners/components/ListingViewTable/SortableTableHead';
 
-const styles = theme => ({
+const tableColumns = [
+  { id: 'icon', label: 'Ikona' },
+  { id: 'name', label: 'Nazwa kategorii' },
+  { id: 'details', label: '' },
+];
+
+const styles = () => ({
   root: {
     minHeight: '100%',
+  },
+  iconCell: {
+    width: 50,
   },
   paper: {
     flex: 1,
   },
-  fetchButton: {
-    marginTop: theme.spacing.unit * 3,
-  },
-  icon: {
-    marginRight: theme.spacing.unit,
-  },
-  placeholder: {
-    height: '100%',
-  },
-  placeholderIcon: {
-    color: theme.palette.grey[500],
-    fontSize: theme.spacing.unit * 10,
-  },
-  placeholderProgress: {
-    width: theme.spacing.unit * 10,
-  },
-  toolbar: {
-    padding: theme.spacing.unit,
-  },
 });
 
-const tableColumns = [
-  { id: 'icon', label: 'Ikona' },
-  { id: 'name', label: 'Nazwa' },
-  { id: 'details', label: 'Szczegóły' },
-];
-
-class PartnersList extends Component {
+class CategoriesList extends React.Component {
   state = {
-    isFetching: false,
+    isFetching: true,
+    menuAnchor: null,
   };
 
   componentDidMount() {
-    this.handleFetchPartners();
+    this.handleFetchCategories();
   }
 
-  handleFetchPartners = () => {
+  handleFetchCategoriesFailure = () => this.setState({ isFetching: false });
+
+  handleFetchCategoriesSuccess = () => this.setState({ isFetching: false });
+
+  handleFetchCategories = () => {
     const { fetchList } = this.props;
 
     fetchList({
-      onFailure: this.handleFetchPartnersFailure,
-      onSuccess: this.handleFetchPartnersSuccess,
+      onFailure: this.handleFetchCategoriesFailure,
+      onSuccess: this.handleFetchCategoriesSuccess,
     });
 
     this.setState({ isFetching: true });
   };
 
-  handleFetchPartnersFailure = () => this.setState({ isFetching: false });
+  handleMenuOpen = event => this.setState({ menuAnchor: event.currentTarget });
 
-  handleFetchPartnersSuccess = () => this.setState({ isFetching: false });
+  handleMenuClose = () => this.setState({ menuAnchor: null });
 
   render() {
-    const { isFetching } = this.state;
+    const { isFetching, menuAnchor } = this.state;
     const { classes, items: sortedList } = this.props;
+
+    const colorActive = 'primary';
+    const colorInactive = 'disabled';
 
     return (
       <Layout>
         <Grid container className={classes.root}>
           <Paper className={classes.paper}>
-            <Grid container direction="column" className={classes.toolbar}>
-              <Grid container item justify="flex-end">
-                <Grid item>
-                  <Link href="/market/partners/create" passHref prefetch>
-                    <Button component="a">
-                      <AddIcon className={classes.icon} />
-                      Dodaj
-                    </Button>
-                  </Link>
-                </Grid>
-              </Grid>
-            </Grid>
-            {(sortedList.length === 0)
-            && (
-              <Grid container item className={classes.placeholder} direction="column" alignItems="center" justify="center">
-                {isFetching
-                  ? (
-                    <Fragment>
-                      <CloudDownloadIcon className={classes.placeholderIcon} />
-                      <LinearProgress className={classes.placeholderProgress} />
-                    </Fragment>
-                  )
-                  : (
-                    <Fragment>
-                      <DomainIcon className={classes.placeholderIcon} />
-                      <Typography variant="h6">Brak partnerów</Typography>
-                      <Typography>
-                        Dodaj partnera lub ponów zapytanie aby wyświetlić listę.
-                      </Typography>
-                      <Button className={classes.fetchButton} variant="outlined" onClick={this.handleFetchPartners}>
-                        Ponów
-                      </Button>
-                    </Fragment>
-                  )
-                }
-              </Grid>
-            )
+            {sortedList.length === 0
+              && (
+                <EmptyView
+                  image={CategoryIcon}
+                  label="Brak kategorii"
+                  loading={isFetching}
+                  message="Dodaj kategorię lub ponów zapytanie aby wyświetlić listę."
+                  onRefresh={this.handleFetchCategories}
+                />
+              )
             }
             {sortedList.length > 0
               && (
-                <Table aria-labelledby="tableTitle">
-                  <SortableTableHead columns={tableColumns} orderBy="name" />
-                  <TableBody>
-                    {
-                      sortedList.map(partner => (
-                        <TableRow key={partner.id} hover>
-                          <TableCell>{partner.id}</TableCell>
-                          <TableCell>{partner.name}</TableCell>
-                          <TableCell>{partner.p24MerchantId}</TableCell>
-                          <TableCell>{`${partner.commission} %`}</TableCell>
-                          <TableCell>{partner.affiliateCode}</TableCell>
-                          <TableCell>
-                            <Typography>{partner.email}</Typography>
-                            <Typography>{partner.phone}</Typography>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    }
-                  </TableBody>
-                </Table>
+                <React.Fragment>
+                  <Table aria-labelledby="categories-list">
+                    <SortableTableHead columns={tableColumns} orderBy="name" onRequestSort={() => {}} />
+                    <TableBody>
+                      {
+                        sortedList.map(({
+                          label, iconName, iconURL, id, restricted, recommended,
+                        }) => (
+                          <TableRow key={id} hover>
+                            <TableCell className={classes.iconCell}>
+                              <img src={iconURL} alt={iconName} />
+                            </TableCell>
+                            <TableCell>
+                              <Typography>{label}</Typography>
+                            </TableCell>
+                            <TableCell align="right">
+                              <IconButton disabled>
+                                <PublicIcon color={!restricted ? colorActive : colorInactive} />
+                              </IconButton>
+                              <IconButton disabled>
+                                <StarIcon color={recommended ? colorActive : colorInactive} />
+                              </IconButton>
+                              <IconButton
+                                aria-owns={menuAnchor ? 'category-menu' : undefined}
+                                aria-haspopup="true"
+                                onClick={this.handleMenuOpen}
+                              >
+                                <MoreVertIcon />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      }
+                    </TableBody>
+                  </Table>
+                  <Menu
+                    id="category-menu"
+                    anchorEl={menuAnchor}
+                    open={Boolean(menuAnchor)}
+                    onClose={this.handleMenuClose}
+                  >
+                    <MenuItem onClick={this.handleMenuClose}>Edytuj</MenuItem>
+                    <MenuItem onClick={this.handleMenuClose}>Usuń</MenuItem>
+                  </Menu>
+                </React.Fragment>
               )
             }
           </Paper>
@@ -159,29 +151,25 @@ class PartnersList extends Component {
   }
 }
 
-PartnersList.propTypes = {
+CategoriesList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   fetchList: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({
-    affiliateCode: PropTypes.string,
-    commission: PropTypes.number,
-    email: PropTypes.string,
-    id: PropTypes.number,
-    name: PropTypes.string,
-    p24MerchantId: PropTypes.number,
+    id: PropTypes.number.isRequired,
+    label: PropTypes.string.isRequired,
   })).isRequired,
 };
 
 const mapStateToProps = state => ({
-  items: partnersSelectors.getList(state),
+  items: categoriesSelectors.getList(state),
 });
 
 const mapDispatchToProps = {
-  fetchList: partnersActions.fetchList,
+  fetchList: categoriesActions.fetchList,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withAuth(),
   withStyles(styles),
-)(PartnersList);
+)(CategoriesList);

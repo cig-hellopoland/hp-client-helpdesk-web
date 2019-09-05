@@ -134,7 +134,11 @@ class PartnersList extends Component {
             {sortedList.length > 0
               && (
                 <Table aria-labelledby="tableTitle">
-                  <SortableTableHead columns={tableColumns} orderBy="name" />
+                  <SortableTableHead
+                    columns={tableColumns}
+                    orderBy="name"
+                    onRequestSort={() => {}}
+                  />
                   <TableBody>
                     {
                       sortedList.map(partner => (

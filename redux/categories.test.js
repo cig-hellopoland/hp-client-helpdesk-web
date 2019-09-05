@@ -136,6 +136,66 @@ describe('actions', () => {
     });
   });
 
+  describe('using createTranslation', () => {
+    it('should create an action with request payload', () => {
+      const { createTranslation } = actions;
+      const { CREATE_TRANSLATION } = types;
+      const data = { a: 1 };
+      const options = { b: 2 };
+      const expectedValue = {
+        type: CREATE_TRANSLATION,
+        payload: {
+          url: apiURL,
+          method: 'post',
+          data,
+        },
+      };
+
+      expect(createTranslation({ data })).toEqual(expectedValue);
+
+      expectedValue.payload = {
+        ...expectedValue.payload,
+        ...options,
+      };
+
+      expect(createTranslation({ data, options })).toEqual(expectedValue);
+
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
+
+      expect(createTranslation({
+        data, options, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+    it('should create an action for failed request', () => {
+      const { createTranslationFailure } = actions;
+      const { CREATE_TRANSLATION_FAILURE } = types;
+      const expectedValue = {
+        type: CREATE_TRANSLATION_FAILURE,
+        error: {},
+      };
+
+      expect(createTranslationFailure()).toEqual(expectedValue);
+
+      expectedValue.error = axiosResponseError;
+
+      expect(createTranslationFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action for successful request', () => {
+      const { createTranslationSuccess } = actions;
+      const { CREATE_TRANSLATION_SUCCESS } = types;
+      const data = { a: 1 };
+      const expectedValue = {
+        type: CREATE_TRANSLATION_SUCCESS,
+        data,
+      };
+
+      expect(createTranslationSuccess(data)).toEqual(expectedValue);
+    });
+  });
+
   describe('using deleteItem', () => {
     it('should create an action with request payload', () => {
       const { deleteItem } = actions;
@@ -506,6 +566,30 @@ describe('reducer', () => {
 
   it('should handle CREATE_ITEM_SUCCESS', () => {
     const action = actions.createItemSuccess();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle CREATE_TRANSLATION_FAILURE', () => {
+    let action = actions.createTranslationFailure();
+    const expectedValue = {
+      ...defaultInitialState,
+      error: {},
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+
+    action = actions.createTranslationFailure(axiosResponseError);
+    expectedValue.error = axiosResponseError;
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle CREATE_TRANSLATION_SUCCESS', () => {
+    const action = actions.createTranslationSuccess();
     const expectedValue = {
       ...defaultInitialState,
     };

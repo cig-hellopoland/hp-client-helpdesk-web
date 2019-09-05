@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
+import _isNumber from 'lodash/isNumber';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -17,6 +18,7 @@ import {
   actions as categoriesActions,
   selectors as categoriesSelectors,
 } from 'redux/categories';
+import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 
 const commonProps = {
@@ -40,7 +42,6 @@ class CategoryForm extends React.Component {
 
     this.state = {
       initialValues: this.getInitialValues(initialValues || {}),
-      language: (initialValues && initialValues.language) || 'pl-PL',
     };
 
     this.validationSchema = yupObject().shape({
@@ -73,8 +74,7 @@ class CategoryForm extends React.Component {
   });
 
   handleSubmit = (values, actions) => {
-    const { language } = this.state;
-    const { onSubmit } = this.props;
+    const { initialValues, language, onSubmit } = this.props;
 
     if (onSubmit) {
       onSubmit(values, actions);
@@ -82,25 +82,35 @@ class CategoryForm extends React.Component {
       return;
     }
 
-    const { createItem, updateItem } = this.props;
+    const { createItem, createTranslation, updateItem } = this.props;
     const { id, ...data } = values;
 
     const payload = {
-      id,
       data,
+      onFailure: this.handleSubmitFailure(actions),
+      onSuccess: this.handleSubmitSuccess(actions),
       options: {
         headers: {
           'Content-Language': language,
         },
       },
-      // pathParams: {
-      //   languageVersion: language,
-      // },
-      onFailure: this.handleSubmitFailure(actions),
-      onSuccess: this.handleSubmitSuccess(actions),
     };
 
-    const submitAction = payload.id ? updateItem : createItem;
+    let submitAction = createItem;
+
+    if (_isNumber(id)) {
+      payload.data.id = id;
+
+      if (initialValues.language) {
+        submitAction = updateItem;
+        payload.id = id;
+        payload.pathParams = {
+          languageVersion: language,
+        };
+      } else {
+        submitAction = createTranslation;
+      }
+    }
 
     submitAction(payload);
   };
@@ -215,10 +225,12 @@ CategoryForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
+  createTranslation: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),
   hideButtons: PropTypes.bool,
   hideErrors: PropTypes.bool,
   initialValues: PropTypes.shape({}),
+  language: PropTypes.string,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
@@ -233,6 +245,7 @@ CategoryForm.defaultProps = {
   hideButtons: false,
   hideErrors: false,
   initialValues: null,
+  language: DEFAULT_LANGUAGE,
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
@@ -246,6 +259,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   clearError: categoriesActions.clearError,
   createItem: categoriesActions.createItem,
+  createTranslation: categoriesActions.createTranslation,
   updateItem: categoriesActions.updateItem,
 };
 

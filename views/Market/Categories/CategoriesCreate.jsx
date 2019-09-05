@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Snackbar from '@material-ui/core/Snackbar';
+import Typography from '@material-ui/core/Typography';
 import {
   actions as categoriesActions,
   selectors as categoriesSelectors,
@@ -40,7 +41,7 @@ class PartnerCreate extends React.Component {
     }
 
     if (categoryId) {
-      this.handleFetchItem(categoryId);
+      this.handleFetchItem(categoryId, 'pl-PL');
     }
   }
 
@@ -54,14 +55,14 @@ class PartnerCreate extends React.Component {
     }
   };
 
-  handleFetchItem = (categoryId) => {
+  handleFetchItem = (categoryId, language) => {
     const { fetchItem } = this.props;
 
     fetchItem({
       id: categoryId,
       options: {
         headers: {
-          'Content-Language': 'pl-PL',
+          'Content-Language': language,
         },
       },
       onFailure: this.handleFetchItemFailure,
@@ -82,9 +83,12 @@ class PartnerCreate extends React.Component {
     const { snackbarOpen, snackbarMessage } = this.state;
     const { classes, item } = this.props;
 
+    const pageTitle = item && item.id ? 'Edycja kategorii' : 'Nowa kategoria';
+
     return (
       <Layout>
         <Paper className={classes.root}>
+          <Typography variant="h6">{pageTitle}</Typography>
           <CategoryForm initialValues={item} />
           <Snackbar
             anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}

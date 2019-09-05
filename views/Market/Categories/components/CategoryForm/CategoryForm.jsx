@@ -1,0 +1,255 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import _isEqual from 'lodash/isEqual';
+import withStyles from '@material-ui/core/styles/withStyles';
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Hidden from '@material-ui/core/Hidden';
+import Typography from '@material-ui/core/Typography';
+import { Formik, Form, Field } from 'formik';
+import { CheckboxWithLabel, TextField } from 'formik-material-ui';
+import yupBoolean from 'yup/lib/boolean';
+import yupObject from 'yup/lib/object';
+import yupString from 'yup/lib/string';
+import {
+  actions as categoriesActions,
+  selectors as categoriesSelectors,
+} from 'redux/categories';
+import GridItem from 'components/GridItem';
+
+const commonProps = {
+  fullWidth: true,
+};
+
+const styles = {
+  formControl: {
+    width: '100%',
+  },
+  section: {
+    marginTop: 40,
+  },
+};
+
+class CategoryForm extends React.Component {
+  constructor(props) {
+    super(props);
+
+    const { initialValues } = this.props;
+
+    this.state = {
+      initialValues: this.getInitialValues(initialValues || {}),
+      language: (initialValues && initialValues.language) || 'pl-PL',
+    };
+
+    this.validationSchema = yupObject().shape({
+      iconUrl: yupString().trim(),
+      label: yupString().trim().required(),
+      recommended: yupBoolean(),
+      restricted: yupBoolean(),
+    });
+  }
+
+  componentDidUpdate(prevProps) {
+    const { initialValues: prevInitialValues } = prevProps;
+    const { initialValues } = this.props;
+
+    if (!_isEqual(prevInitialValues, initialValues)) {
+      this.setInitialValues(initialValues);
+    }
+  }
+
+  getInitialValues = initialValues => ({
+    id: initialValues.id || undefined,
+    iconUrl: initialValues.iconUrl || '',
+    label: initialValues.label || '',
+    recommended: initialValues.recommended || false,
+    restricted: initialValues.restricted || false,
+  });
+
+  setInitialValues = initialValues => this.setState({
+    initialValues: this.getInitialValues(initialValues || {}),
+  });
+
+  handleSubmit = (values, actions) => {
+    const { language } = this.state;
+    const { onSubmit } = this.props;
+
+    if (onSubmit) {
+      onSubmit(values, actions);
+
+      return;
+    }
+
+    const { createItem, updateItem } = this.props;
+    const { id, ...data } = values;
+
+    const payload = {
+      id,
+      data,
+      options: {
+        headers: {
+          'Content-Language': language,
+        },
+      },
+      // pathParams: {
+      //   languageVersion: language,
+      // },
+      onFailure: this.handleSubmitFailure(actions),
+      onSuccess: this.handleSubmitSuccess(actions),
+    };
+
+    const submitAction = payload.id ? updateItem : createItem;
+
+    submitAction(payload);
+  };
+
+  handleSubmitFailure = actions => () => {
+    const { onSubmitFailure } = this.props;
+
+    if (onSubmitFailure) {
+      onSubmitFailure(actions);
+    }
+
+    const { setSubmitting } = actions;
+
+    setSubmitting(false);
+  };
+
+  handleSubmitSuccess = actions => (sightId) => {
+    const { onSubmitSuccess, clearError } = this.props;
+
+    if (onSubmitSuccess) {
+      onSubmitSuccess(sightId, actions);
+
+      return;
+    }
+
+    const { resetForm, setSubmitting } = actions;
+
+    clearError();
+    setSubmitting(false);
+    resetForm();
+  };
+
+  render() {
+    const {
+      classes, requestError, FormikProps, hideButtons, hideErrors,
+    } = this.props;
+    const { initialValues } = this.state;
+    const { data: errorData } = requestError || {};
+    const { message: errorMessage } = errorData || {};
+
+    return (
+      <Formik
+        enableReinitialize
+        {...FormikProps}
+        initialValues={initialValues}
+        validationSchema={this.validationSchema}
+        onSubmit={this.handleSubmit}
+      >
+        {({ isSubmitting, values } = {}) => (
+          <Form autoComplete="off" noValidate>
+            <Grid container spacing={16}>
+              <Hidden xsUp>
+                <GridItem>
+                  <Field name="id" hidden component={TextField} {...commonProps} />
+                </GridItem>
+              </Hidden>
+              <GridItem>
+                <Field name="label" label="Nazwa kategorii" required component={TextField} {...commonProps} />
+              </GridItem>
+              <GridItem>
+                <Hidden xsUp>
+                  <Field name="iconUrl" required component={TextField} {...commonProps} />
+                </Hidden>
+                {`iconURL: ${values.iconUrl}`}
+              </GridItem>
+              <GridItem container md={4} sm={4} alignItems="flex-end">
+                <Field
+                  name="restricted"
+                  Label={{ label: 'Zastrzeżona dla Hello! Poland' }}
+                  component={CheckboxWithLabel}
+                />
+              </GridItem>
+              <GridItem container md={4} sm={4} alignItems="flex-end">
+                <Field
+                  name="recommended"
+                  Label={{ label: 'Polecana' }}
+                  component={CheckboxWithLabel}
+                />
+              </GridItem>
+              <GridItem md={4} sm={4} />
+            </Grid>
+            {(!hideButtons || (!hideErrors && errorMessage))
+              && (
+                <Grid container spacing={16} justify="flex-end" className={classes.section}>
+                  {!hideErrors && errorMessage
+                    && (
+                      <GridItem container md={9} sm={9}>
+                        <Typography color="error">{errorMessage}</Typography>
+                      </GridItem>
+                    )
+                  }
+                  {!hideButtons
+                    && (
+                      <GridItem container md={3} sm={3} justify="flex-end">
+                        <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
+                          Zapisz
+                        </Button>
+                      </GridItem>
+                    )
+                  }
+                </Grid>
+              )
+            }
+          </Form>
+        )}
+      </Formik>
+    );
+  }
+}
+
+CategoryForm.propTypes = {
+  classes: PropTypes.shape({}).isRequired,
+  clearError: PropTypes.func.isRequired,
+  createItem: PropTypes.func.isRequired,
+  FormikProps: PropTypes.shape({}),
+  hideButtons: PropTypes.bool,
+  hideErrors: PropTypes.bool,
+  initialValues: PropTypes.shape({}),
+  onSubmit: PropTypes.func,
+  onSubmitFailure: PropTypes.func,
+  onSubmitSuccess: PropTypes.func,
+  requestError: PropTypes.shape({
+    message: PropTypes.string,
+  }),
+  updateItem: PropTypes.func.isRequired,
+};
+
+CategoryForm.defaultProps = {
+  FormikProps: null,
+  hideButtons: false,
+  hideErrors: false,
+  initialValues: null,
+  onSubmit: null,
+  onSubmitFailure: null,
+  onSubmitSuccess: null,
+  requestError: null,
+};
+
+const mapStateToProps = state => ({
+  requestError: categoriesSelectors.getError(state),
+});
+
+const mapDispatchToProps = {
+  clearError: categoriesActions.clearError,
+  createItem: categoriesActions.createItem,
+  updateItem: categoriesActions.updateItem,
+};
+
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
+  withStyles(styles),
+)(CategoryForm);

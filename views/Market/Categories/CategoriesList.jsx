@@ -24,7 +24,7 @@ import AddIcon from '@material-ui/icons/Add';
 import CategoryIcon from '@material-ui/icons/Category';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import PublicIcon from '@material-ui/icons/Public';
+import LockIcon from '@material-ui/icons/Lock';
 import StarIcon from '@material-ui/icons/Star';
 import Link from 'next/link';
 import { withRouter } from 'next/router';
@@ -102,8 +102,10 @@ class CategoriesList extends React.Component {
   });
 
   handleDeleteCategoryFailure = () => {
+    const { error } = this.props;
+
     this.handleDialogClose();
-    this.handleSnackbarOpen('Rany boskie jestem kioskiem!'); // TODO: Fix me!
+    this.handleSnackbarOpen(error && error.message);
   };
 
   handleDeleteCategorySuccess = () => {
@@ -111,7 +113,7 @@ class CategoriesList extends React.Component {
     this.handleFetchCategories();
   };
 
-  handleDeleteCategory = (id) => {
+  handleDeleteCategory = (categoryId) => {
     const { deleteItem } = this.props;
 
     this.setState(state => ({
@@ -123,7 +125,7 @@ class CategoriesList extends React.Component {
     }));
 
     deleteItem({
-      id,
+      id: categoryId,
       onFailure: this.handleDeleteCategoryFailure,
       onSuccess: this.handleDeleteCategorySuccess,
     });
@@ -148,8 +150,8 @@ class CategoriesList extends React.Component {
     const { menuCategoryId } = this.state;
     const { router } = this.props;
 
-    const href = `/market/categories?categoryId=${menuCategoryId}`;
-    const pathname = `/market/categories/${menuCategoryId}`;
+    const href = `/market/categories/edit?categoryId=${menuCategoryId}`;
+    const pathname = `/market/categories/${menuCategoryId}/edit`;
 
     router.push(href, pathname);
 
@@ -220,13 +222,13 @@ class CategoriesList extends React.Component {
                     <TableBody>
                       {
                         sortedList.map(({
-                          assignedItemsCount, label, iconURL, id: categoryId, restricted,
+                          assignedItemsCount, label, iconUrl, id: categoryId, restricted,
                           recommended,
                         }) => (
                           <TableRow key={categoryId} hover>
-                            <TableCell className={classes.iconCell}>
-                              {iconURL
-                                ? <img src={iconURL} alt={label} />
+                            <TableCell className={classes.iconCell} align="center">
+                              {iconUrl
+                                ? <img src={iconUrl} height={48} width={48} alt={label} />
                                 : <ErrorOutlineIcon color="error" />
                               }
                             </TableCell>
@@ -238,7 +240,7 @@ class CategoriesList extends React.Component {
                             </TableCell>
                             <TableCell align="right">
                               <IconButton disabled>
-                                <PublicIcon color={!restricted ? colorActive : colorInactive} />
+                                <LockIcon color={restricted ? colorActive : colorInactive} />
                               </IconButton>
                               <IconButton disabled>
                                 <StarIcon color={recommended ? colorActive : colorInactive} />
@@ -314,20 +316,27 @@ class CategoriesList extends React.Component {
 CategoriesList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   deleteItem: PropTypes.func.isRequired,
+  error: PropTypes.shape({}),
   fetchList: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    label: PropTypes.string.isRequired,
+    assignedItemsCount: PropTypes.number,
+    iconUrl: PropTypes.string,
+    id: PropTypes.number,
+    label: PropTypes.string,
+    restricted: PropTypes.bool,
+    recommended: PropTypes.bool,
   })).isRequired,
   router: PropTypes.shape({}).isRequired,
 };
 
 const mapStateToProps = state => ({
+  error: categoriesSelectors.getError(state),
   items: categoriesSelectors.getList(state),
 });
 
 const mapDispatchToProps = {
   deleteItem: categoriesActions.deleteItem,
+  error: null,
   fetchList: categoriesActions.fetchList,
 };
 

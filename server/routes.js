@@ -2,4 +2,9 @@
  * Route definitions
  */
 
-module.exports = [];
+module.exports = [
+  {
+    page: '/market/categories/edit',
+    path: '/market/categories/:categoryId/edit',
+  },
+];

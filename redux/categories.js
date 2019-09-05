@@ -35,6 +35,12 @@ const prefix = `${name}/`;
 const CLEAR_ERROR = `${prefix}CLEAR_ERROR`;
 
 /**
+ * Type used for clearing currently loaded entity.
+ * @type {string}
+ */
+const CLEAR_ITEM = `${prefix}CLEAR_ITEM`;
+
+/**
  * Type used for handling create item request.
  * @type {string}
  */
@@ -71,6 +77,30 @@ const DELETE_ITEM_FAILURE = `${prefix}DELETE_ITEM_FAILURE`;
 const DELETE_ITEM_SUCCESS = `${prefix}DELETE_ITEM_SUCCESS`;
 
 /**
+ * Type used for handling entity fetching.
+ * @type {string}
+ */
+const FETCH_ITEM = `${prefix}FETCH_ITEM`;
+
+/**
+ * Type used for handling entity fetching cancellation.
+ * @type {string}
+ */
+const FETCH_ITEM_CANCEL = `${prefix}FETCH_ITEM_CANCEL`;
+
+/**
+ * Type used for handling entity fetching failure.
+ * @type {string}
+ */
+const FETCH_ITEM_FAILURE = `${prefix}FETCH_ITEM_FAILURE`;
+
+/**
+ * Type used for handling entity fetching success.
+ * @type {string}
+ */
+const FETCH_ITEM_SUCCESS = `${prefix}FETCH_ITEM_SUCCESS`;
+
+/**
  * Type used for handling entity list fetching.
  * @type {string}
  */
@@ -97,12 +127,17 @@ const FETCH_LIST_SUCCESS = `${prefix}FETCH_LIST_SUCCESS`;
 
 export const types = {
   CLEAR_ERROR,
+  CLEAR_ITEM,
   CREATE_ITEM,
   CREATE_ITEM_FAILURE,
   CREATE_ITEM_SUCCESS,
   DELETE_ITEM,
   DELETE_ITEM_FAILURE,
   DELETE_ITEM_SUCCESS,
+  FETCH_ITEM,
+  FETCH_ITEM_CANCEL,
+  FETCH_ITEM_FAILURE,
+  FETCH_ITEM_SUCCESS,
   FETCH_LIST,
   FETCH_LIST_CANCEL,
   FETCH_LIST_FAILURE,
@@ -120,6 +155,14 @@ export const types = {
  */
 const clearError = () => ({ type: CLEAR_ERROR });
 
+/**
+ * Creates action for item removal.
+ * @method
+ * @return {{type: string}}
+ */
+const clearItem = () => ({
+  type: CLEAR_ITEM,
+});
 
 /**
  * Creates action for create item request.
@@ -236,6 +279,72 @@ const deleteItemSuccess = () => ({
   type: DELETE_ITEM_SUCCESS,
 });
 
+/**
+ * Creates action with item request details.
+ * @method
+ * @param {Object} params
+ * @param {number} params.id - item id
+ * @param {Object} [params.options] - request config
+ * @param {failureCallback} [params.onFailure] - failure callback
+ * @param {successCallback} [params.onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string, options: *},
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const fetchItem = ({
+  id, options, onFailure, onSuccess,
+} = {}) => ({
+  type: FETCH_ITEM,
+  payload: {
+    url: `${apiURL}/${id}`,
+    method: 'get',
+    ...options,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for item request cancelling.
+ * @method
+ * @return {{type: string}}
+ */
+const fetchItemCancel = () => ({
+  type: FETCH_ITEM_CANCEL,
+});
+
+/**
+ * Creates action for item request failing.
+ * @method
+ * @param {Object} params - axios response schema
+ * @param params.data - response body
+ * @param params.status - response status
+ * @return {{
+ *   type: string,
+ *   error: {data, status: number}
+ * }}
+ */
+const fetchItemFailure = ({ data, status } = {}) => ({
+  type: FETCH_ITEM_FAILURE,
+  error: {
+    data,
+    status,
+  },
+});
+
+/**
+ * Creates action for successful item request.
+ * @method
+ * @param {Object} data - response body
+ * @return {{type: string, data: *}}
+ */
+const fetchItemSuccess = data => ({
+  type: FETCH_ITEM_SUCCESS,
+  data,
+});
 
 /**
  * Creates action with list request details.
@@ -307,12 +416,17 @@ const fetchListSuccess = data => ({
 
 export const actions = {
   clearError,
+  clearItem,
   createItem,
   createItemFailure,
   createItemSuccess,
   deleteItem,
   deleteItemFailure,
   deleteItemSuccess,
+  fetchItem,
+  fetchItemCancel,
+  fetchItemFailure,
+  fetchItemSuccess,
   fetchList,
   fetchListCancel,
   fetchListFailure,
@@ -341,6 +455,14 @@ const getState = state => state[name];
 const getError = state => getState(state).error;
 
 /**
+ * Returns currently loaded Sight.
+ * @method
+ * @param {Object} state - redux state
+ * @return {*}
+ */
+const getItem = state => getState(state).item;
+
+/**
  * Returns currently loaded entity list.
  * @method
  * @param {Object} state - redux state
@@ -351,6 +473,7 @@ const getList = state => getState(state).list;
 export const selectors = {
   getError,
   getState,
+  getItem,
   getList,
 };
 
@@ -446,6 +569,52 @@ const deleteItemLogic = createLogic({
 });
 
 /**
+ * Logic used for handling entity fetching.
+ * @method
+ */
+const fetchItemLogic = createLogic({
+  type: [
+    FETCH_ITEM,
+  ],
+  cancelType: [
+    FETCH_ITEM_CANCEL, CLEAR_ITEM,
+  ],
+  latest: true,
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(fetchItemSuccess(data));
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(fetchItemFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(fetchItemFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    }
+
+    done();
+  },
+});
+
+/**
  * Logic used for handling entity list fetching.
  * @method
  */
@@ -494,6 +663,7 @@ const fetchListLogic = createLogic({
 export const logic = {
   createItemLogic,
   deleteItemLogic,
+  fetchItemLogic,
   fetchListLogic,
 };
 
@@ -523,18 +693,31 @@ export const defaultInitialState = {
  */
 const reducer = (initialState = defaultInitialState) => (state = initialState, action) => {
   switch (action.type) {
-    case CREATE_ITEM_FAILURE:
-    case DELETE_ITEM_FAILURE:
-    case FETCH_LIST_FAILURE:
-      return {
-        ...state,
-        error: action.error,
-      };
     case CLEAR_ERROR:
     case CREATE_ITEM_SUCCESS:
       return {
         ...state,
         error: initialState.error,
+      };
+    case CLEAR_ITEM:
+      return {
+        ...state,
+        error: initialState.error,
+        item: initialState.item,
+      };
+    case CREATE_ITEM_FAILURE:
+    case DELETE_ITEM_FAILURE:
+    case FETCH_ITEM_FAILURE:
+    case FETCH_LIST_FAILURE:
+      return {
+        ...state,
+        error: action.error,
+      };
+    case FETCH_ITEM_SUCCESS:
+      return {
+        ...state,
+        error: initialState.error,
+        item: action.data,
       };
     case FETCH_LIST_SUCCESS:
       return {

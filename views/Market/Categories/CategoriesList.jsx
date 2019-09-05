@@ -329,6 +329,10 @@ CategoriesList.propTypes = {
   router: PropTypes.shape({}).isRequired,
 };
 
+CategoriesList.defaultProps = {
+  error: null,
+};
+
 const mapStateToProps = state => ({
   error: categoriesSelectors.getError(state),
   items: categoriesSelectors.getList(state),
@@ -336,13 +340,12 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   deleteItem: categoriesActions.deleteItem,
-  error: null,
   fetchList: categoriesActions.fetchList,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withAuth(),
-  withStyles(styles),
   withRouter,
+  withStyles(styles),
 )(CategoriesList);

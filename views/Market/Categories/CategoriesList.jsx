@@ -20,10 +20,13 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
+import AddIcon from '@material-ui/icons/Add';
 import CategoryIcon from '@material-ui/icons/Category';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PublicIcon from '@material-ui/icons/Public';
 import StarIcon from '@material-ui/icons/Star';
+import Link from 'next/link';
+import { withRouter } from 'next/router';
 import {
   actions as categoriesActions,
   selectors as categoriesSelectors,
@@ -41,15 +44,21 @@ const tableColumns = [
   { id: 'details', label: '' },
 ];
 
-const styles = () => ({
+const styles = theme => ({
   root: {
     minHeight: '100%',
+  },
+  icon: {
+    marginRight: theme.spacing.unit,
   },
   iconCell: {
     width: 50,
   },
   paper: {
     flex: 1,
+  },
+  toolbar: {
+    padding: theme.spacing.unit,
   },
 });
 
@@ -135,6 +144,18 @@ class CategoriesList extends React.Component {
     this.setState({ isFetching: true });
   };
 
+  handleItemEdit = () => {
+    const { menuCategoryId } = this.state;
+    const { router } = this.props;
+
+    const href = `/market/categories?categoryId=${menuCategoryId}`;
+    const pathname = `/market/categories/${menuCategoryId}`;
+
+    router.push(href, pathname);
+    
+    this.handleMenuClose();
+  };
+
   handleMenuOpen = (event, categoryId) => this.setState({
     menuAnchor: event.currentTarget,
     menuCategoryId: categoryId,
@@ -147,7 +168,7 @@ class CategoriesList extends React.Component {
 
   handleSnackbarOpen = message => this.setState({
     snackbarOpen: true,
-    snackbarMessage: typeof message === 'string' ? message : 'Wystąpił nieznany błąd',
+    snackbarMessage: typeof message === 'string' ? message : 'Wystąpił nieznany błąd.',
   });
 
   handleSnackbarClose = () => this.setState({
@@ -168,6 +189,18 @@ class CategoriesList extends React.Component {
       <Layout>
         <Grid container className={classes.root}>
           <Paper className={classes.paper}>
+            <Grid container direction="column" className={classes.toolbar}>
+              <Grid container item justify="flex-end">
+                <Grid item>
+                  <Link href="/market/categories/create" passHref>
+                    <Button component="a">
+                      <AddIcon className={classes.icon} />
+                      Dodaj
+                    </Button>
+                  </Link>
+                </Grid>
+              </Grid>
+            </Grid>
             {sortedList.length === 0
               && (
                 <EmptyView
@@ -187,12 +220,12 @@ class CategoriesList extends React.Component {
                     <TableBody>
                       {
                         sortedList.map(({
-                          assignedItemsCount, availableLanguageVersions, label, iconName, iconURL,
+                          assignedItemsCount, availableLanguageVersions, label, iconURL,
                           id: categoryId, restricted, recommended,
                         }) => (
                           <TableRow key={categoryId} hover>
                             <TableCell className={classes.iconCell}>
-                              <img src={iconURL} alt={iconName} />
+                              <img src={iconURL} alt={label} />
                             </TableCell>
                             <TableCell>
                               <Typography>{label}</Typography>
@@ -231,10 +264,10 @@ class CategoriesList extends React.Component {
                     open={Boolean(menuAnchor)}
                     onClose={this.handleMenuClose}
                   >
-                    <MenuItem onClick={this.handleMenuClose}>
+                    <MenuItem onClick={this.handleItemEdit}>
                       Edytuj
                     </MenuItem>
-                    <MenuItem onClick={() => this.handleDialogOpen(menuAnchor)}>
+                    <MenuItem onClick={this.handleDialogOpen}>
                       Usuń
                     </MenuItem>
                   </Menu>
@@ -288,6 +321,7 @@ CategoriesList.propTypes = {
     id: PropTypes.number.isRequired,
     label: PropTypes.string.isRequired,
   })).isRequired,
+  router: PropTypes.shape({}).isRequired,
 };
 
 const mapStateToProps = state => ({
@@ -303,4 +337,5 @@ export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withAuth(),
   withStyles(styles),
+  withRouter,
 )(CategoriesList);

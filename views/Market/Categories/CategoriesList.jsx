@@ -22,6 +22,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import CategoryIcon from '@material-ui/icons/Category';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PublicIcon from '@material-ui/icons/Public';
 import StarIcon from '@material-ui/icons/Star';
@@ -40,7 +41,6 @@ const tableColumns = [
   { id: 'icon', label: 'Ikona' },
   { id: 'name', label: 'Nazwa kategorii' },
   { id: 'count', label: 'Liczba ofert' },
-  { id: 'language', label: 'Wersje językowe' },
   { id: 'details', label: '' },
 ];
 
@@ -152,7 +152,7 @@ class CategoriesList extends React.Component {
     const pathname = `/market/categories/${menuCategoryId}`;
 
     router.push(href, pathname);
-    
+
     this.handleMenuClose();
   };
 
@@ -220,23 +220,21 @@ class CategoriesList extends React.Component {
                     <TableBody>
                       {
                         sortedList.map(({
-                          assignedItemsCount, availableLanguageVersions, label, iconURL,
-                          id: categoryId, restricted, recommended,
+                          assignedItemsCount, label, iconURL, id: categoryId, restricted,
+                          recommended,
                         }) => (
                           <TableRow key={categoryId} hover>
                             <TableCell className={classes.iconCell}>
-                              <img src={iconURL} alt={label} />
+                              {iconURL
+                                ? <img src={iconURL} alt={label} />
+                                : <ErrorOutlineIcon color="error" />
+                              }
                             </TableCell>
                             <TableCell>
                               <Typography>{label}</Typography>
                             </TableCell>
                             <TableCell>
                               <Typography>{assignedItemsCount}</Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography>
-                                {availableLanguageVersions && availableLanguageVersions.join(', ')}
-                              </Typography>
                             </TableCell>
                             <TableCell align="right">
                               <IconButton disabled>

@@ -2,9 +2,6 @@
   "categories": [
     {
       "assignedItemsCount": 5,
-      "availableLanguageVersions": [
-        "pl-PL", "en-GB", "de-DE"
-      ],
       "defaultLanguage": "pl-PL",
       "iconURL": "http://localhost:3000/static/images/icons/ic_account_balance_48px.svg",
       "id": 1,
@@ -15,11 +12,7 @@
     },
     {
       "assignedItemsCount": 0,
-      "availableLanguageVersions": [
-        "pl-PL"
-      ],
       "defaultLanguage": "pl-PL",
-      "iconURL": "http://localhost:3000/static/images/icons/ic_nature_48px.svg",
       "id": 2,
       "label": "Natura",
       "language": "pl-PL",
@@ -37,9 +30,6 @@
     },
     {
       "assignedItemsCount": 1234567890,
-      "availableLanguageVersions": [
-        "pl-PL", "de-DE"
-      ],
       "defaultLanguage": "pl-PL",
       "iconURL": "http://localhost:3000/static/images/icons/ic_build_48px.svg",
       "id": 4,

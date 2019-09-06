@@ -1,0 +1,37 @@
+[
+  {
+    "category": "TOGGLE",
+    "name": "ic_check_box",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "TOGGLE",
+    "name": "ic_check_box_outline_blank",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "TOGGLE",
+    "name": "ic_radio_button_checked",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "TOGGLE",
+    "name": "ic_radio_button_unchecked",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "TOGGLE",
+    "name": "ic_star_half",
+    "variants": [
+      "svg"
+    ]
+  }
+]

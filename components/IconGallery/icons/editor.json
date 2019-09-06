@@ -1,0 +1,471 @@
+[
+  {
+    "category": "EDITOR",
+    "name": "ic_attach_file",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_attach_money",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_border_all",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_border_bottom",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_border_clear",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_border_color",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_border_horizontal",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_border_inner",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_border_left",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_border_outer",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_border_right",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_border_style",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_border_top",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_border_vertical",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_bubble_chart",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_drag_handle",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_align_center",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_align_justify",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_align_left",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_align_right",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_bold",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_clear",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_color_fill",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_color_reset",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_color_text",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_indent_decrease",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_indent_increase",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_italic",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_line_spacing",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_list_bulleted",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_list_numbered",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_paint",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_quote",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_shapes",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_size",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_strikethrough",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_textdirection_l_to_r",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_textdirection_r_to_l",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_format_underlined",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_functions",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_highlight",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_insert_chart",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_insert_comment",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_insert_drive_file",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_insert_emoticon",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_insert_invitation",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_insert_link",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_insert_photo",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_linear_scale",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_merge_type",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_mode_comment",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_mode_edit",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_monetization_on",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_multiline_chart",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_pie_chart",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_pie_chart_outlined",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_publish",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_short_text",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_show_chart",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_space_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_strikethrough_s",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_text_fields",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_title",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_vertical_align_bottom",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_vertical_align_center",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_vertical_align_top",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "EDITOR",
+    "name": "ic_wrap_text",
+    "variants": [
+      "svg"
+    ]
+  }
+]

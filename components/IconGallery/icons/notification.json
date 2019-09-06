@@ -1,0 +1,380 @@
+[
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_adb",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_airline_seat_flat",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_airline_seat_flat_angled",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_airline_seat_individual_suite",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_airline_seat_legroom_extra",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_airline_seat_legroom_normal",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_airline_seat_legroom_reduced",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_airline_seat_recline_extra",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_airline_seat_recline_normal",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_bluetooth_audio",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_confirmation_number",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_disc_full",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_do_not_disturb",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_do_not_disturb_alt",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_do_not_disturb_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_do_not_disturb_on",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_drive_eta",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_enhanced_encryption",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_event_available",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_event_busy",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_event_note",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_folder_special",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_live_tv",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_mms",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_more",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_network_check",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_network_locked",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_no_encryption",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_ondemand_video",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_personal_video",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_phone_bluetooth_speaker",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_phone_forwarded",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_phone_in_talk",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_phone_locked",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_phone_missed",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_phone_paused",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_power",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_priority_high",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_rv_hookup",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_sd_card",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_sim_card_alert",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_sms",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_sms_failed",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_sync",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_sync_disabled",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_sync_problem",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_system_update",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_tap_and_play",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_time_to_leave",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_vibration",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_voice_chat",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_vpn_lock",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_wc",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NOTIFICATION",
+    "name": "ic_wifi",
+    "variants": [
+      "svg"
+    ]
+  }
+]

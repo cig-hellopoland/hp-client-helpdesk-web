@@ -1,0 +1,1052 @@
+[
+  {
+    "category": "IMAGE",
+    "name": "ic_add_a_photo",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_add_to_photos",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_adjust",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_assistant",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_assistant_photo",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_audiotrack",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_blur_circular",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_blur_linear",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_blur_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_blur_on",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_brightness_1",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_brightness_2",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_brightness_3",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_brightness_4",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_brightness_5",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_brightness_6",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_brightness_7",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_broken_image",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_brush",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_burst_mode",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_camera",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_camera_alt",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_camera_front",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_camera_rear",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_camera_roll",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_center_focus_strong",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_center_focus_weak",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_collections",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_colorize",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_color_lens",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_compare",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_control_point",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_control_point_duplicate",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_crop_16_9",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_crop_3_2",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_crop",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_crop_5_4",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_crop_7_5",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_crop_din",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_crop_free",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_crop_landscape",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_crop_original",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_crop_portrait",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_crop_rotate",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_crop_square",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_dehaze",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_details",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_edit",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_exposure",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_exposure_neg_1",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_exposure_neg_2",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_exposure_plus_1",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_exposure_plus_2",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_exposure_zero",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_1",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_2",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_3",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_4",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_5",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_6",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_7",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_8",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_9",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_9_plus",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_b_and_w",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_center_focus",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_drama",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_frames",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_hdr",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_none",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_tilt_shift",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_filter_vintage",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_flare",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_flash_auto",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_flash_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_flash_on",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_flip",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_gradient",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_grain",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_grid_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_grid_on",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_hdr_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_hdr_on",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_hdr_strong",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_hdr_weak",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_healing",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_image",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_image_aspect_ratio",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_iso",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_landscape",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_leak_add",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_leak_remove",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_lens",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_linked_camera",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_looks_3",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_looks_4",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_looks",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_looks_5",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_looks_6",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_looks_one",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_looks_two",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_loupe",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_monochrome_photos",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_movie_creation",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_movie_filter",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_music_note",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_nature",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_nature_people",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_navigate_before",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_navigate_next",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_palette",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_panorama",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_panorama_fish_eye",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_panorama_horizontal",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_panorama_vertical",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_panorama_wide_angle",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_photo",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_photo_album",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_photo_camera",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_photo_filter",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_photo_library",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_picture_as_pdf",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_portrait",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_remove_red_eye",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_rotate_90_degrees_ccw",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_rotate_left",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_rotate_right",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_slideshow",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_straighten",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_style",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_switch_camera",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_switch_video",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_tag_faces",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_texture",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_timelapse",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_timer_10",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_timer_3",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_timer",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_timer_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_tonality",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_transform",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_tune",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_view_comfy",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_view_compact",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_wb_auto",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_wb_cloudy",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_wb_incandescent",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_wb_iridescent",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "IMAGE",
+    "name": "ic_wb_sunny",
+    "variants": [
+      "svg"
+    ]
+  }
+]

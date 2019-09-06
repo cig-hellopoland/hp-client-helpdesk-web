@@ -101,7 +101,7 @@ class CategoryForm extends React.Component {
     if (_isNumber(id)) {
       payload.data.id = id;
 
-      if (initialValues.language) {
+      if (initialValues.language === language) {
         submitAction = updateItem;
         payload.id = id;
         payload.pathParams = {

@@ -33,6 +33,8 @@ import {
   selectors as categoriesSelectors,
 } from 'redux/categories';
 import withAuth from 'services/auth/withAuth';
+import { DEFAULT_LANGUAGE } from 'utils/translations';
+
 import Layout from 'components/Layout';
 import EmptyView from './components/EmptyView';
 import SortableTableHead from '../Partners/components/ListingViewTable/SortableTableHead';
@@ -139,6 +141,11 @@ class CategoriesList extends React.Component {
     const { fetchList } = this.props;
 
     fetchList({
+      options: {
+        headers: {
+          'Content-Language': DEFAULT_LANGUAGE,
+        },
+      },
       onFailure: this.handleFetchCategoriesFailure,
       onSuccess: this.handleFetchCategoriesSuccess,
     });

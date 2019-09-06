@@ -52,6 +52,61 @@ function generateAppState(data) {
  */
 
 describe('actions', () => {
+  describe('using changeDefaultTranslation', () => {
+    it('should create an action with request payload', () => {
+      const { changeDefaultTranslation } = actions;
+      const { CHANGE_DEFAULT_TRANSLATION } = types;
+      const id = 3;
+      const options = {
+        headers: {
+          'Content-Language': 'pl-PL',
+        },
+      };
+      const expectedValue = {
+        type: CHANGE_DEFAULT_TRANSLATION,
+        payload: {
+          url: `${apiURL}/${id}/defaultLanguage`,
+          method: 'patch',
+          ...options,
+        },
+      };
+      expect(changeDefaultTranslation({ id, options })).toEqual(expectedValue);
+
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
+
+      expect(changeDefaultTranslation({
+        id, options, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+    it('should create an action for failed request', () => {
+      const { changeDefaultTranslationFailure } = actions;
+      const { CHANGE_DEFAULT_TRANSLATION_FAILURE } = types;
+
+      const expectedValue = {
+        type: CHANGE_DEFAULT_TRANSLATION_FAILURE,
+        error: {},
+      };
+
+      expect(changeDefaultTranslationFailure()).toEqual(expectedValue);
+
+      expectedValue.error = axiosResponseError;
+
+      expect(changeDefaultTranslationFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action for successful request', () => {
+      const { changeDefaultTranslationSuccess } = actions;
+      const { CHANGE_DEFAULT_TRANSLATION_SUCCESS } = types;
+      const expectedValue = {
+        type: CHANGE_DEFAULT_TRANSLATION_SUCCESS,
+      };
+
+      expect(changeDefaultTranslationSuccess()).toEqual(expectedValue);
+    });
+  });
+
   describe('using clearError', () => {
     it('should create an action to clear error from state', () => {
       const { clearError } = actions;
@@ -250,6 +305,65 @@ describe('actions', () => {
       };
 
       expect(deleteItemSuccess()).toEqual(expectedValue);
+    });
+  });
+
+  describe('using deleteTranslation', () => {
+    it('should create an action with request payload', () => {
+      const { deleteTranslation } = actions;
+      const { DELETE_TRANSLATION } = types;
+      const id = 1;
+      const pathParams = { languageVersion: 'pl-PL' };
+      const options = { b: 2 };
+      const expectedValue = {
+        type: DELETE_TRANSLATION,
+        payload: {
+          url: `${apiURL}/${id}/languageVersion/${pathParams.languageVersion}`,
+          method: 'delete',
+        },
+      };
+
+      expect(deleteTranslation({ id, pathParams })).toEqual(expectedValue);
+
+      expectedValue.payload = {
+        ...expectedValue.payload,
+        ...options,
+      };
+
+      expect(deleteTranslation({ id, pathParams, options })).toEqual(expectedValue);
+
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
+
+      expect(deleteTranslation({
+        id, pathParams, options, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+
+    it('should create an action for failed request', () => {
+      const { deleteTranslationFailure } = actions;
+      const { DELETE_TRANSLATION_FAILURE } = types;
+      const expectedValue = {
+        type: DELETE_TRANSLATION_FAILURE,
+        error: {},
+      };
+
+      expect(deleteTranslationFailure()).toEqual(expectedValue);
+
+      expectedValue.error = axiosResponseError;
+
+      expect(deleteTranslationFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action for successful request', () => {
+      const { deleteTranslationSuccess } = actions;
+      const { DELETE_TRANSLATION_SUCCESS } = types;
+      const expectedValue = {
+        type: DELETE_TRANSLATION_SUCCESS,
+      };
+
+      expect(deleteTranslationSuccess()).toEqual(expectedValue);
     });
   });
 
@@ -531,6 +645,30 @@ describe('reducer', () => {
     expect(reducer()(undefined, { type: 'INVALID_TYPE' })).toEqual(defaultInitialState);
   });
 
+  it('should handle CHANGE_DEFAULT_TRANSLATION_FAILURE', () => {
+    let action = actions.changeDefaultTranslationFailure();
+    const expectedValue = {
+      ...defaultInitialState,
+      error: {},
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+
+    action = actions.changeDefaultTranslationFailure(axiosResponseError);
+    expectedValue.error = axiosResponseError;
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle CHANGE_DEFAULT_TRANSLATION_SUCCESS', () => {
+    const action = actions.changeDefaultTranslationSuccess();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
   it('should handle CLEAR_ERROR', () => {
     const action = actions.clearError();
     const expectedValue = {
@@ -608,6 +746,39 @@ describe('reducer', () => {
 
     action = actions.deleteItemFailure(axiosResponseError);
     expectedValue.error = axiosResponseError;
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle DELETE_ITEM_SUCCESS', () => {
+    const action = actions.deleteItemSuccess();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle DELETE_TRANSLATION_FAILURE', () => {
+    let action = actions.deleteTranslationFailure();
+    const expectedValue = {
+      ...defaultInitialState,
+      error: {},
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+
+    action = actions.deleteTranslationFailure(axiosResponseError);
+    expectedValue.error = axiosResponseError;
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle DELETE_TRANSLATION_SUCCESS', () => {
+    const action = actions.deleteTranslationSuccess();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });

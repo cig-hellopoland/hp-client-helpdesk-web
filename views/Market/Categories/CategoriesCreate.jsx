@@ -127,9 +127,69 @@ class PartnerCreate extends React.Component {
     }));
   };
 
+  handleTranslationDefaultChangeFailure = () => {
+    const { clearError, error } = this.props;
+
+    this.handleSnackbarOpen(error && error.message);
+
+    if (clearError) {
+      clearError();
+    }
+  };
+
+  handleTranslationDefaultChangeSuccess = () => {
+    const { selectedTranslation } = this.state;
+    const { categoryId } = this.props;
+
+    this.handleFetchItem(categoryId, selectedTranslation);
+  };
+
+  handleTranslationDefaultChange = () => {
+    const { selectedTranslation } = this.state;
+    const { categoryId, changeDefaultTranslation } = this.props;
+    const options = {
+      headers: {
+        'Content-Language': selectedTranslation,
+      },
+    };
+
+    changeDefaultTranslation({
+      id: categoryId,
+      options,
+      onFailure: this.handleTranslationDefaultChangeFailure,
+      onSuccess: this.handleTranslationDefaultChangeSuccess,
+    });
+  };
+
+  handleTranslationDeleteFailure = () => {
+    const { clearError, error } = this.props;
+
+    this.handleSnackbarOpen(error && error.message);
+
+    if (clearError) {
+      clearError();
+    }
+  };
+
+  handleTranslationDeleteSuccess = () => {
+    const { categoryId, item } = this.props;
+    const { defaultLanguage } = item || {};
+
+    this.handleFetchItem(categoryId, defaultLanguage);
+  };
+
   handleTranslationDelete = () => {
     const { selectedTranslation } = this.state;
-    const { item } = this.props;
+    const { categoryId, deleteTranslation } = this.props;
+
+    deleteTranslation({
+      id: categoryId,
+      onFailure: this.handleTranslationDeleteFailure,
+      onSuccess: this.handleTranslationDeleteSuccess,
+      pathParams: {
+        languageVersion: selectedTranslation,
+      },
+    });
   };
 
   handleSnackbarOpen = message => this.setState({
@@ -175,8 +235,8 @@ class PartnerCreate extends React.Component {
               defaultTranslation: defaultLanguage,
               selectedTranslation,
               onCreateTranslation: this.handleTranslationCreate,
-              onDeleteTranslation: () => console.log('delete'),
-              onSetDefaultTranslation: () => console.log('set default'),
+              onDeleteTranslation: this.handleTranslationDelete,
+              onSetDefaultTranslation: this.handleTranslationDefaultChange,
             }}
           />
           <br />
@@ -202,9 +262,11 @@ class PartnerCreate extends React.Component {
 
 PartnerCreate.propTypes = {
   categoryId: PropTypes.number,
+  changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
+  deleteTranslation: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
   fetchItem: PropTypes.func.isRequired,
   item: PropTypes.shape({
@@ -226,8 +288,10 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
+  changeDefaultTranslation: categoriesActions.changeDefaultTranslation,
   clearError: categoriesActions.clearError,
   clearItem: categoriesActions.clearItem,
+  deleteTranslation: categoriesActions.deleteTranslation,
   fetchItem: categoriesActions.fetchItem,
 };
 

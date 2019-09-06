@@ -9,6 +9,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import Typography from '@material-ui/core/Typography';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import { Formik, Form, Field } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-material-ui';
 import yupBoolean from 'yup/lib/boolean';
@@ -19,13 +20,18 @@ import {
   selectors as categoriesSelectors,
 } from 'redux/categories';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
+import IconGallery from 'components/IconGallery/IconGallery';
 import GridItem from 'components/GridItem';
+import IconGalleryDialog from '../../../../../components/IconGallery/IconGalleryDialog';
 
 const commonProps = {
   fullWidth: true,
 };
 
 const styles = {
+  errorIcon: {
+    fontSize: 48,
+  },
   formControl: {
     width: '100%',
   },
@@ -41,11 +47,12 @@ class CategoryForm extends React.Component {
     const { initialValues } = this.props;
 
     this.state = {
+      iconDialog: false,
       initialValues: this.getInitialValues(initialValues || {}),
     };
 
     this.validationSchema = yupObject().shape({
-      iconUrl: yupString().trim(),
+      iconUrl: yupString().trim().required(),
       label: yupString().trim().required(),
       recommended: yupBoolean(),
       restricted: yupBoolean(),
@@ -72,6 +79,18 @@ class CategoryForm extends React.Component {
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues || {}),
   });
+
+  handleIconDialogClose = () => this.setState({ iconDialog: false });
+
+  handleIconDialogOpen = () => this.setState({ iconDialog: true });
+
+  handleIconSelect = actions => (iconURL) => {
+    const { setFieldValue } = actions;
+
+    if (iconURL) {
+      setFieldValue('iconUrl', iconURL);
+    }
+  };
 
   handleSubmit = (values, actions) => {
     const { initialValues, language, onSubmit } = this.props;
@@ -145,11 +164,14 @@ class CategoryForm extends React.Component {
 
   render() {
     const {
-      classes, requestError, FormikProps, hideButtons, hideErrors,
+      classes, FormikProps, hideButtons, hideErrors, initialValues: itemValues, language,
+      requestError,
     } = this.props;
-    const { initialValues } = this.state;
+    const { iconDialog, initialValues } = this.state;
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
+    const { defaultLanguage } = itemValues || {};
+    const isDisabled = defaultLanguage !== language;
 
     return (
       <Formik
@@ -159,7 +181,7 @@ class CategoryForm extends React.Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {({ isSubmitting, values } = {}) => (
+        {({ isSubmitting, values, ...formikBag } = {}) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <Hidden xsUp>
@@ -174,10 +196,17 @@ class CategoryForm extends React.Component {
                 <Hidden xsUp>
                   <Field name="iconUrl" required component={TextField} {...commonProps} />
                 </Hidden>
-                {`iconURL: ${values.iconUrl}`}
+                <Grid container alignItems="center">
+                  {values.iconUrl
+                    ? <img src={values.iconUrl} height={48} width={48} alt="" />
+                    : <ErrorOutlineIcon color="error" className={classes.errorIcon} />
+                  }
+                  <Button onClick={this.handleIconDialogOpen}>Wybierz ikonę</Button>
+                </Grid>
               </GridItem>
               <GridItem container md={4} sm={4} alignItems="flex-end">
                 <Field
+                  disabled={isDisabled}
                   name="restricted"
                   Label={{ label: 'Zastrzeżona dla Hello! Poland' }}
                   component={CheckboxWithLabel}
@@ -185,6 +214,7 @@ class CategoryForm extends React.Component {
               </GridItem>
               <GridItem container md={4} sm={4} alignItems="flex-end">
                 <Field
+                  disabled={isDisabled}
                   name="recommended"
                   Label={{ label: 'Polecana' }}
                   component={CheckboxWithLabel}
@@ -214,6 +244,11 @@ class CategoryForm extends React.Component {
                 </Grid>
               )
             }
+            <IconGalleryDialog
+              open={iconDialog}
+              onClose={this.handleIconDialogClose}
+              onSelect={this.handleIconSelect(formikBag)}
+            />
           </Form>
         )}
       </Formik>

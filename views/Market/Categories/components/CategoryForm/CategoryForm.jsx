@@ -170,8 +170,8 @@ class CategoryForm extends React.Component {
     const { iconDialog, initialValues } = this.state;
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
-    const { defaultLanguage } = itemValues || {};
-    const isDisabled = defaultLanguage !== language;
+    const { defaultLanguage, id: itemId } = itemValues || {};
+    const isDisabled = itemId && defaultLanguage !== language;
 
     return (
       <Formik

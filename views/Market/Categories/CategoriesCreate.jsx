@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import _sortedUniq from 'lodash/sortedUniq';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -26,6 +27,8 @@ const styles = theme => ({
 
 class PartnerCreate extends React.Component {
   state = {
+    availableTranslations: CONTENT_LANGUAGES,
+    selectedTranslation: DEFAULT_LANGUAGE,
     snackbarOpen: false,
     snackbarMessage: '',
   };
@@ -48,6 +51,26 @@ class PartnerCreate extends React.Component {
     }
   }
 
+  getFormValues = (item) => {
+    const { categoryId } = this.props;
+    const { selectedTranslation } = this.state;
+
+    if (item && categoryId === item.id) {
+      const { availableLanguageVersions } = item;
+      const hasNewTranslation = !availableLanguageVersions.some(lng => lng === selectedTranslation);
+
+      if (hasNewTranslation) {
+        const { label, ...itemProps } = item;
+
+        return { ...itemProps };
+      }
+
+      return { ...item };
+    }
+
+    return null;
+  };
+
   handleFetchItemFailure = () => {
     const { clearError, error } = this.props;
 
@@ -60,8 +83,12 @@ class PartnerCreate extends React.Component {
 
   handleFetchItemSuccess = () => {
     const { item } = this.props;
+    const { availableLanguageVersions, language } = item || {};
 
-    this.setState({ selectedLanguage: item.language || DEFAULT_LANGUAGE });
+    this.setState({
+      availableTranslations: availableLanguageVersions,
+      selectedTranslation: language || DEFAULT_LANGUAGE,
+    });
   };
 
   handleFetchItem = (categoryId, language) => {
@@ -79,15 +106,30 @@ class PartnerCreate extends React.Component {
     });
   };
 
-  handleLanguageChange = (event) => {
+  handleTranslationChange = (event) => {
     const { item } = this.props;
-    const selectedLanguage = event.target.value;
+    const selectedTranslation = event.target.value;
 
-    this.setState({ selectedLanguage });
+    this.setState({ selectedTranslation });
 
     if (item && item.id) {
-      this.handleFetchItem(item.id, selectedLanguage);
+      this.handleFetchItem(item.id, selectedTranslation);
     }
+  };
+
+  handleTranslationCreate = (language) => {
+    this.setState(state => ({
+      availableTranslations: _sortedUniq([
+        ...state.availableTranslations,
+        language,
+      ]),
+      selectedTranslation: language,
+    }));
+  };
+
+  handleTranslationDelete = () => {
+    const { selectedTranslation } = this.state;
+    const { item } = this.props;
   };
 
   handleSnackbarOpen = message => this.setState({
@@ -103,13 +145,15 @@ class PartnerCreate extends React.Component {
   handleSubmitSuccess = () => {
     const { router } = this.props;
 
-    router.push('/market/categories/');
+    router.push('/market/categories');
   };
 
   render() {
-    const { snackbarOpen, snackbarMessage, selectedLanguage } = this.state;
+    const {
+      availableTranslations, selectedTranslation, snackbarOpen, snackbarMessage,
+    } = this.state;
     const { classes, item } = this.props;
-    const { availableLanguageVersions, defaultLanguage } = item || {};
+    const { defaultLanguage } = item || {};
 
     const pageTitle = item && item.id ? 'Edycja kategorii' : 'Nowa kategoria';
     const hasLanguageActions = !!(item && item.id);
@@ -122,21 +166,25 @@ class PartnerCreate extends React.Component {
             actions={hasLanguageActions}
             TranslationPickerProps={{
               defaultValue: defaultLanguage || DEFAULT_LANGUAGE,
-              items: availableLanguageVersions || CONTENT_LANGUAGES,
-              onChange: this.handleLanguageChange,
-              value: selectedLanguage || DEFAULT_LANGUAGE,
+              items: availableTranslations || CONTENT_LANGUAGES,
+              onChange: this.handleTranslationChange,
+              value: selectedTranslation || DEFAULT_LANGUAGE,
             }}
             TranslationActionsProps={{
-              availableTranslations: availableLanguageVersions,
+              availableTranslations,
               defaultTranslation: defaultLanguage,
-              selectedTranslation: selectedLanguage,
-              onCreateTranslation: () => console.log('create'),
+              selectedTranslation,
+              onCreateTranslation: this.handleTranslationCreate,
               onDeleteTranslation: () => console.log('delete'),
               onSetDefaultTranslation: () => console.log('set default'),
             }}
           />
           <br />
-          <CategoryForm initialValues={item} onSubmitSuccess={this.handleSubmitSuccess} />
+          <CategoryForm
+            initialValues={this.getFormValues(item)}
+            language={selectedTranslation}
+            onSubmitSuccess={this.handleSubmitSuccess}
+          />
           <Snackbar
             anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             open={snackbarOpen}

@@ -6,7 +6,8 @@ import Grid from '@material-ui/core/Grid';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ArrowDropDown from '@material-ui/icons/ArrowDropDown';
-import { CONTENT_LANGUAGES } from 'utils/translations';
+import { CONTENT_LANGUAGES, getUntranslatedLanguages } from 'utils/translations';
+import CreateTranslationDialog from './CreateTranslationDialog';
 
 const ACTION_TYPES = {
   CREATE_TRANSLATION: 'CREATE_TRANSLATION',
@@ -25,7 +26,6 @@ class TranslationActions extends React.Component {
     super(props);
 
     this.state = {
-      anchorEl: null,
       actions: [
         {
           actionType: ACTION_TYPES.CREATE_TRANSLATION,
@@ -40,6 +40,8 @@ class TranslationActions extends React.Component {
           label: 'Ustaw tłumaczenie jako domyślne',
         },
       ],
+      anchorEl: null,
+      dialog: false,
     };
   }
 
@@ -60,15 +62,11 @@ class TranslationActions extends React.Component {
     }
   };
 
-  handleButtonClick = event => this.setState({ anchorEl: event.currentTarget });
-
-  handleMenuClose = () => this.setState({ anchorEl: null });
-
   handleActionClick = (actionType) => {
     const { onCreateTranslation, onDeleteTranslation, onSetDefaultTranslation } = this.props;
 
     if (actionType === ACTION_TYPES.CREATE_TRANSLATION && onCreateTranslation) {
-      onCreateTranslation();
+      this.setState({ dialog: true });
     }
 
     if (actionType === ACTION_TYPES.DEFAULT_TRANSLATION && onSetDefaultTranslation) {
@@ -82,8 +80,24 @@ class TranslationActions extends React.Component {
     this.handleMenuClose();
   };
 
+  handleButtonClick = event => this.setState({ anchorEl: event.currentTarget });
+
+  handleDialogClose = () => this.setState({ dialog: false });
+
+  handleDialogSuccess = (selectedTranslation) => {
+    const { onCreateTranslation } = this.props;
+
+    if (onCreateTranslation) {
+      onCreateTranslation(selectedTranslation);
+    }
+
+    this.handleDialogClose();
+  };
+
+  handleMenuClose = () => this.setState({ anchorEl: null });
+
   render() {
-    const { anchorEl, actions } = this.state;
+    const { anchorEl, actions, dialog } = this.state;
     const {
       availableTranslations, classes, defaultTranslation, onCreateTranslation, onDeleteTranslation,
       onSetDefaultTranslation, selectedTranslation, ...rest
@@ -117,6 +131,12 @@ class TranslationActions extends React.Component {
             </MenuItem>
           ))}
         </Menu>
+        <CreateTranslationDialog
+          open={dialog}
+          translations={getUntranslatedLanguages(availableTranslations)}
+          onCancel={this.handleDialogClose}
+          onSuccess={this.handleDialogSuccess}
+        />
       </Grid>
     );
   }

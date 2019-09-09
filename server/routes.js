@@ -5,7 +5,7 @@
 module.exports = [
   {
     page: '/market/categories/edit',
-    path: '/market/categories/:categoryId/edit',
+    path: '/market/categories/:itemId/edit',
   },
   {
     page: '/market/sight-events/edit',

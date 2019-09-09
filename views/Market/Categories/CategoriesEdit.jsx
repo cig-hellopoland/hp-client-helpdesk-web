@@ -4,6 +4,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import _sortedUniq from 'lodash/sortedUniq';
 import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Snackbar from '@material-ui/core/Snackbar';
 import Typography from '@material-ui/core/Typography';
@@ -25,7 +26,7 @@ const styles = theme => ({
   },
 });
 
-class CategoriesCreate extends React.Component {
+class CategoriesEdit extends React.Component {
   state = {
     availableTranslations: CONTENT_LANGUAGES,
     selectedTranslation: DEFAULT_LANGUAGE,
@@ -35,7 +36,7 @@ class CategoriesCreate extends React.Component {
 
   componentDidMount() {
     const {
-      categoryId, clearError, clearItem, error, item,
+      itemId, clearError, clearItem, error, item,
     } = this.props;
 
     if (item) {
@@ -46,16 +47,16 @@ class CategoriesCreate extends React.Component {
       clearError();
     }
 
-    if (categoryId) {
-      this.handleFetchItem(categoryId, DEFAULT_LANGUAGE);
+    if (itemId) {
+      this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
     }
   }
 
   getFormValues = (item) => {
-    const { categoryId } = this.props;
+    const { itemId } = this.props;
     const { selectedTranslation } = this.state;
 
-    if (item && categoryId === item.id) {
+    if (item && itemId === item.id) {
       const { availableLanguageVersions } = item;
       const hasNewTranslation = !availableLanguageVersions.some(lng => lng === selectedTranslation);
 
@@ -91,11 +92,11 @@ class CategoriesCreate extends React.Component {
     });
   };
 
-  handleFetchItem = (categoryId, language) => {
+  handleFetchItem = (itemId, language) => {
     const { fetchItem } = this.props;
 
     fetchItem({
-      id: categoryId,
+      id: itemId,
       options: {
         headers: {
           'Content-Language': language,
@@ -139,14 +140,14 @@ class CategoriesCreate extends React.Component {
 
   handleTranslationDefaultChangeSuccess = () => {
     const { selectedTranslation } = this.state;
-    const { categoryId } = this.props;
+    const { itemId } = this.props;
 
-    this.handleFetchItem(categoryId, selectedTranslation);
+    this.handleFetchItem(itemId, selectedTranslation);
   };
 
   handleTranslationDefaultChange = () => {
     const { selectedTranslation } = this.state;
-    const { categoryId, changeDefaultTranslation } = this.props;
+    const { itemId, changeDefaultTranslation } = this.props;
     const options = {
       headers: {
         'Content-Language': selectedTranslation,
@@ -154,7 +155,7 @@ class CategoriesCreate extends React.Component {
     };
 
     changeDefaultTranslation({
-      id: categoryId,
+      id: itemId,
       options,
       onFailure: this.handleTranslationDefaultChangeFailure,
       onSuccess: this.handleTranslationDefaultChangeSuccess,
@@ -172,18 +173,18 @@ class CategoriesCreate extends React.Component {
   };
 
   handleTranslationDeleteSuccess = () => {
-    const { categoryId, item } = this.props;
+    const { itemId, item } = this.props;
     const { defaultLanguage } = item || {};
 
-    this.handleFetchItem(categoryId, defaultLanguage);
+    this.handleFetchItem(itemId, defaultLanguage);
   };
 
   handleTranslationDelete = () => {
     const { selectedTranslation } = this.state;
-    const { categoryId, deleteTranslation } = this.props;
+    const { itemId, deleteTranslation } = this.props;
 
     deleteTranslation({
-      id: categoryId,
+      id: itemId,
       onFailure: this.handleTranslationDeleteFailure,
       onSuccess: this.handleTranslationDeleteSuccess,
       pathParams: {
@@ -212,34 +213,39 @@ class CategoriesCreate extends React.Component {
     const {
       availableTranslations, selectedTranslation, snackbarOpen, snackbarMessage,
     } = this.state;
-    const { classes, item } = this.props;
+    const { classes, item, itemId } = this.props;
     const { defaultLanguage } = item || {};
 
-    const pageTitle = item && item.id ? 'Edycja kategorii' : 'Nowa kategoria';
-    const hasLanguageActions = !!(item && item.id);
+    const pageTitle = itemId ? 'Edycja kategorii' : 'Nowa kategoria';
+    const hasLanguageActions = !!(itemId);
 
     return (
       <Layout>
         <Paper className={classes.root}>
-          <Typography variant="h6">{pageTitle}</Typography>
-          <ContentTranslation
-            actions={hasLanguageActions}
-            TranslationPickerProps={{
-              defaultValue: defaultLanguage || DEFAULT_LANGUAGE,
-              items: availableTranslations || CONTENT_LANGUAGES,
-              onChange: this.handleTranslationChange,
-              value: selectedTranslation || DEFAULT_LANGUAGE,
-            }}
-            TranslationActionsProps={{
-              availableTranslations,
-              defaultTranslation: defaultLanguage,
-              selectedTranslation,
-              onCreateTranslation: this.handleTranslationCreate,
-              onDeleteTranslation: this.handleTranslationDelete,
-              onSetDefaultTranslation: this.handleTranslationDefaultChange,
-            }}
-          />
-          <br />
+          <Grid container justify="space-between">
+            <Grid item>
+              <Typography variant="h6">{pageTitle}</Typography>
+            </Grid>
+            <Grid item>
+              <ContentTranslation
+                actions={hasLanguageActions}
+                TranslationPickerProps={{
+                  defaultValue: defaultLanguage || DEFAULT_LANGUAGE,
+                  items: availableTranslations || CONTENT_LANGUAGES,
+                  onChange: this.handleTranslationChange,
+                  value: selectedTranslation || DEFAULT_LANGUAGE,
+                }}
+                TranslationActionsProps={{
+                  availableTranslations,
+                  defaultTranslation: defaultLanguage,
+                  selectedTranslation,
+                  onCreateTranslation: this.handleTranslationCreate,
+                  onDeleteTranslation: this.handleTranslationDelete,
+                  onSetDefaultTranslation: this.handleTranslationDefaultChange,
+                }}
+              />
+            </Grid>
+          </Grid>
           <CategoryForm
             initialValues={this.getFormValues(item)}
             language={selectedTranslation}
@@ -260,8 +266,8 @@ class CategoriesCreate extends React.Component {
   }
 }
 
-CategoriesCreate.propTypes = {
-  categoryId: PropTypes.number,
+CategoriesEdit.propTypes = {
+  itemId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
@@ -276,8 +282,8 @@ CategoriesCreate.propTypes = {
   router: PropTypes.shape({}).isRequired,
 };
 
-CategoriesCreate.defaultProps = {
-  categoryId: null,
+CategoriesEdit.defaultProps = {
+  itemId: null,
   error: null,
   item: null,
 };
@@ -300,4 +306,4 @@ export default compose(
   withAuth(),
   withRouter,
   withStyles(styles),
-)(CategoriesCreate);
+)(CategoriesEdit);

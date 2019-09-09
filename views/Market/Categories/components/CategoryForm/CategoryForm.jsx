@@ -6,6 +6,7 @@ import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import Typography from '@material-ui/core/Typography';
@@ -180,7 +181,7 @@ class CategoryForm extends React.Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {({ isSubmitting, values, ...formikBag } = {}) => (
+        {({ errors, isSubmitting, values, ...formikBag } = {}) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <Hidden xsUp>
@@ -196,11 +197,22 @@ class CategoryForm extends React.Component {
                   <Field name="iconUrl" required component={TextField} {...commonProps} />
                 </Hidden>
                 <Grid container alignItems="center">
-                  {values.iconUrl
-                    ? <img src={values.iconUrl} height={48} width={48} alt="" />
-                    : <ErrorOutlineIcon color="error" className={classes.errorIcon} />
+                  <GridItem container alignItems="center">
+                    {values.iconUrl
+                      ? <img src={values.iconUrl} height={48} width={48} alt="" />
+                      : <ErrorOutlineIcon color="error" className={classes.errorIcon} />
+                    }
+                    <Button onClick={this.handleIconDialogOpen} disabled={isDisabled}>
+                      Wybierz ikonę
+                    </Button>
+                  </GridItem>
+                  {errors.iconUrl
+                    && (
+                      <GridItem>
+                        <FormHelperText error>{errors.iconUrl}</FormHelperText>
+                      </GridItem>
+                    )
                   }
-                  <Button onClick={this.handleIconDialogOpen}>Wybierz ikonę</Button>
                 </Grid>
               </GridItem>
               <GridItem container md={4} sm={4} alignItems="flex-end">

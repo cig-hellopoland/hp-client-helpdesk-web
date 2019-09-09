@@ -66,6 +66,8 @@ const styles = theme => ({
 });
 
 class CategoriesList extends React.Component {
+  baseURL = '/market/categories';
+
   state = {
     dialogOpen: false,
     dialogProps: {},
@@ -158,8 +160,8 @@ class CategoriesList extends React.Component {
     const { menuCategoryId } = this.state;
     const { router } = this.props;
 
-    const href = `/market/categories/edit?categoryId=${menuCategoryId}`;
-    const pathname = `/market/categories/${menuCategoryId}/edit`;
+    const href = `${this.baseURL}/edit?itemId=${menuCategoryId}`;
+    const pathname = `${this.baseURL}/${menuCategoryId}/edit`;
 
     router.push(href, pathname);
 

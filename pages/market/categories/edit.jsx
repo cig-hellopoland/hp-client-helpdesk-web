@@ -1,9 +1,9 @@
-import CategoriesCreate from 'views/Market/Categories/CategoriesCreate';
+import CategoriesEdit from 'views/Market/Categories/CategoriesEdit';
 
-CategoriesCreate.getInitialProps = ({ query }) => {
-  const { categoryId } = query;
+CategoriesEdit.getInitialProps = ({ query }) => {
+  const { itemId } = query;
 
-  return { categoryId: +categoryId };
+  return { itemId: +itemId };
 };
 
-export default CategoriesCreate;
+export default CategoriesEdit;

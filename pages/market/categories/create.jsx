@@ -1,3 +1,3 @@
-import CategoriesCreate from 'views/Market/Categories/CategoriesCreate';
+import CategoriesEdit from 'views/Market/Categories/CategoriesEdit';
 
-export default CategoriesCreate;
+export default CategoriesEdit;

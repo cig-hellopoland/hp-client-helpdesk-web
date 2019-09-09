@@ -39,6 +39,32 @@
       "restricted": false
     }
   ],
+  "sight-events": {
+    "items": [
+      {
+        "blocked": false,
+        "id": 1,
+        "name": "Lorem ipsum dolor",
+        "location": {
+          "city": "Wrocław"
+        },
+        "partnerId": 1,
+        "partnerName": "Kolejkowo",
+        "published": true
+      },
+      {
+        "blocked": true,
+        "id": 2,
+        "name": "Lorem ipsum dolor sit amet, consectetur adipiscing elit proin malesuada ultricies vestibulum quisque quis laoreet mauris viverra malesuada augue nec congue ipsum dolor sit amet, consectetur adipiscing elit proin malesuada ultricies vestibulum quisque quis laoreet mauris viverra malesuada augue nec congue",
+        "location": {
+          "city": "Poznań"
+        },
+        "partnerId": 1,
+        "partnerName": "Zwiedzanie Wrocławia w krasnalowych kubraczkach",
+        "published": false
+      }
+    ]
+  },
   "users": [
     {
       "id": 1,

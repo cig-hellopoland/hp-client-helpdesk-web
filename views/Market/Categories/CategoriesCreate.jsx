@@ -25,7 +25,7 @@ const styles = theme => ({
   },
 });
 
-class PartnerCreate extends React.Component {
+class CategoriesCreate extends React.Component {
   state = {
     availableTranslations: CONTENT_LANGUAGES,
     selectedTranslation: DEFAULT_LANGUAGE,
@@ -260,7 +260,7 @@ class PartnerCreate extends React.Component {
   }
 }
 
-PartnerCreate.propTypes = {
+CategoriesCreate.propTypes = {
   categoryId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
@@ -276,7 +276,7 @@ PartnerCreate.propTypes = {
   router: PropTypes.shape({}).isRequired,
 };
 
-PartnerCreate.defaultProps = {
+CategoriesCreate.defaultProps = {
   categoryId: null,
   error: null,
   item: null,
@@ -300,4 +300,4 @@ export default compose(
   withAuth(),
   withRouter,
   withStyles(styles),
-)(PartnerCreate);
+)(CategoriesCreate);

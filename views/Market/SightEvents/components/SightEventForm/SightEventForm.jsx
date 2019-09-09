@@ -42,7 +42,7 @@ const fieldToSwitch = ({
   checked: field.value,
 });
 
-const styles = {
+const styles = theme => ({
   errorIcon: {
     fontSize: 48,
   },
@@ -50,9 +50,9 @@ const styles = {
     width: '100%',
   },
   section: {
-    marginTop: 40,
+    marginTop: theme.spacing.unit * 2,
   },
-};
+});
 
 class SightEventForm extends React.Component {
   constructor(props) {
@@ -277,9 +277,15 @@ class SightEventForm extends React.Component {
                     <GridItem md={6} sm={6}>
                       <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
                     </GridItem>
-                    <GridItem>
-                      <Typography variant="h6" className={classes.section}>Lokalizacja</Typography>
-                    </GridItem>
+                  </React.Fragment>
+                )
+              }
+              <GridItem>
+                <Typography variant="h6" className={classes.section}>Lokalizacja</Typography>
+              </GridItem>
+              {isDefaultTranslation
+                && (
+                  <React.Fragment>
                     <GridItem>
                       <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
                     </GridItem>
@@ -292,12 +298,12 @@ class SightEventForm extends React.Component {
                     <GridItem md={4} sm={4}>
                       <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
                     </GridItem>
-                    <GridItem>
-                      <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={10} />
-                    </GridItem>
                   </React.Fragment>
                 )
               }
+              <GridItem>
+                <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={10} />
+              </GridItem>
             </Grid>
             {(!hideButtons || (!hideErrors && errorMessage))
               && (

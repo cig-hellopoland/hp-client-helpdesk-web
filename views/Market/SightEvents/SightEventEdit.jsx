@@ -4,8 +4,11 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import _sortedUniq from 'lodash/sortedUniq';
 import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Snackbar from '@material-ui/core/Snackbar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import { withRouter } from 'next/router';
 import {
@@ -17,11 +20,15 @@ import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
 import SightEventForm from './components/SightEventForm';
+import SightEventMultimediaForm from './components/SightEventMultimediaForm';
 
 const styles = theme => ({
   root: {
     flex: 1,
     padding: theme.spacing.unit * 2,
+  },
+  section: {
+    marginBottom: theme.spacing.unit * 3,
   },
 });
 
@@ -30,6 +37,7 @@ class SightEventEdit extends React.Component {
 
   state = {
     availableTranslations: CONTENT_LANGUAGES,
+    selectedTab: 0,
     selectedTranslation: DEFAULT_LANGUAGE,
     snackbarOpen: false,
     snackbarMessage: '',
@@ -59,7 +67,8 @@ class SightEventEdit extends React.Component {
 
     if (item && itemId === item.id) {
       const { availableLanguageVersions } = item;
-      const hasNewTranslation = !availableLanguageVersions.some(lng => lng === selectedTranslation);
+      const hasNewTranslation = availableLanguageVersions
+        && !availableLanguageVersions.some(lng => lng === selectedTranslation);
 
       if (hasNewTranslation) {
         const { label, ...itemProps } = item;
@@ -72,6 +81,43 @@ class SightEventEdit extends React.Component {
 
     return null;
   };
+
+  getMultimediaFromItem = (item) => {
+    const { mainImage, pdfAttachment } = item;
+    const data = [];
+
+    if (mainImage) {
+      data.push({
+        createdBy: '',
+        createdDate: '',
+        id: 1,
+        modifiedBy: '',
+        modifiedDate: '',
+        name: 'mainImage',
+        path: '/home/hpl/var/DMS/omg/1234.jpg',
+        size: 12345,
+        type: 'image/jpeg',
+        downloadUrl: mainImage,
+      });
+    }
+
+    if (pdfAttachment) {
+      data.push({
+        ...pdfAttachment,
+        createdBy: '',
+        createdDate: '',
+        modifiedBy: '',
+        modifiedDate: '',
+        size: 12345,
+        type: 'application/pdf',
+      });
+    }
+
+    console.log(item, data);
+    return data;
+  };
+
+  setSelectedTab = (event, selectedTab) => this.setState({ selectedTab });
 
   handleFetchItemFailure = () => {
     const { clearError, error } = this.props;
@@ -212,7 +258,7 @@ class SightEventEdit extends React.Component {
 
   render() {
     const {
-      availableTranslations, selectedTranslation, snackbarOpen, snackbarMessage,
+      availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
     } = this.state;
     const { classes, item, itemId } = this.props;
     const { defaultLanguage } = item || {};
@@ -223,30 +269,55 @@ class SightEventEdit extends React.Component {
     return (
       <Layout>
         <Paper className={classes.root}>
-          <Typography variant="h6">{pageTitle}</Typography>
-          <ContentTranslation
-            actions={hasLanguageActions}
-            TranslationPickerProps={{
-              defaultValue: defaultLanguage || DEFAULT_LANGUAGE,
-              items: availableTranslations || CONTENT_LANGUAGES,
-              onChange: this.handleTranslationChange,
-              value: selectedTranslation || DEFAULT_LANGUAGE,
-            }}
-            TranslationActionsProps={{
-              availableTranslations,
-              defaultTranslation: defaultLanguage,
-              selectedTranslation,
-              onCreateTranslation: this.handleTranslationCreate,
-              onDeleteTranslation: this.handleTranslationDelete,
-              onSetDefaultTranslation: this.handleTranslationDefaultChange,
-            }}
-          />
-          <br />
-          <SightEventForm
-            initialValues={this.getFormValues(item)}
-            language={selectedTranslation}
-            onSubmitSuccess={this.handleSubmitSuccess}
-          />
+          <Grid container justify="space-between">
+            <Grid item>
+              <Typography variant="h6">{pageTitle}</Typography>
+            </Grid>
+            <Grid item>
+              <ContentTranslation
+                actions={hasLanguageActions}
+                TranslationPickerProps={{
+                  defaultValue: defaultLanguage || DEFAULT_LANGUAGE,
+                  items: availableTranslations || CONTENT_LANGUAGES,
+                  onChange: this.handleTranslationChange,
+                  value: selectedTranslation || DEFAULT_LANGUAGE,
+                }}
+                TranslationActionsProps={{
+                  availableTranslations,
+                  defaultTranslation: defaultLanguage,
+                  selectedTranslation,
+                  onCreateTranslation: this.handleTranslationCreate,
+                  onDeleteTranslation: this.handleTranslationDelete,
+                  onSetDefaultTranslation: this.handleTranslationDefaultChange,
+                }}
+              />
+            </Grid>
+          </Grid>
+          <Tabs
+            className={classes.section}
+            onChange={this.setSelectedTab}
+            indicatorColor="primary"
+            textColor="primary"
+            value={selectedTab}
+          >
+            <Tab label="Szczegóły" />
+            <Tab label="Multimedia" />
+            <Tab label="Komentarze" disabled />
+          </Tabs>
+          {selectedTab === 0
+            && (
+              <SightEventForm
+                initialValues={this.getFormValues(item)}
+                language={selectedTranslation}
+                onSubmitSuccess={this.handleSubmitSuccess}
+              />
+            )
+          }
+          {selectedTab === 1
+            && (
+              <SightEventMultimediaForm data={this.getMultimediaFromItem(item)} />
+            )
+          }
           <Snackbar
             anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             open={snackbarOpen}

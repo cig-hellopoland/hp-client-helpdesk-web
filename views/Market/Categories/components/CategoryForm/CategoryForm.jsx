@@ -20,9 +20,8 @@ import {
   selectors as categoriesSelectors,
 } from 'redux/categories';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
-import IconGallery from 'components/IconGallery/IconGallery';
 import GridItem from 'components/GridItem';
-import IconGalleryDialog from '../../../../../components/IconGallery/IconGalleryDialog';
+import IconGalleryDialog from 'components/IconGallery/IconGalleryDialog';
 
 const commonProps = {
   fullWidth: true,

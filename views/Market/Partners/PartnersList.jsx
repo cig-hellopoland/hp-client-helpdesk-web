@@ -30,6 +30,7 @@ const styles = theme => ({
   },
   paper: {
     flex: 1,
+    overflow: 'hidden',
   },
   fetchButton: {
     marginTop: theme.spacing.unit * 3,

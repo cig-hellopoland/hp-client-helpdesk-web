@@ -39,6 +39,371 @@
       "restricted": false
     }
   ],
+  "sight-events": [
+    {
+      "blocked":false,
+      "defaultLanguage":"pl-PL",
+      "description":"Obiekt zlokalizowany jest w południowo-wschodniej części rezerwatu Wietrznia i jest to najważniejsza atrakcja geoturystyczna na trasie „Świętokrzyskiego Szlaku Archeo-Geologicznego”. Inwestycja została zrealizowana ze środków Europejskiego Funduszu Regionalnego w ramach Programu Operacyjnego Innowacyjna Gospodarka 2007-2013.\r\nCentrum Geoedukacji  to miejsce, gdzie w przystępny sposób przekazujemy wiedzę geologiczną i geograficzną, z wykorzystaniem nowoczesnych metod i narzędzi edukacyjnych.\r\nWizyta w Centrum Geoedukacji jest świetnym wstępem do lepszego zrozumienia geologicznego fenomenu Gór Świętokrzyskiego, na czele z gołoborzami, jaskiniami czy dawnymi rafami koralowymi.\r\nDla odwiedzających proponujemy:\r\nzwiedzanie Galerii Ziemi wraz z wirtualną jaskinią\r\n„Podróż do wnętrza Ziemi” – seans w kinie 5D\r\nzwiedzanie wystaw czasowych\r\nzajęcia geoedukacyjne (teoretyczno-praktyczne)\r\nzajęcia terenowe w obrębie obiektów geoturystycznych Kielc\r\nimprezy i wydarzenia geoedukacyjne",
+      "generalAdmission":true,
+      "id":3,
+      "language":"pl-PL",
+      "lead":"Centrum Geoedukacji to nowoczesna placówka, należąca do Geoparku Kielce",
+      "location":{
+        "city":"Kielce",
+        "country":"Polska",
+        "latitude":50.8523704,
+        "longitude":20.6481324,
+        "street":"ul. Daleszycka 21",
+        "zipCode":"25-202"
+      },
+      "mainImage":{
+        "fhd":"https://hpl.fream.pl/api/v1/images/ad26b6afx6235x4d50xbcb5x9777b2b9f18a.jpg",
+        "fhdWebp":"https://hpl.fream.pl/api/v1/images/ad26b6afx6235x4d50xbcb5x9777b2b9f18a.webp",
+        "fourK":"https://hpl.fream.pl/api/v1/images/a71425b4xaa9ax4071x8144x811290d9ab39.jpg",
+        "fourKWebp":"https://hpl.fream.pl/api/v1/images/a71425b4xaa9ax4071x8144x811290d9ab39.webp",
+        "hd":"https://hpl.fream.pl/api/v1/images/73b91a03x79e9x4396xb8b4x76d610bbc318.jpg",
+        "hdWebp":"https://hpl.fream.pl/api/v1/images/73b91a03x79e9x4396xb8b4x76d610bbc318.webp",
+        "original":"https://hpl.fream.pl/api/v1/images/87584d10xb6d3x456dxa29exbf1eb8e4a1b5.jpg",
+        "originalWebp":"https://hpl.fream.pl/api/v1/images/87584d10xb6d3x456dxa29exbf1eb8e4a1b5.webp",
+        "qvg":"https://hpl.fream.pl/api/v1/images/8f348dcaxfcdbx4612xab98x9d645a8521fe.jpg",
+        "qvgWebp":"https://hpl.fream.pl/api/v1/images/8f348dcaxfcdbx4612xab98x9d645a8521fe.webp",
+        "sxga":"https://hpl.fream.pl/api/v1/images/82049ef7xd8d2x4843xbc7bxc53d646f5de4.jpg",
+        "sxgaWebp":"https://hpl.fream.pl/api/v1/images/82049ef7xd8d2x4843xbc7bxc53d646f5de4.webp",
+        "vga":"https://hpl.fream.pl/api/v1/images/eea53bbcx0e22x48e4xb666x8eb6077e2b33.jpg",
+        "vgaWebp":"https://hpl.fream.pl/api/v1/images/eea53bbcx0e22x48e4xb666x8eb6077e2b33.webp",
+        "xga":"https://hpl.fream.pl/api/v1/images/9a6d9515x5935x4a77xb1a6xed73b2d9ddb9.jpg",
+        "xgaWebp":"https://hpl.fream.pl/api/v1/images/9a6d9515x5935x4a77xb1a6xed73b2d9ddb9.webp"
+      },
+      "minPrice":1000,
+      "name":"Geopark Kielce – Centrum Geoedukacji",
+      "partnerAffiliateCode":"zaqwsx",
+      "pdfAttachment": {
+        "created": "2019-09-09T13:28",
+        "downloadUrl": "https://hpl.fream.pl/api/v1/files/967e6bcdx28d7x4107xa572x40ef11a652e7.pdf",
+        "id": 1,
+        "name": "967e6bcdx28d7x4107xa572x40ef11a652e7.pdf",
+        "path": "/home/hpl/var/DMS/sight_event_attachments/9/6/967e6bcdx28d7x4107xa572x40ef11a652e7.pdf",
+        "type": "PDF"
+      },
+      "published":true,
+      "sightId":7,
+      "ticketPoolDefinitions":[
+        {
+          "availableTicketsNumber":-1,
+          "deleted":false,
+          "endDate":"2019-09-09T23:59",
+          "entryEndDate":"2019-09-09T23:59",
+          "entryStartDate":"2019-09-09T00:00",
+          "frequencyData":{
+            "daysOfMonth":[
+
+            ],
+            "daysOfWeek":[
+
+            ],
+            "endDate":"2019-12-31T12:47",
+            "frequency":1,
+            "frequencyType":"DAILY",
+            "startDate":"2019-09-09T00:00"
+          },
+          "id":11,
+          "isCyclic":true,
+          "name":"Wstęp do kieleckiego Geoparku",
+          "sightEventId":3,
+          "startDate":"2019-09-09T00:00",
+          "ticketDefinitions":[
+            {
+              "availableTicketsNumber":-1,
+              "id":3,
+              "name":"Normalny",
+              "price":2000
+            },
+            {
+              "availableTicketsNumber":-1,
+              "id":4,
+              "name":"Ulgowy",
+              "price":1000
+            }
+          ],
+          "wholeDay":false
+        }
+      ]
+    },
+    {
+      "blocked":false,
+      "defaultLanguage":"pl-PL",
+      "description":"W zbiorach muzeum znajdują się rękopisy utworów Stefan Żeromskiego. Między innymi fragment brulionu Wiernej rzeki, część czystopisu Słowa o bandosie, tekst polski włoskiej przedmowy do książki G.L. Milesi La spedizione di Francesco Nullo in Polonia, 1863, czystopisy utworów Wszystko i nic oraz Snu o chlebie, pięć kartek noweli Z odczytem, a także rękopis Oświadczenia w sprawie ochrony dla dzieci w Nałęczowie.\r\nW muzeum zgromadzono zbiór listów pisarza z różnych lat. Ich adresatami byli: Bronisław Saski – kuzyn Żeromskiego, Zofia Kozierkiewiczowa – mieszkanka Kielc, Edmund Massalski – ówczesny redaktor „Gazety Kieleckiej”, Edward Łuszczkiewicz – szkolny kolega, Aleksander Januszkowski – zakopiański lekarz, Antoni Osuchowski – prawnik, czy Stefania Gliwicówna i Maria Bogdanowicz.\r\nW zbiorach muzeum znajdują się pierwsze wydanie Ech leśnych z dedykacją dla Zofii Kochnowskiej czy O Adamie Żeromskim wspomnienie z dedykacją dla Jana Müllera.\r\nMuzeum posiada płytę gramofonową z 1924 roku z nagranym głosem Stefana Żeromskiego, oraz kolekcję fotografii szkolnych kolegów Żeromskiego pochodzących z lat 1884-1886 (niektóre z nich opatrzone są dedykacjami).",
+      "generalAdmission":true,
+      "id":2,
+      "language":"pl-PL",
+      "lead":"Muzeum zajmuje się gromadzeniem, eksponowaniem zbiorów związanych z młodzieńczym okresem życia oraz twórczością Stefana Żeromskiego",
+      "location":{
+        "city":"Kielce",
+        "country":"Polska",
+        "latitude":50.8678941,
+        "longitude":20.6273561,
+        "street":"ul. Jana Pawła II 5",
+        "zipCode":"25-013"
+      },
+      "mainImage":{
+        "fhd":"https://hpl.fream.pl/api/v1/images/fb28d286x62a2x44a7x969ax8f359627ad44.jpg",
+        "fhdWebp":"https://hpl.fream.pl/api/v1/images/fb28d286x62a2x44a7x969ax8f359627ad44.webp",
+        "fourK":"https://hpl.fream.pl/api/v1/images/cc0c16c1x2a91x4f04x8a40x7fe412e932ba.jpg",
+        "fourKWebp":"https://hpl.fream.pl/api/v1/images/cc0c16c1x2a91x4f04x8a40x7fe412e932ba.webp",
+        "hd":"https://hpl.fream.pl/api/v1/images/9dcb12bex4945x4f10x8ba1xcf35c56c91a8.jpg",
+        "hdWebp":"https://hpl.fream.pl/api/v1/images/9dcb12bex4945x4f10x8ba1xcf35c56c91a8.webp",
+        "original":"https://hpl.fream.pl/api/v1/images/043024d3x4452x476axbcffx1bff5307461a.jpg",
+        "originalWebp":"https://hpl.fream.pl/api/v1/images/043024d3x4452x476axbcffx1bff5307461a.webp",
+        "qvg":"https://hpl.fream.pl/api/v1/images/7bf99400x3c5bx4805x9e11x5ca1efdfe5b7.jpg",
+        "qvgWebp":"https://hpl.fream.pl/api/v1/images/7bf99400x3c5bx4805x9e11x5ca1efdfe5b7.webp",
+        "sxga":"https://hpl.fream.pl/api/v1/images/12b92034x110bx4819x9c35xd7afe0ad388e.jpg",
+        "sxgaWebp":"https://hpl.fream.pl/api/v1/images/12b92034x110bx4819x9c35xd7afe0ad388e.webp",
+        "vga":"https://hpl.fream.pl/api/v1/images/f2a7e2c2x4b3ax4c65xa993x44a6f43781a2.jpg",
+        "vgaWebp":"https://hpl.fream.pl/api/v1/images/f2a7e2c2x4b3ax4c65xa993x44a6f43781a2.webp",
+        "xga":"https://hpl.fream.pl/api/v1/images/a085466bxfec6x40edxa331xc97fc92a3245.jpg",
+        "xgaWebp":"https://hpl.fream.pl/api/v1/images/a085466bxfec6x40edxa331xc97fc92a3245.webp"
+      },
+      "minPrice":600,
+      "name":"Muzeum Lat Szkolnych Stefana Żeromskiego",
+      "partnerAffiliateCode":"zaqwsx",
+      "published":true,
+      "sightId":6,
+      "ticketPoolDefinitions":[
+        {
+          "availableTicketsNumber":-1,
+          "deleted":false,
+          "endDate":"2019-09-09T23:59",
+          "entryEndDate":"2019-09-09T23:59",
+          "entryStartDate":"2019-09-09T00:00",
+          "frequencyData":{
+            "daysOfMonth":[
+
+            ],
+            "daysOfWeek":[
+
+            ],
+            "endDate":"2019-12-31T12:47",
+            "frequency":1,
+            "frequencyType":"DAILY",
+            "startDate":"2019-09-09T00:00"
+          },
+          "id":12,
+          "isCyclic":true,
+          "name":"Wstęp do muzeum",
+          "sightEventId":2,
+          "startDate":"2019-09-09T00:00",
+          "ticketDefinitions":[
+            {
+              "availableTicketsNumber":-1,
+              "id":5,
+              "name":"Normalny",
+              "price":800
+            },
+            {
+              "availableTicketsNumber":-1,
+              "id":6,
+              "name":"Ulgowy",
+              "price":600
+            }
+          ],
+          "wholeDay":false
+        }
+      ]
+    },
+    {
+      "blocked":false,
+      "defaultLanguage":"pl-PL",
+      "description":"Park Szczytnicki to największy i najstarszy z wrocławskich parków, najcenniejszy pod względem składu botanicznego, związany nierozerwalnie od XVIII wieku z losami miasta, jego ambicjami i tragediami. Znają go chyba wszyscy mieszkańcy Wrocławia, ale czy na pewno…? Przekonacie się podczas wycieczki w czwartek, 2 sierpnia o 17:30.\n\nNa terenie parku można odnaleźć wiele niezwykłych miejsc, zaskakujących budowli i wyjątkowych okazów roślin. Zapraszamy na spacer przez te „zielone płuca miasta”, a po drodze zobaczymy ponad 100 letnie alpinarium, przeprawimy się przez modernistyczny „wgłębnik”, odwiedzimy drewniany kościół skrywający mroczne tajemnice, poszukamy willi twórcy Hali Stulecia, dowiemy się do czego służą pneumatofory i spróbujemy zapolować na brytyjską wiewiórkę, oczywiście bezkrwawo.",
+      "generalAdmission":false,
+      "id":5,
+      "language":"pl-PL",
+      "location":{
+        "city":"Wrocław",
+        "country":"Polska",
+        "latitude":51.1114018,
+        "longitude":17.0799816,
+        "street":"",
+        "zipCode":"50-001"
+      },
+      "mainImage":{
+        "fhd":"https://hpl.fream.pl/api/v1/images/d12799d2x1bd1x4615x94c7x72b0ed5e855b.jpg",
+        "fhdWebp":"https://hpl.fream.pl/api/v1/images/d12799d2x1bd1x4615x94c7x72b0ed5e855b.webp",
+        "fourK":"https://hpl.fream.pl/api/v1/images/87a37653x9ca0x41f0x8db7x6f17d3ed7def.jpg",
+        "fourKWebp":"https://hpl.fream.pl/api/v1/images/87a37653x9ca0x41f0x8db7x6f17d3ed7def.webp",
+        "hd":"https://hpl.fream.pl/api/v1/images/0b648287x5c88x4525xa05bxf14c53188592.jpg",
+        "hdWebp":"https://hpl.fream.pl/api/v1/images/0b648287x5c88x4525xa05bxf14c53188592.webp",
+        "original":"https://hpl.fream.pl/api/v1/images/d64b80a5x46b1x49f7x8c04x587d073bceb3.jpg",
+        "originalWebp":"https://hpl.fream.pl/api/v1/images/d64b80a5x46b1x49f7x8c04x587d073bceb3.webp",
+        "qvg":"https://hpl.fream.pl/api/v1/images/3bc89ef1x824bx47eex868ex5255e5da6143.jpg",
+        "qvgWebp":"https://hpl.fream.pl/api/v1/images/3bc89ef1x824bx47eex868ex5255e5da6143.webp",
+        "sxga":"https://hpl.fream.pl/api/v1/images/5996960bx3a31x41faxa0c4x721bde674e80.jpg",
+        "sxgaWebp":"https://hpl.fream.pl/api/v1/images/5996960bx3a31x41faxa0c4x721bde674e80.webp",
+        "vga":"https://hpl.fream.pl/api/v1/images/c4733544x85a6x4b23x8383x37b566a6db9f.jpg",
+        "vgaWebp":"https://hpl.fream.pl/api/v1/images/c4733544x85a6x4b23x8383x37b566a6db9f.webp",
+        "xga":"https://hpl.fream.pl/api/v1/images/e998690axa17fx4fb9x929cx9c9d84925dc8.jpg",
+        "xgaWebp":"https://hpl.fream.pl/api/v1/images/e998690axa17fx4fb9x929cx9c9d84925dc8.webp"
+      },
+      "minPrice":2900,
+      "name":"Park Szczytnicki – najstarszy z wrocławskich parków",
+      "partnerAffiliateCode":"zaqwsx",
+      "published":true,
+      "sightId":1,
+      "ticketPoolDefinitions":[
+        {
+          "availableTicketsNumber":-1,
+          "deleted":false,
+          "endDate":"2019-10-09T23:59",
+          "entryEndDate":"2019-10-09T23:59",
+          "entryStartDate":"2019-10-09T00:00",
+          "id":14,
+          "isCyclic":false,
+          "name":"Park Szczytnicki",
+          "sightEventId":5,
+          "startDate":"2019-10-09T00:00",
+          "ticketDefinitions":[
+            {
+              "availableTicketsNumber":15,
+              "id":8,
+              "name":"Normalny",
+              "price":2900
+            }
+          ],
+          "wholeDay":false
+        }
+      ]
+    },
+    {
+      "blocked":false,
+      "defaultLanguage":"pl-PL",
+      "description":"Chcielibyście zobaczyć, co się dzieje w Afrykarium, gdy wyjdą ostatni zwiedzający? Hello Poland zaprasza na zwiedzanie Afrykarium po godzinach otwarcia obiektu! Jest to niepowtarzalna okazja, aby poznać ten unikatowy na skalę Polski obiekt bez tłumu turystów, w niedostępnej porze i w towarzystwie przewodnika, który zdradzi Państwu tajemnice tego fascynującego miejsca.\n\nNasz przewodnik pomoże Państwu odkryć niezwykłe Afrykarium! Dowiecie się, dlaczego akrylowe szyby do akwariów sprowadzono aż z Japonii, jak powstawał osiemnastometrowy podwodny tunel oraz które zwierzęta były pierwszymi lokatorami Afrykarium. Te i wiele innych ciekawostek czeka na Państwa już 29 września (sobota) o godzinie 19:00.\n\nPodczas zwiedzania zaprosimy Państwa także na słodki poczęstunek do Laguna Bistro & Cafe. Skosztujecie Państwo kawy lub herbaty, a w ramach deseru zaserwujemy Państwu pyszne ciasto.\n\nZwiedzanie w cenie 79 zł/os. obejmuje:\n– wejście do Afrykarium po godzinach otwarcia obiektu,\n– zwiedzanie Afrykarium z przewodnikiem,\n– poczęstunek w Laguna Bistro & Cafe\nDzieci do lat 3 – wstęp wolny.",
+      "generalAdmission":false,
+      "id":4,
+      "language":"pl-PL",
+      "location":{
+        "city":"Wrocław",
+        "country":"Polska",
+        "latitude":51.1041258,
+        "longitude":17.0720083,
+        "street":"Wróblewskiego 1-5",
+        "zipCode":"51-618"
+      },
+      "mainImage":{
+        "fhd":"https://hpl.fream.pl/api/v1/images/897f1109xa61fx4640xbe26x2f41f258f4a1.jpg",
+        "fhdWebp":"https://hpl.fream.pl/api/v1/images/897f1109xa61fx4640xbe26x2f41f258f4a1.webp",
+        "fourK":"https://hpl.fream.pl/api/v1/images/06ddf8cex03a9x4e13xb92cx9ed36ed9d453.jpg",
+        "fourKWebp":"https://hpl.fream.pl/api/v1/images/06ddf8cex03a9x4e13xb92cx9ed36ed9d453.webp",
+        "hd":"https://hpl.fream.pl/api/v1/images/7db260bex7d66x40dcxb71bx67d0e7ce2b98.jpg",
+        "hdWebp":"https://hpl.fream.pl/api/v1/images/7db260bex7d66x40dcxb71bx67d0e7ce2b98.webp",
+        "original":"https://hpl.fream.pl/api/v1/images/0c136de1x265cx4cb5x8b79xa8dd754e4bff.jpg",
+        "originalWebp":"https://hpl.fream.pl/api/v1/images/0c136de1x265cx4cb5x8b79xa8dd754e4bff.webp",
+        "qvg":"https://hpl.fream.pl/api/v1/images/a80dfbf4x570fx4a75x8db1x0c4b4c4f8105.jpg",
+        "qvgWebp":"https://hpl.fream.pl/api/v1/images/a80dfbf4x570fx4a75x8db1x0c4b4c4f8105.webp",
+        "sxga":"https://hpl.fream.pl/api/v1/images/ae121c4cxf759x4019x8385xaf56661d55d3.jpg",
+        "sxgaWebp":"https://hpl.fream.pl/api/v1/images/ae121c4cxf759x4019x8385xaf56661d55d3.webp",
+        "vga":"https://hpl.fream.pl/api/v1/images/c6946cbex5636x4705xa474x1f0d393c0ca4.jpg",
+        "vgaWebp":"https://hpl.fream.pl/api/v1/images/c6946cbex5636x4705xa474x1f0d393c0ca4.webp",
+        "xga":"https://hpl.fream.pl/api/v1/images/686f74d5x95b5x4efdx8463xb5052ae71d52.jpg",
+        "xgaWebp":"https://hpl.fream.pl/api/v1/images/686f74d5x95b5x4efdx8463xb5052ae71d52.webp"
+      },
+      "minPrice":7900,
+      "name":"Wieczorne zwiedzanie Afrykarium",
+      "partnerAffiliateCode":"zaqwsx",
+      "published":true,
+      "sightId":1,
+      "ticketPoolDefinitions":[
+        {
+          "availableTicketsNumber":-1,
+          "deleted":false,
+          "endDate":"2019-10-09T23:59",
+          "entryEndDate":"2019-10-09T23:59",
+          "entryStartDate":"2019-10-09T00:00",
+          "id":13,
+          "isCyclic":false,
+          "name":"Wieczorne zwiedzanie Afrykarium",
+          "sightEventId":4,
+          "startDate":"2019-10-09T00:00",
+          "ticketDefinitions":[
+            {
+              "availableTicketsNumber":25,
+              "id":7,
+              "name":"Normalny",
+              "price":7900
+            }
+          ],
+          "wholeDay":false
+        }
+      ]
+    },
+    {
+      "blocked":false,
+      "defaultLanguage":"pl-PL",
+      "description":"Podczas spaceru poznamy najciekawsze zakątki miasta oraz wyjątkowe atrakcje takie jak zabudowa Rynku, Stary Ratusz oraz wiele więcej… \r\nZnajdująca się tutaj malownicza zabudowa pochodzi głównie z XIX i XX stulecia. Całą zachodnią pierzeję Rynku stanowi ratusz – Urząd Miasta Kielce. Jest to budynek o trzech kondygnacjach i czterospadowym dachu, posiadający arkadowe podcienie skrywające wejście do środka.\r\nTuż obok ratusza, na rogu z ulicą Małą w południowej pierzei stoi kamienica z 1767 roku, której budowniczym był Maciej Gilba – kucharz biskupa krakowskiego Kajetana Sołtyka. Jest to jednopiętrowy budynek z podpiwniczeniem oraz podcieniami mieszczący obecnie kawiarnię. Na fasadzie budynku umieszczony jest orzeł będący herbem Sołtyków. Na lewo od Sołtyków znajduje się jedna z najbardziej okazałych kieleckich kamienic powstała w XIX wieku charakteryzująca się neobarokowym wystrojem frontowej elewacji i stiukowymidekoracjami we wnętrzach. Obecnie mieści się w niej siedziba „Gazety Wyborczej”.\r\nPo stronie wschodniej na rogu ul. św. Leonarda stała kamienica zwana Wójtostwem, o której wzmianki pojawiły się już w XVI wieku. W czerwcu 1794 roku przebywał tu przez dwa dni Tadeusz Kościuszko, co upamiętnia znajdująca się obecnie tablica wmurowana w ścianę. 24 maja 1800 roku budynek uległ spaleniu podczas wielkiego pożaru miasta, który pochłonął 276 domów. Budynek odbudowano, a w 1858 roku został on sprzedany Janowi Höningmanowi, który urządził na parterze sklep kolonialny, natomiast z pozostałej części zrobił „Hotel Saski”. Obecnie piętro budynku jest zamieszkane, natomiast na parterze znajdują się lokale usługowe.",
+      "generalAdmission":false,
+      "id":1,
+      "language":"pl-PL",
+      "lead":"Hello Poland zaprasza na niezwykły spacer z przewodnikiem po najciekawszych zakątkach miasta.",
+      "location":{
+        "city":"Kielce",
+        "country":"Polska",
+        "latitude":50.8717573,
+        "longitude":20.6285292,
+        "street":"Rynek 1",
+        "zipCode":"25-303"
+      },
+      "mainImage":{
+        "fhd":"https://hpl.fream.pl/api/v1/images/0a4c3aefxc1d4x4518x87f7xaefc52d3c3cf.jpg",
+        "fhdWebp":"https://hpl.fream.pl/api/v1/images/0a4c3aefxc1d4x4518x87f7xaefc52d3c3cf.webp",
+        "fourK":"https://hpl.fream.pl/api/v1/images/3a60e3f1x6438x4d92x9cd5xf2cc448ee818.jpg",
+        "fourKWebp":"https://hpl.fream.pl/api/v1/images/3a60e3f1x6438x4d92x9cd5xf2cc448ee818.webp",
+        "hd":"https://hpl.fream.pl/api/v1/images/b6e6625cx17c5x455fx8276xf9447e9bf83e.jpg",
+        "hdWebp":"https://hpl.fream.pl/api/v1/images/b6e6625cx17c5x455fx8276xf9447e9bf83e.webp",
+        "original":"https://hpl.fream.pl/api/v1/images/2c8970bbx8f69x49c8x91bbx3665c5fd0f20.jpg",
+        "originalWebp":"https://hpl.fream.pl/api/v1/images/2c8970bbx8f69x49c8x91bbx3665c5fd0f20.webp",
+        "qvg":"https://hpl.fream.pl/api/v1/images/33f71202xc386x48acx90a0xaef53eabee9f.jpg",
+        "qvgWebp":"https://hpl.fream.pl/api/v1/images/33f71202xc386x48acx90a0xaef53eabee9f.webp",
+        "sxga":"https://hpl.fream.pl/api/v1/images/dd1d3506xc2f9x400ax91c8x0a1be4a1be25.jpg",
+        "sxgaWebp":"https://hpl.fream.pl/api/v1/images/dd1d3506xc2f9x400ax91c8x0a1be4a1be25.webp",
+        "vga":"https://hpl.fream.pl/api/v1/images/f5887dc4x263ax4a26x9fdcx93472736a640.jpg",
+        "vgaWebp":"https://hpl.fream.pl/api/v1/images/f5887dc4x263ax4a26x9fdcx93472736a640.webp",
+        "xga":"https://hpl.fream.pl/api/v1/images/ed4d0f35xc100x4016x8ea6x1d9b2136fc45.jpg",
+        "xgaWebp":"https://hpl.fream.pl/api/v1/images/ed4d0f35xc100x4016x8ea6x1d9b2136fc45.webp"
+      },
+      "minPrice":2500,
+      "name":"Zwiedzanie miasta z przewodnikiem",
+      "partnerAffiliateCode":"zaqwsx",
+      "published":true,
+      "sightId":5,
+      "ticketPoolDefinitions":[
+        {
+          "availableTicketsNumber":30,
+          "deleted":false,
+          "endDate":"2019-10-09T23:59",
+          "entryEndDate":"2019-10-09T23:59",
+          "entryStartDate":"2019-10-09T00:00",
+          "id":10,
+          "isCyclic":false,
+          "name":"Zwiedzanie miasta z przewodnikiem",
+          "sightEventId":1,
+          "startDate":"2019-10-09T00:00",
+          "ticketDefinitions":[
+            {
+              "availableTicketsNumber":-1,
+              "id":1,
+              "name":"Normalny",
+              "price":3500
+            },
+            {
+              "availableTicketsNumber":-1,
+              "id":2,
+              "name":"Ulgowy",
+              "price":2500
+            }
+          ],
+          "wholeDay":false
+        }
+      ]
+    }
+  ],
   "users": [
     {
       "id": 1,

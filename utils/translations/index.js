@@ -42,6 +42,10 @@ export function isLanguageSupported(lng) {
  * @return {string[]} - filtered language list.
  */
 export function getTranslatedLanguages(lngList = []) {
+  if (!Array.isArray(lngList)) {
+    return [];
+  }
+
   return lngList.filter(item => isLanguageSupported(item));
 }
 
@@ -53,6 +57,10 @@ export function getTranslatedLanguages(lngList = []) {
  */
 
 export function getUntranslatedLanguages(lngList = []) {
+  if (!Array.isArray(lngList)) {
+    return [];
+  }
+
   return CONTENT_LANGUAGES.filter(item => !lngList.some(lng => item === lng));
 }
 

@@ -29,7 +29,7 @@ export default [
     disabled: true, label: 'Atrakcje', href: '/market/sights', Icon: PlaceIcon,
   },
   {
-    disabled: true, label: 'Oferty', href: '/market/sight-events', Icon: LocalPlayIcon,
+    label: 'Oferty', href: '/market/sight-events', Icon: LocalPlayIcon,
   },
   {
     label: 'Helpdesk',

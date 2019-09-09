@@ -19,30 +19,26 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import Typography from '@material-ui/core/Typography';
-import AddIcon from '@material-ui/icons/Add';
-import CategoryIcon from '@material-ui/icons/Category';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import LocalPlayIcon from '@material-ui/icons/LocalPlay';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import LockIcon from '@material-ui/icons/Lock';
-import StarIcon from '@material-ui/icons/Star';
-import Link from 'next/link';
+import PublicIcon from '@material-ui/icons/Public';
 import { withRouter } from 'next/router';
 import {
-  actions as categoriesActions,
-  selectors as categoriesSelectors,
-} from 'redux/categories';
+  actions as sightEventsActions,
+  selectors as sightEventsSelectors,
+} from '@hello-poland/commons/redux/sightEvents';
 import withAuth from 'services/auth/withAuth';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
-
 import Layout from 'components/Layout';
 import EmptyView from 'components/EmptyView';
 import SortableTableHead from '../Partners/components/ListingViewTable/SortableTableHead';
 
 const tableColumns = [
-  { id: 'icon', label: 'Ikona' },
-  { id: 'name', label: 'Nazwa kategorii' },
-  { id: 'count', label: 'Liczba ofert' },
+  { id: 'item-id', label: '# ID' },
+  { id: 'name', label: 'Nazwa oferty' },
+  { id: 'location', label: 'Lokalizacja' },
+  { id: 'partner', label: 'Partner' },
   { id: 'details', label: '' },
 ];
 
@@ -50,15 +46,14 @@ const styles = theme => ({
   root: {
     minHeight: '100%',
   },
-  icon: {
-    marginRight: theme.spacing.unit,
+  actions: {
+    minWidth: 200,
   },
-  iconCell: {
-    width: 50,
+  orderNunber: {
+    minWidth: 110,
   },
   paper: {
     flex: 1,
-    overflow: 'hidden',
   },
   toolbar: {
     padding: theme.spacing.unit,
@@ -66,32 +61,40 @@ const styles = theme => ({
 });
 
 class CategoriesList extends React.Component {
+  baseURL = '/market/sight-events';
+
   state = {
     dialogOpen: false,
     dialogProps: {},
     isFetching: false,
     menuAnchor: null,
-    menuCategoryId: null,
+    menuItemId: null,
     snackbarOpen: false,
     snackbarMessage: '',
   };
 
   componentDidMount() {
-    this.handleFetchCategories();
+    this.handleFetchItems();
   }
 
+  handleBlockItem = (itemId) => {
+    console.log('handleBlockItem', itemId);
+
+    this.handleMenuClose();
+  };
+
   handleDialogOpen = () => {
-    const { menuCategoryId } = this.state;
+    const { menuItemId } = this.state;
     const { items } = this.props;
 
-    const selectedCategory = items.find(item => item.id === menuCategoryId);
+    const selectedItem = items.find(item => item.id === menuItemId);
 
-    if (selectedCategory) {
+    if (selectedItem) {
       this.setState({
         dialogOpen: true,
         dialogProps: {
-          categoryId: menuCategoryId,
-          categoryName: selectedCategory.label,
+          itemId: menuItemId,
+          name: selectedItem.name,
         },
       });
     }
@@ -104,19 +107,19 @@ class CategoriesList extends React.Component {
     dialogProps: {},
   });
 
-  handleDeleteCategoryFailure = () => {
+  handleDeleteItemFailure = () => {
     const { error } = this.props;
 
     this.handleDialogClose();
     this.handleSnackbarOpen(error && error.message);
   };
 
-  handleDeleteCategorySuccess = () => {
+  handleDeleteItemSuccess = () => {
     this.handleDialogClose();
     this.handleFetchCategories();
   };
 
-  handleDeleteCategory = (categoryId) => {
+  handleDeleteItem = (itemId) => {
     const { deleteItem } = this.props;
 
     this.setState(state => ({
@@ -128,17 +131,17 @@ class CategoriesList extends React.Component {
     }));
 
     deleteItem({
-      id: categoryId,
-      onFailure: this.handleDeleteCategoryFailure,
-      onSuccess: this.handleDeleteCategorySuccess,
+      id: itemId,
+      onFailure: this.handleDeleteItemFailure,
+      onSuccess: this.handleDeleteItemSuccess,
     });
   };
 
-  handleFetchCategoriesFailure = () => this.setState({ isFetching: false });
+  handleFetchItemsFailure = () => this.setState({ isFetching: false });
 
-  handleFetchCategoriesSuccess = () => this.setState({ isFetching: false });
+  handleFetchItemsSuccess = () => this.setState({ isFetching: false });
 
-  handleFetchCategories = () => {
+  handleFetchItems = () => {
     const { fetchList } = this.props;
 
     fetchList({
@@ -147,34 +150,38 @@ class CategoriesList extends React.Component {
           'Content-Language': DEFAULT_LANGUAGE,
         },
       },
-      onFailure: this.handleFetchCategoriesFailure,
-      onSuccess: this.handleFetchCategoriesSuccess,
+      onFailure: this.handleFetchItemsFailure,
+      onSuccess: this.handleFetchItemsSuccess,
     });
 
     this.setState({ isFetching: true });
   };
 
-  handleItemEdit = () => {
-    const { menuCategoryId } = this.state;
+  handleItemEdit = (itemId) => {
     const { router } = this.props;
 
-    const href = `/market/categories/edit?categoryId=${menuCategoryId}`;
-    const pathname = `/market/categories/${menuCategoryId}/edit`;
+    const href = `${this.baseURL}/edit?itemId=${itemId}`;
+    const pathname = `${this.baseURL}/${itemId}/edit`;
 
     router.push(href, pathname);
 
     this.handleMenuClose();
   };
 
-  handleMenuOpen = (event, categoryId) => this.setState({
+  handleMenuOpen = (event, itemId) => this.setState({
     menuAnchor: event.currentTarget,
-    menuCategoryId: categoryId,
+    menuItemId: itemId,
   });
 
-  handleMenuClose = () => this.setState({
-    menuAnchor: null,
-    menuCategoryId: null,
-  });
+  handleMenuClose = () => this.setState({ menuAnchor: null });
+
+  handleMenuExited = () => this.setState({ menuItemId: null });
+
+  handlePublishItem = (itemId) => {
+    console.log('handlePublishItem', itemId);
+
+    this.handleMenuClose();
+  };
 
   handleSnackbarOpen = message => this.setState({
     snackbarOpen: true,
@@ -186,12 +193,35 @@ class CategoriesList extends React.Component {
     snackbarMessage: '',
   });
 
+  isItemBlocked = (itemId) => {
+    const { items } = this.props;
+    const selectedItem = items && items.find(item => item.id === itemId);
+
+    if (selectedItem) {
+      return !!selectedItem.blocked;
+    }
+
+    return false;
+  };
+
+  isItemPublished = (itemId) => {
+    const { items } = this.props;
+    const selectedItem = items && items.find(item => item.id === itemId);
+
+    if (selectedItem) {
+      return !!selectedItem.published;
+    }
+
+    return false;
+  };
+
   render() {
     const {
-      dialogOpen, dialogProps, isFetching, menuAnchor, snackbarMessage, snackbarOpen,
+      dialogOpen, dialogProps, isFetching, menuAnchor, menuItemId, snackbarMessage,
+      snackbarOpen,
     } = this.state;
-    const { classes, items: sortedList } = this.props;
-
+    const { classes, items } = this.props;
+    const sortedList = items || [];
     const colorActive = 'primary';
     const colorInactive = 'disabled';
 
@@ -199,64 +229,43 @@ class CategoriesList extends React.Component {
       <Layout>
         <Grid container className={classes.root}>
           <Paper className={classes.paper}>
-            <Grid container direction="column" className={classes.toolbar}>
-              <Grid container item justify="flex-end">
-                <Grid item>
-                  <Link href="/market/categories/create" passHref>
-                    <Button component="a">
-                      <AddIcon className={classes.icon} />
-                      Dodaj
-                    </Button>
-                  </Link>
-                </Grid>
-              </Grid>
-            </Grid>
             {sortedList.length === 0
               && (
                 <EmptyView
-                  image={CategoryIcon}
-                  label="Brak kategorii"
+                  image={LocalPlayIcon}
+                  label="Brak ofert"
                   loading={isFetching}
-                  message="Dodaj kategorię lub ponów zapytanie aby wyświetlić listę."
-                  onRefresh={this.handleFetchCategories}
+                  message="Ponów zapytanie aby wyświetlić listę."
+                  onRefresh={this.handleFetchItems}
                 />
               )
             }
             {sortedList.length > 0
               && (
                 <React.Fragment>
-                  <Table aria-labelledby="categories-list">
+                  <Table aria-labelledby="items-list">
                     <SortableTableHead columns={tableColumns} orderBy="name" onRequestSort={() => {}} />
                     <TableBody>
                       {
                         sortedList.map(({
-                          assignedItemsCount, label, iconUrl, id: categoryId, restricted,
-                          recommended,
+                          blocked, id: itemId, location, name, partnerName, published,
                         }) => (
-                          <TableRow key={categoryId} hover>
-                            <TableCell className={classes.iconCell} align="center">
-                              {iconUrl
-                                ? <img src={iconUrl} height={48} width={48} alt={label} />
-                                : <ErrorOutlineIcon color="error" />
-                              }
-                            </TableCell>
-                            <TableCell>
-                              <Typography>{label}</Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography>{assignedItemsCount}</Typography>
-                            </TableCell>
-                            <TableCell align="right">
+                          <TableRow key={itemId} hover>
+                            <TableCell className={classes.orderNunber}>{itemId}</TableCell>
+                            <TableCell>{name}</TableCell>
+                            <TableCell>{location.city}</TableCell>
+                            <TableCell>{partnerName}</TableCell>
+                            <TableCell align="right" className={classes.actions}>
                               <IconButton disabled>
-                                <LockIcon color={restricted ? colorActive : colorInactive} />
+                                <LockIcon color={blocked ? colorActive : colorInactive} />
                               </IconButton>
                               <IconButton disabled>
-                                <StarIcon color={recommended ? colorActive : colorInactive} />
+                                <PublicIcon color={published ? colorActive : colorInactive} />
                               </IconButton>
                               <IconButton
-                                aria-owns={menuAnchor ? 'category-menu' : undefined}
+                                aria-owns={menuAnchor ? 'item-menu' : undefined}
                                 aria-haspopup="true"
-                                onClick={event => this.handleMenuOpen(event, categoryId)}
+                                onClick={event => this.handleMenuOpen(event, itemId)}
                               >
                                 <MoreVertIcon />
                               </IconButton>
@@ -267,13 +276,20 @@ class CategoriesList extends React.Component {
                     </TableBody>
                   </Table>
                   <Menu
-                    id="category-menu"
+                    id="item-menu"
                     anchorEl={menuAnchor}
                     open={Boolean(menuAnchor)}
                     onClose={this.handleMenuClose}
+                    onExited={this.handleMenuExited}
                   >
-                    <MenuItem onClick={this.handleItemEdit}>
+                    <MenuItem onClick={() => this.handleItemEdit(menuItemId)}>
                       Edytuj
+                    </MenuItem>
+                    <MenuItem onClick={() => this.handleBlockItem(menuItemId)}>
+                      {this.isItemBlocked(menuItemId) ? 'Odblokuj' : 'Zablokuj'}
+                    </MenuItem>
+                    <MenuItem onClick={() => this.handlePublishItem(menuItemId)}>
+                      {this.isItemPublished(menuItemId) ? 'Odpublikuj' : 'Opublikuj'}
                     </MenuItem>
                     <MenuItem onClick={this.handleDialogOpen}>
                       Usuń
@@ -290,14 +306,14 @@ class CategoriesList extends React.Component {
                     </DialogTitle>
                     <DialogContent>
                       <DialogContentText id="alert-dialog-description">
-                        {`Czy napewno usunąć kategorię "${dialogProps.categoryName}"?`}
+                        {`Czy napewno usunąć ofertę "${dialogProps.name}"?`}
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>
                       <Button onClick={this.handleDialogClose} color="primary" disabled={dialogProps.deleting}>
                         Anuluj
                       </Button>
-                      <Button onClick={() => this.handleDeleteCategory(dialogProps.categoryId)} color="primary" disabled={dialogProps.deleting}>
+                      <Button onClick={() => this.handleDeleteItem(dialogProps.itemId)} color="primary" disabled={dialogProps.deleting}>
                         OK
                       </Button>
                     </DialogActions>
@@ -327,12 +343,6 @@ CategoriesList.propTypes = {
   error: PropTypes.shape({}),
   fetchList: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({
-    assignedItemsCount: PropTypes.number,
-    iconUrl: PropTypes.string,
-    id: PropTypes.number,
-    label: PropTypes.string,
-    restricted: PropTypes.bool,
-    recommended: PropTypes.bool,
   })).isRequired,
   router: PropTypes.shape({}).isRequired,
 };
@@ -342,13 +352,13 @@ CategoriesList.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  error: categoriesSelectors.getError(state),
-  items: categoriesSelectors.getList(state),
+  error: sightEventsSelectors.getError(state),
+  items: sightEventsSelectors.getSightEvents(state),
 });
 
 const mapDispatchToProps = {
-  deleteItem: categoriesActions.deleteItem,
-  fetchList: categoriesActions.fetchList,
+  deleteItem: sightEventsActions.deleteItem,
+  fetchList: sightEventsActions.fetchList,
 };
 
 export default compose(

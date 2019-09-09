@@ -168,9 +168,9 @@ class CategoriesList extends React.Component {
     this.handleMenuClose();
   };
 
-  handleMenuOpen = (event, categoryId) => this.setState({
+  handleMenuOpen = (event, itemId) => this.setState({
     menuAnchor: event.currentTarget,
-    menuItemId: categoryId,
+    menuItemId: itemId,
   });
 
   handleMenuClose = () => this.setState({ menuAnchor: null });
@@ -243,7 +243,7 @@ class CategoriesList extends React.Component {
             {sortedList.length > 0
               && (
                 <React.Fragment>
-                  <Table aria-labelledby="categories-list">
+                  <Table aria-labelledby="items-list">
                     <SortableTableHead columns={tableColumns} orderBy="name" onRequestSort={() => {}} />
                     <TableBody>
                       {
@@ -263,7 +263,7 @@ class CategoriesList extends React.Component {
                                 <PublicIcon color={published ? colorActive : colorInactive} />
                               </IconButton>
                               <IconButton
-                                aria-owns={menuAnchor ? 'category-menu' : undefined}
+                                aria-owns={menuAnchor ? 'item-menu' : undefined}
                                 aria-haspopup="true"
                                 onClick={event => this.handleMenuOpen(event, itemId)}
                               >
@@ -276,7 +276,7 @@ class CategoriesList extends React.Component {
                     </TableBody>
                   </Table>
                   <Menu
-                    id="category-menu"
+                    id="item-menu"
                     anchorEl={menuAnchor}
                     open={Boolean(menuAnchor)}
                     onClose={this.handleMenuClose}
@@ -313,7 +313,7 @@ class CategoriesList extends React.Component {
                       <Button onClick={this.handleDialogClose} color="primary" disabled={dialogProps.deleting}>
                         Anuluj
                       </Button>
-                      <Button onClick={() => this.handleDeleteItem(dialogProps.categoryId)} color="primary" disabled={dialogProps.deleting}>
+                      <Button onClick={() => this.handleDeleteItem(dialogProps.itemId)} color="primary" disabled={dialogProps.deleting}>
                         OK
                       </Button>
                     </DialogActions>

@@ -9,9 +9,9 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Typography from '@material-ui/core/Typography';
 import { withRouter } from 'next/router';
 import {
-  actions as categoriesActions,
-  selectors as categoriesSelectors,
-} from 'redux/categories';
+  actions as sightEventsActions,
+  selectors as sightEventsSelectors,
+} from '@hello-poland/commons/redux/sightEvents';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
@@ -26,6 +26,8 @@ const styles = theme => ({
 });
 
 class SightEventEdit extends React.Component {
+  baseURL = '/market/sight-events';
+
   state = {
     availableTranslations: CONTENT_LANGUAGES,
     selectedTranslation: DEFAULT_LANGUAGE,
@@ -205,7 +207,7 @@ class SightEventEdit extends React.Component {
   handleSubmitSuccess = () => {
     const { router } = this.props;
 
-    router.push('/market/categories');
+    router.push(this.baseURL);
   };
 
   render() {
@@ -283,16 +285,16 @@ SightEventEdit.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  error: categoriesSelectors.getError(state),
-  item: categoriesSelectors.getItem(state),
+  error: sightEventsSelectors.getError(state),
+  item: sightEventsSelectors.getSightEvent(state),
 });
 
 const mapDispatchToProps = {
-  changeDefaultTranslation: categoriesActions.changeDefaultTranslation,
-  clearError: categoriesActions.clearError,
-  clearItem: categoriesActions.clearItem,
-  deleteTranslation: categoriesActions.deleteTranslation,
-  fetchItem: categoriesActions.fetchItem,
+  changeDefaultTranslation: sightEventsActions.changeDefaultTranslation,
+  clearError: sightEventsActions.clearError,
+  clearItem: sightEventsActions.clearItem,
+  deleteTranslation: sightEventsActions.deleteTranslation,
+  fetchItem: sightEventsActions.fetchItem,
 };
 
 export default compose(

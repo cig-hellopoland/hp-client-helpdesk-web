@@ -200,7 +200,7 @@ class SightEventForm extends React.Component {
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
     const { defaultLanguage, id: itemId } = itemValues || {};
-    const isDefaultTranslation = itemId && defaultLanguage !== language;
+    const isDefaultTranslation = itemId && defaultLanguage === language;
 
     return (
       <Formik
@@ -244,6 +244,21 @@ class SightEventForm extends React.Component {
                   </GridItem>
                 )
               }
+              {isDefaultTranslation
+                && (
+                  <GridItem md={4} sm={4}>
+                    <Field
+                      name="blocked"
+                      render={switchProps => (
+                        <FormControlLabel
+                          control={<Switch {...fieldToSwitch(switchProps)} />}
+                          label="Blokuj"
+                        />
+                      )}
+                    />
+                  </GridItem>
+                )
+              }
               <GridItem>
                 <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
               </GridItem>
@@ -254,16 +269,16 @@ class SightEventForm extends React.Component {
                 && (
                   <React.Fragment>
                     <GridItem>
-                      <Typography variant="h6" className={classes.title}>Dane kontaktowe</Typography>
+                      <Typography variant="h6" className={classes.section}>Dane kontaktowe</Typography>
                     </GridItem>
-                    <GridItem>
+                    <GridItem md={6} sm={6}>
                       <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
                     </GridItem>
-                    <GridItem>
+                    <GridItem md={6} sm={6}>
                       <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem>
-                      <Typography variant="h6" className={classes.title}>Lokalizacja</Typography>
+                      <Typography variant="h6" className={classes.section}>Lokalizacja</Typography>
                     </GridItem>
                     <GridItem>
                       <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
@@ -271,14 +286,14 @@ class SightEventForm extends React.Component {
                     <GridItem md={4} sm={4}>
                       <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
                     </GridItem>
-                    <GridItem md={8} sm={8}>
+                    <GridItem md={4} sm={4}>
                       <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
                     </GridItem>
-                    <GridItem>
+                    <GridItem md={4} sm={4}>
                       <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem>
-                      <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={20} />
+                      <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={10} />
                     </GridItem>
                   </React.Fragment>
                 )

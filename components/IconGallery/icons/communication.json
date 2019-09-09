@@ -1,0 +1,324 @@
+[
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_business",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_call",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_call_end",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_call_made",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_call_merge",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_call_missed",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_call_missed_outgoing",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_call_received",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_call_split",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_chat",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_chat_bubble",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_chat_bubble_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_clear_all",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_comment",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_contact_mail",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_contact_phone",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_contacts",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_dialer_sip",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_dialpad",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_email",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_forum",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_import_contacts",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_import_export",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_invert_colors_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_live_help",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_location_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_location_on",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_mail_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_message",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_no_sim",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_phone",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_portable_wifi_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_present_to_all",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_ring_volume",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_rss_feed",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_screen_share",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_speaker_phone",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_stay_current_landscape",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_stay_current_portrait",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_stay_primary_landscape",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_stay_primary_portrait",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_stop_screen_share",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_swap_calls",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_textsms",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_voicemail",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "COMMUNICATION",
+    "name": "ic_vpn_key",
+    "variants": [
+      "svg"
+    ]
+  }
+]

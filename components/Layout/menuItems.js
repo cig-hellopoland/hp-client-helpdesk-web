@@ -1,3 +1,4 @@
+import CategoryIcon from '@material-ui/icons/Category';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import DomainIcon from '@material-ui/icons/Domain';
 import LocalPlayIcon from '@material-ui/icons/LocalPlay';
@@ -22,13 +23,16 @@ export default [
     disabled: true, label: 'Sprzedaż', href: '/market/sales', Icon: ShoppingCartIcon,
   },
   {
+    label: 'Kategorie', href: '/market/categories', Icon: CategoryIcon,
+  },
+  {
     disabled: true, label: 'Atrakcje', href: '/market/sights', Icon: PlaceIcon,
   },
   {
     disabled: true, label: 'Oferty', href: '/market/sight-events', Icon: LocalPlayIcon,
   },
   {
-    label: 'Help Desk',
+    label: 'Helpdesk',
   },
   {
     disabled: true, label: 'Użytkownicy', href: '/helpdesk/users', Icon: PeopleIcon,

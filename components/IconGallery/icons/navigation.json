@@ -1,0 +1,191 @@
+[
+  {
+    "category": "NAVIGATION",
+    "name": "ic_apps",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_arrow_back",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_arrow_downward",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_arrow_drop_down",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_arrow_drop_down_circle",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_arrow_drop_up",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_arrow_forward",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_arrow_upward",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_cancel",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_check",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_chevron_left",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_chevron_right",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_close",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_expand_less",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_expand_more",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_first_page",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_fullscreen",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_fullscreen_exit",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_last_page",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_menu",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_more_horiz",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_more_vert",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_refresh",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_subdirectory_arrow_left",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_subdirectory_arrow_right",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_unfold_less",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "NAVIGATION",
+    "name": "ic_unfold_more",
+    "variants": [
+      "svg"
+    ]
+  }
+]

@@ -30,6 +30,7 @@ const styles = theme => ({
   },
   paper: {
     flex: 1,
+    overflow: 'hidden',
   },
   fetchButton: {
     marginTop: theme.spacing.unit * 3,
@@ -134,7 +135,11 @@ class PartnersList extends Component {
             {sortedList.length > 0
               && (
                 <Table aria-labelledby="tableTitle">
-                  <SortableTableHead columns={tableColumns} orderBy="name" />
+                  <SortableTableHead
+                    columns={tableColumns}
+                    orderBy="name"
+                    onRequestSort={() => {}}
+                  />
                   <TableBody>
                     {
                       sortedList.map(partner => (

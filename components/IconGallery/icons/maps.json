@@ -1,0 +1,478 @@
+[
+  {
+    "category": "MAPS",
+    "name": "ic_add_location",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_beenhere",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_directions",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_directions_bike",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_directions_boat",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_directions_bus",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_directions_car",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_directions_railway",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_directions_run",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_directions_subway",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_directions_transit",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_directions_walk",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_edit_location",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_ev_station",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_flight",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_hotel",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_layers",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_layers_clear",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_activity",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_airport",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_atm",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_cafe",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_car_wash",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_convenience_store",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_dining",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_drink",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_florist",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_gas_station",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_grocery_store",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_hospital",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_hotel",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_laundry_service",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_library",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_mall",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_movies",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_offer",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_parking",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_pharmacy",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_phone",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_pizza",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_play",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_post_office",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_printshop",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_see",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_shipping",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_local_taxi",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_map",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_my_location",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_navigation",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_near_me",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_person_pin",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_person_pin_circle",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_pin_drop",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_place",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_rate_review",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_restaurant",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_restaurant_menu",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_satellite",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_store_mall_directory",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_streetview",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_subway",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_terrain",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_traffic",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_train",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_tram",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_transfer_within_a_station",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "MAPS",
+    "name": "ic_zoom_out_map",
+    "variants": [
+      "svg"
+    ]
+  }
+]

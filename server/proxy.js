@@ -6,10 +6,15 @@ const serverConfig = config.server;
 const baseURL = serverConfig.apiURL || `http://localhost:${port}/api`;
 
 const proxySettings = {
+  '/api/sight-events': {
+    target: 'http://localhost:3003/',
+    changeOrigin: true,
+    pathRewrite: { '^/api': '/' },
+  },
   '/api': {
     target: baseURL,
-    pathRewrite: { '^/api': '/' },
     changeOrigin: true,
+    pathRewrite: { '^/api': '/' },
     // logLevel: 'debug',
   },
 };

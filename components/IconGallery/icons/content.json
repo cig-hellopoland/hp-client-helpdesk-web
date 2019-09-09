@@ -1,0 +1,282 @@
+[
+  {
+    "category": "CONTENT",
+    "name": "ic_add",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_add_box",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_add_circle",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_add_circle_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_archive",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_backspace",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_block",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_clear",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_content_copy",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_content_cut",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_content_paste",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_create",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_delete_sweep",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_drafts",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_filter_list",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_flag",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_forward",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_gesture",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_inbox",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_link",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_low_priority",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_mail",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_markunread",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_move_to_inbox",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_next_week",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_redo",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_remove",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_remove_circle",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_remove_circle_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_reply",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_reply_all",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_report",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_save",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_select_all",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_send",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_sort",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_text_format",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_unarchive",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_undo",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CONTENT",
+    "name": "ic_weekend",
+    "variants": [
+      "svg"
+    ]
+  }
+]

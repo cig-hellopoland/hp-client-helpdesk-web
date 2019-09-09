@@ -1,0 +1,1325 @@
+[
+  {
+    "category": "ACTION",
+    "name": "ic_assignment_ind",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_assignment_late",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_assignment_return",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_assignment_returned",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_assignment_turned_in",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_autorenew",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_backup",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_book",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_bookmark",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_bookmark_border",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_bug_report",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_build",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_cached",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_card_giftcard",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_card_membership",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_card_travel",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_change_history",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_check_circle",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_chrome_reader_mode",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_class",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_code",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_compare_arrows",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_copyright",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_credit_card",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_dashboard",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_date_range",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_delete",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_delete_forever",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_description",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_dns",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_done",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_done_all",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_donut_large",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_donut_small",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_euro_symbol",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_event",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_event_seat",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_exit_to_app",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_explore",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_extension",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_face",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_favorite",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_favorite_border",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_feedback",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_find_in_page",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_find_replace",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_fingerprint",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_flight_land",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_flight_takeoff",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_flip_to_back",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_flip_to_front",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_gavel",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_get_app",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_grade",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_group_work",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_g_translate",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_help",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_highlight_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_history",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_home",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_hourglass_empty",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_hourglass_full",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_http",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_https",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_important_devices",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_info",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_info_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_input",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_invert_colors",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_label",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_label_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_language",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_launch",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_lightbulb_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_line_style",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_line_weight",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_list",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_lock",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_lock_open",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_lock_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_loyalty",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_markunread_mailbox",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_motorcycle",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_note_add",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_opacity",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_open_in_browser",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_open_in_new",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_open_with",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_pageview",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_pan_tool",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_payment",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_perm_camera_mic",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_perm_contact_calendar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_perm_data_setting",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_perm_device_information",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_perm_identity",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_perm_media",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_perm_phone_msg",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_perm_scan_wifi",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_pets",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_picture_in_picture",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_picture_in_picture_alt",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_play_for_work",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_polymer",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_power_settings_new",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_pregnant_woman",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_print",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_query_builder",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_question_answer",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_receipt",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_record_voice_over",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_redeem",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_remove_shopping_cart",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_report_problem",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_restore",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_restore_page",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_room",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_rounded_corner",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_rowing",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_schedule",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_search",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_applications",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_backup_restore",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_bluetooth",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_brightness",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_cell",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_ethernet",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_input_antenna",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_input_component",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_input_composite",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_input_hdmi",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_input_svideo",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_overscan",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_phone",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_power",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_remote",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_settings_voice",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_shop",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_shopping_basket",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_shopping_cart",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_shop_two",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_speaker_notes",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_speaker_notes_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_spellcheck",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_stars",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_store",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_subject",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_supervisor_account",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_swap_horiz",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_swap_vert",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_swap_vertical_circle",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_system_update_alt",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_tab",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_tab_unselected",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_theaters",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_thumb_down",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_thumbs_up_down",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_thumb_up",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_timeline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_toc",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_today",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_toll",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_touch_app",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_track_changes",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_translate",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_trending_down",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_trending_flat",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_trending_up",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_turned_in",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_turned_in_not",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_update",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_verified_user",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_view_agenda",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_view_array",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_view_carousel",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_view_column",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_view_day",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_view_headline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_view_list",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_view_module",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_view_quilt",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_view_stream",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_view_week",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_visibility",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_visibility_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_watch_later",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_work",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ACTION",
+    "name": "ic_youtube_searched_for",
+    "variants": [
+      "svg"
+    ]
+  }
+]

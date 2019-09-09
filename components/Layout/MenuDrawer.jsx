@@ -19,10 +19,6 @@ const styles = theme => ({
   drawerPaper: {
     minWidth: drawerWidth,
   },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing.unit * 3,
-  },
   toolbar: theme.mixins.toolbar,
 });
 
@@ -37,7 +33,7 @@ const MenuDrawer = ({
           disabled, label, href, Icon,
         }) => (href
           ? (
-            <Link key={label} href={href} passHref>
+            <Link key={`${label}-${href}`} href={href} passHref>
               <ListItem button disabled={disabled} selected={currentPath === href}>
                 <ListItemIcon><Icon /></ListItemIcon>
                 <ListItemText primary={label} />
@@ -45,7 +41,7 @@ const MenuDrawer = ({
             </Link>
           )
           : (
-            <ListSubheader>{label}</ListSubheader>
+            <ListSubheader key={label}>{label}</ListSubheader>
           )))}
       </List>
     </nav>
@@ -57,8 +53,8 @@ MenuDrawer.propTypes = {
   currentPath: PropTypes.string.isRequired,
   menuItems: PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.string.isRequired,
-    href: PropTypes.string.isRequired,
-    Icon: PropTypes.func.isRequired,
+    href: PropTypes.string,
+    Icon: PropTypes.func,
   })).isRequired,
 };
 

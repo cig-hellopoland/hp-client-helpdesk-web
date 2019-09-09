@@ -20,11 +20,11 @@ const Layout = ({
   <Fragment>
     <Header documentTitle={title} />
     <Grid container>
-      <NoSsr fallback={<CircularProgress color="secondary" />}>
+      <NoSsr>
         {isAuthenticated
           && (
             <MenuDrawer
-              currentPath={router.asPath}
+              currentPath={router.pathname}
               menuItems={menuItems}
             />
           )

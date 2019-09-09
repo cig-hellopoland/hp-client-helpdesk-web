@@ -36,7 +36,7 @@ import withAuth from 'services/auth/withAuth';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 
 import Layout from 'components/Layout';
-import EmptyView from './components/EmptyView';
+import EmptyView from 'components/EmptyView';
 import SortableTableHead from '../Partners/components/ListingViewTable/SortableTableHead';
 
 const tableColumns = [
@@ -58,6 +58,7 @@ const styles = theme => ({
   },
   paper: {
     flex: 1,
+    overflow: 'hidden',
   },
   toolbar: {
     padding: theme.spacing.unit,

@@ -21,6 +21,7 @@ import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
 import SightEventForm from './components/SightEventForm';
 import SightEventMultimediaForm from './components/SightEventMultimediaForm';
+import TicketPoolDefinitionsList from './components/TicketPoolDefinitionsList';
 
 const styles = theme => ({
   root: {
@@ -301,6 +302,7 @@ class SightEventEdit extends React.Component {
           >
             <Tab label="Szczegóły" />
             <Tab label="Multimedia" />
+            <Tab label="Pule biletów" />
             <Tab label="Komentarze" disabled />
           </Tabs>
           {selectedTab === 0
@@ -320,6 +322,11 @@ class SightEventEdit extends React.Component {
                 itemId={itemId}
                 translation={selectedTranslation}
               />
+            )
+          }
+          {selectedTab === 2
+            && (
+              <TicketPoolDefinitionsList data={item.ticketPoolDefinitions} />
             )
           }
           <Snackbar

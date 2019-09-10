@@ -59,7 +59,7 @@ class MediaManager extends Component {
   handleDrop = (acceptedFiles) => {
     const { onSubmit } = this.props;
 
-    this.setProcessing(true)
+    this.setProcessing(true);
 
     acceptedFiles.forEach((acceptedFile) => {
       const { arrayBuffer, metadata } = acceptedFile;

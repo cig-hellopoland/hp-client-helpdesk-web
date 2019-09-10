@@ -56,7 +56,11 @@ function TicketPoolDefinitionsList({ classes, data }) {
 
 TicketPoolDefinitionsList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
-  data: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  data: PropTypes.arrayOf(PropTypes.shape({})),
+};
+
+TicketPoolDefinitionsList.defaultProps = {
+  data: null,
 };
 
 export default withStyles(styles)(TicketPoolDefinitionsList);

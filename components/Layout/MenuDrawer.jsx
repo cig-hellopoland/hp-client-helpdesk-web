@@ -31,18 +31,24 @@ const MenuDrawer = ({
       <List>
         {menuItems.map(({
           disabled, label, href, Icon,
-        }) => (href
-          ? (
+        }) => {
+          if (!href) {
+            return <ListSubheader key={label}>{label}</ListSubheader>;
+          }
+
+          const isSelected = href.length === 1
+            ? currentPath === href
+            : currentPath.includes(href);
+
+          return (
             <Link key={`${label}-${href}`} href={href} passHref>
-              <ListItem button disabled={disabled} selected={currentPath === href}>
+              <ListItem button disabled={disabled} selected={isSelected}>
                 <ListItemIcon><Icon /></ListItemIcon>
                 <ListItemText primary={label} />
               </ListItem>
             </Link>
-          )
-          : (
-            <ListSubheader key={label}>{label}</ListSubheader>
-          )))}
+          );
+        })}
       </List>
     </nav>
   </Drawer>

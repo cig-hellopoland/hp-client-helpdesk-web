@@ -109,9 +109,9 @@ class SightEventMultimediaForm extends React.Component {
       mediaManagerData: {},
     });
 
-    if (fileType === FILE_TYPES.MAIN_IMAGE) {
+    if (fileType === 'image/jpeg') {
       action = createMainImageCancel;
-    } else if (fileType === FILE_TYPES.DOCUMENT) {
+    } else if (fileType === 'application/pdf') {
       action = createPDFCancel;
     }
 

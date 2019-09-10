@@ -60,7 +60,7 @@ const styles = theme => ({
   },
 });
 
-class CategoriesList extends React.Component {
+class SightEventsList extends React.Component {
   baseURL = '/market/sight-events';
 
   state = {
@@ -337,7 +337,7 @@ class CategoriesList extends React.Component {
   }
 }
 
-CategoriesList.propTypes = {
+SightEventsList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   deleteItem: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
@@ -347,7 +347,7 @@ CategoriesList.propTypes = {
   router: PropTypes.shape({}).isRequired,
 };
 
-CategoriesList.defaultProps = {
+SightEventsList.defaultProps = {
   error: null,
 };
 
@@ -366,4 +366,4 @@ export default compose(
   withAuth(),
   withRouter,
   withStyles(styles),
-)(CategoriesList);
+)(SightEventsList);

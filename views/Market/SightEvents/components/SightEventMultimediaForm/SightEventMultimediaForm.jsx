@@ -12,6 +12,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
+import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
@@ -21,6 +22,7 @@ import {
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
+import AlertDialog from 'components/AlertDialog';
 
 const sectionTitle = {
   'application/pdf': 'Pliki',
@@ -37,7 +39,7 @@ const styles = theme => ({
   },
   section: {
     '& ~ &': {
-      marginTop: theme.spacing.unit * 4,
+      marginTop: theme.spacing.unit * 5,
     },
   },
   thumbnail: {
@@ -46,20 +48,66 @@ const styles = theme => ({
 });
 
 class SightEventMultimediaForm extends React.Component {
-  handleDelete = (itemId, itemName) => {
-    console.log('handleDelete', itemId, itemName);
+  state = {
+    alertDialog: {
+      content: '',
+      open: false,
+      title: '',
+      onSuccess: null,
+    },
   };
 
-  handleUploadModalOpen = () => {
+  handleAlertDialogCancel = () => this.setState(state => ({
+    alertDialog: {
+      content: '',
+      open: false,
+      title: '',
+      onSuccess: null,
+    },
+  }));
+
+  handleDelete = (fileId, { name, type }) => {
+    const alertDialog = {
+      content: `Plik ${name} zostanie trwale usunięty i nie będzie można go przywrócic.`,
+      open: true,
+      title: 'Czy na pewno usunąć wybrany plik?',
+    };
+
+    if (type !== 'image/jpeg') {
+      alertDialog.onSuccess = () => {
+        this.handleDeletePDF(fileId);
+        this.handleAlertDialogCancel();
+      };
+    }
+
+    this.setState({ alertDialog });
+  };
+
+  handleDeletePDF = () => {
+    const { deletePDF, itemId } = this.props;
+    const { language } = this.state;
+
+    const payload = {
+      id: itemId,
+      onSuccess: () => this.handleFetchItem(itemId, language),
+    };
+
+    deletePDF(payload);
+  };
+
+  handleUploadModalOpen = (itemId, dataType) => {
     console.log('opened!');
   };
 
   render() {
-    const { classes, data } = this.props;
+    const { alertDialog } = this.state;
+    const {
+      classes, data, defaultTranslation, itemId, translation,
+    } = this.props;
     const dataTypes = _uniq(data.map(({ type }) => type));
+    const isDefaultTranslation = defaultTranslation === translation;
 
 
-    console.log(dataTypes, data);
     return (
       <React.Fragment>
         {(!data || data.length === 0)
@@ -68,7 +116,7 @@ class SightEventMultimediaForm extends React.Component {
               <FolderOpenIcon className={classes.image} />
               <Typography variant="h6">Multimedia</Typography>
               <Typography>Brak plików przypisanych do oferty.</Typography>
-              <Button className={classes.fetchButton} variant="outlined" onClick={this.handleUploadModalOpen}>
+              <Button className={classes.fetchButton} variant="outlined" onClick={() => this.handleUploadModalOpen(itemId, dataTypes[0])}>
                 Dodaj
               </Button>
             </Grid>
@@ -76,14 +124,28 @@ class SightEventMultimediaForm extends React.Component {
         }
         {(data && data.length > 0) && dataTypes.map(dataType => (
           <div key={dataType} className={classes.section}>
-            <Typography variant="h6">{sectionTitle[dataType]}</Typography>
+            <Grid container alignItems="center" justify="space-between">
+              <Grid item>
+                <Typography variant="h6">{sectionTitle[dataType]}</Typography>
+              </Grid>
+              <Grid item>
+                <IconButton
+                  aria-label="Dodaj"
+                  disabled={!isDefaultTranslation}
+                  onClick={() => this.handleUploadModalOpen(itemId, dataType)}
+                  title="Dodaj"
+                >
+                  <AddIcon />
+                </IconButton>
+              </Grid>
+            </Grid>
             <Table>
               <TableBody>
                 {data.map(({
-                  downloadUrl, id: dataId, name, type,
+                  downloadUrl, id: fileId, name, type,
                 }) => dataType === type
                   && (
-                    <TableRow key={`${name}-${dataId}`} hover>
+                    <TableRow key={`${name}-${fileId}`} hover>
                       <TableCell className={classes.thumbnail} padding={type === 'image/jpeg' ? 'none' : 'default'}>
                         {type === 'image/jpeg'
                           ? <img src={downloadUrl.qvgWebp} width={160} alt={name} />
@@ -105,7 +167,12 @@ class SightEventMultimediaForm extends React.Component {
                             </IconButton>
                           )
                         }
-                        <IconButton aria-label="Usuń" title="Usuń" onClick={() => this.handleDelete(dataId, { name, type })}>
+                        <IconButton
+                          aria-label="Usuń"
+                          disabled={type === 'image/jpeg'}
+                          onClick={() => this.handleDelete(fileId, { name, type })}
+                          title="Usuń"
+                        >
                           <DeleteIcon />
                         </IconButton>
                       </TableCell>
@@ -113,6 +180,10 @@ class SightEventMultimediaForm extends React.Component {
                   ))}
               </TableBody>
             </Table>
+            <AlertDialog
+              onCancel={this.handleAlertDialogCancel}
+              {...alertDialog}
+            />
           </div>
         ))}
       </React.Fragment>
@@ -123,7 +194,10 @@ class SightEventMultimediaForm extends React.Component {
 SightEventMultimediaForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   data: PropTypes.arrayOf(PropTypes.shape({})),
-  language: PropTypes.string,
+  defaultTranslation: PropTypes.string,
+  deletePDF: PropTypes.func.isRequired,
+  itemId: PropTypes.number.isRequired,
+  translation: PropTypes.string,
   requestError: PropTypes.shape({
     message: PropTypes.string,
   }),
@@ -132,7 +206,8 @@ SightEventMultimediaForm.propTypes = {
 
 SightEventMultimediaForm.defaultProps = {
   data: [],
-  language: DEFAULT_LANGUAGE,
+  defaultTranslation: DEFAULT_LANGUAGE,
+  translation: DEFAULT_LANGUAGE,
   requestError: null,
 };
 
@@ -142,6 +217,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearError: sightEventsActions.clearError,
+  deletePDF: sightEventsActions.deletePDF,
   updateItem: sightEventsActions.updateItem,
 };
 

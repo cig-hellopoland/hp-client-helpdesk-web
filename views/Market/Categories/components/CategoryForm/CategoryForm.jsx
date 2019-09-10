@@ -181,7 +181,9 @@ class CategoryForm extends React.Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {({ errors, isSubmitting, values, ...formikBag } = {}) => (
+        {({
+          errors, isSubmitting, values, ...formikBag
+        } = {}) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <Hidden xsUp>

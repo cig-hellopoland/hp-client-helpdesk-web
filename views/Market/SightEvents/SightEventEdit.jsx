@@ -113,7 +113,6 @@ class SightEventEdit extends React.Component {
       });
     }
 
-    console.log(item, data);
     return data;
   };
 
@@ -315,7 +314,12 @@ class SightEventEdit extends React.Component {
           }
           {selectedTab === 1
             && (
-              <SightEventMultimediaForm data={this.getMultimediaFromItem(item)} />
+              <SightEventMultimediaForm
+                data={this.getMultimediaFromItem(item)}
+                defaultTranslation={defaultLanguage}
+                itemId={itemId}
+                translation={selectedTranslation}
+              />
             )
           }
           <Snackbar

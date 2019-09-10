@@ -46,7 +46,6 @@ const CHANGE_DEFAULT_TRANSLATION_FAILURE = `${prefix}CHANGE_DEFAULT_TRANSLATION_
  */
 const CHANGE_DEFAULT_TRANSLATION_SUCCESS = `${prefix}CHANGE_DEFAULT_TRANSLATION_SUCCESS`;
 
-
 /**
  * Type used for clear error.
  * @type {string}
@@ -296,7 +295,9 @@ const changeDefaultTranslationSuccess = () => ({
  * @method
  * @return {{type: string}}
  */
-const clearError = () => ({ type: CLEAR_ERROR });
+const clearError = () => ({
+  type: CLEAR_ERROR,
+});
 
 /**
  * Creates action for item removal.

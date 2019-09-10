@@ -31,7 +31,7 @@ import { withRouter } from 'next/router';
 import {
   actions as categoriesActions,
   selectors as categoriesSelectors,
-} from 'redux/categories';
+} from '@hello-poland/commons/redux/categories';
 import withAuth from 'services/auth/withAuth';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 

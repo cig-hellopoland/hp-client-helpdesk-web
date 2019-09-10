@@ -19,7 +19,7 @@ import yupString from 'yup/lib/string';
 import {
   actions as categoriesActions,
   selectors as categoriesSelectors,
-} from 'redux/categories';
+} from '@hello-poland/commons/redux/categories';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 import IconGalleryDialog from 'components/IconGallery/IconGalleryDialog';

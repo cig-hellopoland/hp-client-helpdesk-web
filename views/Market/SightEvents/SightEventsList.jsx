@@ -77,8 +77,20 @@ class SightEventsList extends React.Component {
     this.handleFetchItems();
   }
 
+  getItemById = (itemId) => {
+    const { items } = this.props;
+
+    return items.find(item => item.id === itemId);
+  };
+
   handleBlockItem = (itemId) => {
-    console.log('handleBlockItem', itemId);
+    const item = this.getItemById(itemId);
+
+    if (item) {
+      const { blocked } = item;
+
+      this.handleUpdateItem(itemId, { blocked: !blocked });
+    }
 
     this.handleMenuClose();
   };
@@ -178,7 +190,12 @@ class SightEventsList extends React.Component {
   handleMenuExited = () => this.setState({ menuItemId: null });
 
   handlePublishItem = (itemId) => {
-    console.log('handlePublishItem', itemId);
+    const item = this.getItemById(itemId);
+
+    if (item) {
+      const { published } = item;
+      this.handleUpdateItem(itemId, { published: !published });
+    }
 
     this.handleMenuClose();
   };
@@ -192,6 +209,38 @@ class SightEventsList extends React.Component {
     snackbarOpen: false,
     snackbarMessage: '',
   });
+
+  handleUpdateItemFailure = () => {
+    const { error } = this.props;
+
+    this.handleSnackbarOpen(error && error.message);
+  };
+
+  handleUpdateItemSuccess = () => this.handleFetchItems();
+
+  handleUpdateItem = (itemId, data) => {
+    const { updateItem } = this.props;
+    const item = this.getItemById(itemId);
+
+    if (item) {
+      const { defaultLanguage } = item;
+
+      updateItem({
+        id: itemId,
+        data,
+        pathParams: {
+          languageVersion: defaultLanguage,
+        },
+        onFailure: this.handleUpdateItemFailure,
+        onSuccess: this.handleUpdateItemSuccess,
+        options: {
+          headers: {
+            'Content-Language': defaultLanguage,
+          },
+        },
+      });
+    }
+  };
 
   isItemBlocked = (itemId) => {
     const { items } = this.props;
@@ -345,6 +394,7 @@ SightEventsList.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({
   })).isRequired,
   router: PropTypes.shape({}).isRequired,
+  updateItem: PropTypes.func.isRequired,
 };
 
 SightEventsList.defaultProps = {
@@ -359,6 +409,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   deleteItem: sightEventsActions.deleteItem,
   fetchList: sightEventsActions.fetchList,
+  updateItem: sightEventsActions.updateItem,
 };
 
 export default compose(

@@ -23,6 +23,7 @@ import {
 } from '@hello-poland/commons/redux/sightEvents';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import AlertDialog from 'components/AlertDialog';
+import MediaManager from 'components/MediaManager';
 
 const sectionTitle = {
   'application/pdf': 'Pliki',
@@ -55,16 +56,18 @@ class SightEventMultimediaForm extends React.Component {
       title: '',
       onSuccess: null,
     },
+    mediaManager: false,
+    mediaManagerData: {},
   };
 
-  handleAlertDialogCancel = () => this.setState(state => ({
+  handleAlertDialogCancel = () => this.setState({
     alertDialog: {
       content: '',
       open: false,
       title: '',
       onSuccess: null,
     },
-  }));
+  });
 
   handleDelete = (fileId, { name, type }) => {
     const alertDialog = {
@@ -95,18 +98,64 @@ class SightEventMultimediaForm extends React.Component {
     deletePDF(payload);
   };
 
-  handleUploadModalOpen = (itemId, dataType) => {
-    console.log('opened!');
+  handleMediaManagerClose = () => {
+    const { clearError, createMainImageCancel, createPDFCancel } = this.props;
+    const { mediaManagerData } = this.state;
+    const { fileType } = mediaManagerData;
+    let action = () => {};
+
+    this.setState({
+      mediaManager: false,
+      mediaManagerData: {},
+    });
+
+    if (fileType === FILE_TYPES.MAIN_IMAGE) {
+      action = createMainImageCancel;
+    } else if (fileType === FILE_TYPES.DOCUMENT) {
+      action = createPDFCancel;
+    }
+
+    action();
+    clearError();
   };
 
+  handleMediaManagerSubmitSuccess = () => this.handleMediaManagerClose();
+
+  handleMediaManagerSubmit = ({ data, options }) => {
+    const { createMainImage, createPDF } = this.props;
+    const { mediaManagerData } = this.state;
+    const { fileType, itemId } = mediaManagerData;
+    let action = () => {};
+
+    if (fileType === 'image/jpeg') {
+      action = createMainImage;
+    } else if (fileType === 'application/pdf') {
+      action = createPDF;
+    }
+
+    action({
+      id: itemId,
+      data,
+      options,
+      onSuccess: this.handleMediaManagerSubmitSuccess,
+    });
+  };
+
+  handleUploadModalOpen = (itemId, fileType) => this.setState({
+    mediaManager: true,
+    mediaManagerData: {
+      itemId,
+      fileType,
+    },
+  });
+
   render() {
-    const { alertDialog } = this.state;
+    const { alertDialog, mediaManager } = this.state;
     const {
-      classes, data, defaultTranslation, itemId, translation,
+      classes, data, defaultTranslation, itemId, requestError, translation,
     } = this.props;
     const dataTypes = _uniq(data.map(({ type }) => type));
     const isDefaultTranslation = defaultTranslation === translation;
-
 
     return (
       <React.Fragment>
@@ -122,17 +171,17 @@ class SightEventMultimediaForm extends React.Component {
             </Grid>
           )
         }
-        {(data && data.length > 0) && dataTypes.map(dataType => (
-          <div key={dataType} className={classes.section}>
+        {(data && data.length > 0) && dataTypes.map(fileType => (
+          <div key={fileType} className={classes.section}>
             <Grid container alignItems="center" justify="space-between">
               <Grid item>
-                <Typography variant="h6">{sectionTitle[dataType]}</Typography>
+                <Typography variant="h6">{sectionTitle[fileType]}</Typography>
               </Grid>
               <Grid item>
                 <IconButton
                   aria-label="Dodaj"
                   disabled={!isDefaultTranslation}
-                  onClick={() => this.handleUploadModalOpen(itemId, dataType)}
+                  onClick={() => this.handleUploadModalOpen(itemId, fileType)}
                   title="Dodaj"
                 >
                   <AddIcon />
@@ -143,7 +192,7 @@ class SightEventMultimediaForm extends React.Component {
               <TableBody>
                 {data.map(({
                   downloadUrl, id: fileId, name, type,
-                }) => dataType === type
+                }) => fileType === type
                   && (
                     <TableRow key={`${name}-${fileId}`} hover>
                       <TableCell className={classes.thumbnail} padding={type === 'image/jpeg' ? 'none' : 'default'}>
@@ -180,6 +229,15 @@ class SightEventMultimediaForm extends React.Component {
                   ))}
               </TableBody>
             </Table>
+            <MediaManager
+              disableBackdropClick
+              error={requestError}
+              onClose={this.handleMediaManagerClose}
+              onSubmit={this.handleMediaManagerSubmit}
+              open={mediaManager}
+              title="Dodaj multimedia"
+            />
+
             <AlertDialog
               onCancel={this.handleAlertDialogCancel}
               {...alertDialog}
@@ -193,6 +251,11 @@ class SightEventMultimediaForm extends React.Component {
 
 SightEventMultimediaForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  clearError: PropTypes.func.isRequired,
+  createMainImage: PropTypes.func.isRequired,
+  createMainImageCancel: PropTypes.func.isRequired,
+  createPDF: PropTypes.func.isRequired,
+  createPDFCancel: PropTypes.func.isRequired,
   data: PropTypes.arrayOf(PropTypes.shape({})),
   defaultTranslation: PropTypes.string,
   deletePDF: PropTypes.func.isRequired,
@@ -201,7 +264,6 @@ SightEventMultimediaForm.propTypes = {
   requestError: PropTypes.shape({
     message: PropTypes.string,
   }),
-  updateItem: PropTypes.func.isRequired,
 };
 
 SightEventMultimediaForm.defaultProps = {
@@ -217,8 +279,11 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearError: sightEventsActions.clearError,
+  createMainImage: sightEventsActions.createMainImage,
+  createMainImageCancel: sightEventsActions.createMainImageCancel,
+  createPDF: sightEventsActions.createPDF,
+  createPDFCancel: sightEventsActions.createPDFCancel,
   deletePDF: sightEventsActions.deletePDF,
-  updateItem: sightEventsActions.updateItem,
 };
 
 export default compose(

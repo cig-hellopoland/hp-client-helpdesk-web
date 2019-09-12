@@ -19,7 +19,7 @@ import {
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import AlertDialog from 'components/AlertDialog';
-import { DEFAULT_LANGUAGE} from 'utils/translations';
+import { DEFAULT_LANGUAGE } from 'utils/translations';
 import PromotionDialog from './PromotionDialog';
 
 const styles = {

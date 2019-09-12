@@ -11,11 +11,6 @@ import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import InputLabel from '@material-ui/core/InputLabel';
 import Input from '@material-ui/core/Input';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Table from '@material-ui/core/Table';
@@ -24,10 +19,8 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
-import CategoryIcon from '@material-ui/icons/Category';
 import DeleteIcon from '@material-ui/icons/Delete';
-import GridItem from 'components/GridItem';
-import InsertDriveFileIcon from '@material-ui/core/SvgIcon/SvgIcon';
+import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 
 const DIALOG_TYPE = {
   COMBINED: 'COMBINED',
@@ -56,7 +49,7 @@ const styles = theme => ({
 });
 
 function CategoriesForm({
-  categories, classes, items, managePublic, manageRestricted, onSubmit, onDelete
+  categories, classes, items, managePublic, manageRestricted, onSubmit, onDelete,
 }) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [dialogType, setDialogType] = React.useState(null);

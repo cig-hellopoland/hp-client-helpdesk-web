@@ -103,16 +103,19 @@ function CategoriesForm({
         <Grid item>
           <Typography variant="h6">Kategorie partnera</Typography>
         </Grid>
-        <Grid item>
-          <IconButton
-            aria-label="Dodaj"
-            disabled={!managePublic}
-            onClick={() => handleDialogOpen(DIALOG_TYPE.PUBLIC)}
-            title="Dodaj"
-          >
-            <AddIcon />
-          </IconButton>
-        </Grid>
+        {managePublic
+          && (
+            <Grid item>
+              <IconButton
+                aria-label="Dodaj"
+                onClick={() => handleDialogOpen(DIALOG_TYPE.PUBLIC)}
+                title="Dodaj"
+              >
+                <AddIcon />
+              </IconButton>
+            </Grid>
+          )
+        }
       </Grid>
       {(publicCategories.length === 0)
         && (
@@ -129,7 +132,7 @@ function CategoriesForm({
                 <Table>
                   <TableBody>
                     {publicCategories.map(({ iconUrl, id: itemId, label }) => (
-                      <TableRow key={`${label}-${itemId}`} hover>
+                      <TableRow key={`${label}-${itemId}`} hover={managePublic}>
                         <TableCell className={classes.thumbnail} padding="none">
                           {iconUrl
                             ? <img src={iconUrl} height={32} width={32} alt={label} />
@@ -138,9 +141,13 @@ function CategoriesForm({
                         </TableCell>
                         <TableCell>{label}</TableCell>
                         <TableCell align="right">
-                          <IconButton aria-label="Usuń" title="Usuń" onClick={() => handleCategoryDelete(itemId)}>
-                            <DeleteIcon />
-                          </IconButton>
+                          {managePublic
+                            && (
+                              <IconButton aria-label="Usuń" title="Usuń" onClick={() => handleCategoryDelete(itemId)}>
+                                <DeleteIcon />
+                              </IconButton>
+                            )
+                          }
                         </TableCell>
                       </TableRow>
                     ))}
@@ -155,16 +162,19 @@ function CategoriesForm({
         <Grid item>
           <Typography variant="h6">Kategorie Hello! Poland</Typography>
         </Grid>
-        <Grid item>
-          <IconButton
-            aria-label="Dodaj"
-            disabled={!manageRestricted}
-            onClick={() => handleDialogOpen(DIALOG_TYPE.RESTRICTED)}
-            title="Dodaj"
-          >
-            <AddIcon />
-          </IconButton>
-        </Grid>
+        {manageRestricted
+          && (
+            <Grid item>
+              <IconButton
+                aria-label="Dodaj"
+                onClick={() => handleDialogOpen(DIALOG_TYPE.RESTRICTED)}
+                title="Dodaj"
+              >
+                <AddIcon />
+              </IconButton>
+            </Grid>
+          )
+        }
       </Grid>
       {(restrictedCategories.length === 0)
         && (
@@ -181,7 +191,7 @@ function CategoriesForm({
                 <Table>
                   <TableBody>
                     {restrictedCategories.map(({ iconUrl, id: itemId, label }) => (
-                      <TableRow key={`${label}-${itemId}`} hover>
+                      <TableRow key={`${label}-${itemId}`} hover={manageRestricted}>
                         <TableCell className={classes.thumbnail} padding="none">
                           {iconUrl
                             ? <img src={iconUrl} height={32} width={32} alt={label} />
@@ -190,9 +200,13 @@ function CategoriesForm({
                         </TableCell>
                         <TableCell>{label}</TableCell>
                         <TableCell align="right" padding="none">
-                          <IconButton aria-label="Usuń" title="Usuń" onClick={() => handleCategoryDelete(itemId)}>
-                            <DeleteIcon />
-                          </IconButton>
+                          {manageRestricted
+                            && (
+                              <IconButton aria-label="Usuń" title="Usuń" onClick={() => handleCategoryDelete(itemId)}>
+                                <DeleteIcon />
+                              </IconButton>
+                            )
+                          }
                         </TableCell>
                       </TableRow>
                     ))}

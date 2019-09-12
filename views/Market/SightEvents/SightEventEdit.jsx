@@ -12,6 +12,10 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import { withRouter } from 'next/router';
 import {
+  actions as categoriesActions,
+  selectors as categoriesSelectors,
+} from '@hello-poland/commons/redux/categories';
+import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
@@ -19,6 +23,7 @@ import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
+import CategoriesForm from './components/CategoriesForm';
 import SightEventForm from './components/SightEventForm';
 import SightEventMultimediaForm from './components/SightEventMultimediaForm';
 import TicketPoolDefinitionsList from './components/TicketPoolDefinitionsList';
@@ -26,6 +31,7 @@ import TicketPoolDefinitionsList from './components/TicketPoolDefinitionsList';
 const styles = theme => ({
   root: {
     flex: 1,
+    minHeight: '100%',
     padding: theme.spacing.unit * 2,
   },
   section: {
@@ -60,6 +66,8 @@ class SightEventEdit extends React.Component {
     if (itemId) {
       this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
     }
+
+    this.handleFetchCategoriesList(DEFAULT_LANGUAGE);
   }
 
   getFormValues = (item) => {
@@ -118,6 +126,72 @@ class SightEventEdit extends React.Component {
   };
 
   setSelectedTab = (event, selectedTab) => this.setState({ selectedTab });
+
+  handleItemCategoryDeleteFailure = () => {
+    const { clearError, error } = this.props;
+
+    this.handleSnackbarOpen(error && error.message);
+
+    if (clearError) {
+      clearError();
+    }
+  };
+
+  handleItemCategoryDeleteSuccess = () => {
+    const { itemId } = this.props;
+
+    this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
+  };
+
+  handleItemCategoryDelete = (categoryId) => {
+    const { itemId, deleteItemCategory } = this.props;
+
+    deleteItemCategory({
+      id: itemId,
+      categoryId,
+      onFailure: this.handleItemCategoryDeleteFailure,
+      onSuccess: this.handleItemCategoryDeleteSuccess,
+    });
+  };
+
+  handleItemCategorySubmitFailure = () => {
+    const { clearError, error } = this.props;
+
+    this.handleSnackbarOpen(error && error.message);
+
+    if (clearError) {
+      clearError();
+    }
+  };
+
+  handleItemCategorySubmitSuccess = () => {
+    const { itemId } = this.props;
+
+    this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
+  };
+
+  handleItemCategorySubmit = (categoryId) => {
+    const { itemId, updateItemCategory } = this.props;
+
+    updateItemCategory({
+      id: itemId,
+      categoryId,
+      onFailure: this.handleItemCategorySubmitFailure,
+      onSuccess: this.handleItemCategorySubmitSuccess,
+    });
+  };
+
+  handleFetchCategoriesList = (language) => {
+    const { fetchCategoriesList } = this.props;
+
+    fetchCategoriesList({
+      options: {
+        headers: {
+          'Content-Language': language,
+        },
+      },
+    });
+  };
 
   handleFetchItemFailure = () => {
     const { clearError, error } = this.props;
@@ -260,7 +334,9 @@ class SightEventEdit extends React.Component {
     const {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
     } = this.state;
-    const { classes, item, itemId } = this.props;
+    const {
+      categoriesList, classes, item, itemId,
+    } = this.props;
     const { defaultLanguage } = item || {};
 
     const pageTitle = itemId ? 'Edycja oferty' : 'Nowa oferta';
@@ -301,6 +377,7 @@ class SightEventEdit extends React.Component {
             value={selectedTab}
           >
             <Tab label="Szczegóły" />
+            <Tab label="Kategorie" />
             <Tab label="Multimedia" />
             <Tab label="Pule biletów" />
             <Tab label="Komentarze" disabled />
@@ -316,6 +393,18 @@ class SightEventEdit extends React.Component {
           }
           {selectedTab === 1
             && (
+              <CategoriesForm
+                categories={categoriesList}
+                items={item.categories}
+                managePublic
+                manageRestricted
+                onSubmit={this.handleItemCategorySubmit}
+                onDelete={this.handleItemCategoryDelete}
+              />
+            )
+          }
+          {selectedTab === 2
+            && (
               <SightEventMultimediaForm
                 data={this.getMultimediaFromItem(item)}
                 defaultTranslation={defaultLanguage}
@@ -324,7 +413,7 @@ class SightEventEdit extends React.Component {
               />
             )
           }
-          {selectedTab === 2
+          {selectedTab === 3
             && (
               <TicketPoolDefinitionsList data={item.ticketPoolDefinitions} />
             )
@@ -345,19 +434,23 @@ class SightEventEdit extends React.Component {
 }
 
 SightEventEdit.propTypes = {
+  categoriesList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   itemId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
+  deleteItemCategory: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
+  fetchCategoriesList: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   item: PropTypes.shape({
     id: PropTypes.number,
     label: PropTypes.string,
   }),
   router: PropTypes.shape({}).isRequired,
+  updateItemCategory: PropTypes.func.isRequired,
 };
 
 SightEventEdit.defaultProps = {
@@ -367,6 +460,7 @@ SightEventEdit.defaultProps = {
 };
 
 const mapStateToProps = state => ({
+  categoriesList: categoriesSelectors.getList(state),
   error: sightEventsSelectors.getError(state),
   item: sightEventsSelectors.getSightEvent(state),
 });
@@ -375,8 +469,11 @@ const mapDispatchToProps = {
   changeDefaultTranslation: sightEventsActions.changeDefaultTranslation,
   clearError: sightEventsActions.clearError,
   clearItem: sightEventsActions.clearItem,
+  deleteItemCategory: sightEventsActions.deleteItemCategory,
   deleteTranslation: sightEventsActions.deleteTranslation,
+  fetchCategoriesList: categoriesActions.fetchList,
   fetchItem: sightEventsActions.fetchItem,
+  updateItemCategory: sightEventsActions.updateItemCategory,
 };
 
 export default compose(

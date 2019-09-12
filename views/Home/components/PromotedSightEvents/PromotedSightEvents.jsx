@@ -19,6 +19,7 @@ import {
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import AlertDialog from 'components/AlertDialog';
+import { DEFAULT_LANGUAGE} from 'utils/translations';
 import PromotionDialog from './PromotionDialog';
 
 const styles = {
@@ -49,7 +50,13 @@ class PromotedSightEvents extends Component {
 
   componentDidMount() {
     const { fetchSightEventsList } = this.props;
-    fetchSightEventsList();
+    fetchSightEventsList({
+      options: {
+        headers: {
+          'Content-Language': DEFAULT_LANGUAGE,
+        },
+      },
+    });
   }
 
   handleClose = () => {

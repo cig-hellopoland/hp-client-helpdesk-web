@@ -155,6 +155,7 @@ class SightForm extends React.Component {
     return {
       id: details.id || '',
       name: details.name || '',
+      blocked: details.blocked || false,
       published: details.published || false,
       lead: details.lead || '',
       description: details.description || '',

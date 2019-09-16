@@ -89,7 +89,7 @@ class SightsList extends React.Component {
     if (item) {
       const { blocked } = item;
 
-      this.handleUpdateItem(itemId, { blocked: !blocked });
+      this.handleUpdateItem(itemId, { ...item, blocked: !blocked });
     }
 
     this.handleMenuClose();
@@ -194,7 +194,7 @@ class SightsList extends React.Component {
 
     if (item) {
       const { published } = item;
-      this.handleUpdateItem(itemId, { published: !published });
+      this.handleUpdateItem(itemId, { ...item, published: !published });
     }
 
     this.handleMenuClose();

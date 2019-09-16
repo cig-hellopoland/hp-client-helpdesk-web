@@ -16,8 +16,8 @@ import {
   selectors as categoriesSelectors,
 } from '@hello-poland/commons/redux/categories';
 import {
-  actions as sightEventsActions,
-  selectors as sightEventsSelectors,
+  actions as sightsActions,
+  selectors as sightsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
@@ -125,60 +125,6 @@ class SightEdit extends React.Component {
   };
 
   setSelectedTab = (event, selectedTab) => this.setState({ selectedTab });
-
-  handleItemCategoryDeleteFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
-
-  handleItemCategoryDeleteSuccess = () => {
-    const { itemId } = this.props;
-
-    this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
-  };
-
-  handleItemCategoryDelete = (categoryId) => {
-    const { itemId, deleteItemCategory } = this.props;
-
-    deleteItemCategory({
-      id: itemId,
-      categoryId,
-      onFailure: this.handleItemCategoryDeleteFailure,
-      onSuccess: this.handleItemCategoryDeleteSuccess,
-    });
-  };
-
-  handleItemCategorySubmitFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
-
-  handleItemCategorySubmitSuccess = () => {
-    const { itemId } = this.props;
-
-    this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
-  };
-
-  handleItemCategorySubmit = (categoryId) => {
-    const { itemId, updateItemCategory } = this.props;
-
-    updateItemCategory({
-      id: itemId,
-      categoryId,
-      onFailure: this.handleItemCategorySubmitFailure,
-      onSuccess: this.handleItemCategorySubmitSuccess,
-    });
-  };
 
   handleFetchCategoriesList = (language) => {
     const { fetchCategoriesList } = this.props;
@@ -394,8 +340,8 @@ class SightEdit extends React.Component {
               <CategoriesForm
                 categories={categoriesList}
                 items={item.categories}
-                onSubmit={this.handleItemCategorySubmit}
-                onDelete={this.handleItemCategoryDelete}
+                onSubmit={() => {}}
+                onDelete={() => {}}
               />
             )
           }
@@ -431,7 +377,6 @@ SightEdit.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
-  deleteItemCategory: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
   fetchCategoriesList: PropTypes.func.isRequired,
@@ -441,7 +386,6 @@ SightEdit.propTypes = {
     label: PropTypes.string,
   }),
   router: PropTypes.shape({}).isRequired,
-  updateItemCategory: PropTypes.func.isRequired,
 };
 
 SightEdit.defaultProps = {
@@ -452,19 +396,17 @@ SightEdit.defaultProps = {
 
 const mapStateToProps = state => ({
   categoriesList: categoriesSelectors.getList(state),
-  error: sightEventsSelectors.getError(state),
-  item: sightEventsSelectors.getSightEvent(state),
+  error: sightsSelectors.getError(state),
+  item: sightsSelectors.getSightEvent(state),
 });
 
 const mapDispatchToProps = {
-  changeDefaultTranslation: sightEventsActions.changeDefaultTranslation,
-  clearError: sightEventsActions.clearError,
-  clearItem: sightEventsActions.clearItem,
-  deleteItemCategory: sightEventsActions.deleteItemCategory,
-  deleteTranslation: sightEventsActions.deleteTranslation,
+  changeDefaultTranslation: sightsActions.changeDefaultTranslation,
+  clearError: sightsActions.clearError,
+  clearItem: sightsActions.clearItem,
+  deleteTranslation: sightsActions.deleteTranslation,
   fetchCategoriesList: categoriesActions.fetchList,
-  fetchItem: sightEventsActions.fetchItem,
-  updateItemCategory: sightEventsActions.updateItemCategory,
+  fetchItem: sightsActions.fetchItem,
 };
 
 export default compose(

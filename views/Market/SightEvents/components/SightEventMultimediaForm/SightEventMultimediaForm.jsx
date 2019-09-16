@@ -4,19 +4,10 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import _uniq from 'lodash/uniq';
 import withStyles from '@material-ui/core/styles/withStyles';
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton/IconButton';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import FolderOpenIcon from '@material-ui/icons/FolderOpen';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
@@ -24,11 +15,7 @@ import {
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import AlertDialog from 'components/AlertDialog';
 import MediaManager from 'components/MediaManager';
-
-const sectionTitle = {
-  'application/pdf': 'Pliki',
-  'image/jpeg': 'Obrazy',
-};
+import MultimediaSection from './Section';
 
 const styles = theme => ({
   fetchButton: {
@@ -42,9 +29,6 @@ const styles = theme => ({
     '& ~ &': {
       marginTop: theme.spacing.unit * 5,
     },
-  },
-  thumbnail: {
-    width: 200,
   },
 });
 
@@ -154,96 +138,60 @@ class SightEventMultimediaForm extends React.Component {
     const {
       classes, data, defaultTranslation, itemId, requestError, translation,
     } = this.props;
-    const dataTypes = _uniq(data.map(({ type }) => type));
     const isDefaultTranslation = defaultTranslation === translation;
+    const images = (data && data.filter(item => item.type === 'image/jpeg')) || [];
+    const documents = (data && data.filter(item => item.type === 'application/pdf')) || [];
 
     return (
       <React.Fragment>
-        {(!data || data.length === 0)
-          && (
-            <Grid container item direction="column" alignItems="center" justify="center">
-              <FolderOpenIcon className={classes.image} />
-              <Typography variant="h6">Multimedia</Typography>
-              <Typography>Brak plików przypisanych do oferty.</Typography>
-              <Button className={classes.fetchButton} variant="outlined" onClick={() => this.handleUploadModalOpen(itemId, dataTypes[0])}>
-                Dodaj
-              </Button>
+        <div className={classes.section}>
+          <Grid container alignItems="center" justify="space-between">
+            <Grid item>
+              <Typography variant="h6">Obrazy</Typography>
             </Grid>
-          )
-        }
-        {(data && data.length > 0) && dataTypes.map(fileType => (
-          <div key={fileType} className={classes.section}>
-            <Grid container alignItems="center" justify="space-between">
-              <Grid item>
-                <Typography variant="h6">{sectionTitle[fileType]}</Typography>
-              </Grid>
-              <Grid item>
-                <IconButton
-                  aria-label="Dodaj"
-                  disabled={!isDefaultTranslation}
-                  onClick={() => this.handleUploadModalOpen(itemId, fileType)}
-                  title="Dodaj"
-                >
-                  <AddIcon />
-                </IconButton>
-              </Grid>
+            <Grid item>
+              <IconButton
+                aria-label="Dodaj"
+                disabled={!isDefaultTranslation}
+                onClick={() => this.handleUploadModalOpen(itemId, 'image/jpeg')}
+                title="Dodaj"
+              >
+                <AddIcon />
+              </IconButton>
             </Grid>
-            <Table>
-              <TableBody>
-                {data.map(({
-                  downloadUrl, id: fileId, name, type,
-                }) => fileType === type
-                  && (
-                    <TableRow key={`${name}-${fileId}`} hover>
-                      <TableCell className={classes.thumbnail} padding={type === 'image/jpeg' ? 'none' : 'default'}>
-                        {type === 'image/jpeg'
-                          ? <img src={downloadUrl.qvgWebp} width={160} alt={name} />
-                          : <InsertDriveFileIcon />
-                        }
-                      </TableCell>
-                      <TableCell>{name}</TableCell>
-                      <TableCell align="right">
-                        {type !== 'image/jpeg'
-                          && (
-                            <IconButton
-                              component="a"
-                              href={downloadUrl}
-                              aria-label="Pobierz"
-                              title="Pobierz"
-                              target="_blank"
-                            >
-                              <GetAppIcon />
-                            </IconButton>
-                          )
-                        }
-                        <IconButton
-                          aria-label="Usuń"
-                          disabled={type === 'image/jpeg'}
-                          onClick={() => this.handleDelete(fileId, { name, type })}
-                          title="Usuń"
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-            <MediaManager
-              disableBackdropClick
-              error={requestError}
-              onClose={this.handleMediaManagerClose}
-              onSubmit={this.handleMediaManagerSubmit}
-              open={mediaManager}
-              title="Dodaj multimedia"
-            />
-
-            <AlertDialog
-              onCancel={this.handleAlertDialogCancel}
-              {...alertDialog}
-            />
-          </div>
-        ))}
+          </Grid>
+          <MultimediaSection items={images} onDelete={this.handleDelete} />
+        </div>
+        <div className={classes.section}>
+          <Grid container alignItems="center" justify="space-between">
+            <Grid item>
+              <Typography variant="h6">Pliki</Typography>
+            </Grid>
+            <Grid item>
+              <IconButton
+                aria-label="Dodaj"
+                disabled={!isDefaultTranslation}
+                onClick={() => this.handleUploadModalOpen(itemId, 'application/pdf')}
+                title="Dodaj"
+              >
+                <AddIcon />
+              </IconButton>
+            </Grid>
+          </Grid>
+          <MultimediaSection items={documents} onDelete={this.handleDelete} />
+        </div>
+        <MediaManager
+          disableBackdropClick
+          error={!!requestError}
+          onClose={this.handleMediaManagerClose}
+          onSubmit={this.handleMediaManagerSubmit}
+          open={mediaManager}
+          title="Dodaj multimedia"
+        />
+        <AlertDialog
+          onCancel={this.handleAlertDialogCancel}
+          {...alertDialog}
+        />
       </React.Fragment>
     );
   }

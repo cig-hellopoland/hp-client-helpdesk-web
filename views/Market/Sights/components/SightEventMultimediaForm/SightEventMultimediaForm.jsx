@@ -69,13 +69,29 @@ class SightEventMultimediaForm extends React.Component {
     this.setState({ alertDialog });
   };
 
+  handleDeletePDFFailure = () => {
+    const { onFailure } = this.props;
+
+    if (onFailure) {
+      onFailure();
+    }
+  };
+
+  handleDeletePDFSuccess = () => {
+    const { onSuccess } = this.props;
+
+    if (onSuccess) {
+      onSuccess();
+    }
+  };
+
   handleDeletePDF = () => {
     const { deletePDF, itemId } = this.props;
-    const { language } = this.state;
 
     const payload = {
       id: itemId,
-      onSuccess: () => this.handleFetchItem(itemId, language),
+      onFailure: this.handleDeletePDFFailure,
+      onSuccess: this.handleDeletePDFSuccess,
     };
 
     deletePDF(payload);
@@ -102,7 +118,23 @@ class SightEventMultimediaForm extends React.Component {
     clearError();
   };
 
-  handleMediaManagerSubmitSuccess = () => this.handleMediaManagerClose();
+  handleMediaManagerSubmitFailure = () => {
+    const { onFailure } = this.props;
+
+    if (onFailure) {
+      onFailure();
+    }
+  };
+
+  handleMediaManagerSubmitSuccess = () => {
+    const { onSuccess } = this.props;
+
+    if (onSuccess) {
+      onSuccess();
+    }
+
+    this.handleMediaManagerClose();
+  };
 
   handleMediaManagerSubmit = ({ data, options }) => {
     const { createMainImage, createPDF } = this.props;
@@ -120,6 +152,7 @@ class SightEventMultimediaForm extends React.Component {
       id: itemId,
       data,
       options,
+      onFailure: this.handleMediaManagerSubmitFailure,
       onSuccess: this.handleMediaManagerSubmitSuccess,
     });
   };
@@ -207,6 +240,8 @@ SightEventMultimediaForm.propTypes = {
   defaultTranslation: PropTypes.string,
   deletePDF: PropTypes.func.isRequired,
   itemId: PropTypes.number.isRequired,
+  onFailure: PropTypes.func,
+  onSuccess: PropTypes.func,
   translation: PropTypes.string,
   requestError: PropTypes.shape({
     message: PropTypes.string,
@@ -216,6 +251,8 @@ SightEventMultimediaForm.propTypes = {
 SightEventMultimediaForm.defaultProps = {
   data: [],
   defaultTranslation: DEFAULT_LANGUAGE,
+  onFailure: null,
+  onSuccess: null,
   translation: DEFAULT_LANGUAGE,
   requestError: null,
 };

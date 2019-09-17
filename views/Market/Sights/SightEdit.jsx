@@ -138,15 +138,7 @@ class SightEdit extends React.Component {
     });
   };
 
-  handleFetchItemFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
+  handleFetchItemFailure = () => this.handleRequestFailure();
 
   handleFetchItemSuccess = () => {
     const { item } = this.props;
@@ -173,6 +165,16 @@ class SightEdit extends React.Component {
     });
   };
 
+  handleRequestFailure = () => {
+    const { clearError, error } = this.props;
+
+    this.handleSnackbarOpen(error && error.message);
+
+    if (clearError) {
+      clearError();
+    }
+  };
+
   handleTranslationChange = (event) => {
     const { item } = this.props;
     const selectedTranslation = event.target.value;
@@ -194,15 +196,7 @@ class SightEdit extends React.Component {
     }));
   };
 
-  handleTranslationDefaultChangeFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
+  handleTranslationDefaultChangeFailure = () => this.handleRequestFailure();
 
   handleTranslationDefaultChangeSuccess = () => {
     const { selectedTranslation } = this.state;
@@ -228,15 +222,7 @@ class SightEdit extends React.Component {
     });
   };
 
-  handleTranslationDeleteFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
+  handleTranslationDeleteFailure = () => this.handleRequestFailure();
 
   handleTranslationDeleteSuccess = () => {
     const { itemId, item } = this.props;
@@ -351,6 +337,8 @@ class SightEdit extends React.Component {
                 data={this.getMultimediaFromItem(item)}
                 defaultTranslation={defaultLanguage}
                 itemId={itemId}
+                onFailure={() => this.handleRequestFailure()}
+                onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}
                 translation={selectedTranslation}
               />
             )

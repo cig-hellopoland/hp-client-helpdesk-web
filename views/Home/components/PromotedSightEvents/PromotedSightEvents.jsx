@@ -50,6 +50,7 @@ class PromotedSightEvents extends Component {
 
   componentDidMount() {
     const { fetchSightEventsList } = this.props;
+
     fetchSightEventsList({
       options: {
         headers: {

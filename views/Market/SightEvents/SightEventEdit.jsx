@@ -127,20 +127,13 @@ class SightEventEdit extends React.Component {
 
   setSelectedTab = (event, selectedTab) => this.setState({ selectedTab });
 
-  handleItemCategoryDeleteFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
+  handleItemCategoryDeleteFailure = () => this.handleRequestFailure();
 
   handleItemCategoryDeleteSuccess = () => {
     const { itemId } = this.props;
+    const { selectedTranslation } = this.state;
 
-    this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
+    this.handleFetchItem(itemId, selectedTranslation);
   };
 
   handleItemCategoryDelete = (categoryId) => {
@@ -154,20 +147,13 @@ class SightEventEdit extends React.Component {
     });
   };
 
-  handleItemCategorySubmitFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
+  handleItemCategorySubmitFailure = () => this.handleRequestFailure();
 
   handleItemCategorySubmitSuccess = () => {
     const { itemId } = this.props;
+    const { selectedTranslation } = this.state;
 
-    this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
+    this.handleFetchItem(itemId, selectedTranslation);
   };
 
   handleItemCategorySubmit = (categoryId) => {
@@ -193,15 +179,7 @@ class SightEventEdit extends React.Component {
     });
   };
 
-  handleFetchItemFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
+  handleFetchItemFailure = () => this.handleRequestFailure();
 
   handleFetchItemSuccess = () => {
     const { item } = this.props;
@@ -228,6 +206,16 @@ class SightEventEdit extends React.Component {
     });
   };
 
+  handleRequestFailure = () => {
+    const { clearError, error } = this.props;
+
+    this.handleSnackbarOpen(error && error.message);
+
+    if (clearError) {
+      clearError();
+    }
+  };
+
   handleTranslationChange = (event) => {
     const { item } = this.props;
     const selectedTranslation = event.target.value;
@@ -249,15 +237,7 @@ class SightEventEdit extends React.Component {
     }));
   };
 
-  handleTranslationDefaultChangeFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
+  handleTranslationDefaultChangeFailure = () => this.handleRequestFailure();
 
   handleTranslationDefaultChangeSuccess = () => {
     const { selectedTranslation } = this.state;
@@ -283,15 +263,7 @@ class SightEventEdit extends React.Component {
     });
   };
 
-  handleTranslationDeleteFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
+  handleTranslationDeleteFailure = () => this.handleRequestFailure();
 
   handleTranslationDeleteSuccess = () => {
     const { itemId, item } = this.props;
@@ -409,6 +381,8 @@ class SightEventEdit extends React.Component {
                 data={this.getMultimediaFromItem(item)}
                 defaultTranslation={defaultLanguage}
                 itemId={itemId}
+                onFailure={() => this.handleRequestFailure()}
+                onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}
                 translation={selectedTranslation}
               />
             )

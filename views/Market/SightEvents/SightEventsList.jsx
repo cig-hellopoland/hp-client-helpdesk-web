@@ -60,7 +60,7 @@ const styles = theme => ({
   },
 });
 
-class CategoriesList extends React.Component {
+class SightEventsList extends React.Component {
   baseURL = '/market/sight-events';
 
   state = {
@@ -77,8 +77,20 @@ class CategoriesList extends React.Component {
     this.handleFetchItems();
   }
 
+  getItemById = (itemId) => {
+    const { items } = this.props;
+
+    return items.find(item => item.id === itemId);
+  };
+
   handleBlockItem = (itemId) => {
-    console.log('handleBlockItem', itemId);
+    const item = this.getItemById(itemId);
+
+    if (item) {
+      const { blocked } = item;
+
+      this.handleUpdateItem(itemId, { ...item, blocked: !blocked });
+    }
 
     this.handleMenuClose();
   };
@@ -178,7 +190,12 @@ class CategoriesList extends React.Component {
   handleMenuExited = () => this.setState({ menuItemId: null });
 
   handlePublishItem = (itemId) => {
-    console.log('handlePublishItem', itemId);
+    const item = this.getItemById(itemId);
+
+    if (item) {
+      const { published } = item;
+      this.handleUpdateItem(itemId, { ...item, published: !published });
+    }
 
     this.handleMenuClose();
   };
@@ -192,6 +209,38 @@ class CategoriesList extends React.Component {
     snackbarOpen: false,
     snackbarMessage: '',
   });
+
+  handleUpdateItemFailure = () => {
+    const { error } = this.props;
+
+    this.handleSnackbarOpen(error && error.message);
+  };
+
+  handleUpdateItemSuccess = () => this.handleFetchItems();
+
+  handleUpdateItem = (itemId, data) => {
+    const { updateItem } = this.props;
+    const item = this.getItemById(itemId);
+
+    if (item) {
+      const { defaultLanguage } = item;
+
+      updateItem({
+        id: itemId,
+        data,
+        pathParams: {
+          languageVersion: defaultLanguage,
+        },
+        onFailure: this.handleUpdateItemFailure,
+        onSuccess: this.handleUpdateItemSuccess,
+        options: {
+          headers: {
+            'Content-Language': defaultLanguage,
+          },
+        },
+      });
+    }
+  };
 
   isItemBlocked = (itemId) => {
     const { items } = this.props;
@@ -337,7 +386,7 @@ class CategoriesList extends React.Component {
   }
 }
 
-CategoriesList.propTypes = {
+SightEventsList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   deleteItem: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
@@ -345,9 +394,10 @@ CategoriesList.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({
   })).isRequired,
   router: PropTypes.shape({}).isRequired,
+  updateItem: PropTypes.func.isRequired,
 };
 
-CategoriesList.defaultProps = {
+SightEventsList.defaultProps = {
   error: null,
 };
 
@@ -359,6 +409,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   deleteItem: sightEventsActions.deleteItem,
   fetchList: sightEventsActions.fetchList,
+  updateItem: sightEventsActions.updateItem,
 };
 
 export default compose(
@@ -366,4 +417,4 @@ export default compose(
   withAuth(),
   withRouter,
   withStyles(styles),
-)(CategoriesList);
+)(SightEventsList);

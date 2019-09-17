@@ -21,6 +21,7 @@ import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
 import SightEventForm from './components/SightEventForm';
 import SightEventMultimediaForm from './components/SightEventMultimediaForm';
+import TicketPoolDefinitionsList from './components/TicketPoolDefinitionsList';
 
 const styles = theme => ({
   root: {
@@ -113,21 +114,12 @@ class SightEventEdit extends React.Component {
       });
     }
 
-    console.log(item, data);
     return data;
   };
 
   setSelectedTab = (event, selectedTab) => this.setState({ selectedTab });
 
-  handleFetchItemFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
+  handleFetchItemFailure = () => this.handleRequestFailure();
 
   handleFetchItemSuccess = () => {
     const { item } = this.props;
@@ -154,6 +146,16 @@ class SightEventEdit extends React.Component {
     });
   };
 
+  handleRequestFailure = () => {
+    const { clearError, error } = this.props;
+
+    this.handleSnackbarOpen(error && error.message);
+
+    if (clearError) {
+      clearError();
+    }
+  };
+
   handleTranslationChange = (event) => {
     const { item } = this.props;
     const selectedTranslation = event.target.value;
@@ -175,15 +177,7 @@ class SightEventEdit extends React.Component {
     }));
   };
 
-  handleTranslationDefaultChangeFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
+  handleTranslationDefaultChangeFailure = () => this.handleRequestFailure();
 
   handleTranslationDefaultChangeSuccess = () => {
     const { selectedTranslation } = this.state;
@@ -209,15 +203,7 @@ class SightEventEdit extends React.Component {
     });
   };
 
-  handleTranslationDeleteFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
+  handleTranslationDeleteFailure = () => this.handleRequestFailure();
 
   handleTranslationDeleteSuccess = () => {
     const { itemId, item } = this.props;
@@ -302,6 +288,7 @@ class SightEventEdit extends React.Component {
           >
             <Tab label="Szczegóły" />
             <Tab label="Multimedia" />
+            <Tab label="Pule biletów" />
             <Tab label="Komentarze" disabled />
           </Tabs>
           {selectedTab === 0
@@ -315,7 +302,19 @@ class SightEventEdit extends React.Component {
           }
           {selectedTab === 1
             && (
-              <SightEventMultimediaForm data={this.getMultimediaFromItem(item)} />
+              <SightEventMultimediaForm
+                data={this.getMultimediaFromItem(item)}
+                defaultTranslation={defaultLanguage}
+                itemId={itemId}
+                onFailure={() => this.handleRequestFailure()}
+                onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}
+                translation={selectedTranslation}
+              />
+            )
+          }
+          {selectedTab === 2
+            && (
+              <TicketPoolDefinitionsList data={item.ticketPoolDefinitions} />
             )
           }
           <Snackbar

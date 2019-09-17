@@ -19,7 +19,7 @@ import yupString from 'yup/lib/string';
 import {
   actions as categoriesActions,
   selectors as categoriesSelectors,
-} from 'redux/categories';
+} from '@hello-poland/commons/redux/categories';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 import IconGalleryDialog from 'components/IconGallery/IconGalleryDialog';
@@ -181,7 +181,9 @@ class CategoryForm extends React.Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {({ errors, isSubmitting, values, ...formikBag } = {}) => (
+        {({
+          errors, isSubmitting, values, ...formikBag
+        } = {}) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <Hidden xsUp>

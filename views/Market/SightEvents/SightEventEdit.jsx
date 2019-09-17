@@ -367,11 +367,13 @@ class SightEventEdit extends React.Component {
             && (
               <CategoriesForm
                 categories={categoriesList}
+                defaultTranslation={defaultLanguage}
                 items={item.categories}
                 managePublic
                 manageRestricted
                 onSubmit={this.handleItemCategorySubmit}
                 onDelete={this.handleItemCategoryDelete}
+                translation={selectedTranslation}
               />
             )
           }

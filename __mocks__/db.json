@@ -42,6 +42,48 @@
   "sight-events": [
     {
       "blocked":false,
+      "categories": [
+        {
+          "assignedItemsCount":0,
+          "defaultLanguage":"pl-PL",
+          "iconUrl":"https://static.thenounproject.com/png/22802-200.png",
+          "id":10,
+          "label":"kategoria 9",
+          "language":"pl-PL",
+          "recommended":false,
+          "restricted":false
+        },
+        {
+          "assignedItemsCount":0,
+          "defaultLanguage":"pl-PL",
+          "iconUrl":"https://static.thenounproject.com/png/22802-200.png",
+          "id":9,
+          "label":"kategoria 8",
+          "language":"pl-PL",
+          "recommended":false,
+          "restricted":false
+        },
+        {
+          "assignedItemsCount":0,
+          "defaultLanguage":"pl-PL",
+          "iconUrl":"https://static.thenounproject.com/png/22802-200.png",
+          "id":8,
+          "label":"kategoria 7",
+          "language":"pl-PL",
+          "recommended":true,
+          "restricted":true
+        },
+        {
+          "assignedItemsCount":0,
+          "defaultLanguage":"pl-PL",
+          "iconUrl":"https://static.thenounproject.com/png/22802-200.png",
+          "id":7,
+          "label":"kategoria 6",
+          "language":"pl-PL",
+          "recommended":false,
+          "restricted":true
+        }
+      ],
       "defaultLanguage":"pl-PL",
       "description":"Obiekt zlokalizowany jest w południowo-wschodniej części rezerwatu Wietrznia i jest to najważniejsza atrakcja geoturystyczna na trasie „Świętokrzyskiego Szlaku Archeo-Geologicznego”. Inwestycja została zrealizowana ze środków Europejskiego Funduszu Regionalnego w ramach Programu Operacyjnego Innowacyjna Gospodarka 2007-2013.\r\nCentrum Geoedukacji  to miejsce, gdzie w przystępny sposób przekazujemy wiedzę geologiczną i geograficzną, z wykorzystaniem nowoczesnych metod i narzędzi edukacyjnych.\r\nWizyta w Centrum Geoedukacji jest świetnym wstępem do lepszego zrozumienia geologicznego fenomenu Gór Świętokrzyskiego, na czele z gołoborzami, jaskiniami czy dawnymi rafami koralowymi.\r\nDla odwiedzających proponujemy:\r\nzwiedzanie Galerii Ziemi wraz z wirtualną jaskinią\r\n„Podróż do wnętrza Ziemi” – seans w kinie 5D\r\nzwiedzanie wystaw czasowych\r\nzajęcia geoedukacyjne (teoretyczno-praktyczne)\r\nzajęcia terenowe w obrębie obiektów geoturystycznych Kielc\r\nimprezy i wydarzenia geoedukacyjne",
       "generalAdmission":true,

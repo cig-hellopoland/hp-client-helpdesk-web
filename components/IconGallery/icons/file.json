@@ -1,0 +1,100 @@
+[
+  {
+    "category": "FILE",
+    "name": "ic_attachment",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_cloud",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_cloud_circle",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_cloud_done",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_cloud_download",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_cloud_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_cloud_queue",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_cloud_upload",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_create_new_folder",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_file_download",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_file_upload",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_folder",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_folder_open",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "FILE",
+    "name": "ic_folder_shared",
+    "variants": [
+      "svg"
+    ]
+  }
+]

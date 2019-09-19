@@ -1,0 +1,135 @@
+[
+  {
+    "category": "PLACES",
+    "name": "ic_ac_unit",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_airport_shuttle",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_all_inclusive",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_beach_access",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_business_center",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_casino",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_child_care",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_child_friendly",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_fitness_center",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_free_breakfast",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_golf_course",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_hot_tub",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_kitchen",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_pool",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_room_service",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_rv_hookup",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_smoke_free",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_smoking_rooms",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "PLACES",
+    "name": "ic_spa",
+    "variants": [
+      "svg"
+    ]
+  }
+]

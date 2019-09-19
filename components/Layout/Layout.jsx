@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { withRouter } from 'next/router';
 import withAuth from 'services/auth/withAuth';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import NoSsr from '@material-ui/core/NoSsr';
 import config from 'config';
@@ -20,11 +19,11 @@ const Layout = ({
   <Fragment>
     <Header documentTitle={title} />
     <Grid container>
-      <NoSsr fallback={<CircularProgress color="secondary" />}>
+      <NoSsr>
         {isAuthenticated
           && (
             <MenuDrawer
-              currentPath={router.asPath}
+              currentPath={router.pathname}
               menuItems={menuItems}
             />
           )

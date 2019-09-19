@@ -8,8 +8,8 @@ const baseURL = serverConfig.apiURL || `http://localhost:${port}/api`;
 const proxySettings = {
   '/api': {
     target: baseURL,
-    pathRewrite: { '^/api': '/' },
     changeOrigin: true,
+    pathRewrite: { '^/api': '' },
     // logLevel: 'debug',
   },
 };

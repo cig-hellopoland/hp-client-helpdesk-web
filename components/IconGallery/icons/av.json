@@ -1,0 +1,555 @@
+[
+  {
+    "category": "AV",
+    "name": "ic_add_to_queue",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_airplay",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_album",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_art_track",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_av_timer",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_branding_watermark",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_call_to_action",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_closed_caption",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_equalizer",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_explicit",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_fast_forward",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_fast_rewind",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_featured_play_list",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_featured_video",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_fiber_dvr",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_fiber_manual_record",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_fiber_new",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_fiber_pin",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_fiber_smart_record",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_forward_10",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_forward_30",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_forward_5",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_games",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_hearing",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_high_quality",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_library_add",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_library_books",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_library_music",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_loop",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_mic",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_mic_none",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_mic_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_movie",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_music_video",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_new_releases",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_note",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_not_interested",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_pause",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_pause_circle_filled",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_pause_circle_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_play_arrow",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_play_circle_filled",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_play_circle_filled_white",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_play_circle_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_playlist_add",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_playlist_add_check",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_playlist_play",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_queue",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_queue_music",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_queue_play_next",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_radio",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_recent_actors",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_remove_from_queue",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_repeat",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_repeat_one",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_replay_10",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_replay_30",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_replay",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_replay_5",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_shuffle",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_skip_next",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_skip_previous",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_slow_motion_video",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_snooze",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_stop",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_subscriptions",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_subtitles",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_surround_sound",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_video_call",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_videocam",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_videocam_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_video_label",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_video_library",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_volume_down",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_volume_mute",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_volume_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_volume_up",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_web",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "AV",
+    "name": "ic_web_asset",
+    "variants": [
+      "svg"
+    ]
+  }
+]

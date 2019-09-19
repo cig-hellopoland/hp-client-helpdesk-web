@@ -1,0 +1,30 @@
+[
+  {
+    "category": "ALERT",
+    "name": "ic_add_alert",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ALERT",
+    "name": "ic_error",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ALERT",
+    "name": "ic_error_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "ALERT",
+    "name": "ic_warning",
+    "variants": [
+      "svg"
+    ]
+  }
+]

@@ -1,0 +1,555 @@
+[
+  {
+    "category": "DEVICE",
+    "name": "ic_access_alarm",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_access_alarms",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_access_time",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_add_alarm",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_airplanemode_active",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_airplanemode_inactive",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_20",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_30",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_50",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_60",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_80",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_90",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_alert",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_charging_20",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_charging_30",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_charging_50",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_charging_60",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_charging_80",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_charging_90",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_charging_full",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_full",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_std",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_battery_unknown",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_bluetooth",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_bluetooth_connected",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_bluetooth_disabled",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_bluetooth_searching",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_brightness_auto",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_brightness_high",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_brightness_low",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_brightness_medium",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_data_usage",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_developer_mode",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_devices",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_dvr",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_gps_fixed",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_gps_not_fixed",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_gps_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_graphic_eq",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_location_disabled",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_location_searching",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_network_cell",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_network_wifi",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_nfc",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_screen_lock_landscape",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_screen_lock_portrait",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_screen_lock_rotation",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_screen_rotation",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_sd_storage",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_settings_system_daydream",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_0_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_1_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_2_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_3_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_4_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_connected_no_internet_0_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_connected_no_internet_1_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_connected_no_internet_2_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_connected_no_internet_3_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_connected_no_internet_4_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_no_sim",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_null",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_cellular_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_wifi_0_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_wifi_1_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_wifi_1_bar_lock",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_wifi_2_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_wifi_2_bar_lock",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_wifi_3_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_wifi_3_bar_lock",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_wifi_4_bar",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_wifi_4_bar_lock",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_signal_wifi_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_storage",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_usb",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_wallpaper",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_widgets",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_wifi_lock",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "DEVICE",
+    "name": "ic_wifi_tethering",
+    "variants": [
+      "svg"
+    ]
+  }
+]

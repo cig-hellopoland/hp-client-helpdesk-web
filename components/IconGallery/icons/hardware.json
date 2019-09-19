@@ -1,0 +1,331 @@
+[
+  {
+    "category": "HARDWARE",
+    "name": "ic_cast",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_cast_connected",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_computer",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_desktop_mac",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_desktop_windows",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_developer_board",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_devices_other",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_dock",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_gamepad",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_headset",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_headset_mic",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_keyboard",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_keyboard_arrow_down",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_keyboard_arrow_left",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_keyboard_arrow_right",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_keyboard_arrow_up",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_keyboard_backspace",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_keyboard_capslock",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_keyboard_hide",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_keyboard_return",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_keyboard_tab",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_keyboard_voice",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_laptop",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_laptop_chromebook",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_laptop_mac",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_laptop_windows",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_memory",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_mouse",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_phone_android",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_phone_iphone",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_phonelink",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_phonelink_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_power_input",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_router",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_scanner",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_security",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_sim_card",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_smartphone",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_speaker",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_speaker_group",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_tablet",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_tablet_android",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_tablet_mac",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_toys",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_tv",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_videogame_asset",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "HARDWARE",
+    "name": "ic_watch",
+    "variants": [
+      "svg"
+    ]
+  }
+]

@@ -1,0 +1,212 @@
+[
+  {
+    "category": "SOCIAL",
+    "name": "ic_cake",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_domain",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_group",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_group_add",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_location_city",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_mood",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_mood_bad",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_notifications",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_notifications_active",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_notifications_none",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_notifications_off",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_notifications_paused",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_pages",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_party_mode",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_people",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_people_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_person",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_person_add",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_person_outline",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_plus_one",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_poll",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_public",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_school",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_sentiment_dissatisfied",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_sentiment_neutral",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_sentiment_satisfied",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_sentiment_very_dissatisfied",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_sentiment_very_satisfied",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_share",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "SOCIAL",
+    "name": "ic_whatshot",
+    "variants": [
+      "svg"
+    ]
+  }
+]

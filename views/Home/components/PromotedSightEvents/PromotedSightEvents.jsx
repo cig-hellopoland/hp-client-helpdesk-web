@@ -73,6 +73,11 @@ class PromotedSightEvents extends Component {
     changePromotion({
       id,
       pathParams,
+      options: {
+        headers: {
+          'Content-Language': DEFAULT_LANGUAGE,
+        },
+      },
       onSuccess: () => {
         fetchSightEventsList();
         this.handleClose();
@@ -87,6 +92,11 @@ class PromotedSightEvents extends Component {
     const { deletePromotion, fetchSightEventsList } = this.props;
     deletePromotion({
       id,
+      options: {
+        headers: {
+          'Content-Language': DEFAULT_LANGUAGE,
+        },
+      },
       onSuccess: () => {
         fetchSightEventsList();
         this.handleClose();

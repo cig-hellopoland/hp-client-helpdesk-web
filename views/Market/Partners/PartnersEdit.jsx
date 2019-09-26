@@ -22,7 +22,7 @@ import ContentTranslation from 'components/ContentTranslation';
 import CategoriesForm from 'components/CategoriesForm';
 import PartnerMarketForm from './components/PartnerMarketForm';
 import PartnerCompanyForm from './components/PartnerCompanyForm';
-// import SightEventMultimediaForm from './components/SightEventMultimediaForm';
+import PartnerMultimediaForm from './components/PartnerMultimediaForm';
 
 const styles = theme => ({
   root: {
@@ -86,7 +86,7 @@ class PartnersEdit extends React.Component {
   };
 
   getMultimediaFromItem = (item) => {
-    const { mainImage, pdfAttachment } = item;
+    const { mainImage } = item;
     const data = [];
 
     if (mainImage) {
@@ -101,18 +101,6 @@ class PartnersEdit extends React.Component {
         size: 12345,
         type: 'image/jpeg',
         downloadUrl: mainImage,
-      });
-    }
-
-    if (pdfAttachment) {
-      data.push({
-        ...pdfAttachment,
-        createdBy: '',
-        createdDate: '',
-        modifiedBy: '',
-        modifiedDate: '',
-        size: 12345,
-        type: 'application/pdf',
       });
     }
 
@@ -248,7 +236,7 @@ class PartnersEdit extends React.Component {
     const {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
     } = this.state;
-    const { classes, item } = this.props;
+    const { classes, item, itemId } = this.props;
     const { defaultLanguage } = item || {};
 
     const pageTitle = 'Edycja partnera';
@@ -322,18 +310,18 @@ class PartnersEdit extends React.Component {
               />
             )
           }
-          {/* {selectedTab === 1 */}
-          {/*  && ( */}
-          {/*    <SightEventMultimediaForm */}
-          {/*      data={this.getMultimediaFromItem(item)} */}
-          {/*      defaultTranslation={defaultLanguage} */}
-          {/*      itemId={itemId} */}
-          {/*      onFailure={() => this.handleRequestFailure()} */}
-          {/*      onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)} */}
-          {/*      translation={selectedTranslation} */}
-          {/*    /> */}
-          {/*  ) */}
-          {/* } */}
+          {selectedTab === 3
+            && (
+              <PartnerMultimediaForm
+                data={this.getMultimediaFromItem(item)}
+                defaultTranslation={defaultLanguage}
+                itemId={itemId}
+                onFailure={() => this.handleRequestFailure()}
+                onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}
+                translation={selectedTranslation}
+              />
+            )
+          }
           <Snackbar
             anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             open={snackbarOpen}

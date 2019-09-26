@@ -91,6 +91,30 @@ const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
 const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
 
 /**
+ * Type used for handling main image creation.
+ * @type {string}
+ */
+const CREATE_MAIN_IMAGE = `${prefix}CREATE_MAIN_IMAGE`;
+
+/**
+ * Type used for handling entity fetching cancellation.
+ * @type {string}
+ */
+const CREATE_MAIN_IMAGE_CANCEL = `${prefix}CREATE_MAIN_IMAGE_CANCEL`;
+
+/**
+ * Type used for handling main image creation failure.
+ * @type {string}
+ */
+const CREATE_MAIN_IMAGE_FAILURE = `${prefix}CREATE_MAIN_IMAGE_FAILURE`;
+
+/**
+ * Type used for handling main image creation success.
+ * @type {string}
+ */
+const CREATE_MAIN_IMAGE_SUCCESS = `${prefix}CREATE_MAIN_IMAGE_SUCCESS`;
+
+/**
  * Type used for handling translation creation.
  * @type {string}
  */
@@ -202,6 +226,10 @@ export const types = {
   CREATE_ITEM,
   CREATE_ITEM_FAILURE,
   CREATE_ITEM_SUCCESS,
+  CREATE_MAIN_IMAGE,
+  CREATE_MAIN_IMAGE_CANCEL,
+  CREATE_MAIN_IMAGE_FAILURE,
+  CREATE_MAIN_IMAGE_SUCCESS,
   CREATE_TRANSLATION,
   CREATE_TRANSLATION_FAILURE,
   CREATE_TRANSLATION_SUCCESS,
@@ -350,6 +378,75 @@ const createItemFailure = ({ data, status } = {}) => ({
  */
 const createItemSuccess = data => ({
   type: CREATE_ITEM_SUCCESS,
+  data,
+});
+
+/**
+ * Creates action with main image creation request details.
+ * @method
+ * @param {number} id - item id
+ * @param {Object} data - request data
+ * @param {Object} [options] - request config
+ * @param {failureCallback} [onFailure] - failure callback
+ * @param {successCallback} [onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string, data: *, options: *},
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const createMainImage = ({
+  id, data, options = {}, onFailure, onSuccess,
+}) => ({
+  type: CREATE_MAIN_IMAGE,
+  payload: {
+    url: `${apiURL}/${id}/mainImage`,
+    method: 'put',
+    ...options,
+    headers: {
+      'content-type': 'image/jpeg',
+      ...options.headers,
+    },
+    data,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for creating main image request cancelling.
+ * @method
+ * @return {{type: string}}
+ */
+
+const createMainImageCancel = () => ({
+  type: CREATE_MAIN_IMAGE_CANCEL,
+});
+
+/**
+ * Creates action for main image creation request failing.
+ * @method
+ * @param {Object} params - axios response schema
+ * @param params.data - response body
+ * @return {{
+ *   type: string,
+ *   error: {data, status: number}
+ * }}
+ */
+const createMainImageFailure = ({ data = defaultInitialState.error } = {}) => ({
+  type: CREATE_MAIN_IMAGE_FAILURE,
+  error: data,
+});
+
+/**
+ * Creates action for successful main image creation request.
+ * @method
+ * @param {Object} data - response body
+ * @return {{type: string, data: *}}
+ */
+const createMainImageSuccess = ({ data = defaultInitialState.item } = {}) => ({
+  type: CREATE_MAIN_IMAGE_SUCCESS,
   data,
 });
 
@@ -660,6 +757,10 @@ export const actions = {
   createItem,
   createItemFailure,
   createItemSuccess,
+  createMainImage,
+  createMainImageCancel,
+  createMainImageFailure,
+  createMainImageSuccess,
   createTranslation,
   createTranslationFailure,
   createTranslationSuccess,
@@ -820,6 +921,52 @@ const createItemLogic = createLogic({
       const { data } = response;
 
       dispatch(createItemFailure({ data }));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
+  },
+});
+
+/**
+ * Logic used for handling main image creation.
+ * @method
+ */
+const createMainImageLogic = createLogic({
+  type: [
+    CREATE_MAIN_IMAGE,
+  ],
+  cancelType: [
+    CREATE_MAIN_IMAGE_CANCEL,
+  ],
+  latest: true,
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(createMainImageSuccess({ data }));
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(createMainImageFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(createMainImageFailure(response));
 
       if (onFailure) {
         onFailure();
@@ -1067,6 +1214,7 @@ const updateItemLogic = createLogic({
 export const logic = {
   changeDefaultLanguageLogic,
   createItemLogic,
+  createMainImageLogic,
   createTranslationLogic,
   deleteTranslationLogic,
   fetchItemLogic,
@@ -1095,6 +1243,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
       };
     case CHANGE_DEFAULT_TRANSLATION_FAILURE:
     case CREATE_ITEM_FAILURE:
+    case CREATE_MAIN_IMAGE_FAILURE:
     case CREATE_TRANSLATION_FAILURE:
     case DELETE_TRANSLATION_FAILURE:
     case FETCH_ITEM_FAILURE:
@@ -1107,6 +1256,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
     case CHANGE_DEFAULT_TRANSLATION_SUCCESS:
     case CLEAR_ERROR:
     case CREATE_ITEM_SUCCESS:
+    case CREATE_MAIN_IMAGE_SUCCESS:
     case CREATE_TRANSLATION_SUCCESS:
     case DELETE_TRANSLATION_SUCCESS:
     case UPDATE_ITEM_SUCCESS:

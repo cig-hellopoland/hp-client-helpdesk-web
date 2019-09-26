@@ -248,9 +248,7 @@ class PartnersEdit extends React.Component {
     const {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
     } = this.state;
-    const {
-      classes, item, itemId,
-    } = this.props;
+    const { classes, item } = this.props;
     const { defaultLanguage } = item || {};
 
     const pageTitle = 'Edycja partnera';
@@ -379,11 +377,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  // changeDefaultTranslation: partnersActions.changeDefaultTranslation,
-  changeDefaultTranslation: () => {},
+  changeDefaultTranslation: partnersActions.changeDefaultTranslation,
   clearError: partnersActions.clearError,
   clearItem: partnersActions.clearItem,
-  deleteItemCategory: () => {},
   // deleteTranslation: partnersActions.deleteTranslation,
   deleteTranslation: () => {},
   fetchItem: partnersActions.fetchItem,

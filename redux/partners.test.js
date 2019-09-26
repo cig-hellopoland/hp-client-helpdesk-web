@@ -52,6 +52,61 @@ function generateAppState(data) {
  */
 
 describe('actions', () => {
+  describe('using changeDefaultTranslation', () => {
+    it('should create an action with request payload', () => {
+      const { changeDefaultTranslation } = actions;
+      const { CHANGE_DEFAULT_TRANSLATION } = types;
+      const id = 3;
+      const options = {
+        headers: {
+          'Content-Language': 'pl-PL',
+        },
+      };
+      const expectedValue = {
+        type: CHANGE_DEFAULT_TRANSLATION,
+        payload: {
+          url: `${apiURL}/${id}/defaultLanguage`,
+          method: 'patch',
+          ...options,
+        },
+      };
+      expect(changeDefaultTranslation({ id, options })).toEqual(expectedValue);
+
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
+
+      expect(changeDefaultTranslation({
+        id, options, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+    it('should create an action for failed request', () => {
+      const { changeDefaultTranslationFailure } = actions;
+      const { CHANGE_DEFAULT_TRANSLATION_FAILURE } = types;
+
+      const expectedValue = {
+        type: CHANGE_DEFAULT_TRANSLATION_FAILURE,
+        error: defaultInitialState.error,
+      };
+
+      expect(changeDefaultTranslationFailure()).toEqual(expectedValue);
+
+      expectedValue.error = axiosResponseError.data;
+
+      expect(changeDefaultTranslationFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action for successful request', () => {
+      const { changeDefaultTranslationSuccess } = actions;
+      const { CHANGE_DEFAULT_TRANSLATION_SUCCESS } = types;
+      const expectedValue = {
+        type: CHANGE_DEFAULT_TRANSLATION_SUCCESS,
+      };
+
+      expect(changeDefaultTranslationSuccess()).toEqual(expectedValue);
+    });
+  });
+
   describe('using clearError', () => {
     it('should create an action to clear error from state', () => {
       const { clearError } = actions;
@@ -516,6 +571,29 @@ describe('reducer', () => {
 
   it('should return current state if action type was not found', () => {
     expect(reducer()(undefined, { type: 'INVALID_TYPE' })).toEqual(defaultInitialState);
+  });
+
+  it('should handle CHANGE_DEFAULT_TRANSLATION_FAILURE', () => {
+    let action = actions.changeDefaultTranslationFailure();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+
+    action = actions.changeDefaultTranslationFailure(axiosResponseError);
+    expectedValue.error = axiosResponseError.data;
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle CHANGE_DEFAULT_TRANSLATION_SUCCESS', () => {
+    const action = actions.changeDefaultTranslationSuccess();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });
 
   it('should handle CLEAR_ERROR', () => {

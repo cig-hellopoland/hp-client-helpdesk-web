@@ -43,6 +43,24 @@ export const defaultInitialState = {
  */
 
 /**
+ * Type used for handling content's default translation change.
+ * @type {string}
+ */
+const CHANGE_DEFAULT_TRANSLATION = `${prefix}CHANGE_DEFAULT_TRANSLATION`;
+
+/**
+ * Type used for handling content's default translation change failure.
+ * @type {string}
+ */
+const CHANGE_DEFAULT_TRANSLATION_FAILURE = `${prefix}CHANGE_DEFAULT_TRANSLATION_FAILURE`;
+
+/**
+ * Type used for handling content's default translation change success.
+ * @type {string}
+ */
+const CHANGE_DEFAULT_TRANSLATION_SUCCESS = `${prefix}CHANGE_DEFAULT_TRANSLATION_SUCCESS`;
+
+/**
  * Type used for clear error.
  * @type {string}
  */
@@ -158,6 +176,9 @@ const UPDATE_ITEM_SUCCESS = `${prefix}UPDATE_ITEM_SUCCESS`;
 
 
 export const types = {
+  CHANGE_DEFAULT_TRANSLATION,
+  CHANGE_DEFAULT_TRANSLATION_FAILURE,
+  CHANGE_DEFAULT_TRANSLATION_SUCCESS,
   CLEAR_ERROR,
   CLEAR_ITEM,
   CREATE_ITEM,
@@ -182,6 +203,61 @@ export const types = {
 /*
  * ACTIONS
  */
+
+/**
+ * Creates action for default translation change request.
+ * @method
+ * @callback failureCallback
+ * @callback successCallback
+ * @param {number} id - item id
+ * @param {Object} options - request config
+ * @param {string} options.headers.content-language - new default translation code
+ * @param {failureCallback} [onFailure] - failure callback
+ * @param {successCallback} [onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string, options: *},
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const changeDefaultTranslation = ({
+  id, options, onFailure, onSuccess,
+} = {}) => ({
+  type: CHANGE_DEFAULT_TRANSLATION,
+  payload: {
+    url: `${apiURL}/${id}/defaultLanguage`,
+    method: 'patch',
+    ...options,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for default translation change request failing.
+ * @method
+ * @param {Object} params - axios response schema
+ * @param params.data - response body
+ * @return {{
+ *   type: string,
+ *   error: {data, status: number}
+ * }}
+ */
+const changeDefaultTranslationFailure = ({ data = defaultInitialState.error } = {}) => ({
+  type: CHANGE_DEFAULT_TRANSLATION_FAILURE,
+  error: data,
+});
+
+/**
+ * Creates action for successful default translation change request.
+ * @method
+ * @return {{type: string}}
+ */
+const changeDefaultTranslationSuccess = () => ({
+  type: CHANGE_DEFAULT_TRANSLATION_SUCCESS,
+});
+
 
 /**
  * Creates action for error clearing
@@ -495,6 +571,9 @@ const updateItemSuccess = ({ data = defaultInitialState.item } = {}) => ({
 });
 
 export const actions = {
+  changeDefaultTranslation,
+  changeDefaultTranslationFailure,
+  changeDefaultTranslationSuccess,
   clearError,
   clearItem,
   createItem,
@@ -575,6 +654,52 @@ export const selectors = {
 /*
  * LOGIC
  */
+
+/**
+ * Logic used for handling change default language request.
+ * @method
+ */
+const changeDefaultLanguageLogic = createLogic({
+  type: [
+    CHANGE_DEFAULT_TRANSLATION,
+  ],
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { status } = response;
+
+      debugger;
+      if (status === 200 || status === 204) {
+        dispatch(changeDefaultTranslationSuccess());
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(changeDefaultTranslationFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch (error) {
+      const { response = {} } = error;
+
+      dispatch(changeDefaultTranslationFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
+  },
+});
+
 
 /**
  * Logic used for handling create item request.
@@ -812,6 +937,7 @@ const updateItemLogic = createLogic({
 });
 
 export const logic = {
+  changeDefaultLanguageLogic,
   createItemLogic,
   createTranslationLogic,
   fetchItemLogic,
@@ -838,6 +964,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         error: initialState.error,
         item: initialState.item,
       };
+    case CHANGE_DEFAULT_TRANSLATION_FAILURE:
     case CREATE_ITEM_FAILURE:
     case CREATE_TRANSLATION_FAILURE:
     case FETCH_ITEM_FAILURE:
@@ -847,6 +974,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         ...state,
         error: action.error,
       };
+    case CHANGE_DEFAULT_TRANSLATION_SUCCESS:
     case CLEAR_ERROR:
     case CREATE_ITEM_SUCCESS:
     case CREATE_TRANSLATION_SUCCESS:

@@ -286,8 +286,8 @@ CategoriesForm.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({})),
   managePublic: PropTypes.bool,
   manageRestricted: PropTypes.bool,
-  onSubmit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func,
+  onDelete: PropTypes.func,
   translation: PropTypes.string,
 };
 
@@ -297,6 +297,8 @@ CategoriesForm.defaultProps = {
   items: [],
   managePublic: false,
   manageRestricted: false,
+  onSubmit: null,
+  onDelete: null,
   translation: DEFAULT_LANGUAGE,
 };
 

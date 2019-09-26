@@ -24,9 +24,10 @@ import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
 import CategoriesForm from 'components/CategoriesForm';
-import SightEventForm from './components/SightEventForm';
-import SightEventMultimediaForm from './components/SightEventMultimediaForm';
-import TicketPoolDefinitionsList from './components/TicketPoolDefinitionsList';
+// import CategoriesForm from './components/CategoriesForm';
+// import SightEventForm from './components/SightEventForm';
+// import SightEventMultimediaForm from './components/SightEventMultimediaForm';
+// import TicketPoolDefinitionsList from './components/TicketPoolDefinitionsList';
 
 const styles = theme => ({
   root: {
@@ -39,8 +40,8 @@ const styles = theme => ({
   },
 });
 
-class SightEventEdit extends React.Component {
-  baseURL = '/market/sight-events';
+class PartnersEdit extends React.Component {
+  baseURL = '/market/partners';
 
   state = {
     availableTranslations: CONTENT_LANGUAGES,
@@ -348,52 +349,43 @@ class SightEventEdit extends React.Component {
             textColor="primary"
             value={selectedTab}
           >
-            <Tab label="Szczegóły" />
+            <Tab label="Wizytówka" />
+            <Tab label="Dane firmy" />
             <Tab label="Kategorie" />
             <Tab label="Multimedia" />
-            <Tab label="Pule biletów" />
             <Tab label="Komentarze" disabled />
           </Tabs>
-          {selectedTab === 0
-            && (
-              <SightEventForm
-                initialValues={this.getFormValues(item)}
-                language={selectedTranslation}
-                onSubmitSuccess={this.handleSubmitSuccess}
-              />
-            )
-          }
-          {selectedTab === 1
+          {/*{selectedTab === 0*/}
+          {/*  && (*/}
+          {/*    <SightEventForm*/}
+          {/*      initialValues={this.getFormValues(item)}*/}
+          {/*      language={selectedTranslation}*/}
+          {/*      onSubmitSuccess={this.handleSubmitSuccess}*/}
+          {/*    />*/}
+          {/*  )*/}
+          {/*}*/}
+          {selectedTab === 2
             && (
               <CategoriesForm
                 categories={categoriesList}
                 defaultTranslation={defaultLanguage}
                 items={item.categories}
-                managePublic
-                manageRestricted
-                onSubmit={this.handleItemCategorySubmit}
-                onDelete={this.handleItemCategoryDelete}
                 translation={selectedTranslation}
               />
             )
           }
-          {selectedTab === 2
-            && (
-              <SightEventMultimediaForm
-                data={this.getMultimediaFromItem(item)}
-                defaultTranslation={defaultLanguage}
-                itemId={itemId}
-                onFailure={() => this.handleRequestFailure()}
-                onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}
-                translation={selectedTranslation}
-              />
-            )
-          }
-          {selectedTab === 3
-            && (
-              <TicketPoolDefinitionsList data={item.ticketPoolDefinitions} />
-            )
-          }
+          {/*{selectedTab === 1*/}
+          {/*  && (*/}
+          {/*    <SightEventMultimediaForm*/}
+          {/*      data={this.getMultimediaFromItem(item)}*/}
+          {/*      defaultTranslation={defaultLanguage}*/}
+          {/*      itemId={itemId}*/}
+          {/*      onFailure={() => this.handleRequestFailure()}*/}
+          {/*      onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}*/}
+          {/*      translation={selectedTranslation}*/}
+          {/*    />*/}
+          {/*  )*/}
+          {/*}*/}
           <Snackbar
             anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             open={snackbarOpen}
@@ -409,7 +401,7 @@ class SightEventEdit extends React.Component {
   }
 }
 
-SightEventEdit.propTypes = {
+PartnersEdit.propTypes = {
   categoriesList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   itemId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
@@ -429,7 +421,7 @@ SightEventEdit.propTypes = {
   updateItemCategory: PropTypes.func.isRequired,
 };
 
-SightEventEdit.defaultProps = {
+PartnersEdit.defaultProps = {
   itemId: null,
   error: null,
   item: null,
@@ -457,4 +449,4 @@ export default compose(
   withAuth(),
   withRouter,
   withStyles(styles),
-)(SightEventEdit);
+)(PartnersEdit);

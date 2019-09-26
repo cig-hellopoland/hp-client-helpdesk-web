@@ -257,6 +257,11 @@ class PartnerCompanyForm extends Component {
             <Grid container spacing={16}>
               <GridItem>
                 <Typography variant="h6">Dane partnera</Typography>
+                {values.id
+                  && (
+                    <Typography color="error">UWAGA: Modyfikujesz dane w systemie Hello! Poland. Upewnij się, że partner zaktualizuje je w Przelewach24.</Typography>
+                  )
+                }
               </GridItem>
               <GridItem>
                 <Field disabled={disabled} name="name" label="Nazwa" required component={TextField} {...commonProps} />

@@ -98,7 +98,10 @@ class PartnerMarketForm extends React.Component {
     const { id, ...data } = values;
 
     const payload = {
-      data,
+      data: {
+        ...initialValues,
+        ...data,
+      },
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
       options: {

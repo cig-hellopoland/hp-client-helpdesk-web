@@ -109,6 +109,24 @@ const CREATE_TRANSLATION_FAILURE = `${prefix}CREATE_TRANSLATION_FAILURE`;
 const CREATE_TRANSLATION_SUCCESS = `${prefix}CREATE_TRANSLATION_SUCCESS`;
 
 /**
+ * Type used for handling translation deletion.
+ * @type {string}
+ */
+const DELETE_TRANSLATION = `${prefix}DELETE_TRANSLATION`;
+
+/**
+ * Type used for handling translation deletion failure.
+ * @type {string}
+ */
+const DELETE_TRANSLATION_FAILURE = `${prefix}DELETE_TRANSLATION_FAILURE`;
+
+/**
+ * Type used for handling translation deletion success.
+ * @type {string}
+ */
+const DELETE_TRANSLATION_SUCCESS = `${prefix}DELETE_TRANSLATION_SUCCESS`;
+
+/**
  * Type used for handling entity fetching.
  * @type {string}
  */
@@ -187,6 +205,9 @@ export const types = {
   CREATE_TRANSLATION,
   CREATE_TRANSLATION_FAILURE,
   CREATE_TRANSLATION_SUCCESS,
+  DELETE_TRANSLATION,
+  DELETE_TRANSLATION_FAILURE,
+  DELETE_TRANSLATION_SUCCESS,
   FETCH_ITEM,
   FETCH_ITEM_CANCEL,
   FETCH_ITEM_FAILURE,
@@ -381,6 +402,66 @@ const createTranslationFailure = ({ data = defaultInitialState.error } = {}) => 
 const createTranslationSuccess = ({ data = defaultInitialState.item } = {}) => ({
   type: CREATE_TRANSLATION_SUCCESS,
   data,
+});
+
+/**
+ * Creates action with translation deletion request details.
+ * @method
+ * @param {number} id - item id
+ * @param {Object} options - request config
+ * @param {Object} pathParams - URL path params
+ * @param {failureCallback} [onFailure] - failure callback
+ * @param {successCallback} [onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string, options: *},
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const deleteTranslation = ({
+  id, pathParams, options, onFailure, onSuccess,
+} = {}) => {
+  let path = '';
+
+  if (pathParams) {
+    path = Object.entries(pathParams).reduce((acc, [key, value]) => `${acc}/${key}/${value}`, '');
+  }
+
+  return ({
+    type: DELETE_TRANSLATION,
+    payload: {
+      url: `${apiURL}/${id}${path}`,
+      method: 'delete',
+      ...options,
+    },
+    onFailure,
+    onSuccess,
+  });
+};
+
+/**
+ * Creates action for translation deletion request failing.
+ * @method
+ * @param {Object} params - axios response schema
+ * @param params.data - response body
+ * @return {{
+ *   type: string,
+ *   error: {data, status: number}
+ * }}
+ */
+const deleteTranslationFailure = ({ data = defaultInitialState.error } = {}) => ({
+  type: DELETE_TRANSLATION_FAILURE,
+  error: data,
+});
+
+/**
+ * Creates action for successful translation deletion request.
+ * @method
+ * @return {{type: string}}
+ */
+const deleteTranslationSuccess = () => ({
+  type: DELETE_TRANSLATION_SUCCESS,
 });
 
 /**
@@ -582,6 +663,9 @@ export const actions = {
   createTranslation,
   createTranslationFailure,
   createTranslationSuccess,
+  deleteTranslation,
+  deleteTranslationFailure,
+  deleteTranslationSuccess,
   fetchItem,
   fetchItemCancel,
   fetchItemFailure,
@@ -672,7 +756,6 @@ const changeDefaultLanguageLogic = createLogic({
       const response = await httpClient.cancellable(payload, cancelled$);
       const { status } = response;
 
-      debugger;
       if (status === 200 || status === 204) {
         dispatch(changeDefaultTranslationSuccess());
 
@@ -783,6 +866,51 @@ const createTranslationLogic = createLogic({
       const { data } = response;
 
       dispatch(createItemFailure({ data }));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
+  },
+});
+
+/**
+ * Logic used for handling translation deletion.
+ * @method
+ */
+const deleteTranslationLogic = createLogic({
+  type: [
+    DELETE_TRANSLATION,
+  ],
+  latest: true,
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(deleteTranslationSuccess());
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(deleteTranslationFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch (error) {
+      const { response = {} } = error;
+
+      dispatch(deleteTranslationFailure(response));
 
       if (onFailure) {
         onFailure();
@@ -940,6 +1068,7 @@ export const logic = {
   changeDefaultLanguageLogic,
   createItemLogic,
   createTranslationLogic,
+  deleteTranslationLogic,
   fetchItemLogic,
   fetchListLogic,
   updateItemLogic,
@@ -967,6 +1096,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
     case CHANGE_DEFAULT_TRANSLATION_FAILURE:
     case CREATE_ITEM_FAILURE:
     case CREATE_TRANSLATION_FAILURE:
+    case DELETE_TRANSLATION_FAILURE:
     case FETCH_ITEM_FAILURE:
     case FETCH_LIST_FAILURE:
     case UPDATE_ITEM_FAILURE:
@@ -978,6 +1108,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
     case CLEAR_ERROR:
     case CREATE_ITEM_SUCCESS:
     case CREATE_TRANSLATION_SUCCESS:
+    case DELETE_TRANSLATION_SUCCESS:
     case UPDATE_ITEM_SUCCESS:
       return {
         ...state,

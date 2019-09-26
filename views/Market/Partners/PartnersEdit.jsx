@@ -306,8 +306,8 @@ class PartnersEdit extends React.Component {
           {selectedTab === 1
             && (
               <PartnerCompanyForm
-                disabled
-                hideButtons
+                disabled={selectedTranslation !== defaultLanguage}
+                hideButtons={selectedTranslation !== defaultLanguage}
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
                 onSubmitSuccess={this.handleSubmitSuccess}
@@ -380,8 +380,7 @@ const mapDispatchToProps = {
   changeDefaultTranslation: partnersActions.changeDefaultTranslation,
   clearError: partnersActions.clearError,
   clearItem: partnersActions.clearItem,
-  // deleteTranslation: partnersActions.deleteTranslation,
-  deleteTranslation: () => {},
+  deleteTranslation: partnersActions.deleteTranslation,
   fetchItem: partnersActions.fetchItem,
 };
 

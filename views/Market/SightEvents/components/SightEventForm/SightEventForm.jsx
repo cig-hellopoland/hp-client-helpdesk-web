@@ -117,7 +117,6 @@ class SightEventForm extends React.Component {
     };
   };
 
-
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues || {}),
   });

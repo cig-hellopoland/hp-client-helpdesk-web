@@ -6,10 +6,8 @@ import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
-import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -26,21 +24,6 @@ import GridItem from 'components/GridItem';
 const commonProps = {
   fullWidth: true,
 };
-
-// TODO: remove this function and change Switch implementation after it's fixed.
-// TODO: see https://github.com/stackworx/formik-material-ui/pull/42
-const fieldToSwitch = ({
-  field,
-  form: { isSubmitting },
-  disabled = false,
-  ...props
-}) => ({
-  disabled: isSubmitting || disabled,
-  ...props,
-  ...field,
-  value: field.name,
-  checked: field.value,
-});
 
 const styles = theme => ({
   errorIcon: {
@@ -70,7 +53,7 @@ class PartnerMarketForm extends React.Component {
       published: yupBoolean(),
       description: yupString().min(10).max(2500).required(),
       location: yupObject().shape({
-        directions: yupString().min(5).max(255),
+        directions: yupString(),
       }),
     });
   }

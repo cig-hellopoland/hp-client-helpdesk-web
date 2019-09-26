@@ -21,8 +21,8 @@ import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
 import CategoriesForm from 'components/CategoriesForm';
 import PartnerMarketForm from './components/PartnerMarketForm';
+import PartnerCompanyForm from './components/PartnerCompanyForm';
 // import SightEventMultimediaForm from './components/SightEventMultimediaForm';
-// import TicketPoolDefinitionsList from './components/TicketPoolDefinitionsList';
 
 const styles = theme => ({
   root: {
@@ -305,27 +305,37 @@ class PartnersEdit extends React.Component {
               />
             )
           }
+          {selectedTab === 1
+            && (
+              <PartnerCompanyForm
+                disabled
+                hideButtons
+                initialValues={this.getFormValues(item)}
+                language={selectedTranslation}
+                onSubmitSuccess={this.handleSubmitSuccess}
+              />
+            )
+          }
           {selectedTab === 2
             && (
               <CategoriesForm
                 defaultTranslation={defaultLanguage}
-                items={item.categories}
                 translation={selectedTranslation}
               />
             )
           }
-          {/*{selectedTab === 1*/}
-          {/*  && (*/}
-          {/*    <SightEventMultimediaForm*/}
-          {/*      data={this.getMultimediaFromItem(item)}*/}
-          {/*      defaultTranslation={defaultLanguage}*/}
-          {/*      itemId={itemId}*/}
-          {/*      onFailure={() => this.handleRequestFailure()}*/}
-          {/*      onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}*/}
-          {/*      translation={selectedTranslation}*/}
-          {/*    />*/}
-          {/*  )*/}
-          {/*}*/}
+          {/* {selectedTab === 1 */}
+          {/*  && ( */}
+          {/*    <SightEventMultimediaForm */}
+          {/*      data={this.getMultimediaFromItem(item)} */}
+          {/*      defaultTranslation={defaultLanguage} */}
+          {/*      itemId={itemId} */}
+          {/*      onFailure={() => this.handleRequestFailure()} */}
+          {/*      onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)} */}
+          {/*      translation={selectedTranslation} */}
+          {/*    /> */}
+          {/*  ) */}
+          {/* } */}
           <Snackbar
             anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             open={snackbarOpen}
@@ -372,9 +382,7 @@ const mapDispatchToProps = {
   // changeDefaultTranslation: partnersActions.changeDefaultTranslation,
   changeDefaultTranslation: () => {},
   clearError: partnersActions.clearError,
-  // clearItem: partnersActions.clearItem,
-  clearItem: () => {},
-  // deleteItemCategory: partnersActions.deleteItemCategory,
+  clearItem: partnersActions.clearItem,
   deleteItemCategory: () => {},
   // deleteTranslation: partnersActions.deleteTranslation,
   deleteTranslation: () => {},

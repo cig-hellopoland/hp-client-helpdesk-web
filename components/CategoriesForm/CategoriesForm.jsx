@@ -192,7 +192,7 @@ function CategoriesForm({
       {(restrictedCategories.length === 0)
         && (
           <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>Brak ketegorii przypisanych przez Hello! Poland.</Typography>
+            <Typography>Brak kategorii przypisanych przez Hello! Poland.</Typography>
           </Grid>
         )
       }

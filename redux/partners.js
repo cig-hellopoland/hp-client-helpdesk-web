@@ -49,6 +49,12 @@ export const defaultInitialState = {
 const CLEAR_ERROR = `${prefix}CLEAR_ERROR`;
 
 /**
+ * Type used for clearing currently loaded entity.
+ * @type {string}
+ */
+const CLEAR_ITEM = `${prefix}CLEAR_ITEM`;
+
+/**
  * Type used for handling create item request.
  * @type {string}
  */
@@ -153,6 +159,7 @@ const UPDATE_ITEM_SUCCESS = `${prefix}UPDATE_ITEM_SUCCESS`;
 
 export const types = {
   CLEAR_ERROR,
+  CLEAR_ITEM,
   CREATE_ITEM,
   CREATE_ITEM_FAILURE,
   CREATE_ITEM_SUCCESS,
@@ -177,11 +184,18 @@ export const types = {
  */
 
 /**
- * Creates action for clear error
+ * Creates action for error clearing
  * @method
  * @return {{type: string}}
  */
 const clearError = () => ({ type: CLEAR_ERROR });
+
+/**
+* Creates action for item clearing
+* @method
+* @return {{type: string}}
+*/
+const clearItem = () => ({ type: CLEAR_ITEM });
 
 /**
  * Creates action for create item request.
@@ -394,20 +408,15 @@ const fetchListCancel = () => ({
 /**
  * Creates action for list request failing.
  * @method
- * @param {Object} params - axios response schema
- * @param params.data - response body
- * @param params.status - response status
+ * @param data - response body
  * @return {{
  *   type: string,
- *   error: {data, status: number}
+ *   error: {Object}
  * }}
  */
-const fetchListFailure = ({ data, status } = {}) => ({
+const fetchListFailure = ({ data = defaultInitialState.error } = {}) => ({
   type: FETCH_LIST_FAILURE,
-  error: {
-    data,
-    status,
-  },
+  error: data,
 });
 
 /**
@@ -416,7 +425,7 @@ const fetchListFailure = ({ data, status } = {}) => ({
  * @param {Object} data - response body
  * @return {{type: string, data: *}}
  */
-const fetchListSuccess = data => ({
+const fetchListSuccess = ({ data = { items: defaultInitialState.list } } = {}) => ({
   type: FETCH_LIST_SUCCESS,
   data,
 });
@@ -487,6 +496,7 @@ const updateItemSuccess = ({ data = defaultInitialState.item } = {}) => ({
 
 export const actions = {
   clearError,
+  clearItem,
   createItem,
   createItemFailure,
   createItemSuccess,
@@ -585,13 +595,13 @@ const createItemLogic = createLogic({
       const { data, status } = response;
 
       if (status === 200 || status === 204) {
-        dispatch(createItemSuccess(data));
+        dispatch(createItemSuccess({ data }));
 
         if (onSuccess) {
           onSuccess();
         }
       } else {
-        dispatch(createItemFailure(response));
+        dispatch(createItemFailure({ data }));
 
         if (onFailure) {
           onFailure();
@@ -599,8 +609,9 @@ const createItemLogic = createLogic({
       }
     } catch (error) {
       const { response = {} } = error;
+      const { data } = response;
 
-      dispatch(createItemFailure(response));
+      dispatch(createItemFailure({ data }));
 
       if (onFailure) {
         onFailure();
@@ -630,13 +641,13 @@ const createTranslationLogic = createLogic({
       const { data, status } = response;
 
       if (status === 200 || status === 204) {
-        dispatch(createItemSuccess(data));
+        dispatch(createItemSuccess({ data }));
 
         if (onSuccess) {
           onSuccess();
         }
       } else {
-        dispatch(createItemFailure(response));
+        dispatch(createItemFailure({ data }));
 
         if (onFailure) {
           onFailure();
@@ -646,7 +657,7 @@ const createTranslationLogic = createLogic({
       const { response = {} } = error;
       const { data } = response;
 
-      dispatch(createItemFailure(data));
+      dispatch(createItemFailure({ data }));
 
       if (onFailure) {
         onFailure();
@@ -679,13 +690,13 @@ const fetchItemLogic = createLogic({
       const { data, status } = response;
 
       if (status === 200 || status === 204) {
-        dispatch(fetchItemSuccess(data));
+        dispatch(fetchItemSuccess({ data }));
 
         if (onSuccess) {
           onSuccess();
         }
       } else {
-        dispatch(fetchItemFailure(data));
+        dispatch(fetchItemFailure({ data }));
 
         if (onFailure) {
           onFailure();
@@ -695,7 +706,7 @@ const fetchItemLogic = createLogic({
       const { response = {} } = error;
       const { data } = response;
 
-      dispatch(fetchItemFailure(data));
+      dispatch(fetchItemFailure({ data }));
 
       if (onFailure) {
         onFailure();
@@ -728,20 +739,23 @@ const fetchListLogic = createLogic({
       const { data, status } = response;
 
       if (status === 200) {
-        dispatch(fetchListSuccess(data));
+        dispatch(fetchListSuccess({ data }));
 
         if (onSuccess) {
           onSuccess();
         }
       } else {
-        dispatch(fetchListFailure(response));
+        dispatch(fetchListFailure({ data }));
 
         if (onFailure) {
           onFailure();
         }
       }
-    } catch ({ response }) {
-      dispatch(fetchListFailure(response));
+    } catch (error) {
+      const { response = {} } = error;
+      const { data } = response;
+
+      dispatch(fetchListFailure({ data }));
 
       if (onFailure) {
         onFailure();
@@ -771,13 +785,13 @@ const updateItemLogic = createLogic({
       const { data, status } = response;
 
       if (status === 200 || status === 201) {
-        dispatch(updateItemSuccess(data));
+        dispatch(updateItemSuccess({ data }));
 
         if (onSuccess) {
           onSuccess();
         }
       } else {
-        dispatch(updateItemFailure(response));
+        dispatch(updateItemFailure({ data }));
 
         if (onFailure) {
           onFailure();
@@ -786,7 +800,7 @@ const updateItemLogic = createLogic({
     } catch (error) {
       const { response = {} } = error;
       const { data } = response;
-      dispatch(updateItemFailure(data));
+      dispatch(updateItemFailure({ data }));
 
       if (onFailure) {
         onFailure();
@@ -818,6 +832,12 @@ export const logic = {
  */
 const reducer = (initialState = defaultInitialState) => (state = initialState, action) => {
   switch (action.type) {
+    case CLEAR_ITEM:
+      return {
+        ...state,
+        error: initialState.error,
+        item: initialState.item,
+      };
     case CREATE_ITEM_FAILURE:
     case CREATE_TRANSLATION_FAILURE:
     case FETCH_ITEM_FAILURE:

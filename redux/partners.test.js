@@ -64,6 +64,18 @@ describe('actions', () => {
     });
   });
 
+  describe('using clearItem', () => {
+    it('should create an action to clear item from state', () => {
+      const { clearItem } = actions;
+      const { CLEAR_ITEM } = types;
+      const expectedValue = {
+        type: CLEAR_ITEM,
+      };
+
+      expect(clearItem()).toEqual(expectedValue);
+    });
+  });
+
   describe('using createItem', () => {
     it('should create an action with request payload', () => {
       const { createItem } = actions;
@@ -320,12 +332,12 @@ describe('actions', () => {
       const { FETCH_LIST_FAILURE } = types;
       const expectedValue = {
         type: FETCH_LIST_FAILURE,
-        error: {},
+        error: defaultInitialState.error,
       };
 
       expect(fetchListFailure()).toEqual(expectedValue);
 
-      expectedValue.error = axiosResponseError;
+      expectedValue.error = axiosResponseError.data;
 
       expect(fetchListFailure(axiosResponseError)).toEqual(expectedValue);
     });
@@ -333,13 +345,21 @@ describe('actions', () => {
     it('should create an action for successful request', () => {
       const { fetchListSuccess } = actions;
       const { FETCH_LIST_SUCCESS } = types;
-      const data = { a: 1 };
+      const data = {
+        items: [{ a: 1 }],
+      };
       const expectedValue = {
         type: FETCH_LIST_SUCCESS,
-        data,
+        data: {
+          items: defaultInitialState.list,
+        },
       };
 
-      expect(fetchListSuccess(data)).toEqual(expectedValue);
+      expect(fetchListSuccess()).toEqual(expectedValue);
+
+      expectedValue.data = data;
+
+      expect(fetchListSuccess({ data })).toEqual(expectedValue);
     });
   });
 
@@ -507,6 +527,15 @@ describe('reducer', () => {
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });
 
+  it('should handle CLEAR_ITEM', () => {
+    const action = actions.clearItem();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()({ ...defaultInitialState, item: {} }, action)).toEqual(expectedValue);
+  });
+
   it('should handle CREATE_ITEM_FAILURE', () => {
     let action = actions.createItemFailure();
     const expectedValue = {
@@ -587,13 +616,12 @@ describe('reducer', () => {
     let action = actions.fetchListFailure();
     const expectedValue = {
       ...defaultInitialState,
-      error: {},
     };
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
 
     action = actions.fetchListFailure(axiosResponseError);
-    expectedValue.error = axiosResponseError;
+    expectedValue.error = axiosResponseError.data;
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });
@@ -606,7 +634,7 @@ describe('reducer', () => {
         { id: 2 },
       ],
     };
-    const action = actions.fetchListSuccess(data);
+    const action = actions.fetchListSuccess({ data });
     const expectedValue = {
       ...defaultInitialState,
       list: data.items,

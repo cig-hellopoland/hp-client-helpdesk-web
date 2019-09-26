@@ -124,6 +124,85 @@ describe('actions', () => {
     });
   });
 
+  describe('using fetchItem', () => {
+    it('should create an action with request payload', () => {
+      const { fetchItem } = actions;
+      const { FETCH_ITEM } = types;
+      const id = 1;
+      const payload = { a: 1 };
+      const expectedValue = {
+        type: FETCH_ITEM,
+        payload: {
+          url: `${apiURL}/${id}`,
+          method: 'get',
+        },
+      };
+
+      expect(fetchItem({ id })).toEqual(expectedValue);
+
+      expectedValue.payload = {
+        ...expectedValue.payload,
+        ...payload,
+      };
+
+      expect(fetchItem({ id, payload })).toEqual(expectedValue);
+
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
+
+      expect(fetchItem({
+        id, payload, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+    it('should create an action for cancelled request', () => {
+      const { fetchItemCancel } = actions;
+      const { FETCH_ITEM_CANCEL } = types;
+      const expectedValue = {
+        type: FETCH_ITEM_CANCEL,
+      };
+
+      expect(fetchItemCancel()).toEqual(expectedValue);
+    });
+
+    it('should create an action for failed request', () => {
+      const { fetchItemFailure } = actions;
+      const { FETCH_ITEM_FAILURE } = types;
+      let expectedValue = {
+        type: FETCH_ITEM_FAILURE,
+        error: defaultInitialState.error,
+      };
+
+      expect(fetchItemFailure()).toEqual(expectedValue);
+
+      expectedValue = {
+        type: FETCH_ITEM_FAILURE,
+        error: axiosResponseError.data,
+      };
+
+      expect(fetchItemFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action for successful request', () => {
+      const { fetchItemSuccess } = actions;
+      const { FETCH_ITEM_SUCCESS } = types;
+      const data = [{ a: 1 }];
+      let expectedValue = {
+        type: FETCH_ITEM_SUCCESS,
+        data: defaultInitialState.item,
+      };
+
+      expect(fetchItemSuccess()).toEqual(expectedValue);
+
+      expectedValue = {
+        type: FETCH_ITEM_SUCCESS,
+        data,
+      };
+
+      expect(fetchItemSuccess({ data })).toEqual(expectedValue);
+    });
+  });
+
   describe('using fetchList', () => {
     it('should create an action with request payload', () => {
       const { fetchList } = actions;
@@ -199,6 +278,10 @@ describe('selectors', () => {
   describe('using getState', () => {
     const { getState } = selectors;
 
+    it('should throw if state namespace is not found', () => {
+      expect(() => getState({})).toThrow();
+    });
+
     it(`should return ${name} state`, () => {
       expect(getState(appState)).toEqual(initialState);
     });
@@ -206,26 +289,44 @@ describe('selectors', () => {
 
   describe('using getError', () => {
     const { getError } = selectors;
+    const { error: defaultState } = defaultInitialState;
 
-    it('should return null if there was no error', () => {
-      expect(getError(appState)).toBeNull();
+    it('should return default error state if there was no error', () => {
+      expect(getError(appState)).toEqual(defaultState);
     });
 
-    it('should return some error message if there was an error', () => {
-      const error = 'omg';
+    it('should return some error messages if there was an error', () => {
+      const error = [
+        { title: 'abc' },
+      ];
       const state = generateAppState({ error });
 
       expect(getError(state)).toEqual(error);
     });
   });
 
+  describe('using getItem', () => {
+    const { getItem } = selectors;
+    const { item: defaultState } = defaultInitialState;
+
+    it('should return default item state if there is no item data', () => {
+      expect(getItem(appState)).toEqual(defaultState);
+    });
+
+    it('should return item data', () => {
+      const expectedValue = { id: 1 };
+      const state = generateAppState({ item: expectedValue });
+
+      expect(getItem(state)).toEqual(expectedValue);
+    });
+  });
+
   describe('using getList', () => {
     const { getList } = selectors;
+    const { list: defaultState } = defaultInitialState;
 
-    it('should return empty array if there is no list data', () => {
-      const expectedValue = [];
-
-      expect(getList(appState)).toEqual(expectedValue);
+    it('should return default list state if there is no list data', () => {
+      expect(getList(appState)).toEqual(defaultState);
     });
 
     it('should return list data', () => {
@@ -282,6 +383,35 @@ describe('reducer', () => {
     const expectedValue = {
       ...defaultInitialState,
     };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle FETCH_ITEM_FAILURE', () => {
+    let action = actions.fetchItemFailure();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+
+    action = actions.fetchItemFailure(axiosResponseError);
+    expectedValue.error = axiosResponseError.data;
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle FETCH_ITEM_SUCCESS', () => {
+    let action = actions.fetchItemSuccess();
+    const data = { id: 1 };
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+
+    action = actions.fetchItemSuccess({ data });
+    expectedValue.item = data;
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
   });

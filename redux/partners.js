@@ -24,6 +24,20 @@ export const name = 'partners';
  */
 const prefix = `${name}/`;
 
+/**
+ * Default state model.
+ * @type {object}
+ * @property {object|null} error - submission error
+ * @property {object} item - current entity data
+ * @property {object[]} list - entity list data
+ */
+export const defaultInitialState = {
+  error: null,
+  item: null,
+  list: [],
+};
+
+
 /*
  * TYPES
  */
@@ -51,6 +65,30 @@ const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
  * @type {string}
  */
 const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
+
+/**
+ * Type used for handling entity fetching.
+ * @type {string}
+ */
+const FETCH_ITEM = `${prefix}FETCH_ITEM`;
+
+/**
+ * Type used for handling entity list fetching cancellation.
+ * @type {string}
+ */
+const FETCH_ITEM_CANCEL = `${prefix}FETCH_ITEM_CANCEL`;
+
+/**
+ * Type used for handling entity fetching failure.
+ * @type {string}
+ */
+const FETCH_ITEM_FAILURE = `${prefix}FETCH_ITEM_FAILURE`;
+
+/**
+ * Type used for handling entity fetching success.
+ * @type {string}
+ */
+const FETCH_ITEM_SUCCESS = `${prefix}FETCH_ITEM_SUCCESS`;
 
 /**
  * Type used for handling entity list fetching.
@@ -82,6 +120,10 @@ export const types = {
   CREATE_ITEM,
   CREATE_ITEM_FAILURE,
   CREATE_ITEM_SUCCESS,
+  FETCH_ITEM,
+  FETCH_ITEM_CANCEL,
+  FETCH_ITEM_FAILURE,
+  FETCH_ITEM_SUCCESS,
   FETCH_LIST,
   FETCH_LIST_CANCEL,
   FETCH_LIST_FAILURE,
@@ -98,7 +140,6 @@ export const types = {
  * @return {{type: string}}
  */
 const clearError = () => ({ type: CLEAR_ERROR });
-
 
 /**
  * Creates action for create item request.
@@ -156,6 +197,66 @@ const createItemFailure = ({ data, status } = {}) => ({
  */
 const createItemSuccess = data => ({
   type: CREATE_ITEM_SUCCESS,
+  data,
+});
+
+/**
+ * Creates action with item request details.
+ * @method
+ * @callback failureCallback
+ * @callback successCallback
+ * @param {number} id - item id
+ * @param {Object} [payload] - request config
+ * @param {failureCallback} [onFailure] - failure callback
+ * @param {successCallback} [onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string},
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const fetchItem = ({
+  id, payload = {}, onFailure, onSuccess,
+} = {}) => ({
+  type: FETCH_ITEM,
+  payload: {
+    url: `${apiURL}/${id}`,
+    method: 'get',
+    ...payload,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for item request cancelling.
+ * @method
+ * @return {{type: string}}
+ */
+const fetchItemCancel = () => ({
+  type: FETCH_ITEM_CANCEL,
+});
+
+/**
+ * Creates action for item request failing.
+ * @method
+ * @param {Object[]} error - response body
+ * @return {{ type: string, error: Object }}
+ */
+const fetchItemFailure = ({ data = defaultInitialState.error } = {}) => ({
+  type: FETCH_ITEM_FAILURE,
+  error: data,
+});
+
+/**
+ * Creates action for successful item request.
+ * @method
+ * @param {Object} data - response body
+ * @return {{ type: string, data: Object }}
+ */
+const fetchItemSuccess = ({ data = defaultInitialState.item } = {}) => ({
+  type: FETCH_ITEM_SUCCESS,
   data,
 });
 
@@ -232,6 +333,10 @@ export const actions = {
   createItem,
   createItemFailure,
   createItemSuccess,
+  fetchItem,
+  fetchItemCancel,
+  fetchItemFailure,
+  fetchItemSuccess,
   fetchList,
   fetchListCancel,
   fetchListFailure,
@@ -249,7 +354,18 @@ export const actions = {
  * @param {Object} state - redux state
  * @return {*}
  */
-const getState = state => state[name];
+const getState = (state) => {
+  if (!state[name]) {
+    const msg = [
+      `State for '${name}' not found in redux store.`,
+      'Check root reducer and logic configuration.',
+    ];
+
+    throw new Error(msg.join(' '));
+  }
+
+  return state[name];
+};
 
 /**
  * Returns request error.
@@ -258,6 +374,14 @@ const getState = state => state[name];
  * @return {*}
  */
 const getError = state => getState(state).error;
+
+/**
+ * Returns currently loaded Promotion.
+ * @method
+ * @param {Object} state - redux state
+ * @return {*}
+ */
+const getItem = state => getState(state).item;
 
 /**
  * Returns currently loaded entity list.
@@ -269,8 +393,9 @@ const getList = state => getState(state).list;
 
 export const selectors = {
   getError,
-  getState,
+  getItem,
   getList,
+  getState,
 };
 
 
@@ -309,15 +434,66 @@ const createItemLogic = createLogic({
           onFailure();
         }
       }
-    } catch ({ response }) {
+    } catch (error) {
+      const { response = {} } = error;
+
       dispatch(createItemFailure(response));
 
       if (onFailure) {
         onFailure();
       }
+    } finally {
+      done();
     }
+  },
+});
 
-    done();
+/**
+ * Logic used for handling entity fetching.
+ * @method
+ */
+const fetchItemLogic = createLogic({
+  type: [
+    FETCH_ITEM,
+  ],
+  cancelType: [
+    FETCH_ITEM_CANCEL,
+  ],
+  latest: true,
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(fetchItemSuccess(data));
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(fetchItemFailure(data));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch (error) {
+      const { response = {} } = error;
+      const { data } = response;
+
+      dispatch(fetchItemFailure(data));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
   },
 });
 
@@ -361,14 +537,15 @@ const fetchListLogic = createLogic({
       if (onFailure) {
         onFailure();
       }
+    } finally {
+      done();
     }
-
-    done();
   },
 });
 
 export const logic = {
   createItemLogic,
+  fetchItemLogic,
   fetchListLogic,
 };
 
@@ -376,19 +553,6 @@ export const logic = {
 /*
  * REDUCERS
  */
-
-/**
- * Default state model.
- * @type {object}
- * @property {object|null} error - submission error
- * @property {object} item - current entity data
- * @property {object[]} list - entity list data
- */
-export const defaultInitialState = {
-  error: null,
-  item: null,
-  list: [],
-};
 
 /**
  * Module's reducer function.
@@ -399,6 +563,7 @@ export const defaultInitialState = {
 const reducer = (initialState = defaultInitialState) => (state = initialState, action) => {
   switch (action.type) {
     case CREATE_ITEM_FAILURE:
+    case FETCH_ITEM_FAILURE:
     case FETCH_LIST_FAILURE:
       return {
         ...state,
@@ -409,6 +574,12 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
       return {
         ...state,
         error: initialState.error,
+      };
+    case FETCH_ITEM_SUCCESS:
+      return {
+        ...state,
+        errors: initialState.errors,
+        item: action.data,
       };
     case FETCH_LIST_SUCCESS:
       return {

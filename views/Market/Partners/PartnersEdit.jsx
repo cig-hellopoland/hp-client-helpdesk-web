@@ -12,10 +12,6 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import { withRouter } from 'next/router';
 import {
-  actions as categoriesActions,
-  selectors as categoriesSelectors,
-} from '@hello-poland/commons/redux/categories';
-import {
   actions as partnersActions,
   selectors as partnersSelectors,
 } from 'redux/partners';
@@ -66,8 +62,6 @@ class PartnersEdit extends React.Component {
     if (itemId) {
       this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
     }
-
-    this.handleFetchCategoriesList(DEFAULT_LANGUAGE);
   }
 
   getFormValues = (item) => {
@@ -126,58 +120,6 @@ class PartnersEdit extends React.Component {
   };
 
   setSelectedTab = (event, selectedTab) => this.setState({ selectedTab });
-
-  handleItemCategoryDeleteFailure = () => this.handleRequestFailure();
-
-  handleItemCategoryDeleteSuccess = () => {
-    const { itemId } = this.props;
-    const { selectedTranslation } = this.state;
-
-    this.handleFetchItem(itemId, selectedTranslation);
-  };
-
-  handleItemCategoryDelete = (categoryId) => {
-    const { itemId, deleteItemCategory } = this.props;
-
-    deleteItemCategory({
-      id: itemId,
-      categoryId,
-      onFailure: this.handleItemCategoryDeleteFailure,
-      onSuccess: this.handleItemCategoryDeleteSuccess,
-    });
-  };
-
-  handleItemCategorySubmitFailure = () => this.handleRequestFailure();
-
-  handleItemCategorySubmitSuccess = () => {
-    const { itemId } = this.props;
-    const { selectedTranslation } = this.state;
-
-    this.handleFetchItem(itemId, selectedTranslation);
-  };
-
-  handleItemCategorySubmit = (categoryId) => {
-    const { itemId, updateItemCategory } = this.props;
-
-    updateItemCategory({
-      id: itemId,
-      categoryId,
-      onFailure: this.handleItemCategorySubmitFailure,
-      onSuccess: this.handleItemCategorySubmitSuccess,
-    });
-  };
-
-  handleFetchCategoriesList = (language) => {
-    const { fetchCategoriesList } = this.props;
-
-    fetchCategoriesList({
-      options: {
-        headers: {
-          'Content-Language': language,
-        },
-      },
-    });
-  };
 
   handleFetchItemFailure = () => this.handleRequestFailure();
 
@@ -307,7 +249,7 @@ class PartnersEdit extends React.Component {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
     } = this.state;
     const {
-      categoriesList, classes, item, itemId,
+      classes, item, itemId,
     } = this.props;
     const { defaultLanguage } = item || {};
 
@@ -366,7 +308,6 @@ class PartnersEdit extends React.Component {
           {selectedTab === 2
             && (
               <CategoriesForm
-                categories={categoriesList}
                 defaultTranslation={defaultLanguage}
                 items={item.categories}
                 translation={selectedTranslation}
@@ -401,23 +342,19 @@ class PartnersEdit extends React.Component {
 }
 
 PartnersEdit.propTypes = {
-  categoriesList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   itemId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
-  deleteItemCategory: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
-  fetchCategoriesList: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   item: PropTypes.shape({
     id: PropTypes.number,
     label: PropTypes.string,
   }),
   router: PropTypes.shape({}).isRequired,
-  updateItemCategory: PropTypes.func.isRequired,
 };
 
 PartnersEdit.defaultProps = {
@@ -427,7 +364,6 @@ PartnersEdit.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  categoriesList: categoriesSelectors.getList(state),
   error: partnersSelectors.getError(state),
   item: partnersSelectors.getItem(state),
 });
@@ -442,10 +378,7 @@ const mapDispatchToProps = {
   deleteItemCategory: () => {},
   // deleteTranslation: partnersActions.deleteTranslation,
   deleteTranslation: () => {},
-  fetchCategoriesList: categoriesActions.fetchList,
   fetchItem: partnersActions.fetchItem,
-  // updateItemCategory: partnersActions.updateItemCategory,
-  updateItemCategory: () => {},
 };
 
 export default compose(

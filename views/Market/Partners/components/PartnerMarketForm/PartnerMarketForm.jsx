@@ -68,18 +68,10 @@ class PartnerMarketForm extends React.Component {
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
       published: yupBoolean(),
-      // generalAdmission: yupBoolen(),
-      lead: yupString().min(10).max(250),
       description: yupString().min(10).max(2500).required(),
-      email: yupString().email().trim(),
-      phone: yupString().min(9).trim(),
-      // location: yupObject().shape({
-      //   directions: yupString().min(5).max(255),
-      //   street: yupString().min(5),
-      //   zipCode: yupString().min(6).max(6),
-      //   city: yupString().min(3),
-      //   country: yupString().min(5),
-      // }),
+      location: yupObject().shape({
+        directions: yupString().min(5).max(255),
+      }),
     });
   }
 
@@ -98,16 +90,9 @@ class PartnerMarketForm extends React.Component {
 
     return {
       id: details.id || '',
-      blocked: details.blocked || false,
       description: details.description || '',
-      email: details.email || '',
-      phone: details.phone || '',
       location: {
         directions: location.directions || '',
-        street: location.street || '',
-        zipCode: location.zipCode || '',
-        city: location.city || '',
-        country: location.country || '',
       },
     };
   };
@@ -189,14 +174,11 @@ class PartnerMarketForm extends React.Component {
 
   render() {
     const {
-      classes, FormikProps, hideButtons, hideErrors, initialValues: itemValues, language,
-      requestError,
+      classes, FormikProps, hideButtons, hideErrors, requestError,
     } = this.props;
     const { initialValues } = this.state;
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
-    const { defaultLanguage, id: itemId } = itemValues || {};
-    const isDefaultTranslation = itemId && defaultLanguage === language;
 
     return (
       <Formik
@@ -220,42 +202,9 @@ class PartnerMarketForm extends React.Component {
               <GridItem>
                 <Field name="description" label="Opis partnera" required component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
-              {isDefaultTranslation
-                && (
-                  <React.Fragment>
-                    <GridItem>
-                      <Typography variant="h6" className={classes.section}>Dane kontaktowe</Typography>
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
-                    </GridItem>
-                  </React.Fragment>
-                )
-              }
               <GridItem>
                 <Typography variant="h6" className={classes.section}>Lokalizacja</Typography>
               </GridItem>
-              {isDefaultTranslation
-                && (
-                  <React.Fragment>
-                    <GridItem>
-                      <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={4} sm={4}>
-                      <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={4} sm={4}>
-                      <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={4} sm={4}>
-                      <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
-                    </GridItem>
-                  </React.Fragment>
-                )
-              }
               <GridItem>
                 <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={10} />
               </GridItem>

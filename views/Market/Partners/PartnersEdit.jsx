@@ -276,15 +276,17 @@ class PartnersEdit extends React.Component {
             textColor="primary"
             value={selectedTab}
           >
-            <Tab label="Wizytówka" />
             <Tab label="Dane firmy" />
+            <Tab label="Wizytówka" />
             <Tab label="Kategorie" />
             <Tab label="Multimedia" />
             <Tab label="Komentarze" disabled />
           </Tabs>
           {selectedTab === 0
             && (
-              <PartnerMarketForm
+              <PartnerCompanyForm
+                disabled={selectedTranslation !== defaultLanguage}
+                hideButtons={selectedTranslation !== defaultLanguage}
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
                 onSubmitSuccess={this.handleSubmitSuccess}
@@ -293,9 +295,7 @@ class PartnersEdit extends React.Component {
           }
           {selectedTab === 1
             && (
-              <PartnerCompanyForm
-                disabled={selectedTranslation !== defaultLanguage}
-                hideButtons={selectedTranslation !== defaultLanguage}
+              <PartnerMarketForm
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
                 onSubmitSuccess={this.handleSubmitSuccess}

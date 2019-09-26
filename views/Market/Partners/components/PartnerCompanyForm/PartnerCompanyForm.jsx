@@ -21,6 +21,8 @@ import {
   selectors as partnersSelectors,
 } from 'redux/partners';
 import _isEqual from 'lodash/isEqual';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 const commonProps = {
   fullWidth: true,
@@ -38,6 +40,21 @@ const businesTypes = [
   { label: 'Stowarzyszenie, fundacja, organizacja pożytku publicznego', value: 9 },
   { label: 'Spółdzielnia', value: 10 },
 ];
+
+// TODO: remove this function and change Switch implementation after it's fixed.
+// TODO: see https://github.com/stackworx/formik-material-ui/pull/42
+const fieldToSwitch = ({
+                         field,
+                         form: { isSubmitting },
+                         disabled = false,
+                         ...props
+                       }) => ({
+  disabled: isSubmitting || disabled,
+  ...props,
+  ...field,
+  value: field.name,
+  checked: field.value,
+});
 
 const styles = {
   formControl: {
@@ -265,6 +282,18 @@ class PartnerCompanyForm extends Component {
               </GridItem>
               <GridItem>
                 <Field disabled={disabled} name="name" label="Nazwa" required component={TextField} {...commonProps} />
+              </GridItem>
+              <GridItem md={4} sm={4}>
+                <Field
+                  name="blocked"
+                  disabled={disabled}
+                  render={switchProps => (
+                    <FormControlLabel
+                      control={<Switch {...fieldToSwitch(switchProps)} />}
+                      label="Blokuj"
+                    />
+                  )}
+                />
               </GridItem>
               <GridItem>
                 <Field disabled={disabled} name="location.street" label="Ulica" required component={TextField} {...commonProps} />

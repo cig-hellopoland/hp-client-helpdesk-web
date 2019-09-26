@@ -1200,6 +1200,7 @@ const updateItemLogic = createLogic({
     } catch (error) {
       const { response = {} } = error;
       const { data } = response;
+
       dispatch(updateItemFailure({ data }));
 
       if (onFailure) {

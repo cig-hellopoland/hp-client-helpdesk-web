@@ -2,27 +2,29 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import _isEqual from 'lodash/isEqual';
+import _isNumber from 'lodash/isNumber';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
+import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
-import withStyles from '@material-ui/core/styles/withStyles';
 import { Formik, Form, Field } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-material-ui';
 import yupBoolean from 'yup/lib/boolean';
 import yupNumber from 'yup/lib/number';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
-import GridItem from 'components/GridItem';
 import {
   actions as partnersActions,
   selectors as partnersSelectors,
 } from 'redux/partners';
-import _isEqual from 'lodash/isEqual';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
+import { DEFAULT_LANGUAGE } from 'utils/translations';
+import GridItem from 'components/GridItem';
 
 const commonProps = {
   fullWidth: true,
@@ -206,7 +208,7 @@ class PartnerCompanyForm extends Component {
   handleChange = fieldName => event => this.setState({ [fieldName]: event.target.value });
 
   handleSubmit = (values, actions) => {
-    const { onSubmit } = this.props;
+    const { initialValues, language, onSubmit } = this.props;
     const parsedValues = this.getParsedValues(values);
 
     if (onSubmit) {
@@ -215,14 +217,37 @@ class PartnerCompanyForm extends Component {
       return;
     }
 
-    const { createItem } = this.props;
+    const { createItem, updateItem } = this.props;
+    const { id, ...data } = parsedValues;
+
     const payload = {
-      data: parsedValues,
+      data,
+      options: {
+        headers: {
+          'Content-Language': language,
+        },
+      },
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
     };
 
-    createItem(payload);
+    let submitAction = createItem;
+
+    if (_isNumber(id)) {
+      payload.data.id = id;
+
+      submitAction = updateItem;
+      payload.id = id;
+      payload.data = {
+        ...initialValues,
+        ...data,
+      };
+      payload.pathParams = {
+        languageVersion: language,
+      };
+    }
+
+    submitAction(payload);
   };
 
   handleSubmitFailure = actions => () => {
@@ -455,12 +480,14 @@ PartnerCompanyForm.propTypes = {
   hideButtons: PropTypes.bool,
   hideErrors: PropTypes.bool,
   initialValues: PropTypes.shape({}),
+  language: PropTypes.string,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
   requestError: PropTypes.shape({
     message: PropTypes.string,
   }),
+  updateItem: PropTypes.func.isRequired,
 };
 
 PartnerCompanyForm.defaultProps = {
@@ -469,6 +496,7 @@ PartnerCompanyForm.defaultProps = {
   hideButtons: false,
   hideErrors: false,
   initialValues: null,
+  language: DEFAULT_LANGUAGE,
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
@@ -482,6 +510,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   clearError: partnersActions.clearError,
   createItem: partnersActions.createItem,
+  updateItem: partnersActions.updateItem,
 };
 
 export default compose(

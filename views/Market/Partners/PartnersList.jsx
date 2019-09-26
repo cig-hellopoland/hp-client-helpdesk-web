@@ -338,7 +338,7 @@ PartnersList.propTypes = {
 
 PartnersList.defaultProps = {
   error: null,
-}
+};
 
 const mapStateToProps = state => ({
   error: partnersSelectors.getError(state),

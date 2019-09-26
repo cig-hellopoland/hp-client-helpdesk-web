@@ -170,7 +170,7 @@ class TagsList extends React.Component {
 
   handleMenuOpen = (event, menuItemId) => this.setState({
     menuAnchor: event.currentTarget,
-    menuItemId: menuItemId,
+    menuItemId,
   });
 
   handleMenuClose = () => this.setState({

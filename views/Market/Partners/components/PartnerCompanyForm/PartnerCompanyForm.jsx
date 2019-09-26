@@ -44,11 +44,11 @@ const businesTypes = [
 // TODO: remove this function and change Switch implementation after it's fixed.
 // TODO: see https://github.com/stackworx/formik-material-ui/pull/42
 const fieldToSwitch = ({
-                         field,
-                         form: { isSubmitting },
-                         disabled = false,
-                         ...props
-                       }) => ({
+  field,
+  form: { isSubmitting },
+  disabled = false,
+  ...props
+}) => ({
   disabled: isSubmitting || disabled,
   ...props,
   ...field,

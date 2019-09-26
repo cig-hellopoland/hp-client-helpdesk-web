@@ -322,7 +322,7 @@ class PartnersList extends Component {
 
 PartnersList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
-  error: PropTypes.shape({}),
+  error: PropTypes.shape({}).isRequired,
   fetchList: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({
     affiliateCode: PropTypes.string,

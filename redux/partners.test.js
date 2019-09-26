@@ -129,7 +129,7 @@ describe('actions', () => {
       const { fetchItem } = actions;
       const { FETCH_ITEM } = types;
       const id = 1;
-      const payload = { a: 1 };
+      const options = { a: 1 };
       const expectedValue = {
         type: FETCH_ITEM,
         payload: {
@@ -142,16 +142,16 @@ describe('actions', () => {
 
       expectedValue.payload = {
         ...expectedValue.payload,
-        ...payload,
+        ...options,
       };
 
-      expect(fetchItem({ id, payload })).toEqual(expectedValue);
+      expect(fetchItem({ id, options })).toEqual(expectedValue);
 
       expectedValue.onFailure = onFailure;
       expectedValue.onSuccess = onSuccess;
 
       expect(fetchItem({
-        id, payload, onFailure, onSuccess,
+        id, options, onFailure, onSuccess,
       })).toEqual(expectedValue);
     });
 

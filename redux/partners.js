@@ -206,7 +206,7 @@ const createItemSuccess = data => ({
  * @callback failureCallback
  * @callback successCallback
  * @param {number} id - item id
- * @param {Object} [payload] - request config
+ * @param {Object} [options] - request config
  * @param {failureCallback} [onFailure] - failure callback
  * @param {successCallback} [onSuccess] - success callback
  * @return {{
@@ -217,13 +217,13 @@ const createItemSuccess = data => ({
  * }}
  */
 const fetchItem = ({
-  id, payload = {}, onFailure, onSuccess,
+  id, options = {}, onFailure, onSuccess,
 } = {}) => ({
   type: FETCH_ITEM,
   payload: {
     url: `${apiURL}/${id}`,
     method: 'get',
-    ...payload,
+    ...options,
   },
   onFailure,
   onSuccess,

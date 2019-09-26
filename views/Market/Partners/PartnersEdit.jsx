@@ -16,16 +16,15 @@ import {
   selectors as categoriesSelectors,
 } from '@hello-poland/commons/redux/categories';
 import {
-  actions as sightEventsActions,
-  selectors as sightEventsSelectors,
-} from '@hello-poland/commons/redux/sightEvents';
+  actions as partnersActions,
+  selectors as partnersSelectors,
+} from 'redux/partners';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
 import CategoriesForm from 'components/CategoriesForm';
-// import CategoriesForm from './components/CategoriesForm';
-// import SightEventForm from './components/SightEventForm';
+import PartnerMarketForm from './components/PartnerMarketForm';
 // import SightEventMultimediaForm from './components/SightEventMultimediaForm';
 // import TicketPoolDefinitionsList from './components/TicketPoolDefinitionsList';
 
@@ -312,7 +311,7 @@ class PartnersEdit extends React.Component {
     } = this.props;
     const { defaultLanguage } = item || {};
 
-    const pageTitle = itemId ? 'Edycja oferty' : 'Nowa oferta';
+    const pageTitle = 'Edycja partnera';
     const hasLanguageActions = !!(item && item.id);
 
     return (
@@ -355,15 +354,15 @@ class PartnersEdit extends React.Component {
             <Tab label="Multimedia" />
             <Tab label="Komentarze" disabled />
           </Tabs>
-          {/*{selectedTab === 0*/}
-          {/*  && (*/}
-          {/*    <SightEventForm*/}
-          {/*      initialValues={this.getFormValues(item)}*/}
-          {/*      language={selectedTranslation}*/}
-          {/*      onSubmitSuccess={this.handleSubmitSuccess}*/}
-          {/*    />*/}
-          {/*  )*/}
-          {/*}*/}
+          {selectedTab === 0
+            && (
+              <PartnerMarketForm
+                initialValues={this.getFormValues(item)}
+                language={selectedTranslation}
+                onSubmitSuccess={this.handleSubmitSuccess}
+              />
+            )
+          }
           {selectedTab === 2
             && (
               <CategoriesForm
@@ -429,19 +428,24 @@ PartnersEdit.defaultProps = {
 
 const mapStateToProps = state => ({
   categoriesList: categoriesSelectors.getList(state),
-  error: sightEventsSelectors.getError(state),
-  item: sightEventsSelectors.getSightEvent(state),
+  error: partnersSelectors.getError(state),
+  item: partnersSelectors.getItem(state),
 });
 
 const mapDispatchToProps = {
-  changeDefaultTranslation: sightEventsActions.changeDefaultTranslation,
-  clearError: sightEventsActions.clearError,
-  clearItem: sightEventsActions.clearItem,
-  deleteItemCategory: sightEventsActions.deleteItemCategory,
-  deleteTranslation: sightEventsActions.deleteTranslation,
+  // changeDefaultTranslation: partnersActions.changeDefaultTranslation,
+  changeDefaultTranslation: () => {},
+  clearError: partnersActions.clearError,
+  // clearItem: partnersActions.clearItem,
+  clearItem: () => {},
+  // deleteItemCategory: partnersActions.deleteItemCategory,
+  deleteItemCategory: () => {},
+  // deleteTranslation: partnersActions.deleteTranslation,
+  deleteTranslation: () => {},
   fetchCategoriesList: categoriesActions.fetchList,
-  fetchItem: sightEventsActions.fetchItem,
-  updateItemCategory: sightEventsActions.updateItemCategory,
+  fetchItem: partnersActions.fetchItem,
+  // updateItemCategory: partnersActions.updateItemCategory,
+  updateItemCategory: () => {},
 };
 
 export default compose(

@@ -19,7 +19,6 @@ import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
-import CategoriesForm from 'components/CategoriesForm';
 import PartnerMarketForm from './components/PartnerMarketForm';
 import PartnerCompanyForm from './components/PartnerCompanyForm';
 import PartnerMultimediaForm from './components/PartnerMultimediaForm';
@@ -278,7 +277,6 @@ class PartnersEdit extends React.Component {
           >
             <Tab label="Dane firmy" />
             <Tab label="Wizytówka" />
-            <Tab label="Kategorie" />
             <Tab label="Multimedia" />
             <Tab label="Komentarze" disabled />
           </Tabs>
@@ -303,14 +301,6 @@ class PartnersEdit extends React.Component {
             )
           }
           {selectedTab === 2
-            && (
-              <CategoriesForm
-                defaultTranslation={defaultLanguage}
-                translation={selectedTranslation}
-              />
-            )
-          }
-          {selectedTab === 3
             && (
               <PartnerMultimediaForm
                 data={this.getMultimediaFromItem(item)}

@@ -114,6 +114,24 @@ const FETCH_LIST_FAILURE = `${prefix}FETCH_LIST_FAILURE`;
  */
 const FETCH_LIST_SUCCESS = `${prefix}FETCH_LIST_SUCCESS`;
 
+/**
+ * Type used for handling entity updates.
+ * @type {string}
+ */
+const UPDATE_ITEM = `${prefix}UPDATE_ITEM`;
+
+/**
+ * Type used for handling entity updates failure.
+ * @type {string}
+ */
+const UPDATE_ITEM_FAILURE = `${prefix}UPDATE_ITEM_FAILURE`;
+
+/**
+ * Type used for handling entity updates success.
+ * @type {string}
+ */
+const UPDATE_ITEM_SUCCESS = `${prefix}UPDATE_ITEM_SUCCESS`;
+
 
 export const types = {
   CLEAR_ERROR,
@@ -128,6 +146,9 @@ export const types = {
   FETCH_LIST_CANCEL,
   FETCH_LIST_FAILURE,
   FETCH_LIST_SUCCESS,
+  UPDATE_ITEM,
+  UPDATE_ITEM_FAILURE,
+  UPDATE_ITEM_SUCCESS,
 };
 
 /*
@@ -328,6 +349,70 @@ const fetchListSuccess = data => ({
   data,
 });
 
+/**
+ * Creates action with item update request details.
+ * @method
+ * @param {Object} params
+ * @param {Object} id - item id
+ * @param {Object} data - request body
+ * @param {Object} pathParams - URL path params
+ * @param {Object} [options] - request config
+ * @param {failureCallback} [onFailure] - failure callback
+ * @param {successCallback} [onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string, data: *, options: *},
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const updateItem = ({
+  id, data, pathParams, options, onFailure, onSuccess,
+} = {}) => {
+  let path = '';
+
+  if (pathParams) {
+    path = Object.entries(pathParams).reduce((acc, [key, value]) => `${acc}/${key}/${value}`, '');
+  }
+
+  return ({
+    type: UPDATE_ITEM,
+    payload: {
+      url: `${apiURL}/${id}${path}`,
+      method: 'put',
+      ...options,
+      data,
+    },
+    onFailure,
+    onSuccess,
+  });
+};
+
+/**
+ * Creates action for item update request failing.
+ * @method
+ * @param {Object} data - response body
+ * @return {{
+ *   type: string,
+ *   error: {Object}
+ * }}
+ */
+const updateItemFailure = ({ data = defaultInitialState.error } = {}) => ({
+  type: UPDATE_ITEM_FAILURE,
+  error: data,
+});
+
+/**
+ * Creates action for successful item update request.
+ * @method
+ * @param {Object} data - response body
+ * @return {{type: string, data: *}}
+ */
+const updateItemSuccess = ({ data = defaultInitialState.item } = {}) => ({
+  type: UPDATE_ITEM_SUCCESS,
+  data,
+});
+
 export const actions = {
   clearError,
   createItem,
@@ -341,6 +426,9 @@ export const actions = {
   fetchListCancel,
   fetchListFailure,
   fetchListSuccess,
+  updateItem,
+  updateItemFailure,
+  updateItemSuccess,
 };
 
 
@@ -543,10 +631,56 @@ const fetchListLogic = createLogic({
   },
 });
 
+/**
+ * Logic used for handling entity updates.
+ * @method
+ */
+const updateItemLogic = createLogic({
+  type: [
+    UPDATE_ITEM,
+  ],
+  latest: true,
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 201) {
+        dispatch(updateItemSuccess(data));
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(updateItemFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch (error) {
+      const { response = {} } = error;
+      const { data } = response;
+      dispatch(updateItemFailure(data));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
+  },
+});
+
 export const logic = {
   createItemLogic,
   fetchItemLogic,
   fetchListLogic,
+  updateItemLogic,
 };
 
 
@@ -565,12 +699,14 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
     case CREATE_ITEM_FAILURE:
     case FETCH_ITEM_FAILURE:
     case FETCH_LIST_FAILURE:
+    case UPDATE_ITEM_FAILURE:
       return {
         ...state,
         error: action.error,
       };
     case CLEAR_ERROR:
     case CREATE_ITEM_SUCCESS:
+    case UPDATE_ITEM_SUCCESS:
       return {
         ...state,
         error: initialState.error,

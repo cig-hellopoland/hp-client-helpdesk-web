@@ -272,6 +272,80 @@ describe('actions', () => {
       expect(fetchListSuccess(data)).toEqual(expectedValue);
     });
   });
+
+  describe('using updateItem', () => {
+    it('should create an action with request payload', () => {
+      const { updateItem } = actions;
+      const { UPDATE_ITEM } = types;
+      const id = 1;
+      const data = { a: 1 };
+      const pathParams = { languageVersion: 'pl-PL' };
+      const options = { b: 2 };
+      const expectedValue = {
+        type: UPDATE_ITEM,
+        payload: {
+          url: `${apiURL}/${id}/languageVersion/${pathParams.languageVersion}`,
+          method: 'put',
+          data,
+        },
+      };
+
+      expect(updateItem({ id, data, pathParams })).toEqual(expectedValue);
+
+      expectedValue.payload = {
+        ...expectedValue.payload,
+        ...options,
+      };
+
+      expect(updateItem({
+        id, data, pathParams, options,
+      })).toEqual(expectedValue);
+
+      expectedValue.onFailure = onFailure;
+      expectedValue.onSuccess = onSuccess;
+
+      expect(updateItem({
+        id, data, pathParams, options, onFailure, onSuccess,
+      })).toEqual(expectedValue);
+    });
+
+    it('should create an action for failed request', () => {
+      const { updateItemFailure } = actions;
+      const { UPDATE_ITEM_FAILURE } = types;
+      let expectedValue = {
+        type: UPDATE_ITEM_FAILURE,
+        error: defaultInitialState.error,
+      };
+
+      expect(updateItemFailure()).toEqual(expectedValue);
+
+      expectedValue = {
+        type: UPDATE_ITEM_FAILURE,
+        error: axiosResponseError.data,
+      };
+
+      expect(updateItemFailure(axiosResponseError)).toEqual(expectedValue);
+    });
+
+    it('should create an action for successful request', () => {
+      const { updateItemSuccess } = actions;
+      const { UPDATE_ITEM_SUCCESS } = types;
+      const data = [{ a: 1 }];
+      let expectedValue = {
+        type: UPDATE_ITEM_SUCCESS,
+        data: defaultInitialState.item,
+      };
+
+      expect(updateItemSuccess()).toEqual(expectedValue);
+
+      expectedValue = {
+        type: UPDATE_ITEM_SUCCESS,
+        data,
+      };
+
+      expect(updateItemSuccess({ data })).toEqual(expectedValue);
+    });
+  });
 });
 
 describe('selectors', () => {
@@ -443,6 +517,30 @@ describe('reducer', () => {
     const expectedValue = {
       ...defaultInitialState,
       list: data.items,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle UPDATE_ITEM_FAILURE', () => {
+    let action = actions.updateItemFailure();
+    const expectedValue = {
+      ...defaultInitialState,
+    };
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+
+    action = actions.updateItemFailure(axiosResponseError);
+    expectedValue.error = axiosResponseError.data;
+
+    expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);
+  });
+
+  it('should handle UPDATE_ITEM_SUCCESS', () => {
+    const data = { id: 1 };
+    const action = actions.updateItemSuccess({ data });
+    const expectedValue = {
+      ...defaultInitialState,
     };
 
     expect(reducer()(defaultInitialState, action)).toEqual(expectedValue);

@@ -67,6 +67,24 @@ const CREATE_ITEM_FAILURE = `${prefix}CREATE_ITEM_FAILURE`;
 const CREATE_ITEM_SUCCESS = `${prefix}CREATE_ITEM_SUCCESS`;
 
 /**
+ * Type used for handling translation creation.
+ * @type {string}
+ */
+const CREATE_TRANSLATION = `${prefix}CREATE_TRANSLATION`;
+
+/**
+ * Type used for handling translation creation failure.
+ * @type {string}
+ */
+const CREATE_TRANSLATION_FAILURE = `${prefix}CREATE_TRANSLATION_FAILURE`;
+
+/**
+ * Type used for handling translation creation success.
+ * @type {string}
+ */
+const CREATE_TRANSLATION_SUCCESS = `${prefix}CREATE_TRANSLATION_SUCCESS`;
+
+/**
  * Type used for handling entity fetching.
  * @type {string}
  */
@@ -138,6 +156,9 @@ export const types = {
   CREATE_ITEM,
   CREATE_ITEM_FAILURE,
   CREATE_ITEM_SUCCESS,
+  CREATE_TRANSLATION,
+  CREATE_TRANSLATION_FAILURE,
+  CREATE_TRANSLATION_SUCCESS,
   FETCH_ITEM,
   FETCH_ITEM_CANCEL,
   FETCH_ITEM_FAILURE,
@@ -218,6 +239,57 @@ const createItemFailure = ({ data, status } = {}) => ({
  */
 const createItemSuccess = data => ({
   type: CREATE_ITEM_SUCCESS,
+  data,
+});
+
+/**
+ * Creates action with translation creation request details.
+ * @method
+ * @param {Object} params
+ * @param {Object} params.data - request data
+ * @param {Object} [params.options] - request config
+ * @param {failureCallback} [params.onFailure] - failure callback
+ * @param {successCallback} [params.onSuccess] - success callback
+ * @return {{
+ *   type: string,
+ *   payload: {url: string, method: string, data: *, options: *},
+ *   onFailure: failureCallback,
+ *   onSuccess: successCallback
+ * }}
+ */
+const createTranslation = ({
+  data, options, onFailure, onSuccess,
+} = {}) => ({
+  type: CREATE_TRANSLATION,
+  payload: {
+    url: apiURL,
+    method: 'post',
+    ...options,
+    data,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for item request failing.
+ * @method
+ * @param {Object[]} error - response body
+ * @return {{ type: string, error: Object }}
+ */
+const createTranslationFailure = ({ data = defaultInitialState.error } = {}) => ({
+  type: CREATE_TRANSLATION_FAILURE,
+  error: data,
+});
+
+/**
+ * Creates action for successful item request.
+ * @method
+ * @param {Object} data - response body
+ * @return {{ type: string, data: Object }}
+ */
+const createTranslationSuccess = ({ data = defaultInitialState.item } = {}) => ({
+  type: CREATE_TRANSLATION_SUCCESS,
   data,
 });
 
@@ -418,6 +490,9 @@ export const actions = {
   createItem,
   createItemFailure,
   createItemSuccess,
+  createTranslation,
+  createTranslationFailure,
+  createTranslationSuccess,
   fetchItem,
   fetchItemCancel,
   fetchItemFailure,
@@ -526,6 +601,52 @@ const createItemLogic = createLogic({
       const { response = {} } = error;
 
       dispatch(createItemFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
+  },
+});
+
+/**
+ * Logic used for handling translation creation.
+ * @method
+ */
+const createTranslationLogic = createLogic({
+  type: [
+    CREATE_TRANSLATION,
+  ],
+  latest: true,
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(createItemSuccess(data));
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(createItemFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch (error) {
+      const { response = {} } = error;
+      const { data } = response;
+
+      dispatch(createItemFailure(data));
 
       if (onFailure) {
         onFailure();
@@ -678,6 +799,7 @@ const updateItemLogic = createLogic({
 
 export const logic = {
   createItemLogic,
+  createTranslationLogic,
   fetchItemLogic,
   fetchListLogic,
   updateItemLogic,
@@ -697,6 +819,7 @@ export const logic = {
 const reducer = (initialState = defaultInitialState) => (state = initialState, action) => {
   switch (action.type) {
     case CREATE_ITEM_FAILURE:
+    case CREATE_TRANSLATION_FAILURE:
     case FETCH_ITEM_FAILURE:
     case FETCH_LIST_FAILURE:
     case UPDATE_ITEM_FAILURE:
@@ -706,6 +829,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
       };
     case CLEAR_ERROR:
     case CREATE_ITEM_SUCCESS:
+    case CREATE_TRANSLATION_SUCCESS:
     case UPDATE_ITEM_SUCCESS:
       return {
         ...state,

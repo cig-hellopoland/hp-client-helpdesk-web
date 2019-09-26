@@ -276,10 +276,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   clearError: partnersActions.clearError,
   createItem: partnersActions.createItem,
-  createTranslation: () => {},
-  // createTranslation: partnersActions.createTranslation,
-  updateItem: () => {},
-  // updateItem: partnersActions.updateItem,
+  createTranslation: partnersActions.createTranslation,
+  updateItem: partnersActions.updateItem,
 };
 
 export default compose(

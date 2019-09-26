@@ -34,9 +34,6 @@ const styles = theme => ({
   root: {
     minHeight: '100%',
   },
-  actions: {
-    minWidth: 200,
-  },
   paper: {
     flex: 1,
     overflow: 'hidden',
@@ -192,7 +189,7 @@ class PartnersList extends Component {
                             <Typography>{partner.email}</Typography>
                             <Typography>{partner.phone}</Typography>
                           </TableCell>
-                          <TableCell align="right" className={classes.actions}>
+                          <TableCell align="right">
                             <IconButton
                               aria-owns={menuAnchor ? 'item-menu' : undefined}
                               aria-haspopup="true"

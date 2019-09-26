@@ -322,7 +322,7 @@ class PartnersList extends Component {
 
 PartnersList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
-  error: PropTypes.shape({}).isRequired,
+  error: PropTypes.shape({}),
   fetchList: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({
     affiliateCode: PropTypes.string,
@@ -335,6 +335,10 @@ PartnersList.propTypes = {
   router: PropTypes.shape({}).isRequired,
   updateItem: PropTypes.func.isRequired,
 };
+
+PartnersList.defaultProps = {
+  error: null,
+}
 
 const mapStateToProps = state => ({
   error: partnersSelectors.getError(state),

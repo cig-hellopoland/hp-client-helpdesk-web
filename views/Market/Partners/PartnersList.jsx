@@ -241,7 +241,7 @@ class PartnersList extends Component {
                       <Typography>
                         Dodaj partnera lub ponów zapytanie aby wyświetlić listę.
                       </Typography>
-                      <Button className={classes.fetchButton} variant="outlined" onClick={this.handleFetchPartners}>
+                      <Button className={classes.fetchButton} variant="outlined" onClick={this.handleFetchItems}>
                         Ponów
                       </Button>
                     </Fragment>

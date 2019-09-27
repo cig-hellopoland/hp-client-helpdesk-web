@@ -102,13 +102,13 @@ class PartnerMarketForm extends React.Component {
         ...initialValues,
         ...data,
       },
-      onFailure: this.handleSubmitFailure(actions),
-      onSuccess: this.handleSubmitSuccess(actions),
       options: {
         headers: {
           'Content-Language': language,
         },
       },
+      onFailure: this.handleSubmitFailure(actions),
+      onSuccess: this.handleSubmitSuccess(actions),
     };
 
     let submitAction = createItem;

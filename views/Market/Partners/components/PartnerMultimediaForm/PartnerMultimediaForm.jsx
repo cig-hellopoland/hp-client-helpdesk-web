@@ -8,9 +8,9 @@ import IconButton from '@material-ui/core/IconButton/IconButton';
 import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import {
-  actions as sightEventsActions,
-  selectors as sightEventsSelectors,
-} from '@hello-poland/commons/redux/sightEvents';
+  actions as partnersActions,
+  selectors as partnersSelectors,
+} from 'redux/partners';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import AlertDialog from 'components/AlertDialog';
 import MediaManager from 'components/MediaManager';
@@ -31,7 +31,7 @@ const styles = theme => ({
   },
 });
 
-class SightEventMultimediaForm extends React.Component {
+class PartnerMultimediaForm extends React.Component {
   state = {
     alertDialog: {
       content: '',
@@ -69,36 +69,8 @@ class SightEventMultimediaForm extends React.Component {
     this.setState({ alertDialog });
   };
 
-  handleDeletePDFFailure = () => {
-    const { onFailure } = this.props;
-
-    if (onFailure) {
-      onFailure();
-    }
-  };
-
-  handleDeletePDFSuccess = () => {
-    const { onSuccess } = this.props;
-
-    if (onSuccess) {
-      onSuccess();
-    }
-  };
-
-  handleDeletePDF = () => {
-    const { deletePDF, itemId } = this.props;
-
-    const payload = {
-      id: itemId,
-      onFailure: this.handleDeletePDFFailure,
-      onSuccess: this.handleDeletePDFSuccess,
-    };
-
-    deletePDF(payload);
-  };
-
   handleMediaManagerClose = () => {
-    const { clearError, createMainImageCancel, createPDFCancel } = this.props;
+    const { clearError, createMainImageCancel } = this.props;
     const { mediaManagerData } = this.state;
     const { fileType } = mediaManagerData;
     let action = () => {};
@@ -110,8 +82,6 @@ class SightEventMultimediaForm extends React.Component {
 
     if (fileType === 'image/jpeg') {
       action = createMainImageCancel;
-    } else if (fileType === 'application/pdf') {
-      action = createPDFCancel;
     }
 
     action();
@@ -137,15 +107,13 @@ class SightEventMultimediaForm extends React.Component {
   };
 
   handleMediaManagerSubmit = ({ data, options }) => {
-    const { createMainImage, createPDF } = this.props;
+    const { createMainImage } = this.props;
     const { mediaManagerData } = this.state;
     const { fileType, itemId } = mediaManagerData;
     let action = () => {};
 
     if (fileType === 'image/jpeg') {
       action = createMainImage;
-    } else if (fileType === 'application/pdf') {
-      action = createPDF;
     }
 
     action({
@@ -172,7 +140,6 @@ class SightEventMultimediaForm extends React.Component {
     } = this.props;
     const isDefaultTranslation = defaultTranslation === translation;
     const images = (data && data.filter(item => item.type === 'image/jpeg')) || [];
-    const documents = (data && data.filter(item => item.type === 'application/pdf')) || [];
 
     return (
       <React.Fragment>
@@ -194,24 +161,6 @@ class SightEventMultimediaForm extends React.Component {
           </Grid>
           <MultimediaSection items={images} onDelete={this.handleDelete} />
         </div>
-        <div className={classes.section}>
-          <Grid container alignItems="center" justify="space-between">
-            <Grid item>
-              <Typography variant="h6">Pliki</Typography>
-            </Grid>
-            <Grid item>
-              <IconButton
-                aria-label="Dodaj"
-                disabled={!isDefaultTranslation}
-                onClick={() => this.handleUploadModalOpen(itemId, 'application/pdf')}
-                title="Dodaj"
-              >
-                <AddIcon />
-              </IconButton>
-            </Grid>
-          </Grid>
-          <MultimediaSection items={documents} onDelete={this.handleDelete} />
-        </div>
         <MediaManager
           disableBackdropClick
           error={!!requestError}
@@ -229,16 +178,13 @@ class SightEventMultimediaForm extends React.Component {
   }
 }
 
-SightEventMultimediaForm.propTypes = {
+PartnerMultimediaForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   createMainImage: PropTypes.func.isRequired,
   createMainImageCancel: PropTypes.func.isRequired,
-  createPDF: PropTypes.func.isRequired,
-  createPDFCancel: PropTypes.func.isRequired,
   data: PropTypes.arrayOf(PropTypes.shape({})),
   defaultTranslation: PropTypes.string,
-  deletePDF: PropTypes.func.isRequired,
   itemId: PropTypes.number.isRequired,
   onFailure: PropTypes.func,
   onSuccess: PropTypes.func,
@@ -248,7 +194,7 @@ SightEventMultimediaForm.propTypes = {
   }),
 };
 
-SightEventMultimediaForm.defaultProps = {
+PartnerMultimediaForm.defaultProps = {
   data: [],
   defaultTranslation: DEFAULT_LANGUAGE,
   onFailure: null,
@@ -258,19 +204,16 @@ SightEventMultimediaForm.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  requestError: sightEventsSelectors.getError(state),
+  requestError: partnersSelectors.getError(state),
 });
 
 const mapDispatchToProps = {
-  clearError: sightEventsActions.clearError,
-  createMainImage: sightEventsActions.createMainImage,
-  createMainImageCancel: sightEventsActions.createMainImageCancel,
-  createPDF: sightEventsActions.createPDF,
-  createPDFCancel: sightEventsActions.createPDFCancel,
-  deletePDF: sightEventsActions.deletePDF,
+  clearError: partnersActions.clearError,
+  createMainImage: partnersActions.createMainImage,
+  createMainImageCancel: partnersActions.createMainImageCancel,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
-)(SightEventMultimediaForm);
+)(PartnerMultimediaForm);

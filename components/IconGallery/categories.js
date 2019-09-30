@@ -15,4 +15,5 @@ export default {
   PLACES: 'PLACES',
   SOCIAL: 'SOCIAL',
   TOGGLE: 'TOGGLE',
+  CUSTOM: 'CUSTOM',
 };

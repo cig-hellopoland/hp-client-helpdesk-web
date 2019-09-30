@@ -21,17 +21,17 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
-import CategoryIcon from '@material-ui/icons/Category';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import LockIcon from '@material-ui/icons/Lock';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import StarIcon from '@material-ui/icons/Star';
 import Link from 'next/link';
 import { withRouter } from 'next/router';
 import {
-  actions as categoriesActions,
-  selectors as categoriesSelectors,
-} from '@hello-poland/commons/redux/categories';
+  actions as tagsActions,
+  selectors as tagsSelectors,
+} from '@hello-poland/commons/redux/tags';
 import withAuth from 'services/auth/withAuth';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 
@@ -65,8 +65,8 @@ const styles = theme => ({
   },
 });
 
-class CategoriesList extends React.Component {
-  baseURL = '/market/categories';
+class TagsList extends React.Component {
+  baseURL = '/market/tags';
 
   state = {
     dialogOpen: false,
@@ -168,9 +168,9 @@ class CategoriesList extends React.Component {
     this.handleMenuClose();
   };
 
-  handleMenuOpen = (event, itemId) => this.setState({
+  handleMenuOpen = (event, menuItemId) => this.setState({
     menuAnchor: event.currentTarget,
-    menuItemId: itemId,
+    menuItemId,
   });
 
   handleMenuClose = () => this.setState({
@@ -216,10 +216,10 @@ class CategoriesList extends React.Component {
             {sortedList.length === 0
               && (
                 <EmptyView
-                  image={CategoryIcon}
-                  label="Brak kategorii"
+                  image={LocalOfferIcon}
+                  label="Brak tagów"
                   loading={isFetching}
-                  message="Dodaj kategorię lub ponów zapytanie aby wyświetlić listę."
+                  message="Dodaj tag lub ponów zapytanie aby wyświetlić listę."
                   onRefresh={this.handleFetchItems}
                 />
               )
@@ -323,7 +323,7 @@ class CategoriesList extends React.Component {
   }
 }
 
-CategoriesList.propTypes = {
+TagsList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   deleteItem: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
@@ -339,18 +339,18 @@ CategoriesList.propTypes = {
   router: PropTypes.shape({}).isRequired,
 };
 
-CategoriesList.defaultProps = {
+TagsList.defaultProps = {
   error: null,
 };
 
 const mapStateToProps = state => ({
-  error: categoriesSelectors.getError(state),
-  items: categoriesSelectors.getList(state),
+  error: tagsSelectors.getError(state),
+  items: tagsSelectors.getList(state),
 });
 
 const mapDispatchToProps = {
-  deleteItem: categoriesActions.deleteItem,
-  fetchList: categoriesActions.fetchList,
+  deleteItem: tagsActions.deleteItem,
+  fetchList: tagsActions.fetchList,
 };
 
 export default compose(
@@ -358,4 +358,4 @@ export default compose(
   withAuth(),
   withRouter,
   withStyles(styles),
-)(CategoriesList);
+)(TagsList);

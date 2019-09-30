@@ -49,6 +49,16 @@ class PromotedSightEvents extends Component {
   state = this.initialState;
 
   componentDidMount() {
+    this.handleFetchSightEvents();
+  }
+
+  handleClose = () => {
+    this.setState({
+      ...this.initialState,
+    });
+  };
+
+  handleFetchSightEvents = () => {
     const { fetchSightEventsList } = this.props;
 
     fetchSightEventsList({
@@ -58,16 +68,10 @@ class PromotedSightEvents extends Component {
         },
       },
     });
-  }
-
-  handleClose = () => {
-    this.setState({
-      ...this.initialState,
-    });
   };
 
   handlePromotionChange = (id, value) => {
-    const { changePromotion, fetchSightEventsList } = this.props;
+    const { changePromotion } = this.props;
     const { promotionDialog } = this.state;
     const pathParams = { promotion: value };
     changePromotion({
@@ -79,7 +83,7 @@ class PromotedSightEvents extends Component {
         },
       },
       onSuccess: () => {
-        fetchSightEventsList();
+        this.handleFetchSightEvents();
         this.handleClose();
       },
       onFailure: () => {
@@ -89,7 +93,7 @@ class PromotedSightEvents extends Component {
   };
 
   handleRemovePromotion = (id) => {
-    const { deletePromotion, fetchSightEventsList } = this.props;
+    const { deletePromotion } = this.props;
     deletePromotion({
       id,
       options: {
@@ -98,7 +102,7 @@ class PromotedSightEvents extends Component {
         },
       },
       onSuccess: () => {
-        fetchSightEventsList();
+        this.handleFetchSightEvents();
         this.handleClose();
       },
       onFailure: () => {
@@ -113,7 +117,7 @@ class PromotedSightEvents extends Component {
       onCancel: this.handleClose,
       onSuccess: () => this.handleRemovePromotion(id),
       title: 'Uwaga',
-      content: `Oferta ${name} przestanie być promowana, czy chcesz kontynuować?`,
+      content: `Oferta "${name}" przestanie być promowana, czy chcesz kontynuować?`,
     },
   });
 

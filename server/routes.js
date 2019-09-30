@@ -15,4 +15,8 @@ module.exports = [
     page: '/market/sight-events/edit',
     path: '/market/sight-events/:itemId/edit',
   },
+  {
+    page: '/market/tags/edit',
+    path: '/market/tags/:itemId/edit',
+  },
 ];

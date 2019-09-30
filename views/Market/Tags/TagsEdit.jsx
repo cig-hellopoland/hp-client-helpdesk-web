@@ -7,39 +7,30 @@ import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Snackbar from '@material-ui/core/Snackbar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import { withRouter } from 'next/router';
 import {
-  actions as partnersActions,
-  selectors as partnersSelectors,
-} from 'redux/partners';
+  actions as tagsActions,
+  selectors as tagsSelectors,
+} from '@hello-poland/commons/redux/tags';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
-import PartnerMarketForm from './components/PartnerMarketForm';
-import PartnerCompanyForm from './components/PartnerCompanyForm';
-import PartnerMultimediaForm from './components/PartnerMultimediaForm';
+import TagForm from './components/TagForm';
 
 const styles = theme => ({
   root: {
     flex: 1,
-    minHeight: '100%',
     padding: theme.spacing.unit * 2,
-  },
-  section: {
-    marginBottom: theme.spacing.unit * 3,
   },
 });
 
-class PartnersEdit extends React.Component {
-  baseURL = '/market/partners';
+class TagsEdit extends React.Component {
+  baseURL = '/market/tags';
 
   state = {
     availableTranslations: CONTENT_LANGUAGES,
-    selectedTab: 0,
     selectedTranslation: DEFAULT_LANGUAGE,
     snackbarOpen: false,
     snackbarMessage: '',
@@ -69,8 +60,7 @@ class PartnersEdit extends React.Component {
 
     if (item && itemId === item.id) {
       const { availableLanguageVersions } = item;
-      const hasNewTranslation = availableLanguageVersions
-        && !availableLanguageVersions.some(lng => lng === selectedTranslation);
+      const hasNewTranslation = !availableLanguageVersions.some(lng => lng === selectedTranslation);
 
       if (hasNewTranslation) {
         const { label, ...itemProps } = item;
@@ -84,31 +74,15 @@ class PartnersEdit extends React.Component {
     return null;
   };
 
-  getMultimediaFromItem = (item) => {
-    const { mainImage } = item;
-    const data = [];
+  handleFetchItemFailure = () => {
+    const { clearError, error } = this.props;
 
-    if (mainImage) {
-      data.push({
-        createdBy: '',
-        createdDate: '',
-        id: 1,
-        modifiedBy: '',
-        modifiedDate: '',
-        name: 'mainImage',
-        path: '/home/hpl/var/DMS/omg/1234.jpg',
-        size: 12345,
-        type: 'image/jpeg',
-        downloadUrl: mainImage,
-      });
+    this.handleSnackbarOpen(error && error.message);
+
+    if (clearError) {
+      clearError();
     }
-
-    return data;
   };
-
-  setSelectedTab = (event, selectedTab) => this.setState({ selectedTab });
-
-  handleFetchItemFailure = () => this.handleRequestFailure();
 
   handleFetchItemSuccess = () => {
     const { item } = this.props;
@@ -135,16 +109,6 @@ class PartnersEdit extends React.Component {
     });
   };
 
-  handleRequestFailure = () => {
-    const { clearError, error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-
-    if (clearError) {
-      clearError();
-    }
-  };
-
   handleTranslationChange = (event) => {
     const { item } = this.props;
     const selectedTranslation = event.target.value;
@@ -166,7 +130,15 @@ class PartnersEdit extends React.Component {
     }));
   };
 
-  handleTranslationDefaultChangeFailure = () => this.handleRequestFailure();
+  handleTranslationDefaultChangeFailure = () => {
+    const { clearError, error } = this.props;
+
+    this.handleSnackbarOpen(error && error.message);
+
+    if (clearError) {
+      clearError();
+    }
+  };
 
   handleTranslationDefaultChangeSuccess = () => {
     const { selectedTranslation } = this.state;
@@ -192,7 +164,15 @@ class PartnersEdit extends React.Component {
     });
   };
 
-  handleTranslationDeleteFailure = () => this.handleRequestFailure();
+  handleTranslationDeleteFailure = () => {
+    const { clearError, error } = this.props;
+
+    this.handleSnackbarOpen(error && error.message);
+
+    if (clearError) {
+      clearError();
+    }
+  };
 
   handleTranslationDeleteSuccess = () => {
     const { itemId, item } = this.props;
@@ -233,13 +213,13 @@ class PartnersEdit extends React.Component {
 
   render() {
     const {
-      availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
+      availableTranslations, selectedTranslation, snackbarOpen, snackbarMessage,
     } = this.state;
     const { classes, item, itemId } = this.props;
     const { defaultLanguage } = item || {};
 
-    const pageTitle = 'Edycja partnera';
-    const hasLanguageActions = !!(item && item.id);
+    const pageTitle = itemId ? 'Edycja taga' : 'Nowy tag';
+    const hasLanguageActions = !!(itemId);
 
     return (
       <Layout>
@@ -268,50 +248,11 @@ class PartnersEdit extends React.Component {
               />
             </Grid>
           </Grid>
-          <Tabs
-            className={classes.section}
-            onChange={this.setSelectedTab}
-            indicatorColor="primary"
-            textColor="primary"
-            value={selectedTab}
-          >
-            <Tab label="Dane firmy" />
-            <Tab label="Wizytówka" />
-            <Tab label="Multimedia" />
-            <Tab label="Komentarze" disabled />
-          </Tabs>
-          {selectedTab === 0
-            && (
-              <PartnerCompanyForm
-                disabled={selectedTranslation !== defaultLanguage}
-                hideButtons={selectedTranslation !== defaultLanguage}
-                initialValues={this.getFormValues(item)}
-                language={selectedTranslation}
-                onSubmitSuccess={this.handleSubmitSuccess}
-              />
-            )
-          }
-          {selectedTab === 1
-            && (
-              <PartnerMarketForm
-                initialValues={this.getFormValues(item)}
-                language={selectedTranslation}
-                onSubmitSuccess={this.handleSubmitSuccess}
-              />
-            )
-          }
-          {selectedTab === 2
-            && (
-              <PartnerMultimediaForm
-                data={this.getMultimediaFromItem(item)}
-                defaultTranslation={defaultLanguage}
-                itemId={itemId}
-                onFailure={() => this.handleRequestFailure()}
-                onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}
-                translation={selectedTranslation}
-              />
-            )
-          }
+          <TagForm
+            initialValues={this.getFormValues(item)}
+            language={selectedTranslation}
+            onSubmitSuccess={this.handleSubmitSuccess}
+          />
           <Snackbar
             anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             open={snackbarOpen}
@@ -327,7 +268,7 @@ class PartnersEdit extends React.Component {
   }
 }
 
-PartnersEdit.propTypes = {
+TagsEdit.propTypes = {
   itemId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
@@ -343,23 +284,23 @@ PartnersEdit.propTypes = {
   router: PropTypes.shape({}).isRequired,
 };
 
-PartnersEdit.defaultProps = {
+TagsEdit.defaultProps = {
   itemId: null,
   error: null,
   item: null,
 };
 
 const mapStateToProps = state => ({
-  error: partnersSelectors.getError(state),
-  item: partnersSelectors.getItem(state),
+  error: tagsSelectors.getError(state),
+  item: tagsSelectors.getItem(state),
 });
 
 const mapDispatchToProps = {
-  changeDefaultTranslation: partnersActions.changeDefaultTranslation,
-  clearError: partnersActions.clearError,
-  clearItem: partnersActions.clearItem,
-  deleteTranslation: partnersActions.deleteTranslation,
-  fetchItem: partnersActions.fetchItem,
+  changeDefaultTranslation: tagsActions.changeDefaultTranslation,
+  clearError: tagsActions.clearError,
+  clearItem: tagsActions.clearItem,
+  deleteTranslation: tagsActions.deleteTranslation,
+  fetchItem: tagsActions.fetchItem,
 };
 
 export default compose(
@@ -367,4 +308,4 @@ export default compose(
   withAuth(),
   withRouter,
   withStyles(styles),
-)(PartnersEdit);
+)(TagsEdit);

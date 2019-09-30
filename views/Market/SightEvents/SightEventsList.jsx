@@ -351,7 +351,7 @@ class SightEventsList extends React.Component {
                     aria-describedby="alert-dialog-description"
                   >
                     <DialogTitle id="alert-dialog-title">
-                      Usuń kategorię
+                      Usuń ofertę
                     </DialogTitle>
                     <DialogContent>
                       <DialogContentText id="alert-dialog-description">

@@ -225,12 +225,6 @@ class PartnersEdit extends React.Component {
     snackbarMessage: '',
   });
 
-  handleSubmitSuccess = () => {
-    const { router } = this.props;
-
-    router.push(this.baseURL);
-  };
-
   render() {
     const {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
@@ -287,7 +281,6 @@ class PartnersEdit extends React.Component {
                 hideButtons={selectedTranslation !== defaultLanguage}
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
-                onSubmitSuccess={this.handleSubmitSuccess}
               />
             )
           }
@@ -296,7 +289,6 @@ class PartnersEdit extends React.Component {
               <PartnerMarketForm
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
-                onSubmitSuccess={this.handleSubmitSuccess}
               />
             )
           }

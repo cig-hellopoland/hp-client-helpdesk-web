@@ -12,20 +12,16 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import { withRouter } from 'next/router';
 import {
-  actions as categoriesActions,
-  selectors as categoriesSelectors,
-} from '@hello-poland/commons/redux/categories';
-import {
   actions as sightsActions,
   selectors as sightsSelectors,
-} from '@hello-poland/commons/redux/sightEvents';
+} from '@hello-poland/commons/redux/sights';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
-import CategoriesForm from './components/CategoriesForm';
+import CategoriesForm from 'components/CategoriesForm';
 import SightForm from './components/SightForm';
-import SightEventMultimediaForm from './components/SightEventMultimediaForm';
+import SightMultimediaForm from './components/SightMultimediaForm';
 
 const styles = theme => ({
   root: {
@@ -65,8 +61,6 @@ class SightEdit extends React.Component {
     if (itemId) {
       this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
     }
-
-    this.handleFetchCategoriesList(DEFAULT_LANGUAGE);
   }
 
   getFormValues = (item) => {
@@ -125,18 +119,6 @@ class SightEdit extends React.Component {
   };
 
   setSelectedTab = (event, selectedTab) => this.setState({ selectedTab });
-
-  handleFetchCategoriesList = (language) => {
-    const { fetchCategoriesList } = this.props;
-
-    fetchCategoriesList({
-      options: {
-        headers: {
-          'Content-Language': language,
-        },
-      },
-    });
-  };
 
   handleFetchItemFailure = () => this.handleRequestFailure();
 
@@ -255,22 +237,14 @@ class SightEdit extends React.Component {
     snackbarMessage: '',
   });
 
-  handleSubmitSuccess = () => {
-    const { router } = this.props;
-
-    router.push(this.baseURL);
-  };
-
   render() {
     const {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
     } = this.state;
-    const {
-      categoriesList, classes, item, itemId,
-    } = this.props;
+    const { classes, item, itemId } = this.props;
     const { defaultLanguage } = item || {};
 
-    const pageTitle = itemId ? 'Edycja oferty' : 'Nowa oferta';
+    const pageTitle = 'Edycja atrakcji';
     const hasLanguageActions = !!(item && item.id);
 
     return (
@@ -317,23 +291,17 @@ class SightEdit extends React.Component {
               <SightForm
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
-                onSubmitSuccess={this.handleSubmitSuccess}
               />
             )
           }
           {selectedTab === 1
             && (
-              <CategoriesForm
-                categories={categoriesList}
-                items={item.categories}
-                onSubmit={() => {}}
-                onDelete={() => {}}
-              />
+              <CategoriesForm items={item.categories} />
             )
           }
           {selectedTab === 2
             && (
-              <SightEventMultimediaForm
+              <SightMultimediaForm
                 data={this.getMultimediaFromItem(item)}
                 defaultTranslation={defaultLanguage}
                 itemId={itemId}
@@ -359,7 +327,6 @@ class SightEdit extends React.Component {
 }
 
 SightEdit.propTypes = {
-  categoriesList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   itemId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
@@ -367,7 +334,6 @@ SightEdit.propTypes = {
   clearItem: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
-  fetchCategoriesList: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   item: PropTypes.shape({
     id: PropTypes.number,
@@ -383,9 +349,8 @@ SightEdit.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  categoriesList: categoriesSelectors.getList(state),
   error: sightsSelectors.getError(state),
-  item: sightsSelectors.getSightEvent(state),
+  item: sightsSelectors.getSight(state),
 });
 
 const mapDispatchToProps = {
@@ -393,7 +358,6 @@ const mapDispatchToProps = {
   clearError: sightsActions.clearError,
   clearItem: sightsActions.clearItem,
   deleteTranslation: sightsActions.deleteTranslation,
-  fetchCategoriesList: categoriesActions.fetchList,
   fetchItem: sightsActions.fetchItem,
 };
 

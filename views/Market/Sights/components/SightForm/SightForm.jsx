@@ -137,8 +137,8 @@ class SightForm extends React.Component {
         openingHours.push({
           checked,
           day: i,
-          openTime: openTime ? `1970-01-01'T'${openTime}` : '1970-01-01T09:00',
-          closeTime: closeTime ? `1970-01-01'T'${closeTime}` : '1970-01-01T18:00',
+          openTime: openTime ? `1970-01-01T${openTime}` : '1970-01-01T09:00',
+          closeTime: closeTime ? `1970-01-01T${closeTime}` : '1970-01-01T18:00',
         });
       }
     } else {
@@ -429,12 +429,12 @@ class SightForm extends React.Component {
                   </React.Fragment>
                 )
               }
-              <GridItem>
-                <Typography variant="h6" className={classes.section}>Lokalizacja</Typography>
-              </GridItem>
               {isDefaultTranslation
                 && (
                   <React.Fragment>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.section}>Lokalizacja</Typography>
+                    </GridItem>
                     <GridItem>
                       <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
                     </GridItem>

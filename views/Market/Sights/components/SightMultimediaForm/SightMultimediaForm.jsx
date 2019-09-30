@@ -31,7 +31,7 @@ const styles = theme => ({
   },
 });
 
-class SightEventMultimediaForm extends React.Component {
+class SightMultimediaForm extends React.Component {
   state = {
     alertDialog: {
       content: '',
@@ -194,24 +194,6 @@ class SightEventMultimediaForm extends React.Component {
           </Grid>
           <MultimediaSection items={images} onDelete={this.handleDelete} />
         </div>
-        <div className={classes.section}>
-          <Grid container alignItems="center" justify="space-between">
-            <Grid item>
-              <Typography variant="h6">Pliki</Typography>
-            </Grid>
-            <Grid item>
-              <IconButton
-                aria-label="Dodaj"
-                disabled={!isDefaultTranslation}
-                onClick={() => this.handleUploadModalOpen(itemId, 'application/pdf')}
-                title="Dodaj"
-              >
-                <AddIcon />
-              </IconButton>
-            </Grid>
-          </Grid>
-          <MultimediaSection items={documents} onDelete={this.handleDelete} />
-        </div>
         <MediaManager
           disableBackdropClick
           error={!!requestError}
@@ -229,7 +211,7 @@ class SightEventMultimediaForm extends React.Component {
   }
 }
 
-SightEventMultimediaForm.propTypes = {
+SightMultimediaForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   createMainImage: PropTypes.func.isRequired,
@@ -248,7 +230,7 @@ SightEventMultimediaForm.propTypes = {
   }),
 };
 
-SightEventMultimediaForm.defaultProps = {
+SightMultimediaForm.defaultProps = {
   data: [],
   defaultTranslation: DEFAULT_LANGUAGE,
   onFailure: null,
@@ -273,4 +255,4 @@ const mapDispatchToProps = {
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
-)(SightEventMultimediaForm);
+)(SightMultimediaForm);

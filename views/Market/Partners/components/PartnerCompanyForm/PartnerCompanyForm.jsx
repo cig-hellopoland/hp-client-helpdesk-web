@@ -4,6 +4,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
+import _merge from 'lodash/merge';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
@@ -238,10 +239,7 @@ class PartnerCompanyForm extends Component {
 
       submitAction = updateItem;
       payload.id = id;
-      payload.data = {
-        ...initialValues,
-        ...data,
-      };
+      payload.data = _merge({}, initialValues, data);
       payload.pathParams = {
         languageVersion: language,
       };
@@ -311,10 +309,10 @@ class PartnerCompanyForm extends Component {
               <GridItem md={4} sm={4}>
                 <Field
                   name="blocked"
-                  disabled={disabled}
                   render={switchProps => (
                     <FormControlLabel
                       control={<Switch {...fieldToSwitch(switchProps)} />}
+                      disabled={disabled}
                       label="Blokuj"
                     />
                   )}

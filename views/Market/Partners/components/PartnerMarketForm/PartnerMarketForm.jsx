@@ -4,6 +4,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
+import _merge from 'lodash/merge';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -98,10 +99,7 @@ class PartnerMarketForm extends React.Component {
     const { id, ...data } = values;
 
     const payload = {
-      data: {
-        ...initialValues,
-        ...data,
-      },
+      data: _merge({}, initialValues, data),
       options: {
         headers: {
           'Content-Language': language,

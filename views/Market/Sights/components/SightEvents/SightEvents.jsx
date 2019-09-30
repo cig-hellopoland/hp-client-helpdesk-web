@@ -22,12 +22,15 @@ const tableColumns = [
 ];
 
 const styles = theme => ({
+  actions: {
+    minWidth: 200,
+  },
   image: {
     color: theme.palette.grey[500],
     fontSize: theme.spacing.unit * 10,
   },
   orderNumber: {
-    width: 160,
+    width: 100,
   },
 });
 
@@ -59,7 +62,7 @@ function SightEvents({ classes, items }) {
                 <TableRow key={itemId} hover>
                   <TableCell className={classes.orderNumber}>{itemId}</TableCell>
                   <TableCell>{name}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align="right" className={classes.actions}>
                     <IconButton disabled>
                       <LockIcon color={blocked ? colorActive : colorInactive} />
                     </IconButton>

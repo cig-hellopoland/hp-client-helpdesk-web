@@ -172,7 +172,6 @@ class SightMultimediaForm extends React.Component {
     } = this.props;
     const isDefaultTranslation = defaultTranslation === translation;
     const images = (data && data.filter(item => item.type === 'image/jpeg')) || [];
-    const documents = (data && data.filter(item => item.type === 'application/pdf')) || [];
 
     return (
       <React.Fragment>

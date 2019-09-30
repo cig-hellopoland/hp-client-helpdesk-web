@@ -2,24 +2,30 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import _isEqual from 'lodash/isEqual';
+import _isNumber from 'lodash/isNumber';
+import _merge from 'lodash/merge';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
+import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
-import withStyles from '@material-ui/core/styles/withStyles';
 import { Formik, Form, Field } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-material-ui';
 import yupBoolean from 'yup/lib/boolean';
 import yupNumber from 'yup/lib/number';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
-import GridItem from 'components/GridItem';
 import {
   actions as partnersActions,
   selectors as partnersSelectors,
 } from 'redux/partners';
+import { DEFAULT_LANGUAGE } from 'utils/translations';
+import GridItem from 'components/GridItem';
 
 const commonProps = {
   fullWidth: true,
@@ -38,6 +44,21 @@ const businesTypes = [
   { label: 'Spółdzielnia', value: 10 },
 ];
 
+// TODO: remove this function and change Switch implementation after it's fixed.
+// TODO: see https://github.com/stackworx/formik-material-ui/pull/42
+const fieldToSwitch = ({
+  field,
+  form: { isSubmitting },
+  disabled = false,
+  ...props
+}) => ({
+  disabled: isSubmitting || disabled,
+  ...props,
+  ...field,
+  value: field.name,
+  checked: field.value,
+});
+
 const styles = {
   formControl: {
     width: '100%',
@@ -47,35 +68,14 @@ const styles = {
   },
 };
 
-class AddPartnerForm extends Component {
+class PartnerCompanyForm extends Component {
   constructor(props) {
     super(props);
 
-    this.initialValues = {
-      affiliation: true,
-      bankAccount: '',
-      businessType: '',
-      commission: '',
-      contactPerson: {
-        email: '',
-        name: '',
-        phone: '',
-      },
-      email: '',
-      invoiceEmail: '',
-      krs: '',
-      location: {
-        city: '',
-        country: 'PL',
-        street: '',
-        zipCode: '',
-      },
-      name: '',
-      phone: '',
-      regon: '',
-      servicesDescription: '',
-      socialNumber: '',
-      taxNumber: '',
+    const { initialValues } = this.props;
+
+    this.state = {
+      initialValues: this.getInitialValues(initialValues || {}),
     };
 
     this.validationSchema = yupObject().shape({
@@ -118,6 +118,56 @@ class AddPartnerForm extends Component {
     });
   }
 
+  componentDidUpdate(prevProps) {
+    const { initialValues: prevInitialValues } = prevProps;
+    const { initialValues } = this.props;
+
+    if (!_isEqual(prevInitialValues, initialValues)) {
+      this.setInitialValues(initialValues);
+    }
+  }
+
+  getInitialValues = (initialValues) => {
+    const {
+      contactPerson: initialContactPerson, location: initialLocation, ...details
+    } = initialValues || {};
+    const contactPerson = initialContactPerson || {};
+    const location = initialLocation || {};
+
+    return {
+      id: details.id || '',
+      affiliation: details.affiliation || true,
+      bankAccount: details.bankAccount || '',
+      blocked: details.blocked || false,
+      businessType: details.businessType || '',
+      commission: details.commission || '0',
+      contactPerson: {
+        email: contactPerson.email || '',
+        name: contactPerson.name || '',
+        phone: contactPerson.phone || '',
+      },
+      email: details.email || '',
+      invoiceEmail: details.invoiceEmail || '',
+      krs: details.krs || '',
+      location: {
+        city: location.city || '',
+        country: location.country || 'PL',
+        street: location.street || '',
+        zipCode: location.zipCode || '',
+      },
+      name: details.name || '',
+      phone: details.phone || '',
+      regon: details.regon || '',
+      servicesDescription: details.servicesDescription || '',
+      socialNumber: details.socialNumber || '',
+      taxNumber: details.taxNumber || '',
+    };
+  };
+
+  setInitialValues = initialValues => this.setState({
+    initialValues: this.getInitialValues(initialValues || {}),
+  });
+
   getParsedValues = (values) => {
     const {
       krs, regon, taxNumber, socialNumber, ...parsedValues
@@ -159,7 +209,7 @@ class AddPartnerForm extends Component {
   handleChange = fieldName => event => this.setState({ [fieldName]: event.target.value });
 
   handleSubmit = (values, actions) => {
-    const { onSubmit } = this.props;
+    const { initialValues, language, onSubmit } = this.props;
     const parsedValues = this.getParsedValues(values);
 
     if (onSubmit) {
@@ -168,14 +218,34 @@ class AddPartnerForm extends Component {
       return;
     }
 
-    const { createItem } = this.props;
+    const { createItem, updateItem } = this.props;
+    const { id, ...data } = parsedValues;
+
     const payload = {
-      data: parsedValues,
+      data,
+      options: {
+        headers: {
+          'Content-Language': language,
+        },
+      },
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
     };
 
-    createItem(payload);
+    let submitAction = createItem;
+
+    if (_isNumber(id)) {
+      payload.data.id = id;
+
+      submitAction = updateItem;
+      payload.id = id;
+      payload.data = _merge({}, initialValues, data);
+      payload.pathParams = {
+        languageVersion: language,
+      };
+    }
+
+    submitAction(payload);
   };
 
   handleSubmitFailure = actions => () => {
@@ -207,15 +277,18 @@ class AddPartnerForm extends Component {
 
   render() {
     const {
-      classes, requestError, FormikProps, hideButtons, hideErrors,
+      classes, disabled, requestError, FormikProps, hideButtons, hideErrors,
     } = this.props;
+    const { initialValues } = this.state;
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
 
     return (
       <Formik
+        enableReinitialize
         {...FormikProps}
-        initialValues={this.initialValues}
+        disabled={disabled}
+        initialValues={initialValues}
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
@@ -224,24 +297,42 @@ class AddPartnerForm extends Component {
             <Grid container spacing={16}>
               <GridItem>
                 <Typography variant="h6">Dane partnera</Typography>
+                {values.id
+                  && (
+                    <Typography color="error">UWAGA: Modyfikujesz dane w systemie Hello! Poland. Upewnij się, że partner zaktualizuje je w Przelewach24.</Typography>
+                  )
+                }
               </GridItem>
               <GridItem>
-                <Field name="name" label="Nazwa" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="name" label="Nazwa" required component={TextField} {...commonProps} />
+              </GridItem>
+              <GridItem md={4} sm={4}>
+                <Field
+                  name="blocked"
+                  render={switchProps => (
+                    <FormControlLabel
+                      control={<Switch {...fieldToSwitch(switchProps)} />}
+                      disabled={disabled}
+                      label="Blokuj"
+                    />
+                  )}
+                />
               </GridItem>
               <GridItem>
-                <Field name="location.street" label="Ulica" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="location.street" label="Ulica" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={3} sm={3}>
-                <Field name="location.zipCode" label="Kod pocztowy" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="location.zipCode" label="Kod pocztowy" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={6} sm={6}>
-                <Field name="location.city" label="Miasto" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="location.city" label="Miasto" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={3} sm={3}>
                 <FormControl className={classes.formControl} required>
-                  <InputLabel htmlFor="location-country">Kraj</InputLabel>
+                  <InputLabel disabled={disabled} htmlFor="location-country">Kraj</InputLabel>
                   <Field
                     component={Select}
+                    disabled={disabled}
                     inputProps={{
                       id: 'location-country',
                       name: 'location.country',
@@ -254,10 +345,10 @@ class AddPartnerForm extends Component {
                 </FormControl>
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="phone" type="tel" label="Telefon" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="phone" type="tel" label="Telefon" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="email" type="email" label="E-mail (login partnera)" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="email" type="email" label="E-mail (login partnera)" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem className={classes.section}>
                 <Typography variant="h6">Informacje o działalności</Typography>
@@ -267,6 +358,7 @@ class AddPartnerForm extends Component {
                   <InputLabel htmlFor="business-type">Rodzaj działalności</InputLabel>
                   <Field
                     component={Select}
+                    disabled={disabled}
                     inputProps={{
                       id: 'business-type',
                       name: 'businessType',
@@ -285,10 +377,10 @@ class AddPartnerForm extends Component {
                 && (
                   <Fragment>
                     <GridItem md={3} sm={3}>
-                      <Field name="taxNumber" label="NIP" helperText="Format: tylko cyfry, bez spacji" required component={TextField} {...commonProps} />
+                      <Field disabled={disabled} name="taxNumber" label="NIP" helperText="Format: tylko cyfry, bez spacji" required component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem md={3} sm={3}>
-                      <Field name="regon" label="REGON" required component={TextField} {...commonProps} />
+                      <Field disabled={disabled} name="regon" label="REGON" required component={TextField} {...commonProps} />
                     </GridItem>
                   </Fragment>
                 )
@@ -296,14 +388,14 @@ class AddPartnerForm extends Component {
               {values.businessType && values.businessType > 3
                 && (
                   <GridItem md={3} sm={3}>
-                    <Field name="krs" label="KRS" required component={TextField} {...commonProps} />
+                    <Field disabled={disabled} name="krs" label="KRS" required component={TextField} {...commonProps} />
                   </GridItem>
                 )
               }
               {values.businessType && values.businessType === 1
                 && (
                   <GridItem md={3} sm={3}>
-                    <Field name="socialNumber" label="PESEL" required component={TextField} {...commonProps} />
+                    <Field disabled={disabled} name="socialNumber" label="PESEL" required component={TextField} {...commonProps} />
                   </GridItem>
                 )
               }
@@ -311,29 +403,30 @@ class AddPartnerForm extends Component {
                 <Typography variant="h6">Osoba reprezentująca</Typography>
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="contactPerson.name" label="Imię i nazwisko" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="contactPerson.name" label="Imię i nazwisko" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="contactPerson.phone" type="tel" label="Telefon" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="contactPerson.phone" type="tel" label="Telefon" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="contactPerson.email" type="email" label="E-mail" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="contactPerson.email" type="email" label="E-mail" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem className={classes.section}>
                 <Typography variant="h6">Płatności</Typography>
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="bankAccount" label="Konto bankowe" helperText="Format: tylko cyfry, bez spacji" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="bankAccount" label="Konto bankowe" helperText="Format: tylko cyfry, bez spacji" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field name="invoiceEmail" type="email" label="E-mail do faktur" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="invoiceEmail" type="email" label="E-mail do faktur" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4} />
               <GridItem md={4} sm={4}>
-                <Field name="commission" type="number" label="Prowizja (%)" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="commission" type="number" label="Prowizja (%)" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem container md={4} sm={4} alignItems="flex-end">
                 <Field
+                  disabled={disabled}
                   name="affiliation"
                   Label={{ label: 'Generuj kod afiliacyjny' }}
                   component={CheckboxWithLabel}
@@ -344,7 +437,7 @@ class AddPartnerForm extends Component {
                 <Typography variant="h6">Przelewy24</Typography>
               </GridItem>
               <GridItem>
-                <Field name="servicesDescription" label="Opis usługi partnera" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="servicesDescription" label="Opis usługi partnera" required component={TextField} {...commonProps} />
               </GridItem>
             </Grid>
             {(!hideButtons || (!hideErrors && errorMessage))
@@ -376,25 +469,32 @@ class AddPartnerForm extends Component {
   }
 }
 
-AddPartnerForm.propTypes = {
+PartnerCompanyForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
   FormikProps: PropTypes.shape({}),
   hideButtons: PropTypes.bool,
   hideErrors: PropTypes.bool,
+  initialValues: PropTypes.shape({}),
+  language: PropTypes.string,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
   requestError: PropTypes.shape({
     message: PropTypes.string,
   }),
+  updateItem: PropTypes.func.isRequired,
 };
 
-AddPartnerForm.defaultProps = {
+PartnerCompanyForm.defaultProps = {
+  disabled: false,
   FormikProps: null,
   hideButtons: false,
   hideErrors: false,
+  initialValues: null,
+  language: DEFAULT_LANGUAGE,
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
@@ -408,9 +508,10 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   clearError: partnersActions.clearError,
   createItem: partnersActions.createItem,
+  updateItem: partnersActions.updateItem,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
-)(AddPartnerForm);
+)(PartnerCompanyForm);

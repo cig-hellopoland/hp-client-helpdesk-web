@@ -7,7 +7,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Layout from 'components/Layout';
 import { actions as partnersActions } from 'redux/partners';
-import AddPartnerForm from './components/PartnerForm';
+import PartnerCompanyForm from './components/PartnerCompanyForm';
 import SuccessDialog from './components/SuccessDialog';
 
 const styles = theme => ({
@@ -48,9 +48,7 @@ class PartnerCreate extends Component {
     return (
       <Layout>
         <Paper className={classes.root}>
-          <AddPartnerForm
-            onSubmitSuccess={this.handleSubmitSuccess}
-          />
+          <PartnerCompanyForm onSubmitSuccess={this.handleSubmitSuccess} />
         </Paper>
         <SuccessDialog open={successDialog} onClose={this.handleSuccessDialogClose} />
       </Layout>

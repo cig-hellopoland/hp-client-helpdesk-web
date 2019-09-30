@@ -12,21 +12,17 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import { withRouter } from 'next/router';
 import {
-  actions as categoriesActions,
-  selectors as categoriesSelectors,
-} from '@hello-poland/commons/redux/categories';
-import {
-  actions as sightEventsActions,
-  selectors as sightEventsSelectors,
-} from '@hello-poland/commons/redux/sightEvents';
+  actions as partnersActions,
+  selectors as partnersSelectors,
+} from 'redux/partners';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
 import CategoriesForm from 'components/CategoriesForm';
-import SightEventForm from './components/SightEventForm';
-import SightEventMultimediaForm from './components/SightEventMultimediaForm';
-import TicketPoolDefinitionsList from './components/TicketPoolDefinitionsList';
+import PartnerMarketForm from './components/PartnerMarketForm';
+import PartnerCompanyForm from './components/PartnerCompanyForm';
+import PartnerMultimediaForm from './components/PartnerMultimediaForm';
 
 const styles = theme => ({
   root: {
@@ -39,8 +35,8 @@ const styles = theme => ({
   },
 });
 
-class SightEventEdit extends React.Component {
-  baseURL = '/market/sight-events';
+class PartnersEdit extends React.Component {
+  baseURL = '/market/partners';
 
   state = {
     availableTranslations: CONTENT_LANGUAGES,
@@ -66,8 +62,6 @@ class SightEventEdit extends React.Component {
     if (itemId) {
       this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
     }
-
-    this.handleFetchCategoriesList(DEFAULT_LANGUAGE);
   }
 
   getFormValues = (item) => {
@@ -92,7 +86,7 @@ class SightEventEdit extends React.Component {
   };
 
   getMultimediaFromItem = (item) => {
-    const { mainImage, pdfAttachment } = item;
+    const { mainImage } = item;
     const data = [];
 
     if (mainImage) {
@@ -110,74 +104,10 @@ class SightEventEdit extends React.Component {
       });
     }
 
-    if (pdfAttachment) {
-      data.push({
-        ...pdfAttachment,
-        createdBy: '',
-        createdDate: '',
-        modifiedBy: '',
-        modifiedDate: '',
-        size: 12345,
-        type: 'application/pdf',
-      });
-    }
-
     return data;
   };
 
   setSelectedTab = (event, selectedTab) => this.setState({ selectedTab });
-
-  handleItemCategoryDeleteFailure = () => this.handleRequestFailure();
-
-  handleItemCategoryDeleteSuccess = () => {
-    const { itemId } = this.props;
-    const { selectedTranslation } = this.state;
-
-    this.handleFetchItem(itemId, selectedTranslation);
-  };
-
-  handleItemCategoryDelete = (categoryId) => {
-    const { itemId, deleteItemCategory } = this.props;
-
-    deleteItemCategory({
-      id: itemId,
-      categoryId,
-      onFailure: this.handleItemCategoryDeleteFailure,
-      onSuccess: this.handleItemCategoryDeleteSuccess,
-    });
-  };
-
-  handleItemCategorySubmitFailure = () => this.handleRequestFailure();
-
-  handleItemCategorySubmitSuccess = () => {
-    const { itemId } = this.props;
-    const { selectedTranslation } = this.state;
-
-    this.handleFetchItem(itemId, selectedTranslation);
-  };
-
-  handleItemCategorySubmit = (categoryId) => {
-    const { itemId, updateItemCategory } = this.props;
-
-    updateItemCategory({
-      id: itemId,
-      categoryId,
-      onFailure: this.handleItemCategorySubmitFailure,
-      onSuccess: this.handleItemCategorySubmitSuccess,
-    });
-  };
-
-  handleFetchCategoriesList = (language) => {
-    const { fetchCategoriesList } = this.props;
-
-    fetchCategoriesList({
-      options: {
-        headers: {
-          'Content-Language': language,
-        },
-      },
-    });
-  };
 
   handleFetchItemFailure = () => this.handleRequestFailure();
 
@@ -306,12 +236,10 @@ class SightEventEdit extends React.Component {
     const {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
     } = this.state;
-    const {
-      categoriesList, classes, item, itemId,
-    } = this.props;
+    const { classes, item, itemId } = this.props;
     const { defaultLanguage } = item || {};
 
-    const pageTitle = itemId ? 'Edycja oferty' : 'Nowa oferta';
+    const pageTitle = 'Edycja partnera';
     const hasLanguageActions = !!(item && item.id);
 
     return (
@@ -348,15 +276,17 @@ class SightEventEdit extends React.Component {
             textColor="primary"
             value={selectedTab}
           >
-            <Tab label="Szczegóły" />
+            <Tab label="Dane firmy" />
+            <Tab label="Wizytówka" />
             <Tab label="Kategorie" />
             <Tab label="Multimedia" />
-            <Tab label="Pule biletów" />
             <Tab label="Komentarze" disabled />
           </Tabs>
           {selectedTab === 0
             && (
-              <SightEventForm
+              <PartnerCompanyForm
+                disabled={selectedTranslation !== defaultLanguage}
+                hideButtons={selectedTranslation !== defaultLanguage}
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
                 onSubmitSuccess={this.handleSubmitSuccess}
@@ -365,21 +295,24 @@ class SightEventEdit extends React.Component {
           }
           {selectedTab === 1
             && (
-              <CategoriesForm
-                categories={categoriesList}
-                defaultTranslation={defaultLanguage}
-                items={item.categories}
-                managePublic
-                manageRestricted
-                onSubmit={this.handleItemCategorySubmit}
-                onDelete={this.handleItemCategoryDelete}
-                translation={selectedTranslation}
+              <PartnerMarketForm
+                initialValues={this.getFormValues(item)}
+                language={selectedTranslation}
+                onSubmitSuccess={this.handleSubmitSuccess}
               />
             )
           }
           {selectedTab === 2
             && (
-              <SightEventMultimediaForm
+              <CategoriesForm
+                defaultTranslation={defaultLanguage}
+                translation={selectedTranslation}
+              />
+            )
+          }
+          {selectedTab === 3
+            && (
+              <PartnerMultimediaForm
                 data={this.getMultimediaFromItem(item)}
                 defaultTranslation={defaultLanguage}
                 itemId={itemId}
@@ -387,11 +320,6 @@ class SightEventEdit extends React.Component {
                 onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}
                 translation={selectedTranslation}
               />
-            )
-          }
-          {selectedTab === 3
-            && (
-              <TicketPoolDefinitionsList data={item.ticketPoolDefinitions} />
             )
           }
           <Snackbar
@@ -409,47 +337,39 @@ class SightEventEdit extends React.Component {
   }
 }
 
-SightEventEdit.propTypes = {
-  categoriesList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+PartnersEdit.propTypes = {
   itemId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
-  deleteItemCategory: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
-  fetchCategoriesList: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   item: PropTypes.shape({
     id: PropTypes.number,
     label: PropTypes.string,
   }),
   router: PropTypes.shape({}).isRequired,
-  updateItemCategory: PropTypes.func.isRequired,
 };
 
-SightEventEdit.defaultProps = {
+PartnersEdit.defaultProps = {
   itemId: null,
   error: null,
   item: null,
 };
 
 const mapStateToProps = state => ({
-  categoriesList: categoriesSelectors.getList(state),
-  error: sightEventsSelectors.getError(state),
-  item: sightEventsSelectors.getSightEvent(state),
+  error: partnersSelectors.getError(state),
+  item: partnersSelectors.getItem(state),
 });
 
 const mapDispatchToProps = {
-  changeDefaultTranslation: sightEventsActions.changeDefaultTranslation,
-  clearError: sightEventsActions.clearError,
-  clearItem: sightEventsActions.clearItem,
-  deleteItemCategory: sightEventsActions.deleteItemCategory,
-  deleteTranslation: sightEventsActions.deleteTranslation,
-  fetchCategoriesList: categoriesActions.fetchList,
-  fetchItem: sightEventsActions.fetchItem,
-  updateItemCategory: sightEventsActions.updateItemCategory,
+  changeDefaultTranslation: partnersActions.changeDefaultTranslation,
+  clearError: partnersActions.clearError,
+  clearItem: partnersActions.clearItem,
+  deleteTranslation: partnersActions.deleteTranslation,
+  fetchItem: partnersActions.fetchItem,
 };
 
 export default compose(
@@ -457,4 +377,4 @@ export default compose(
   withAuth(),
   withRouter,
   withStyles(styles),
-)(SightEventEdit);
+)(PartnersEdit);

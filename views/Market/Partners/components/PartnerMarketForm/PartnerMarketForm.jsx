@@ -4,12 +4,11 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
+import _merge from 'lodash/merge';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
-import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -17,30 +16,15 @@ import yupBoolean from 'yup/lib/boolean';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import {
-  actions as sightEventsActions,
-  selectors as sightEventsSelectors,
-} from '@hello-poland/commons/redux/sightEvents';
+  actions as partnersActions,
+  selectors as partnersSelectors,
+} from 'redux/partners';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 
 const commonProps = {
   fullWidth: true,
 };
-
-// TODO: remove this function and change Switch implementation after it's fixed.
-// TODO: see https://github.com/stackworx/formik-material-ui/pull/42
-const fieldToSwitch = ({
-  field,
-  form: { isSubmitting },
-  disabled = false,
-  ...props
-}) => ({
-  disabled: isSubmitting || disabled,
-  ...props,
-  ...field,
-  value: field.name,
-  checked: field.value,
-});
 
 const styles = theme => ({
   errorIcon: {
@@ -54,7 +38,7 @@ const styles = theme => ({
   },
 });
 
-class SightEventForm extends React.Component {
+class PartnerMarketForm extends React.Component {
   constructor(props) {
     super(props);
 
@@ -67,20 +51,11 @@ class SightEventForm extends React.Component {
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
-      name: yupString().min(3).max(250).required(),
       published: yupBoolean(),
-      // generalAdmission: yupBoolen(),
-      lead: yupString().min(10).max(250),
       description: yupString().min(10).max(2500).required(),
-      email: yupString().email().trim(),
-      phone: yupString().min(9).trim(),
-      // location: yupObject().shape({
-      //   directions: yupString().min(5).max(255),
-      //   street: yupString().min(5),
-      //   zipCode: yupString().min(6).max(6),
-      //   city: yupString().min(3),
-      //   country: yupString().min(5),
-      // }),
+      location: yupObject().shape({
+        directions: yupString(),
+      }),
     });
   }
 
@@ -99,23 +74,13 @@ class SightEventForm extends React.Component {
 
     return {
       id: details.id || '',
-      sightId: details.sightId || '',
-      name: details.name || '',
-      blocked: details.blocked || false,
-      published: details.published || false,
-      lead: details.lead || '',
       description: details.description || '',
-      email: details.email || '',
-      phone: details.phone || '',
       location: {
         directions: location.directions || '',
-        street: location.street || '',
-        zipCode: location.zipCode || '',
-        city: location.city || '',
-        country: location.country || '',
       },
     };
   };
+
 
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues || {}),
@@ -134,14 +99,14 @@ class SightEventForm extends React.Component {
     const { id, ...data } = values;
 
     const payload = {
-      data,
-      onFailure: this.handleSubmitFailure(actions),
-      onSuccess: this.handleSubmitSuccess(actions),
+      data: _merge({}, initialValues, data),
       options: {
         headers: {
           'Content-Language': language,
         },
       },
+      onFailure: this.handleSubmitFailure(actions),
+      onSuccess: this.handleSubmitSuccess(actions),
     };
 
     let submitAction = createItem;
@@ -193,14 +158,11 @@ class SightEventForm extends React.Component {
 
   render() {
     const {
-      classes, FormikProps, hideButtons, hideErrors, initialValues: itemValues, language,
-      requestError,
+      classes, FormikProps, hideButtons, hideErrors, requestError,
     } = this.props;
     const { initialValues } = this.state;
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
-    const { defaultLanguage, id: itemId } = itemValues || {};
-    const isDefaultTranslation = itemId && defaultLanguage === language;
 
     return (
       <Formik
@@ -221,86 +183,12 @@ class SightEventForm extends React.Component {
                   <Field name="id" hidden component={TextField} {...commonProps} />
                 </GridItem>
               </Hidden>
-              <Hidden xsUp>
-                <GridItem>
-                  <Field name="sightId" hidden component={TextField} {...commonProps} />
-                </GridItem>
-              </Hidden>
               <GridItem>
-                <Field name="name" label="Nazwa oferty" required component={TextField} {...commonProps} />
+                <Field name="description" label="Opis partnera" required component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
-              {isDefaultTranslation
-                && (
-                  <GridItem md={4} sm={4}>
-                    <Field
-                      name="published"
-                      render={switchProps => (
-                        <FormControlLabel
-                          control={<Switch {...fieldToSwitch(switchProps)} />}
-                          label="Publikuj"
-                        />
-                      )}
-                    />
-                  </GridItem>
-                )
-              }
-              {isDefaultTranslation
-                && (
-                  <GridItem md={4} sm={4}>
-                    <Field
-                      name="blocked"
-                      render={switchProps => (
-                        <FormControlLabel
-                          control={<Switch {...fieldToSwitch(switchProps)} />}
-                          label="Blokuj"
-                        />
-                      )}
-                    />
-                  </GridItem>
-                )
-              }
-              <GridItem>
-                <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem>
-                <Field name="description" label="Opis oferty" required component={TextField} {...commonProps} multiline rowsMax={20} />
-              </GridItem>
-              {isDefaultTranslation
-                && (
-                  <React.Fragment>
-                    <GridItem>
-                      <Typography variant="h6" className={classes.section}>Dane kontaktowe</Typography>
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={6} sm={6}>
-                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
-                    </GridItem>
-                  </React.Fragment>
-                )
-              }
               <GridItem>
                 <Typography variant="h6" className={classes.section}>Lokalizacja</Typography>
               </GridItem>
-              {isDefaultTranslation
-                && (
-                  <React.Fragment>
-                    <GridItem>
-                      <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={4} sm={4}>
-                      <Field name="location.zipCode" label="Kod pocztowy" component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={4} sm={4}>
-                      <Field name="location.city" label="Miasto" component={TextField} {...commonProps} />
-                    </GridItem>
-                    <GridItem md={4} sm={4}>
-                      <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
-                    </GridItem>
-                  </React.Fragment>
-                )
-              }
               <GridItem>
                 <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={10} />
               </GridItem>
@@ -334,7 +222,7 @@ class SightEventForm extends React.Component {
   }
 }
 
-SightEventForm.propTypes = {
+PartnerMarketForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
@@ -353,7 +241,7 @@ SightEventForm.propTypes = {
   updateItem: PropTypes.func.isRequired,
 };
 
-SightEventForm.defaultProps = {
+PartnerMarketForm.defaultProps = {
   FormikProps: null,
   hideButtons: false,
   hideErrors: false,
@@ -366,17 +254,17 @@ SightEventForm.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  requestError: sightEventsSelectors.getError(state),
+  requestError: partnersSelectors.getError(state),
 });
 
 const mapDispatchToProps = {
-  clearError: sightEventsActions.clearError,
-  createItem: sightEventsActions.createItem,
-  createTranslation: sightEventsActions.createTranslation,
-  updateItem: sightEventsActions.updateItem,
+  clearError: partnersActions.clearError,
+  createItem: partnersActions.createItem,
+  createTranslation: partnersActions.createTranslation,
+  updateItem: partnersActions.updateItem,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
-)(SightEventForm);
+)(PartnerMarketForm);

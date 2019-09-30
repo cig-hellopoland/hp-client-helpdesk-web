@@ -22,6 +22,7 @@ import ContentTranslation from 'components/ContentTranslation';
 import CategoriesForm from 'components/CategoriesForm';
 import SightForm from './components/SightForm';
 import SightMultimediaForm from './components/SightMultimediaForm';
+import SightEvents from './components/SightEvents';
 
 const styles = theme => ({
   root: {
@@ -284,6 +285,7 @@ class SightEdit extends React.Component {
             <Tab label="Szczegóły" />
             <Tab label="Kategorie" />
             <Tab label="Multimedia" />
+            <Tab label="Oferty" />
             <Tab label="Komentarze" disabled />
           </Tabs>
           {selectedTab === 0
@@ -309,6 +311,11 @@ class SightEdit extends React.Component {
                 onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}
                 translation={selectedTranslation}
               />
+            )
+          }
+          {selectedTab === 3
+            && (
+              <SightEvents items={item.sightEvents} />
             )
           }
           <Snackbar

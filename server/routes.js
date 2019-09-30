@@ -12,6 +12,10 @@ module.exports = [
     path: '/market/partners/:itemId/edit',
   },
   {
+    page: '/market/sights/edit',
+    path: '/market/sights/:itemId/edit',
+  },
+  {
     page: '/market/sight-events/edit',
     path: '/market/sight-events/:itemId/edit',
   },

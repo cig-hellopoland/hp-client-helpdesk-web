@@ -39,6 +39,174 @@
       "restricted": false
     }
   ],
+  "sights": [
+    {
+      "blocked":false,
+      "defaultLanguage":"pl-PL",
+      "description":"ATRAKCJA HPL - test kategorii",
+      "email":"",
+      "id":8,
+      "language":"pl-PL",
+      "lead":"",
+      "location":{
+        "city":"",
+        "country":"Polska",
+        "street":"",
+        "zipCode":""
+      },
+      "name":"ATRAKCJA HPL - test kategorii",
+      "phone":"",
+      "published":true
+    },
+    {
+      "blocked":false,
+      "defaultLanguage":"pl-PL",
+      "description":"Obiekt zlokalizowany jest w południowo-wschodniej części rezerwatu Wietrznia i jest to najważniejsza atrakcja geoturystyczna na trasie „Świętokrzyskiego Szlaku Archeo-Geologicznego”. Inwestycja została zrealizowana ze środków Europejskiego Funduszu Regionalnego w ramach Programu Operacyjnego Innowacyjna Gospodarka 2007-2013.\r\nCentrum Geoedukacji  to miejsce, gdzie w przystępny sposób przekazujemy wiedzę geologiczną i geograficzną, z wykorzystaniem nowoczesnych metod i narzędzi edukacyjnych.\r\nWizyta w Centrum Geoedukacji jest świetnym wstępem do lepszego zrozumienia geologicznego fenomenu Gór Świętokrzyskiego, na czele z gołoborzami, jaskiniami czy dawnymi rafami koralowymi.\r\nDla odwiedzających proponujemy:\r\nzwiedzanie Galerii Ziemi wraz z wirtualną jaskinią\r\n„Podróż do wnętrza Ziemi” – seans w kinie 5D\r\nzwiedzanie wystaw czasowych\r\nzajęcia geoedukacyjne (teoretyczno-praktyczne)\r\nzajęcia terenowe w obrębie obiektów geoturystycznych Kielc\r\nimprezy i wydarzenia geoedukacyjne",
+      "id":7,
+      "language":"pl-PL",
+      "lead":"Centrum Geoedukacji to nowoczesna placówka, należąca do Geoparku Kielce",
+      "location":{
+        "city":"Kielce",
+        "country":"Polska",
+        "latitude":50.8523704,
+        "longitude":20.6481324,
+        "street":"ul. Daleszycka 21",
+        "zipCode":"25-202"
+      },
+      "mainImage":{
+        "fhd":"https://hpl.fream.pl/api/v1/images/5e3c740dx7e0ax4fafxa851xa65e193e0004.jpg",
+        "fhdWebp":"https://hpl.fream.pl/api/v1/images/5e3c740dx7e0ax4fafxa851xa65e193e0004.webp",
+        "fourK":"https://hpl.fream.pl/api/v1/images/72821ec0x5195x4642xabccxa977615af038.jpg",
+        "fourKWebp":"https://hpl.fream.pl/api/v1/images/72821ec0x5195x4642xabccxa977615af038.webp",
+        "hd":"https://hpl.fream.pl/api/v1/images/e514b0fbxc40ex4071xa051xa7f8eb6c2962.jpg",
+        "hdWebp":"https://hpl.fream.pl/api/v1/images/e514b0fbxc40ex4071xa051xa7f8eb6c2962.webp",
+        "original":"https://hpl.fream.pl/api/v1/images/4d96c624xa9f7x4ddfxb20dx0480548ba6f9.jpg",
+        "originalWebp":"https://hpl.fream.pl/api/v1/images/4d96c624xa9f7x4ddfxb20dx0480548ba6f9.webp",
+        "qvg":"https://hpl.fream.pl/api/v1/images/81cdab26xe559x4f1axaca7x65cf750bfb78.jpg",
+        "qvgWebp":"https://hpl.fream.pl/api/v1/images/81cdab26xe559x4f1axaca7x65cf750bfb78.webp",
+        "sxga":"https://hpl.fream.pl/api/v1/images/6562285cx359ax4250x8dc4x659be1c1402a.jpg",
+        "sxgaWebp":"https://hpl.fream.pl/api/v1/images/6562285cx359ax4250x8dc4x659be1c1402a.webp",
+        "vga":"https://hpl.fream.pl/api/v1/images/5f640679x9cfcx462dx9199xdd49b66be956.jpg",
+        "vgaWebp":"https://hpl.fream.pl/api/v1/images/5f640679x9cfcx462dx9199xdd49b66be956.webp",
+        "xga":"https://hpl.fream.pl/api/v1/images/c70c0d9exf954x4b92x9d63xa69ebcef6d5f.jpg",
+        "xgaWebp":"https://hpl.fream.pl/api/v1/images/c70c0d9exf954x4b92x9d63xa69ebcef6d5f.webp"
+      },
+      "name":"Geopark Kielce",
+      "published":true,
+      "score":4.8
+    },
+    {
+      "blocked":false,
+      "defaultLanguage":"pl-PL",
+      "description":"W zbiorach muzeum znajdują się rękopisy utworów Stefan Żeromskiego. Między innymi fragment brulionu Wiernej rzeki, część czystopisu Słowa o bandosie, tekst polski włoskiej przedmowy do książki G.L. Milesi La spedizione di Francesco Nullo in Polonia, 1863, czystopisy utworów Wszystko i nic oraz Snu o chlebie, pięć kartek noweli Z odczytem, a także rękopis Oświadczenia w sprawie ochrony dla dzieci w Nałęczowie.\r\nW muzeum zgromadzono zbiór listów pisarza z różnych lat. Ich adresatami byli: Bronisław Saski – kuzyn Żeromskiego, Zofia Kozierkiewiczowa – mieszkanka Kielc, Edmund Massalski – ówczesny redaktor „Gazety Kieleckiej”, Edward Łuszczkiewicz – szkolny kolega, Aleksander Januszkowski – zakopiański lekarz, Antoni Osuchowski – prawnik, czy Stefania Gliwicówna i Maria Bogdanowicz.\r\nW zbiorach muzeum znajdują się pierwsze wydanie Ech leśnych z dedykacją dla Zofii Kochnowskiej czy O Adamie Żeromskim wspomnienie z dedykacją dla Jana Müllera.\r\nMuzeum posiada płytę gramofonową z 1924 roku z nagranym głosem Stefana Żeromskiego, oraz kolekcję fotografii szkolnych kolegów Żeromskiego pochodzących z lat 1884-1886 (niektóre z nich opatrzone są dedykacjami).",
+      "id":6,
+      "language":"pl-PL",
+      "lead":"Muzeum zajmuje się gromadzeniem, eksponowaniem zbiorów związanych z młodzieńczym okresem życia oraz twórczością Stefana Żeromskiego",
+      "location":{
+        "city":"Kielce",
+        "country":"Polska",
+        "latitude":50.8678941,
+        "longitude":20.6273561,
+        "street":"ul. Jana Pawła II 5",
+        "zipCode":"25-013"
+      },
+      "mainImage":{
+        "fhd":"https://hpl.fream.pl/api/v1/images/7cd5dfd9x3c8dx4e74x9699xbbb0e39196c0.jpg",
+        "fhdWebp":"https://hpl.fream.pl/api/v1/images/7cd5dfd9x3c8dx4e74x9699xbbb0e39196c0.webp",
+        "fourK":"https://hpl.fream.pl/api/v1/images/5c3711d1xbb51x4b9cxa69ex1b2342f3e2e9.jpg",
+        "fourKWebp":"https://hpl.fream.pl/api/v1/images/5c3711d1xbb51x4b9cxa69ex1b2342f3e2e9.webp",
+        "hd":"https://hpl.fream.pl/api/v1/images/183a7023xd856x46b6x9f95xfe232953dc45.jpg",
+        "hdWebp":"https://hpl.fream.pl/api/v1/images/183a7023xd856x46b6x9f95xfe232953dc45.webp",
+        "original":"https://hpl.fream.pl/api/v1/images/b77bb04axca30x4b15xa000xe081e038cb28.jpg",
+        "originalWebp":"https://hpl.fream.pl/api/v1/images/b77bb04axca30x4b15xa000xe081e038cb28.webp",
+        "qvg":"https://hpl.fream.pl/api/v1/images/9842a08bxd3c0x4a44xbc92x88d3193b8351.jpg",
+        "qvgWebp":"https://hpl.fream.pl/api/v1/images/9842a08bxd3c0x4a44xbc92x88d3193b8351.webp",
+        "sxga":"https://hpl.fream.pl/api/v1/images/9d447a76x01d6x44fax8eb2x9732849260b5.jpg",
+        "sxgaWebp":"https://hpl.fream.pl/api/v1/images/9d447a76x01d6x44fax8eb2x9732849260b5.webp",
+        "vga":"https://hpl.fream.pl/api/v1/images/3aadcaf7xccefx47afxa9fexeb446fe67f9d.jpg",
+        "vgaWebp":"https://hpl.fream.pl/api/v1/images/3aadcaf7xccefx47afxa9fexeb446fe67f9d.webp",
+        "xga":"https://hpl.fream.pl/api/v1/images/9cf648b5xdf48x49bax89ccx0b5562596eab.jpg",
+        "xgaWebp":"https://hpl.fream.pl/api/v1/images/9cf648b5xdf48x49bax89ccx0b5562596eab.webp"
+      },
+      "name":"Muzeum Lat Szkolnych Stefana Żeromskiego",
+      "published":true,
+      "score":4.9
+    },
+    {
+      "blocked":false,
+      "defaultLanguage":"pl-PL",
+      "description":"Specjalizujemy się w obsłudze zorganizowanych grup turystycznych oraz biznesowych z kraju i zagranicy.",
+      "id":5,
+      "language":"pl-PL",
+      "lead":"Kupuj taniej, zwiedzaj łatwiej!",
+      "location":{
+        "city":"Wrocław",
+        "country":"Polska",
+        "latitude":51.111746,
+        "longitude":17.0240973,
+        "street":"Świętego Mikołaja 19",
+        "zipCode":"50-128"
+      },
+      "mainImage":{
+        "fhd":"https://hpl.fream.pl/api/v1/images/35de1199x8929x4153x81cdx1bcc228d9d34.jpg",
+        "fhdWebp":"https://hpl.fream.pl/api/v1/images/35de1199x8929x4153x81cdx1bcc228d9d34.webp",
+        "fourK":"https://hpl.fream.pl/api/v1/images/b09dbf16xdb6ax4ebfxad63xf67417cbf9d5.jpg",
+        "fourKWebp":"https://hpl.fream.pl/api/v1/images/b09dbf16xdb6ax4ebfxad63xf67417cbf9d5.webp",
+        "hd":"https://hpl.fream.pl/api/v1/images/148be892x1ebfx4ed0xabd6x88536ad90550.jpg",
+        "hdWebp":"https://hpl.fream.pl/api/v1/images/148be892x1ebfx4ed0xabd6x88536ad90550.webp",
+        "original":"https://hpl.fream.pl/api/v1/images/2f381bf5x27bbx461cx88c1x2dc47dac7e7e.jpg",
+        "originalWebp":"https://hpl.fream.pl/api/v1/images/2f381bf5x27bbx461cx88c1x2dc47dac7e7e.webp",
+        "qvg":"https://hpl.fream.pl/api/v1/images/e26dfd0bx707fx45d5xae21xe937275d1257.jpg",
+        "qvgWebp":"https://hpl.fream.pl/api/v1/images/e26dfd0bx707fx45d5xae21xe937275d1257.webp",
+        "sxga":"https://hpl.fream.pl/api/v1/images/e0390628xf57ex403bx92b7xfc994181911f.jpg",
+        "sxgaWebp":"https://hpl.fream.pl/api/v1/images/e0390628xf57ex403bx92b7xfc994181911f.webp",
+        "vga":"https://hpl.fream.pl/api/v1/images/092c69ddxb793x47ecxa518xad0b9f5aea38.jpg",
+        "vgaWebp":"https://hpl.fream.pl/api/v1/images/092c69ddxb793x47ecxa518xad0b9f5aea38.webp",
+        "xga":"https://hpl.fream.pl/api/v1/images/015c7054x5d70x4a08xab13x5c5f2b07c0b6.jpg",
+        "xgaWebp":"https://hpl.fream.pl/api/v1/images/015c7054x5d70x4a08xab13x5c5f2b07c0b6.webp"
+      },
+      "name":"Kieleckie wycieczki Hello Poland",
+      "published":true,
+      "score":5.0
+    },
+    {
+      "blocked":false,
+      "defaultLanguage":"pl-PL",
+      "description":"Specjalizujemy się w obsłudze zorganizowanych grup turystycznych oraz biznesowych z kraju i zagranicy.",
+      "id":1,
+      "language":"pl-PL",
+      "lead":"Kupuj taniej, zwiedzaj łatwiej!",
+      "location":{
+        "city":"Wrocław",
+        "country":"Polska",
+        "latitude":51.111746,
+        "longitude":17.0240973,
+        "street":"Świętego Mikołaja 19",
+        "zipCode":"50-128"
+      },
+      "mainImage":{
+        "fhd":"https://hpl.fream.pl/api/v1/images/c03732d9x376bx4a84x9ac9x43f46bae6b08.jpg",
+        "fhdWebp":"https://hpl.fream.pl/api/v1/images/c03732d9x376bx4a84x9ac9x43f46bae6b08.webp",
+        "fourK":"https://hpl.fream.pl/api/v1/images/dcf2e540x0057x495fxa22ex6da24994f4f8.jpg",
+        "fourKWebp":"https://hpl.fream.pl/api/v1/images/dcf2e540x0057x495fxa22ex6da24994f4f8.webp",
+        "hd":"https://hpl.fream.pl/api/v1/images/4edbc93fxdfd5x41c6xaef2x5a67b9cd4f29.jpg",
+        "hdWebp":"https://hpl.fream.pl/api/v1/images/4edbc93fxdfd5x41c6xaef2x5a67b9cd4f29.webp",
+        "original":"https://hpl.fream.pl/api/v1/images/63f705c3x9072x47e8xba2bx414f12f3db3d.jpg",
+        "originalWebp":"https://hpl.fream.pl/api/v1/images/63f705c3x9072x47e8xba2bx414f12f3db3d.webp",
+        "qvg":"https://hpl.fream.pl/api/v1/images/69031ac4xadb1x42a7x94f3xe1067754b829.jpg",
+        "qvgWebp":"https://hpl.fream.pl/api/v1/images/69031ac4xadb1x42a7x94f3xe1067754b829.webp",
+        "sxga":"https://hpl.fream.pl/api/v1/images/2a6cf3bex90fcx44dax87f4x709e4b4bfbbf.jpg",
+        "sxgaWebp":"https://hpl.fream.pl/api/v1/images/2a6cf3bex90fcx44dax87f4x709e4b4bfbbf.webp",
+        "vga":"https://hpl.fream.pl/api/v1/images/b3391fe6xde93x4950x952bxa7d2fbc69f3b.jpg",
+        "vgaWebp":"https://hpl.fream.pl/api/v1/images/b3391fe6xde93x4950x952bxa7d2fbc69f3b.webp",
+        "xga":"https://hpl.fream.pl/api/v1/images/01bcae62x6f2ex4fb1x9f4ex5b7e1ce5ddf4.jpg",
+        "xgaWebp":"https://hpl.fream.pl/api/v1/images/01bcae62x6f2ex4fb1x9f4ex5b7e1ce5ddf4.webp"
+      },
+      "name":"Wycieczki Hello Poland we Wrocławiu",
+      "published":true,
+      "score":4.9
+    }
+  ],
   "sight-events": [
     {
       "blocked":false,

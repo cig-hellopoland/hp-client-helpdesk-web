@@ -4,6 +4,7 @@ import { logic as categoriesLogic } from '@hello-poland/commons/redux/categories
 import { logic as partnersLogic } from 'redux/partners';
 import { logic as profileLogic } from 'redux/profile';
 import { logic as sightEventsLogic } from '@hello-poland/commons/redux/sightEvents';
+import { logic as sightsLogic } from '@hello-poland/commons/redux/sights';
 import { logic as tagsLogic } from '@hello-poland/commons/redux/tags';
 import { logic as ticketDefinitions } from '@hello-poland/commons/redux/ticketDefinitions';
 
@@ -14,6 +15,7 @@ export default parseReduxLogic({
   partnersLogic,
   profileLogic,
   sightEventsLogic,
+  sightsLogic,
   tagsLogic,
   ticketDefinitions,
 });

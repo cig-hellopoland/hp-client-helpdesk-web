@@ -30,7 +30,7 @@ export default [
     label: 'Tagi', href: '/market/tags', Icon: LocalOfferIcon,
   },
   {
-    disabled: true, label: 'Atrakcje', href: '/market/sights', Icon: PlaceIcon,
+    label: 'Atrakcje', href: '/market/sights', Icon: PlaceIcon,
   },
   {
     label: 'Oferty', href: '/market/sight-events', Icon: LocalPlayIcon,

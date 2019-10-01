@@ -128,7 +128,7 @@ class SightEventsList extends React.Component {
 
   handleDeleteItemSuccess = () => {
     this.handleDialogClose();
-    this.handleFetchCategories();
+    this.handleFetchItems();
   };
 
   handleDeleteItem = (itemId) => {

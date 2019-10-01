@@ -128,7 +128,7 @@ class SightsList extends React.Component {
 
   handleDeleteItemSuccess = () => {
     this.handleDialogClose();
-    this.handleFetchCategories();
+    this.handleFetchItems();
   };
 
   handleDeleteItem = (itemId) => {
@@ -224,7 +224,6 @@ class SightsList extends React.Component {
 
     if (item) {
       const { defaultLanguage } = item;
-
       updateItem({
         id: itemId,
         data,

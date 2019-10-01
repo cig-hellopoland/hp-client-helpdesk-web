@@ -19,9 +19,9 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import LocalPlayIcon from '@material-ui/icons/LocalPlay';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
 import LockIcon from '@material-ui/icons/Lock';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import PlaceIcon from '@material-ui/icons/Place';
 import PublicIcon from '@material-ui/icons/Public';
 import { withRouter } from 'next/router';
 import {
@@ -281,7 +281,7 @@ class SightsList extends React.Component {
             {sortedList.length === 0
               && (
                 <EmptyView
-                  image={LocalPlayIcon}
+                  image={PlaceIcon}
                   label="Brak atrakcji"
                   loading={isFetching}
                   message="Ponów zapytanie aby wyświetlić listę."

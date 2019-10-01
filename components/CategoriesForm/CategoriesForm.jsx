@@ -127,7 +127,7 @@ function CategoriesForm({
       {(publicCategories.length === 0)
         && (
           <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>Brak ketegorii przypisanych przez partnera.</Typography>
+            <Typography>Brak kategorii przypisanych przez partnera.</Typography>
           </Grid>
         )
       }

@@ -203,10 +203,15 @@ class CategoriesEdit extends React.Component {
     snackbarMessage: '',
   });
 
-  handleSubmitSuccess = () => {
-    const { router } = this.props;
+  handleSubmitSuccess = (entityId, actions) => {
+    const { selectedTranslation } = this.state;
+    const { itemId } = this.props;
+    const { resetForm, setSubmitting } = actions;
 
-    router.push('/market/categories');
+    this.handleFetchItem(itemId, selectedTranslation);
+
+    setSubmitting(false);
+    resetForm();
   };
 
   render() {

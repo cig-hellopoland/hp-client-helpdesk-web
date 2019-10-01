@@ -225,6 +225,17 @@ class PartnersEdit extends React.Component {
     snackbarMessage: '',
   });
 
+  handleSubmitSuccess = (entityId, actions) => {
+    const { selectedTranslation } = this.state;
+    const { itemId } = this.props;
+    const { resetForm, setSubmitting } = actions;
+
+    this.handleFetchItem(itemId, selectedTranslation);
+
+    setSubmitting(false);
+    resetForm();
+  };
+
   render() {
     const {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
@@ -281,6 +292,7 @@ class PartnersEdit extends React.Component {
                 hideButtons={selectedTranslation !== defaultLanguage}
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
+                onSubmitSuccess={this.handleSubmitSuccess}
               />
             )
           }
@@ -289,6 +301,7 @@ class PartnersEdit extends React.Component {
               <PartnerMarketForm
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
+                onSubmitSuccess={this.handleSubmitSuccess}
               />
             )
           }

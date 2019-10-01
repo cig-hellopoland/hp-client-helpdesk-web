@@ -341,6 +341,17 @@ class SightEventEdit extends React.Component {
     snackbarMessage: '',
   });
 
+  handleSubmitSuccess = (entityId, actions) => {
+    const { selectedTranslation } = this.state;
+    const { itemId } = this.props;
+    const { resetForm, setSubmitting } = actions;
+
+    this.handleFetchItem(itemId, selectedTranslation);
+
+    setSubmitting(false);
+    resetForm();
+  };
+
   render() {
     const {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
@@ -399,6 +410,7 @@ class SightEventEdit extends React.Component {
               <SightEventForm
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
+                onSubmitSuccess={this.handleSubmitSuccess}
               />
             )
           }

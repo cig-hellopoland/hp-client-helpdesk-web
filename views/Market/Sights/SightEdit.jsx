@@ -36,7 +36,7 @@ const styles = theme => ({
 });
 
 class SightEdit extends React.Component {
-  baseURL = '/market/sight-events';
+  baseURL = '/market/sights';
 
   state = {
     availableTranslations: CONTENT_LANGUAGES,

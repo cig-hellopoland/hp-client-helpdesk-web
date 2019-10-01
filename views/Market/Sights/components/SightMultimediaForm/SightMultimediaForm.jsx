@@ -10,7 +10,7 @@ import AddIcon from '@material-ui/icons/Add';
 import {
   actions as sightsActions,
   selectors as sightsSelectors,
-} from '@hello-poland/commons/redux/sightEvents';
+} from '@hello-poland/commons/redux/sights';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import AlertDialog from 'components/AlertDialog';
 import MediaManager from 'components/MediaManager';
@@ -85,20 +85,8 @@ class SightMultimediaForm extends React.Component {
     }
   };
 
-  handleDeletePDF = () => {
-    const { deletePDF, itemId } = this.props;
-
-    const payload = {
-      id: itemId,
-      onFailure: this.handleDeletePDFFailure,
-      onSuccess: this.handleDeletePDFSuccess,
-    };
-
-    deletePDF(payload);
-  };
-
   handleMediaManagerClose = () => {
-    const { clearError, createMainImageCancel, createPDFCancel } = this.props;
+    const { clearError, createMainImageCancel } = this.props;
     const { mediaManagerData } = this.state;
     const { fileType } = mediaManagerData;
     let action = () => {};
@@ -110,8 +98,6 @@ class SightMultimediaForm extends React.Component {
 
     if (fileType === 'image/jpeg') {
       action = createMainImageCancel;
-    } else if (fileType === 'application/pdf') {
-      action = createPDFCancel;
     }
 
     action();
@@ -137,15 +123,13 @@ class SightMultimediaForm extends React.Component {
   };
 
   handleMediaManagerSubmit = ({ data, options }) => {
-    const { createMainImage, createPDF } = this.props;
+    const { createMainImage } = this.props;
     const { mediaManagerData } = this.state;
     const { fileType, itemId } = mediaManagerData;
     let action = () => {};
 
     if (fileType === 'image/jpeg') {
       action = createMainImage;
-    } else if (fileType === 'application/pdf') {
-      action = createPDF;
     }
 
     action({
@@ -215,11 +199,8 @@ SightMultimediaForm.propTypes = {
   clearError: PropTypes.func.isRequired,
   createMainImage: PropTypes.func.isRequired,
   createMainImageCancel: PropTypes.func.isRequired,
-  createPDF: PropTypes.func.isRequired,
-  createPDFCancel: PropTypes.func.isRequired,
   data: PropTypes.arrayOf(PropTypes.shape({})),
   defaultTranslation: PropTypes.string,
-  deletePDF: PropTypes.func.isRequired,
   itemId: PropTypes.number.isRequired,
   onFailure: PropTypes.func,
   onSuccess: PropTypes.func,
@@ -246,9 +227,6 @@ const mapDispatchToProps = {
   clearError: sightsActions.clearError,
   createMainImage: sightsActions.createMainImage,
   createMainImageCancel: sightsActions.createMainImageCancel,
-  createPDF: sightsActions.createPDF,
-  createPDFCancel: sightsActions.createPDFCancel,
-  deletePDF: sightsActions.deletePDF,
 };
 
 export default compose(

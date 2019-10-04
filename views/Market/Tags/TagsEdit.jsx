@@ -31,6 +31,7 @@ class TagsEdit extends React.Component {
 
   state = {
     availableTranslations: CONTENT_LANGUAGES,
+    isFetching: false,
     selectedTranslation: DEFAULT_LANGUAGE,
     snackbarOpen: false,
     snackbarMessage: '',
@@ -51,6 +52,17 @@ class TagsEdit extends React.Component {
 
     if (itemId) {
       this.handleFetchItem(itemId, DEFAULT_LANGUAGE);
+    }
+  }
+
+  componentDidUpdate() {
+    const { item, itemId } = this.props;
+    const { isFetching } = this.state;
+
+    if (itemId && !isFetching && (!item || item.id !== itemId)) {
+      const { selectedTranslation } = this.state;
+
+      this.handleFetchItem(itemId, selectedTranslation);
     }
   }
 
@@ -77,6 +89,8 @@ class TagsEdit extends React.Component {
   handleFetchItemFailure = () => {
     const { clearError, error } = this.props;
 
+    this.setState({ isFetching: false });
+
     this.handleSnackbarOpen(error && error.message);
 
     if (clearError) {
@@ -90,6 +104,7 @@ class TagsEdit extends React.Component {
 
     this.setState({
       availableTranslations: availableLanguageVersions,
+      isFetching: false,
       selectedTranslation: language || DEFAULT_LANGUAGE,
     });
   };
@@ -107,6 +122,8 @@ class TagsEdit extends React.Component {
       onFailure: this.handleFetchItemFailure,
       onSuccess: this.handleFetchItemSuccess,
     });
+
+    this.setState({ isFetching: true });
   };
 
   handleTranslationChange = (event) => {
@@ -205,15 +222,23 @@ class TagsEdit extends React.Component {
     snackbarMessage: '',
   });
 
-  handleSubmitSuccess = (entityId, actions) => {
+  handleSubmitSuccess = (tagId, actions) => {
     const { selectedTranslation } = this.state;
     const { itemId } = this.props;
-    const { resetForm, setSubmitting } = actions;
-
-    this.handleFetchItem(itemId, selectedTranslation);
+    const { setSubmitting } = actions;
 
     setSubmitting(false);
-    resetForm();
+
+    if (itemId) {
+      this.handleFetchItem(itemId, selectedTranslation);
+    } else {
+      const { router } = this.props;
+
+      const path = `${this.baseURL}/edit?itemId=${tagId}`;
+      const pathname = `${this.baseURL}/${tagId}/edit`;
+
+      router.push(path, pathname);
+    }
   };
 
   render() {

@@ -146,11 +146,11 @@ class TagForm extends React.Component {
     setSubmitting(false);
   };
 
-  handleSubmitSuccess = actions => (sightId) => {
+  handleSubmitSuccess = actions => (tagId) => {
     const { onSubmitSuccess, clearError } = this.props;
 
     if (onSubmitSuccess) {
-      onSubmitSuccess(sightId, actions);
+      onSubmitSuccess(tagId, actions);
 
       return;
     }

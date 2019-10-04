@@ -105,7 +105,10 @@ class CategoryForm extends React.Component {
     const { id, ...data } = values;
 
     const payload = {
-      data,
+      data: {
+        ...initialValues,
+        ...data,
+      },
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
       options: {
@@ -146,11 +149,11 @@ class CategoryForm extends React.Component {
     setSubmitting(false);
   };
 
-  handleSubmitSuccess = actions => (sightId) => {
+  handleSubmitSuccess = actions => (categoryId) => {
     const { onSubmitSuccess, clearError } = this.props;
 
     if (onSubmitSuccess) {
-      onSubmitSuccess(sightId, actions);
+      onSubmitSuccess(categoryId, actions);
 
       return;
     }

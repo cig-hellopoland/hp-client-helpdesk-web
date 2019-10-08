@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import _merge from 'lodash/merge';
 import withAuth from 'services/auth/withAuth';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -101,7 +102,12 @@ class PartnersList extends Component {
     if (item) {
       const { blocked } = item;
 
-      this.handleUpdateItem(itemId, { ...item, blocked: !blocked });
+      this.handleUpdateItem(itemId, {
+        data: { blocked: !blocked },
+        options: {
+          method: 'patch',
+        },
+      });
     }
 
     this.handleMenuClose();
@@ -165,19 +171,14 @@ class PartnersList extends Component {
 
   handleUpdateItemSuccess = () => this.handleFetchItems();
 
-  handleUpdateItem = (itemId, data) => {
+  handleUpdateItem = (itemId, payload) => {
     const { updateItem } = this.props;
     const item = this.getItemById(itemId);
 
     if (item) {
       const { defaultLanguage } = item;
-
-      updateItem({
+      const request = {
         id: itemId,
-        data,
-        pathParams: {
-          languageVersion: defaultLanguage,
-        },
         onFailure: this.handleUpdateItemFailure,
         onSuccess: this.handleUpdateItemSuccess,
         options: {
@@ -185,7 +186,10 @@ class PartnersList extends Component {
             'Content-Language': defaultLanguage,
           },
         },
-      });
+      };
+
+      console.log(_merge(request, payload));
+      updateItem(_merge(request, payload));
     }
   };
 

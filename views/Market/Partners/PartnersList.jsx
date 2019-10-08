@@ -188,7 +188,6 @@ class PartnersList extends Component {
         },
       };
 
-      console.log(_merge(request, payload));
       updateItem(_merge(request, payload));
     }
   };

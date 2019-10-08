@@ -17,9 +17,9 @@ import yupBoolean from 'yup/lib/boolean';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import {
-  actions as categoriesActions,
-  selectors as categoriesSelectors,
-} from '@hello-poland/commons/redux/categories';
+  actions as tagsActions,
+  selectors as tagsSelectors,
+} from '@hello-poland/commons/redux/tags';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 import IconGalleryDialog from 'components/IconGallery/IconGalleryDialog';
@@ -40,7 +40,7 @@ const styles = {
   },
 };
 
-class CategoryForm extends React.Component {
+class TagForm extends React.Component {
   constructor(props) {
     super(props);
 
@@ -105,10 +105,7 @@ class CategoryForm extends React.Component {
     const { id, ...data } = values;
 
     const payload = {
-      data: {
-        ...initialValues,
-        ...data,
-      },
+      data,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
       options: {
@@ -149,11 +146,11 @@ class CategoryForm extends React.Component {
     setSubmitting(false);
   };
 
-  handleSubmitSuccess = actions => (categoryId) => {
+  handleSubmitSuccess = actions => (tagId) => {
     const { onSubmitSuccess, clearError } = this.props;
 
     if (onSubmitSuccess) {
-      onSubmitSuccess(categoryId, actions);
+      onSubmitSuccess(tagId, actions);
 
       return;
     }
@@ -195,7 +192,7 @@ class CategoryForm extends React.Component {
                 </GridItem>
               </Hidden>
               <GridItem>
-                <Field name="label" label="Nazwa kategorii" required component={TextField} {...commonProps} />
+                <Field name="label" label="Nazwa tagu" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Hidden xsUp>
@@ -224,7 +221,7 @@ class CategoryForm extends React.Component {
                 <Field
                   disabled={isDisabled}
                   name="restricted"
-                  Label={{ label: 'Zastrzeżona dla Hello! Poland' }}
+                  Label={{ label: 'Zastrzeżony dla Hello! Poland' }}
                   component={CheckboxWithLabel}
                 />
               </GridItem>
@@ -232,7 +229,7 @@ class CategoryForm extends React.Component {
                 <Field
                   disabled={isDisabled}
                   name="recommended"
-                  Label={{ label: 'Polecana' }}
+                  Label={{ label: 'Polecany' }}
                   component={CheckboxWithLabel}
                 />
               </GridItem>
@@ -272,7 +269,7 @@ class CategoryForm extends React.Component {
   }
 }
 
-CategoryForm.propTypes = {
+TagForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
@@ -291,7 +288,7 @@ CategoryForm.propTypes = {
   updateItem: PropTypes.func.isRequired,
 };
 
-CategoryForm.defaultProps = {
+TagForm.defaultProps = {
   FormikProps: null,
   hideButtons: false,
   hideErrors: false,
@@ -304,17 +301,17 @@ CategoryForm.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  requestError: categoriesSelectors.getError(state),
+  requestError: tagsSelectors.getError(state),
 });
 
 const mapDispatchToProps = {
-  clearError: categoriesActions.clearError,
-  createItem: categoriesActions.createItem,
-  createTranslation: categoriesActions.createTranslation,
-  updateItem: categoriesActions.updateItem,
+  clearError: tagsActions.clearError,
+  createItem: tagsActions.createItem,
+  createTranslation: tagsActions.createTranslation,
+  updateItem: tagsActions.updateItem,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
-)(CategoryForm);
+)(TagForm);

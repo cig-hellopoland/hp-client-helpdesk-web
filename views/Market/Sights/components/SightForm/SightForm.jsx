@@ -2,8 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import _find from 'lodash/find';
 import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
+import format from 'date-fns/format';
+import parseISO from 'date-fns/parseISO';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
 import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
@@ -11,17 +14,32 @@ import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
+import TimePicker from 'material-ui-pickers/TimePicker';
+import MuiPickersUtilsProvider from 'material-ui-pickers/MuiPickersUtilsProvider';
+import DateFnsUtils from '@date-io/date-fns';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import yupBoolean from 'yup/lib/boolean';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import {
-  actions as sightEventsActions,
-  selectors as sightEventsSelectors,
-} from '@hello-poland/commons/redux/sightEvents';
+  actions as sightsActions,
+  selectors as sightsSelectors,
+} from '@hello-poland/commons/redux/sights';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
+
+const i18n = {
+  days: {
+    1: 'Poniedziałek',
+    2: 'Wtorek',
+    3: 'Środa',
+    4: 'Czwartek',
+    5: 'Piątek',
+    6: 'Sobota',
+    7: 'Niedziela',
+  },
+};
 
 const commonProps = {
   fullWidth: true,
@@ -52,16 +70,21 @@ const styles = theme => ({
   section: {
     marginTop: theme.spacing.unit * 2,
   },
+  openingHoursTimepicker: {
+    width: 50,
+  },
 });
 
-class SightEventForm extends React.Component {
+class SightForm extends React.Component {
   constructor(props) {
     super(props);
 
     const { initialValues } = this.props;
+    const { openingHours } = initialValues || {};
 
     this.state = {
       initialValues: this.getInitialValues(initialValues || {}),
+      viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
     };
 
     // TODO: nested validation seems not working
@@ -89,17 +112,48 @@ class SightEventForm extends React.Component {
     const { initialValues } = this.props;
 
     if (!_isEqual(prevInitialValues, initialValues)) {
+      const { openingHours } = initialValues || {};
+
       this.setInitialValues(initialValues);
+      this.setViewOpeningHours(openingHours, true);
     }
   }
 
+  getFormattedTime = (datetime, dateFormat = 'HH:mm') => {
+    const parsedDatetime = typeof datetime === 'string' ? parseISO(datetime) : datetime;
+
+    return format(parsedDatetime, dateFormat);
+  };
+
+  getInitialOpeningHours = (initialValues = [], viewValues = false) => {
+    let openingHours = [];
+
+    if (viewValues) {
+      for (let i = 1; i < 8; i += 1) {
+        const values = _find(initialValues, { day: i }) || {};
+        const { closeTime, openTime } = values;
+        const checked = !!Object.getOwnPropertyNames(values).length;
+
+        openingHours.push({
+          checked,
+          day: i,
+          openTime: openTime ? `1970-01-01T${openTime}` : '1970-01-01T09:00',
+          closeTime: closeTime ? `1970-01-01T${closeTime}` : '1970-01-01T18:00',
+        });
+      }
+    } else {
+      openingHours = initialValues;
+    }
+
+    return openingHours;
+  };
+
   getInitialValues = (initialValues) => {
-    const { location: initialLocation, pdfAttachment: files, ...details } = initialValues || {};
+    const { location: initialLocation, openingHours, ...details } = initialValues || {};
     const location = initialLocation || {};
 
     return {
       id: details.id || '',
-      sightId: details.sightId || '',
       name: details.name || '',
       blocked: details.blocked || false,
       published: details.published || false,
@@ -107,12 +161,12 @@ class SightEventForm extends React.Component {
       description: details.description || '',
       email: details.email || '',
       phone: details.phone || '',
+      openingHours: this.getInitialOpeningHours(openingHours),
       location: {
-        directions: location.directions || '',
         street: location.street || '',
         zipCode: location.zipCode || '',
         city: location.city || '',
-        country: location.country || '',
+        country: location.country || 'Polska',
       },
     };
   };
@@ -120,6 +174,59 @@ class SightEventForm extends React.Component {
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues || {}),
   });
+
+  setViewOpeningHours = openingHours => this.setState({
+    viewOpeningHours: this.getInitialOpeningHours(openingHours, true),
+  });
+
+  handleOpeningHoursChange = (day, keyName, keyValue) => {
+    const { initialValues, viewOpeningHours } = this.state;
+    const { openingHours } = initialValues;
+    const dayIndex = day - 1;
+    const entryIndex = openingHours.findIndex(o => o.day === day);
+
+    viewOpeningHours[dayIndex][keyName] = keyValue;
+    openingHours[entryIndex][keyName] = this.getFormattedTime(keyValue);
+
+    this.setState({
+      initialValues: {
+        ...initialValues,
+        openingHours,
+      },
+      viewOpeningHours,
+    });
+  };
+
+  handleOpeningHoursSelectionChange = (day, values) => (event) => {
+    const { viewOpeningHours } = this.state;
+    const { target } = event;
+    const dayIndex = day - 1;
+    let { openingHours } = values;
+
+    viewOpeningHours[dayIndex].checked = target.checked;
+
+    if (target.checked) {
+      const { closeTime, openTime } = viewOpeningHours[dayIndex];
+
+      openingHours.push({
+        day: viewOpeningHours[dayIndex].day,
+        openTime: this.getFormattedTime(openTime),
+        closeTime: this.getFormattedTime(closeTime),
+      });
+
+      openingHours.sort((a, b) => a.day - b.day);
+    } else {
+      openingHours = openingHours.filter(o => o.day !== day);
+    }
+
+    this.setState({
+      initialValues: {
+        ...values,
+        openingHours,
+      },
+      viewOpeningHours,
+    });
+  };
 
   handleSubmit = (values, actions) => {
     const { initialValues, language, onSubmit } = this.props;
@@ -196,7 +303,7 @@ class SightEventForm extends React.Component {
       classes, FormikProps, hideButtons, hideErrors, initialValues: itemValues, language,
       requestError,
     } = this.props;
-    const { initialValues } = this.state;
+    const { initialValues, viewOpeningHours } = this.state;
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
     const { defaultLanguage, id: itemId } = itemValues || {};
@@ -210,7 +317,7 @@ class SightEventForm extends React.Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {({ isSubmitting } = {}) => (
+        {({ isSubmitting, values } = {}) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <GridItem>
@@ -219,11 +326,6 @@ class SightEventForm extends React.Component {
               <Hidden xsUp>
                 <GridItem>
                   <Field name="id" hidden component={TextField} {...commonProps} />
-                </GridItem>
-              </Hidden>
-              <Hidden xsUp>
-                <GridItem>
-                  <Field name="sightId" hidden component={TextField} {...commonProps} />
                 </GridItem>
               </Hidden>
               <GridItem>
@@ -269,6 +371,53 @@ class SightEventForm extends React.Component {
                 && (
                   <React.Fragment>
                     <GridItem>
+                      <Typography variant="h6" className={classes.title}>Godziny otwarcia</Typography>
+                    </GridItem>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                      {viewOpeningHours.map(item => (
+                        <React.Fragment key={`openingHours-list-${item.day}`}>
+                          <GridItem sm={6} md={6}>
+                            <FormControlLabel
+                              control={(
+                                <Switch
+                                  checked={item.checked}
+                                  onChange={
+                                    this.handleOpeningHoursSelectionChange(item.day, values)
+                                  }
+                                  value={`${item.day}`}
+                                />
+                              )}
+                              label={i18n.days[item.day]}
+                            />
+                          </GridItem>
+                          <GridItem sm={3} md={3}>
+                            <TimePicker
+                              ampm={false}
+                              className={classes.openingHoursTimepicker}
+                              disabled={!item.checked}
+                              onChange={event => this.handleOpeningHoursChange(item.day, 'openTime', event)}
+                              value={item.openTime}
+                            />
+                          </GridItem>
+                          <GridItem sm={3} md={3}>
+                            <TimePicker
+                              ampm={false}
+                              className={classes.openingHoursTimepicker}
+                              disabled={!item.checked}
+                              onChange={event => this.handleOpeningHoursChange(item.day, 'closeTime', event)}
+                              value={item.closeTime}
+                            />
+                          </GridItem>
+                        </React.Fragment>
+                      ))}
+                    </MuiPickersUtilsProvider>
+                  </React.Fragment>
+                )
+              }
+              {isDefaultTranslation
+                && (
+                  <React.Fragment>
+                    <GridItem>
                       <Typography variant="h6" className={classes.section}>Dane kontaktowe</Typography>
                     </GridItem>
                     <GridItem md={6} sm={6}>
@@ -280,12 +429,12 @@ class SightEventForm extends React.Component {
                   </React.Fragment>
                 )
               }
-              <GridItem>
-                <Typography variant="h6" className={classes.section}>Lokalizacja</Typography>
-              </GridItem>
               {isDefaultTranslation
                 && (
                   <React.Fragment>
+                    <GridItem>
+                      <Typography variant="h6" className={classes.section}>Lokalizacja</Typography>
+                    </GridItem>
                     <GridItem>
                       <Field name="location.street" label="Ulica" component={TextField} {...commonProps} />
                     </GridItem>
@@ -301,9 +450,6 @@ class SightEventForm extends React.Component {
                   </React.Fragment>
                 )
               }
-              <GridItem>
-                <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={10} />
-              </GridItem>
             </Grid>
             {(!hideButtons || (!hideErrors && errorMessage))
               && (
@@ -334,7 +480,7 @@ class SightEventForm extends React.Component {
   }
 }
 
-SightEventForm.propTypes = {
+SightForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
@@ -353,7 +499,7 @@ SightEventForm.propTypes = {
   updateItem: PropTypes.func.isRequired,
 };
 
-SightEventForm.defaultProps = {
+SightForm.defaultProps = {
   FormikProps: null,
   hideButtons: false,
   hideErrors: false,
@@ -366,17 +512,17 @@ SightEventForm.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  requestError: sightEventsSelectors.getError(state),
+  requestError: sightsSelectors.getError(state),
 });
 
 const mapDispatchToProps = {
-  clearError: sightEventsActions.clearError,
-  createItem: sightEventsActions.createItem,
-  createTranslation: sightEventsActions.createTranslation,
-  updateItem: sightEventsActions.updateItem,
+  clearError: sightsActions.clearError,
+  createItem: sightsActions.createItem,
+  createTranslation: sightsActions.createTranslation,
+  updateItem: sightsActions.updateItem,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
-)(SightEventForm);
+)(SightForm);

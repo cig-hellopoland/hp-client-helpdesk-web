@@ -73,27 +73,27 @@ class CategoriesList extends React.Component {
     dialogProps: {},
     isFetching: false,
     menuAnchor: null,
-    menuCategoryId: null,
+    menuItemId: null,
     snackbarOpen: false,
     snackbarMessage: '',
   };
 
   componentDidMount() {
-    this.handleFetchCategories();
+    this.handleFetchItems();
   }
 
   handleDialogOpen = () => {
-    const { menuCategoryId } = this.state;
+    const { menuItemId } = this.state;
     const { items } = this.props;
 
-    const selectedCategory = items.find(item => item.id === menuCategoryId);
+    const selectedItem = items.find(item => item.id === menuItemId);
 
-    if (selectedCategory) {
+    if (selectedItem) {
       this.setState({
         dialogOpen: true,
         dialogProps: {
-          categoryId: menuCategoryId,
-          categoryName: selectedCategory.label,
+          itemId: menuItemId,
+          itemName: selectedItem.label,
         },
       });
     }
@@ -106,19 +106,19 @@ class CategoriesList extends React.Component {
     dialogProps: {},
   });
 
-  handleDeleteCategoryFailure = () => {
+  handleDeleteItemFailure = () => {
     const { error } = this.props;
 
     this.handleDialogClose();
     this.handleSnackbarOpen(error && error.message);
   };
 
-  handleDeleteCategorySuccess = () => {
+  handleDeleteItemSuccess = () => {
     this.handleDialogClose();
-    this.handleFetchCategories();
+    this.handleFetchItems();
   };
 
-  handleDeleteCategory = (categoryId) => {
+  handleDeleteItem = (itemId) => {
     const { deleteItem } = this.props;
 
     this.setState(state => ({
@@ -130,17 +130,17 @@ class CategoriesList extends React.Component {
     }));
 
     deleteItem({
-      id: categoryId,
-      onFailure: this.handleDeleteCategoryFailure,
-      onSuccess: this.handleDeleteCategorySuccess,
+      id: itemId,
+      onFailure: this.handleDeleteItemFailure,
+      onSuccess: this.handleDeleteItemSuccess,
     });
   };
 
-  handleFetchCategoriesFailure = () => this.setState({ isFetching: false });
+  handleFetchItemsFailure = () => this.setState({ isFetching: false });
 
-  handleFetchCategoriesSuccess = () => this.setState({ isFetching: false });
+  handleFetchItemsSuccess = () => this.setState({ isFetching: false });
 
-  handleFetchCategories = () => {
+  handleFetchItems = () => {
     const { fetchList } = this.props;
 
     fetchList({
@@ -149,33 +149,33 @@ class CategoriesList extends React.Component {
           'Content-Language': DEFAULT_LANGUAGE,
         },
       },
-      onFailure: this.handleFetchCategoriesFailure,
-      onSuccess: this.handleFetchCategoriesSuccess,
+      onFailure: this.handleFetchItemsFailure,
+      onSuccess: this.handleFetchItemsSuccess,
     });
 
     this.setState({ isFetching: true });
   };
 
   handleItemEdit = () => {
-    const { menuCategoryId } = this.state;
+    const { menuItemId } = this.state;
     const { router } = this.props;
 
-    const href = `${this.baseURL}/edit?itemId=${menuCategoryId}`;
-    const pathname = `${this.baseURL}/${menuCategoryId}/edit`;
+    const href = `${this.baseURL}/edit?itemId=${menuItemId}`;
+    const pathname = `${this.baseURL}/${menuItemId}/edit`;
 
     router.push(href, pathname);
 
     this.handleMenuClose();
   };
 
-  handleMenuOpen = (event, categoryId) => this.setState({
+  handleMenuOpen = (event, itemId) => this.setState({
     menuAnchor: event.currentTarget,
-    menuCategoryId: categoryId,
+    menuItemId: itemId,
   });
 
   handleMenuClose = () => this.setState({
     menuAnchor: null,
-    menuCategoryId: null,
+    menuItemId: null,
   });
 
   handleSnackbarOpen = message => this.setState({
@@ -204,7 +204,7 @@ class CategoriesList extends React.Component {
             <Grid container direction="column" className={classes.toolbar}>
               <Grid container item justify="flex-end">
                 <Grid item>
-                  <Link href="/market/categories/create" passHref>
+                  <Link href={`${this.baseURL}/create`} passHref>
                     <Button component="a">
                       <AddIcon className={classes.icon} />
                       Dodaj
@@ -220,22 +220,22 @@ class CategoriesList extends React.Component {
                   label="Brak kategorii"
                   loading={isFetching}
                   message="Dodaj kategorię lub ponów zapytanie aby wyświetlić listę."
-                  onRefresh={this.handleFetchCategories}
+                  onRefresh={this.handleFetchItems}
                 />
               )
             }
             {sortedList.length > 0
               && (
                 <React.Fragment>
-                  <Table aria-labelledby="categories-list">
+                  <Table aria-labelledby="items-list">
                     <SortableTableHead columns={tableColumns} orderBy="name" onRequestSort={() => {}} />
                     <TableBody>
                       {
                         sortedList.map(({
-                          assignedItemsCount, label, iconUrl, id: categoryId, restricted,
+                          assignedItemsCount, label, iconUrl, id: listItemId, restricted,
                           recommended,
                         }) => (
-                          <TableRow key={categoryId} hover>
+                          <TableRow key={listItemId} hover>
                             <TableCell className={classes.iconCell} align="center">
                               {iconUrl
                                 ? <img src={iconUrl} height={48} width={48} alt={label} />
@@ -256,9 +256,9 @@ class CategoriesList extends React.Component {
                                 <StarIcon color={recommended ? colorActive : colorInactive} />
                               </IconButton>
                               <IconButton
-                                aria-owns={menuAnchor ? 'category-menu' : undefined}
+                                aria-owns={menuAnchor ? 'item-menu' : undefined}
                                 aria-haspopup="true"
-                                onClick={event => this.handleMenuOpen(event, categoryId)}
+                                onClick={event => this.handleMenuOpen(event, listItemId)}
                               >
                                 <MoreVertIcon />
                               </IconButton>
@@ -269,7 +269,7 @@ class CategoriesList extends React.Component {
                     </TableBody>
                   </Table>
                   <Menu
-                    id="category-menu"
+                    id="item-menu"
                     anchorEl={menuAnchor}
                     open={Boolean(menuAnchor)}
                     onClose={this.handleMenuClose}
@@ -288,18 +288,18 @@ class CategoriesList extends React.Component {
                     aria-describedby="alert-dialog-description"
                   >
                     <DialogTitle id="alert-dialog-title">
-                      Usuń kategorię
+                      Usuń element
                     </DialogTitle>
                     <DialogContent>
                       <DialogContentText id="alert-dialog-description">
-                        {`Czy napewno usunąć kategorię "${dialogProps.categoryName}"?`}
+                        {`Czy napewno usunąć element "${dialogProps.itemName}"?`}
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>
                       <Button onClick={this.handleDialogClose} color="primary" disabled={dialogProps.deleting}>
                         Anuluj
                       </Button>
-                      <Button onClick={() => this.handleDeleteCategory(dialogProps.categoryId)} color="primary" disabled={dialogProps.deleting}>
+                      <Button onClick={() => this.handleDeleteItem(dialogProps.itemId)} color="primary" disabled={dialogProps.deleting}>
                         OK
                       </Button>
                     </DialogActions>

@@ -10,14 +10,14 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Typography from '@material-ui/core/Typography';
 import { withRouter } from 'next/router';
 import {
-  actions as categoriesActions,
-  selectors as categoriesSelectors,
-} from '@hello-poland/commons/redux/categories';
+  actions as tagsActions,
+  selectors as tagsSelectors,
+} from '@hello-poland/commons/redux/tags';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
-import CategoryForm from './components/CategoryForm';
+import TagForm from './components/TagForm';
 
 const styles = theme => ({
   root: {
@@ -26,8 +26,8 @@ const styles = theme => ({
   },
 });
 
-class CategoriesEdit extends React.Component {
-  baseURL = '/market/categories';
+class TagsEdit extends React.Component {
+  baseURL = '/market/tags';
 
   state = {
     availableTranslations: CONTENT_LANGUAGES,
@@ -222,7 +222,7 @@ class CategoriesEdit extends React.Component {
     snackbarMessage: '',
   });
 
-  handleSubmitSuccess = (categoryId, actions) => {
+  handleSubmitSuccess = (tagId, actions) => {
     const { selectedTranslation } = this.state;
     const { itemId } = this.props;
     const { setSubmitting } = actions;
@@ -234,8 +234,8 @@ class CategoriesEdit extends React.Component {
     } else {
       const { router } = this.props;
 
-      const path = `${this.baseURL}/edit?itemId=${categoryId}`;
-      const pathname = `${this.baseURL}/${categoryId}/edit`;
+      const path = `${this.baseURL}/edit?itemId=${tagId}`;
+      const pathname = `${this.baseURL}/${tagId}/edit`;
 
       router.push(path, pathname);
     }
@@ -248,7 +248,7 @@ class CategoriesEdit extends React.Component {
     const { classes, item, itemId } = this.props;
     const { defaultLanguage } = item || {};
 
-    const pageTitle = itemId ? 'Edycja kategorii' : 'Nowa kategoria';
+    const pageTitle = itemId ? 'Edycja taga' : 'Nowy tag';
     const hasLanguageActions = !!(itemId);
 
     return (
@@ -278,7 +278,7 @@ class CategoriesEdit extends React.Component {
               />
             </Grid>
           </Grid>
-          <CategoryForm
+          <TagForm
             initialValues={this.getFormValues(item)}
             language={selectedTranslation}
             onSubmitSuccess={this.handleSubmitSuccess}
@@ -298,7 +298,7 @@ class CategoriesEdit extends React.Component {
   }
 }
 
-CategoriesEdit.propTypes = {
+TagsEdit.propTypes = {
   itemId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
@@ -314,23 +314,23 @@ CategoriesEdit.propTypes = {
   router: PropTypes.shape({}).isRequired,
 };
 
-CategoriesEdit.defaultProps = {
+TagsEdit.defaultProps = {
   itemId: null,
   error: null,
   item: null,
 };
 
 const mapStateToProps = state => ({
-  error: categoriesSelectors.getError(state),
-  item: categoriesSelectors.getItem(state),
+  error: tagsSelectors.getError(state),
+  item: tagsSelectors.getItem(state),
 });
 
 const mapDispatchToProps = {
-  changeDefaultTranslation: categoriesActions.changeDefaultTranslation,
-  clearError: categoriesActions.clearError,
-  clearItem: categoriesActions.clearItem,
-  deleteTranslation: categoriesActions.deleteTranslation,
-  fetchItem: categoriesActions.fetchItem,
+  changeDefaultTranslation: tagsActions.changeDefaultTranslation,
+  clearError: tagsActions.clearError,
+  clearItem: tagsActions.clearItem,
+  deleteTranslation: tagsActions.deleteTranslation,
+  fetchItem: tagsActions.fetchItem,
 };
 
 export default compose(
@@ -338,4 +338,4 @@ export default compose(
   withAuth(),
   withRouter,
   withStyles(styles),
-)(CategoriesEdit);
+)(TagsEdit);

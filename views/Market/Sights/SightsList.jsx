@@ -19,15 +19,15 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import LocalPlayIcon from '@material-ui/icons/LocalPlay';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
 import LockIcon from '@material-ui/icons/Lock';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import PlaceIcon from '@material-ui/icons/Place';
 import PublicIcon from '@material-ui/icons/Public';
 import { withRouter } from 'next/router';
 import {
-  actions as sightEventsActions,
-  selectors as sightEventsSelectors,
-} from '@hello-poland/commons/redux/sightEvents';
+  actions as sightsActions,
+  selectors as sightsSelectors,
+} from '@hello-poland/commons/redux/sights';
 import withAuth from 'services/auth/withAuth';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
@@ -36,7 +36,7 @@ import SortableTableHead from '../Partners/components/ListingViewTable/SortableT
 
 const tableColumns = [
   { id: 'item-id', label: '# ID' },
-  { id: 'name', label: 'Nazwa oferty' },
+  { id: 'name', label: 'Nazwa atrakcji' },
   { id: 'location', label: 'Lokalizacja' },
   { id: 'partner', label: 'Partner' },
   { id: 'details', label: '' },
@@ -60,8 +60,8 @@ const styles = theme => ({
   },
 });
 
-class SightEventsList extends React.Component {
-  baseURL = '/market/sight-events';
+class SightsList extends React.Component {
+  baseURL = '/market/sights';
 
   state = {
     dialogOpen: false,
@@ -224,7 +224,6 @@ class SightEventsList extends React.Component {
 
     if (item) {
       const { defaultLanguage } = item;
-
       updateItem({
         id: itemId,
         data,
@@ -281,8 +280,8 @@ class SightEventsList extends React.Component {
             {sortedList.length === 0
               && (
                 <EmptyView
-                  image={LocalPlayIcon}
-                  label="Brak ofert"
+                  image={PlaceIcon}
+                  label="Brak atrakcji"
                   loading={isFetching}
                   message="Ponów zapytanie aby wyświetlić listę."
                   onRefresh={this.handleFetchItems}
@@ -351,11 +350,11 @@ class SightEventsList extends React.Component {
                     aria-describedby="alert-dialog-description"
                   >
                     <DialogTitle id="alert-dialog-title">
-                      Usuń ofertę
+                      Usuń atrakcję
                     </DialogTitle>
                     <DialogContent>
                       <DialogContentText id="alert-dialog-description">
-                        {`Czy napewno usunąć ofertę "${dialogProps.name}"?`}
+                        {`Czy napewno usunąć atrakcję "${dialogProps.name}"?`}
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -386,30 +385,29 @@ class SightEventsList extends React.Component {
   }
 }
 
-SightEventsList.propTypes = {
+SightsList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   deleteItem: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
   fetchList: PropTypes.func.isRequired,
-  items: PropTypes.arrayOf(PropTypes.shape({
-  })).isRequired,
+  items: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   router: PropTypes.shape({}).isRequired,
   updateItem: PropTypes.func.isRequired,
 };
 
-SightEventsList.defaultProps = {
+SightsList.defaultProps = {
   error: null,
 };
 
 const mapStateToProps = state => ({
-  error: sightEventsSelectors.getError(state),
-  items: sightEventsSelectors.getSightEvents(state),
+  error: sightsSelectors.getError(state),
+  items: sightsSelectors.getSights(state),
 });
 
 const mapDispatchToProps = {
-  deleteItem: sightEventsActions.deleteItem,
-  fetchList: sightEventsActions.fetchList,
-  updateItem: sightEventsActions.updateItem,
+  deleteItem: sightsActions.deleteItem,
+  fetchList: sightsActions.fetchList,
+  updateItem: sightsActions.updateItem,
 };
 
 export default compose(
@@ -417,4 +415,4 @@ export default compose(
   withAuth(),
   withRouter,
   withStyles(styles),
-)(SightEventsList);
+)(SightsList);

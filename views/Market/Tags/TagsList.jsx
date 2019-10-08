@@ -19,26 +19,30 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import LocalPlayIcon from '@material-ui/icons/LocalPlay';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Typography from '@material-ui/core/Typography';
+import AddIcon from '@material-ui/icons/Add';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import LockIcon from '@material-ui/icons/Lock';
-import PublicIcon from '@material-ui/icons/Public';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import StarIcon from '@material-ui/icons/Star';
+import Link from 'next/link';
 import { withRouter } from 'next/router';
 import {
-  actions as sightEventsActions,
-  selectors as sightEventsSelectors,
-} from '@hello-poland/commons/redux/sightEvents';
+  actions as tagsActions,
+  selectors as tagsSelectors,
+} from '@hello-poland/commons/redux/tags';
 import withAuth from 'services/auth/withAuth';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
+
 import Layout from 'components/Layout';
 import EmptyView from 'components/EmptyView';
 import SortableTableHead from '../Partners/components/ListingViewTable/SortableTableHead';
 
 const tableColumns = [
-  { id: 'item-id', label: '# ID' },
-  { id: 'name', label: 'Nazwa oferty' },
-  { id: 'location', label: 'Lokalizacja' },
-  { id: 'partner', label: 'Partner' },
+  { id: 'icon', label: 'Ikona' },
+  { id: 'name', label: 'Nazwa kategorii' },
+  { id: 'count', label: 'Liczba ofert' },
   { id: 'details', label: '' },
 ];
 
@@ -46,22 +50,23 @@ const styles = theme => ({
   root: {
     minHeight: '100%',
   },
-  actions: {
-    minWidth: 200,
+  icon: {
+    marginRight: theme.spacing.unit,
   },
-  orderNunber: {
-    minWidth: 110,
+  iconCell: {
+    width: 50,
   },
   paper: {
     flex: 1,
+    overflow: 'hidden',
   },
   toolbar: {
     padding: theme.spacing.unit,
   },
 });
 
-class SightEventsList extends React.Component {
-  baseURL = '/market/sight-events';
+class TagsList extends React.Component {
+  baseURL = '/market/tags';
 
   state = {
     dialogOpen: false,
@@ -77,24 +82,6 @@ class SightEventsList extends React.Component {
     this.handleFetchItems();
   }
 
-  getItemById = (itemId) => {
-    const { items } = this.props;
-
-    return items.find(item => item.id === itemId);
-  };
-
-  handleBlockItem = (itemId) => {
-    const item = this.getItemById(itemId);
-
-    if (item) {
-      const { blocked } = item;
-
-      this.handleUpdateItem(itemId, { ...item, blocked: !blocked });
-    }
-
-    this.handleMenuClose();
-  };
-
   handleDialogOpen = () => {
     const { menuItemId } = this.state;
     const { items } = this.props;
@@ -106,7 +93,7 @@ class SightEventsList extends React.Component {
         dialogOpen: true,
         dialogProps: {
           itemId: menuItemId,
-          name: selectedItem.name,
+          itemName: selectedItem.label,
         },
       });
     }
@@ -169,36 +156,27 @@ class SightEventsList extends React.Component {
     this.setState({ isFetching: true });
   };
 
-  handleItemEdit = (itemId) => {
+  handleItemEdit = () => {
+    const { menuItemId } = this.state;
     const { router } = this.props;
 
-    const href = `${this.baseURL}/edit?itemId=${itemId}`;
-    const pathname = `${this.baseURL}/${itemId}/edit`;
+    const href = `${this.baseURL}/edit?itemId=${menuItemId}`;
+    const pathname = `${this.baseURL}/${menuItemId}/edit`;
 
     router.push(href, pathname);
 
     this.handleMenuClose();
   };
 
-  handleMenuOpen = (event, itemId) => this.setState({
+  handleMenuOpen = (event, menuItemId) => this.setState({
     menuAnchor: event.currentTarget,
-    menuItemId: itemId,
+    menuItemId,
   });
 
-  handleMenuClose = () => this.setState({ menuAnchor: null });
-
-  handleMenuExited = () => this.setState({ menuItemId: null });
-
-  handlePublishItem = (itemId) => {
-    const item = this.getItemById(itemId);
-
-    if (item) {
-      const { published } = item;
-      this.handleUpdateItem(itemId, { ...item, published: !published });
-    }
-
-    this.handleMenuClose();
-  };
+  handleMenuClose = () => this.setState({
+    menuAnchor: null,
+    menuItemId: null,
+  });
 
   handleSnackbarOpen = message => this.setState({
     snackbarOpen: true,
@@ -210,67 +188,12 @@ class SightEventsList extends React.Component {
     snackbarMessage: '',
   });
 
-  handleUpdateItemFailure = () => {
-    const { error } = this.props;
-
-    this.handleSnackbarOpen(error && error.message);
-  };
-
-  handleUpdateItemSuccess = () => this.handleFetchItems();
-
-  handleUpdateItem = (itemId, data) => {
-    const { updateItem } = this.props;
-    const item = this.getItemById(itemId);
-
-    if (item) {
-      const { defaultLanguage } = item;
-
-      updateItem({
-        id: itemId,
-        data,
-        pathParams: {
-          languageVersion: defaultLanguage,
-        },
-        onFailure: this.handleUpdateItemFailure,
-        onSuccess: this.handleUpdateItemSuccess,
-        options: {
-          headers: {
-            'Content-Language': defaultLanguage,
-          },
-        },
-      });
-    }
-  };
-
-  isItemBlocked = (itemId) => {
-    const { items } = this.props;
-    const selectedItem = items && items.find(item => item.id === itemId);
-
-    if (selectedItem) {
-      return !!selectedItem.blocked;
-    }
-
-    return false;
-  };
-
-  isItemPublished = (itemId) => {
-    const { items } = this.props;
-    const selectedItem = items && items.find(item => item.id === itemId);
-
-    if (selectedItem) {
-      return !!selectedItem.published;
-    }
-
-    return false;
-  };
-
   render() {
     const {
-      dialogOpen, dialogProps, isFetching, menuAnchor, menuItemId, snackbarMessage,
-      snackbarOpen,
+      dialogOpen, dialogProps, isFetching, menuAnchor, snackbarMessage, snackbarOpen,
     } = this.state;
-    const { classes, items } = this.props;
-    const sortedList = items || [];
+    const { classes, items: sortedList } = this.props;
+
     const colorActive = 'primary';
     const colorInactive = 'disabled';
 
@@ -278,13 +201,25 @@ class SightEventsList extends React.Component {
       <Layout>
         <Grid container className={classes.root}>
           <Paper className={classes.paper}>
+            <Grid container direction="column" className={classes.toolbar}>
+              <Grid container item justify="flex-end">
+                <Grid item>
+                  <Link href={`${this.baseURL}/create`} passHref>
+                    <Button component="a">
+                      <AddIcon className={classes.icon} />
+                      Dodaj
+                    </Button>
+                  </Link>
+                </Grid>
+              </Grid>
+            </Grid>
             {sortedList.length === 0
               && (
                 <EmptyView
-                  image={LocalPlayIcon}
-                  label="Brak ofert"
+                  image={LocalOfferIcon}
+                  label="Brak tagów"
                   loading={isFetching}
-                  message="Ponów zapytanie aby wyświetlić listę."
+                  message="Dodaj tag lub ponów zapytanie aby wyświetlić listę."
                   onRefresh={this.handleFetchItems}
                 />
               )
@@ -297,24 +232,33 @@ class SightEventsList extends React.Component {
                     <TableBody>
                       {
                         sortedList.map(({
-                          blocked, id: itemId, location, name, partnerName, published,
+                          assignedItemsCount, label, iconUrl, id: listItemId, restricted,
+                          recommended,
                         }) => (
-                          <TableRow key={itemId} hover>
-                            <TableCell className={classes.orderNunber}>{itemId}</TableCell>
-                            <TableCell>{name}</TableCell>
-                            <TableCell>{location.city}</TableCell>
-                            <TableCell>{partnerName}</TableCell>
-                            <TableCell align="right" className={classes.actions}>
+                          <TableRow key={listItemId} hover>
+                            <TableCell className={classes.iconCell} align="center">
+                              {iconUrl
+                                ? <img src={iconUrl} height={48} width={48} alt={label} />
+                                : <ErrorOutlineIcon color="error" />
+                              }
+                            </TableCell>
+                            <TableCell>
+                              <Typography>{label}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography>{assignedItemsCount}</Typography>
+                            </TableCell>
+                            <TableCell align="right">
                               <IconButton disabled>
-                                <LockIcon color={blocked ? colorActive : colorInactive} />
+                                <LockIcon color={restricted ? colorActive : colorInactive} />
                               </IconButton>
                               <IconButton disabled>
-                                <PublicIcon color={published ? colorActive : colorInactive} />
+                                <StarIcon color={recommended ? colorActive : colorInactive} />
                               </IconButton>
                               <IconButton
                                 aria-owns={menuAnchor ? 'item-menu' : undefined}
                                 aria-haspopup="true"
-                                onClick={event => this.handleMenuOpen(event, itemId)}
+                                onClick={event => this.handleMenuOpen(event, listItemId)}
                               >
                                 <MoreVertIcon />
                               </IconButton>
@@ -329,16 +273,9 @@ class SightEventsList extends React.Component {
                     anchorEl={menuAnchor}
                     open={Boolean(menuAnchor)}
                     onClose={this.handleMenuClose}
-                    onExited={this.handleMenuExited}
                   >
-                    <MenuItem onClick={() => this.handleItemEdit(menuItemId)}>
+                    <MenuItem onClick={this.handleItemEdit}>
                       Edytuj
-                    </MenuItem>
-                    <MenuItem onClick={() => this.handleBlockItem(menuItemId)}>
-                      {this.isItemBlocked(menuItemId) ? 'Odblokuj' : 'Zablokuj'}
-                    </MenuItem>
-                    <MenuItem onClick={() => this.handlePublishItem(menuItemId)}>
-                      {this.isItemPublished(menuItemId) ? 'Odpublikuj' : 'Opublikuj'}
                     </MenuItem>
                     <MenuItem onClick={this.handleDialogOpen}>
                       Usuń
@@ -351,11 +288,11 @@ class SightEventsList extends React.Component {
                     aria-describedby="alert-dialog-description"
                   >
                     <DialogTitle id="alert-dialog-title">
-                      Usuń ofertę
+                      Usuń element
                     </DialogTitle>
                     <DialogContent>
                       <DialogContentText id="alert-dialog-description">
-                        {`Czy napewno usunąć ofertę "${dialogProps.name}"?`}
+                        {`Czy napewno usunąć element "${dialogProps.itemName}"?`}
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -386,30 +323,34 @@ class SightEventsList extends React.Component {
   }
 }
 
-SightEventsList.propTypes = {
+TagsList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   deleteItem: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
   fetchList: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({
+    assignedItemsCount: PropTypes.number,
+    iconUrl: PropTypes.string,
+    id: PropTypes.number,
+    label: PropTypes.string,
+    restricted: PropTypes.bool,
+    recommended: PropTypes.bool,
   })).isRequired,
   router: PropTypes.shape({}).isRequired,
-  updateItem: PropTypes.func.isRequired,
 };
 
-SightEventsList.defaultProps = {
+TagsList.defaultProps = {
   error: null,
 };
 
 const mapStateToProps = state => ({
-  error: sightEventsSelectors.getError(state),
-  items: sightEventsSelectors.getSightEvents(state),
+  error: tagsSelectors.getError(state),
+  items: tagsSelectors.getList(state),
 });
 
 const mapDispatchToProps = {
-  deleteItem: sightEventsActions.deleteItem,
-  fetchList: sightEventsActions.fetchList,
-  updateItem: sightEventsActions.updateItem,
+  deleteItem: tagsActions.deleteItem,
+  fetchList: tagsActions.fetchList,
 };
 
 export default compose(
@@ -417,4 +358,4 @@ export default compose(
   withAuth(),
   withRouter,
   withStyles(styles),
-)(SightEventsList);
+)(TagsList);

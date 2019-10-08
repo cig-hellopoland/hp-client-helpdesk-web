@@ -2,6 +2,7 @@ import CategoryIcon from '@material-ui/icons/Category';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import DomainIcon from '@material-ui/icons/Domain';
 import LocalPlayIcon from '@material-ui/icons/LocalPlay';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import PeopleIcon from '@material-ui/icons/People';
 import PlaceIcon from '@material-ui/icons/Place';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
@@ -26,7 +27,10 @@ export default [
     label: 'Kategorie', href: '/market/categories', Icon: CategoryIcon,
   },
   {
-    disabled: true, label: 'Atrakcje', href: '/market/sights', Icon: PlaceIcon,
+    label: 'Tagi', href: '/market/tags', Icon: LocalOfferIcon,
+  },
+  {
+    label: 'Atrakcje', href: '/market/sights', Icon: PlaceIcon,
   },
   {
     label: 'Oferty', href: '/market/sight-events', Icon: LocalPlayIcon,

@@ -4,31 +4,29 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
+import _merge from 'lodash/merge';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import Typography from '@material-ui/core/Typography';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import { Formik, Form, Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-material-ui';
+import { TextField } from 'formik-material-ui';
 import yupBoolean from 'yup/lib/boolean';
 import yupObject from 'yup/lib/object';
 import yupString from 'yup/lib/string';
 import {
-  actions as categoriesActions,
-  selectors as categoriesSelectors,
-} from '@hello-poland/commons/redux/categories';
+  actions as partnersActions,
+  selectors as partnersSelectors,
+} from 'redux/partners';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
-import IconGalleryDialog from 'components/IconGallery/IconGalleryDialog';
 
 const commonProps = {
   fullWidth: true,
 };
 
-const styles = {
+const styles = theme => ({
   errorIcon: {
     fontSize: 48,
   },
@@ -36,26 +34,28 @@ const styles = {
     width: '100%',
   },
   section: {
-    marginTop: 40,
+    marginTop: theme.spacing.unit * 2,
   },
-};
+});
 
-class CategoryForm extends React.Component {
+class PartnerMarketForm extends React.Component {
   constructor(props) {
     super(props);
 
     const { initialValues } = this.props;
 
     this.state = {
-      iconDialog: false,
       initialValues: this.getInitialValues(initialValues || {}),
     };
 
+    // TODO: nested validation seems not working
+    // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
-      iconUrl: yupString().trim().required(),
-      label: yupString().trim().required(),
-      recommended: yupBoolean(),
-      restricted: yupBoolean(),
+      published: yupBoolean(),
+      description: yupString().min(10).max(2500).required(),
+      location: yupObject().shape({
+        directions: yupString(),
+      }),
     });
   }
 
@@ -68,29 +68,23 @@ class CategoryForm extends React.Component {
     }
   }
 
-  getInitialValues = initialValues => ({
-    id: initialValues.id || undefined,
-    iconUrl: initialValues.iconUrl || '',
-    label: initialValues.label || '',
-    recommended: initialValues.recommended || false,
-    restricted: initialValues.restricted || false,
-  });
+  getInitialValues = (initialValues) => {
+    const { location: initialLocation, pdfAttachment: files, ...details } = initialValues || {};
+    const location = initialLocation || {};
+
+    return {
+      id: details.id || '',
+      description: details.description || '',
+      location: {
+        directions: location.directions || '',
+      },
+    };
+  };
+
 
   setInitialValues = initialValues => this.setState({
     initialValues: this.getInitialValues(initialValues || {}),
   });
-
-  handleIconDialogClose = () => this.setState({ iconDialog: false });
-
-  handleIconDialogOpen = () => this.setState({ iconDialog: true });
-
-  handleIconSelect = actions => (iconURL) => {
-    const { setFieldValue } = actions;
-
-    if (iconURL) {
-      setFieldValue('iconUrl', iconURL);
-    }
-  };
 
   handleSubmit = (values, actions) => {
     const { initialValues, language, onSubmit } = this.props;
@@ -105,17 +99,14 @@ class CategoryForm extends React.Component {
     const { id, ...data } = values;
 
     const payload = {
-      data: {
-        ...initialValues,
-        ...data,
-      },
-      onFailure: this.handleSubmitFailure(actions),
-      onSuccess: this.handleSubmitSuccess(actions),
+      data: _merge({}, initialValues, data),
       options: {
         headers: {
           'Content-Language': language,
         },
       },
+      onFailure: this.handleSubmitFailure(actions),
+      onSuccess: this.handleSubmitSuccess(actions),
     };
 
     let submitAction = createItem;
@@ -149,11 +140,11 @@ class CategoryForm extends React.Component {
     setSubmitting(false);
   };
 
-  handleSubmitSuccess = actions => (categoryId) => {
+  handleSubmitSuccess = actions => (sightId) => {
     const { onSubmitSuccess, clearError } = this.props;
 
     if (onSubmitSuccess) {
-      onSubmitSuccess(categoryId, actions);
+      onSubmitSuccess(sightId, actions);
 
       return;
     }
@@ -167,14 +158,11 @@ class CategoryForm extends React.Component {
 
   render() {
     const {
-      classes, FormikProps, hideButtons, hideErrors, initialValues: itemValues, language,
-      requestError,
+      classes, FormikProps, hideButtons, hideErrors, requestError,
     } = this.props;
-    const { iconDialog, initialValues } = this.state;
+    const { initialValues } = this.state;
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
-    const { defaultLanguage, id: itemId } = itemValues || {};
-    const isDisabled = itemId && defaultLanguage !== language;
 
     return (
       <Formik
@@ -184,59 +172,26 @@ class CategoryForm extends React.Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {({
-          errors, isSubmitting, values, ...formikBag
-        } = {}) => (
+        {({ isSubmitting } = {}) => (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
+              <GridItem>
+                <Typography variant="h6">Dane podstawowe</Typography>
+              </GridItem>
               <Hidden xsUp>
                 <GridItem>
                   <Field name="id" hidden component={TextField} {...commonProps} />
                 </GridItem>
               </Hidden>
               <GridItem>
-                <Field name="label" label="Nazwa kategorii" required component={TextField} {...commonProps} />
+                <Field name="description" label="Opis partnera" required component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
               <GridItem>
-                <Hidden xsUp>
-                  <Field name="iconUrl" required component={TextField} {...commonProps} />
-                </Hidden>
-                <Grid container alignItems="center">
-                  <GridItem container alignItems="center">
-                    {values.iconUrl
-                      ? <img src={values.iconUrl} height={48} width={48} alt="" />
-                      : <ErrorOutlineIcon color="error" className={classes.errorIcon} />
-                    }
-                    <Button onClick={this.handleIconDialogOpen} disabled={isDisabled}>
-                      Wybierz ikonę
-                    </Button>
-                  </GridItem>
-                  {errors.iconUrl
-                    && (
-                      <GridItem>
-                        <FormHelperText error>{errors.iconUrl}</FormHelperText>
-                      </GridItem>
-                    )
-                  }
-                </Grid>
+                <Typography variant="h6" className={classes.section}>Lokalizacja</Typography>
               </GridItem>
-              <GridItem container md={4} sm={4} alignItems="flex-end">
-                <Field
-                  disabled={isDisabled}
-                  name="restricted"
-                  Label={{ label: 'Zastrzeżona dla Hello! Poland' }}
-                  component={CheckboxWithLabel}
-                />
+              <GridItem>
+                <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={10} />
               </GridItem>
-              <GridItem container md={4} sm={4} alignItems="flex-end">
-                <Field
-                  disabled={isDisabled}
-                  name="recommended"
-                  Label={{ label: 'Polecana' }}
-                  component={CheckboxWithLabel}
-                />
-              </GridItem>
-              <GridItem md={4} sm={4} />
             </Grid>
             {(!hideButtons || (!hideErrors && errorMessage))
               && (
@@ -260,11 +215,6 @@ class CategoryForm extends React.Component {
                 </Grid>
               )
             }
-            <IconGalleryDialog
-              open={iconDialog}
-              onClose={this.handleIconDialogClose}
-              onSelect={this.handleIconSelect(formikBag)}
-            />
           </Form>
         )}
       </Formik>
@@ -272,7 +222,7 @@ class CategoryForm extends React.Component {
   }
 }
 
-CategoryForm.propTypes = {
+PartnerMarketForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
@@ -291,7 +241,7 @@ CategoryForm.propTypes = {
   updateItem: PropTypes.func.isRequired,
 };
 
-CategoryForm.defaultProps = {
+PartnerMarketForm.defaultProps = {
   FormikProps: null,
   hideButtons: false,
   hideErrors: false,
@@ -304,17 +254,17 @@ CategoryForm.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  requestError: categoriesSelectors.getError(state),
+  requestError: partnersSelectors.getError(state),
 });
 
 const mapDispatchToProps = {
-  clearError: categoriesActions.clearError,
-  createItem: categoriesActions.createItem,
-  createTranslation: categoriesActions.createTranslation,
-  updateItem: categoriesActions.updateItem,
+  clearError: partnersActions.clearError,
+  createItem: partnersActions.createItem,
+  createTranslation: partnersActions.createTranslation,
+  updateItem: partnersActions.updateItem,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
-)(CategoryForm);
+)(PartnerMarketForm);

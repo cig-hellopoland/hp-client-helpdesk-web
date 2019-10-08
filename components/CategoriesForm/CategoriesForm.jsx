@@ -127,7 +127,7 @@ function CategoriesForm({
       {(publicCategories.length === 0)
         && (
           <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>Brak ketegorii przypisanych przez partnera.</Typography>
+            <Typography>Brak kategorii przypisanych przez partnera.</Typography>
           </Grid>
         )
       }
@@ -192,7 +192,7 @@ function CategoriesForm({
       {(restrictedCategories.length === 0)
         && (
           <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>Brak ketegorii przypisanych przez Hello! Poland.</Typography>
+            <Typography>Brak kategorii przypisanych przez Hello! Poland.</Typography>
           </Grid>
         )
       }
@@ -286,8 +286,8 @@ CategoriesForm.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({})),
   managePublic: PropTypes.bool,
   manageRestricted: PropTypes.bool,
-  onSubmit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func,
+  onDelete: PropTypes.func,
   translation: PropTypes.string,
 };
 
@@ -297,6 +297,8 @@ CategoriesForm.defaultProps = {
   items: [],
   managePublic: false,
   manageRestricted: false,
+  onSubmit: null,
+  onDelete: null,
   translation: DEFAULT_LANGUAGE,
 };
 

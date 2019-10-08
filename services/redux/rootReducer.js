@@ -4,6 +4,8 @@ import categories, { name as categoriesName } from '@hello-poland/commons/redux/
 import partners, { name as partnersName } from 'redux/partners';
 import profile, { name as profileName } from 'redux/profile';
 import sightEvents, { name as sightEventsName } from '@hello-poland/commons/redux/sightEvents';
+import sights, { name as sightsName } from '@hello-poland/commons/redux/sights';
+import tags, { name as tagsName } from '@hello-poland/commons/redux/tags';
 import ticketDefinitions, { name as ticketDefinitionsName } from '@hello-poland/commons/redux/ticketDefinitions';
 
 export default combineReducers({
@@ -12,5 +14,7 @@ export default combineReducers({
   [partnersName]: partners(),
   [profileName]: profile(),
   [sightEventsName]: sightEvents(),
+  [sightsName]: sights(),
+  [tagsName]: tags(),
   [ticketDefinitionsName]: ticketDefinitions(),
 });

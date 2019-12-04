@@ -86,34 +86,56 @@ class SightEdit extends React.Component {
   };
 
   getMultimediaFromItem = (item) => {
-    const { mainImage, pdfAttachment } = item;
-    const data = [];
+    const { images, mainImage, pdfAttachment } = item;
+    const data = {};
 
     if (mainImage) {
-      data.push({
+      const { id, ...downloadUrl } = mainImage;
+
+      data.mainImage = {
         createdBy: '',
         createdDate: '',
-        id: 1,
+        id,
         modifiedBy: '',
         modifiedDate: '',
-        name: 'mainImage',
+        name: 'Zdjęcie promocyjne',
         path: '/home/hpl/var/DMS/omg/1234.jpg',
         size: 12345,
         type: 'image/jpeg',
-        downloadUrl: mainImage,
+        downloadUrl,
+      };
+    }
+
+    if (Array.isArray(images)) {
+      data.images = images.map((image) => {
+        const { id, ...downloadUrl } = image;
+        return {
+          createdBy: '',
+          createdDate: '',
+          id,
+          modifiedBy: '',
+          modifiedDate: '',
+          name: `Zdjęcie galerii (id #${id})`,
+          path: '/home/hpl/var/DMS/omg/1234.jpg',
+          size: 12345,
+          type: 'image/jpeg',
+          downloadUrl,
+        };
       });
     }
 
     if (pdfAttachment) {
-      data.push({
-        ...pdfAttachment,
-        createdBy: '',
-        createdDate: '',
-        modifiedBy: '',
-        modifiedDate: '',
-        size: 12345,
-        type: 'application/pdf',
-      });
+      data.attachments = [
+        {
+          ...pdfAttachment,
+          createdBy: '',
+          createdDate: '',
+          modifiedBy: '',
+          modifiedDate: '',
+          size: 12345,
+          type: 'application/pdf',
+        },
+      ];
     }
 
     return data;

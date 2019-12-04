@@ -16,6 +16,12 @@ import AlertDialog from 'components/AlertDialog';
 import MediaManager from 'components/MediaManager';
 import MultimediaSection from './Section';
 
+const UPLOAD_TYPE = {
+  ATTACHMENT: 'ATTACHMENT',
+  GALLERY: 'GALLERY',
+  MAIN_IMAGE: 'MAIN_IMAGE',
+};
+
 const styles = theme => ({
   fetchButton: {
     marginTop: theme.spacing.unit * 3,
@@ -59,9 +65,9 @@ class SightMultimediaForm extends React.Component {
       title: 'Czy na pewno usunąć wybrany plik?',
     };
 
-    if (type !== 'image/jpeg') {
+    if (type === UPLOAD_TYPE.GALLERY) {
       alertDialog.onSuccess = () => {
-        this.handleDeletePDF(fileId);
+        this.handleImageDelete(fileId);
         this.handleAlertDialogCancel();
       };
     }
@@ -78,6 +84,33 @@ class SightMultimediaForm extends React.Component {
   };
 
   handleDeletePDFSuccess = () => {
+    const { onSuccess } = this.props;
+
+    if (onSuccess) {
+      onSuccess();
+    }
+  };
+
+  handleImageDelete = (imageId) => {
+    const { deleteImage, itemId } = this.props;
+
+    deleteImage({
+      id: imageId,
+      itemId,
+      onFailure: this.handleImageDeleteFailure,
+      onSuccess: this.handleImageDeleteSuccess,
+    });
+  };
+
+  handleImageDeleteFailure = () => {
+    const { onFailure } = this.props;
+
+    if (onFailure) {
+      onFailure();
+    }
+  };
+
+  handleImageDeleteSuccess = () => {
     const { onSuccess } = this.props;
 
     if (onSuccess) {
@@ -123,13 +156,15 @@ class SightMultimediaForm extends React.Component {
   };
 
   handleMediaManagerSubmit = ({ data, options }) => {
-    const { createMainImage } = this.props;
+    const { createMainImage, createImage } = this.props;
     const { mediaManagerData } = this.state;
-    const { fileType, itemId } = mediaManagerData;
+    const { uploadType, itemId } = mediaManagerData;
     let action = () => {};
 
-    if (fileType === 'image/jpeg') {
+    if (uploadType === UPLOAD_TYPE.MAIN_IMAGE) {
       action = createMainImage;
+    } else if (uploadType === UPLOAD_TYPE.GALLERY) {
+      action = createImage;
     }
 
     action({
@@ -141,11 +176,11 @@ class SightMultimediaForm extends React.Component {
     });
   };
 
-  handleUploadModalOpen = (itemId, fileType) => this.setState({
+  handleUploadModalOpen = (itemId, uploadType) => this.setState({
     mediaManager: true,
     mediaManagerData: {
       itemId,
-      fileType,
+      uploadType,
     },
   });
 
@@ -155,27 +190,50 @@ class SightMultimediaForm extends React.Component {
       classes, data, defaultTranslation, itemId, requestError, translation,
     } = this.props;
     const isDefaultTranslation = defaultTranslation === translation;
-    const images = (data && data.filter(item => item.type === 'image/jpeg')) || [];
+    const mainImage = data.mainImage ? [data.mainImage] : [];
+    const images = data.images ? data.images : [];
 
     return (
       <React.Fragment>
         <div className={classes.section}>
           <Grid container alignItems="center" justify="space-between">
             <Grid item>
-              <Typography variant="h6">Obrazy</Typography>
+              <Typography variant="h6">Zdjęcie promocyjne</Typography>
             </Grid>
             <Grid item>
               <IconButton
                 aria-label="Dodaj"
                 disabled={!isDefaultTranslation}
-                onClick={() => this.handleUploadModalOpen(itemId, 'image/jpeg')}
+                onClick={() => this.handleUploadModalOpen(itemId, UPLOAD_TYPE.MAIN_IMAGE)}
                 title="Dodaj"
               >
                 <AddIcon />
               </IconButton>
             </Grid>
           </Grid>
-          <MultimediaSection items={images} onDelete={this.handleDelete} />
+          <MultimediaSection items={mainImage} sectionType={UPLOAD_TYPE.MAIN_IMAGE} />
+        </div>
+        <div className={classes.section}>
+          <Grid container alignItems="center" justify="space-between">
+            <Grid item>
+              <Typography variant="h6">Galeria zdjęć</Typography>
+            </Grid>
+            <Grid item>
+              <IconButton
+                aria-label="Dodaj"
+                disabled={!isDefaultTranslation}
+                onClick={() => this.handleUploadModalOpen(itemId, UPLOAD_TYPE.GALLERY)}
+                title="Dodaj"
+              >
+                <AddIcon />
+              </IconButton>
+            </Grid>
+          </Grid>
+          <MultimediaSection
+            items={images}
+            sectionType={UPLOAD_TYPE.GALLERY}
+            onDelete={this.handleDelete}
+          />
         </div>
         <MediaManager
           disableBackdropClick
@@ -197,9 +255,16 @@ class SightMultimediaForm extends React.Component {
 SightMultimediaForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
+  createImage: PropTypes.func.isRequired,
+  createImageCancel: PropTypes.func.isRequired,
   createMainImage: PropTypes.func.isRequired,
   createMainImageCancel: PropTypes.func.isRequired,
-  data: PropTypes.arrayOf(PropTypes.shape({})),
+  deleteImage: PropTypes.func.isRequired,
+  data: PropTypes.shape({
+    attachments: PropTypes.arrayOf(PropTypes.shape({})),
+    images: PropTypes.arrayOf(PropTypes.shape({})),
+    mainImage: PropTypes.shape({}),
+  }),
   defaultTranslation: PropTypes.string,
   itemId: PropTypes.number.isRequired,
   onFailure: PropTypes.func,
@@ -211,7 +276,7 @@ SightMultimediaForm.propTypes = {
 };
 
 SightMultimediaForm.defaultProps = {
-  data: [],
+  data: {},
   defaultTranslation: DEFAULT_LANGUAGE,
   onFailure: null,
   onSuccess: null,
@@ -225,8 +290,11 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearError: sightsActions.clearError,
+  createImage: sightsActions.createImage,
+  createImageCancel: sightsActions.createImageCancel,
   createMainImage: sightsActions.createMainImage,
   createMainImageCancel: sightsActions.createMainImageCancel,
+  deleteImage: sightsActions.deleteImage,
 };
 
 export default compose(

@@ -12,7 +12,6 @@ module.exports = {
     name: 'Hello! Poland - Help Desk',
     axios: {
       baseURL: 'http://localhost:3000/api',
-      timeout: 5000, // ms
     },
     iconBaseURL: 'https://hpl.fream.pl/static/icons',
   },

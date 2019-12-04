@@ -18,7 +18,9 @@ const styles = () => ({
   },
 });
 
-function MultimediaSection({ classes, items, onDelete }) {
+function MultimediaSection({
+  classes, items, onDelete, sectionType,
+}) {
   if (!items || items.length === 0) {
     return (
       <Grid container item direction="column" alignItems="center" justify="center">
@@ -57,8 +59,8 @@ function MultimediaSection({ classes, items, onDelete }) {
               }
               <IconButton
                 aria-label="Usuń"
-                disabled={!!onDelete}
-                onClick={() => onDelete(fileId, { name, type })}
+                disabled={!onDelete}
+                onClick={() => onDelete(fileId, { name, type: sectionType })}
                 title="Usuń"
               >
                 <DeleteIcon />
@@ -74,6 +76,7 @@ function MultimediaSection({ classes, items, onDelete }) {
 MultimediaSection.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({})),
+  sectionType: PropTypes.string.isRequired,
   onDelete: PropTypes.func,
 };
 

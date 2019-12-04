@@ -44,19 +44,17 @@ function MultimediaSection({
             </TableCell>
             <TableCell>{name}</TableCell>
             <TableCell align="right">
-              {type !== 'image/jpeg'
-                && (
-                  <IconButton
-                    component="a"
-                    href={downloadUrl}
-                    aria-label="Pobierz"
-                    title="Pobierz"
-                    target="_blank"
-                  >
-                    <GetAppIcon />
-                  </IconButton>
-                )
-              }
+              {type !== 'image/jpeg' && (
+                <IconButton
+                  component="a"
+                  href={downloadUrl}
+                  aria-label="Pobierz"
+                  title="Pobierz"
+                  target="_blank"
+                >
+                  <GetAppIcon />
+                </IconButton>
+              )}
               <IconButton
                 aria-label="Usuń"
                 disabled={!onDelete}

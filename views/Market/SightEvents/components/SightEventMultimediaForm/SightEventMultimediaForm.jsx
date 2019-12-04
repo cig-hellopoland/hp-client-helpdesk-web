@@ -14,7 +14,14 @@ import {
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import AlertDialog from 'components/AlertDialog';
 import MediaManager from 'components/MediaManager';
-import MultimediaSection from './Section';
+import MultimediaSection from 'components/Multimedia/Section';
+import { actions as sightsActions } from '@hello-poland/commons/redux/sights';
+
+const UPLOAD_TYPE = {
+  ATTACHMENT: 'ATTACHMENT',
+  GALLERY: 'GALLERY',
+  MAIN_IMAGE: 'MAIN_IMAGE',
+};
 
 const styles = theme => ({
   fetchButton: {
@@ -59,14 +66,46 @@ class SightEventMultimediaForm extends React.Component {
       title: 'Czy na pewno usunąć wybrany plik?',
     };
 
-    if (type !== 'image/jpeg') {
+    if (type === UPLOAD_TYPE.ATTACHMENT) {
       alertDialog.onSuccess = () => {
         this.handleDeletePDF(fileId);
+        this.handleAlertDialogCancel();
+      };
+    } else if (type === UPLOAD_TYPE.GALLERY) {
+      alertDialog.onSuccess = () => {
+        this.handleImageDelete(fileId);
         this.handleAlertDialogCancel();
       };
     }
 
     this.setState({ alertDialog });
+  };
+
+  handleImageDelete = (imageId) => {
+    const { deleteImage, itemId } = this.props;
+
+    deleteImage({
+      id: imageId,
+      itemId,
+      onFailure: this.handleImageDeleteFailure,
+      onSuccess: this.handleImageDeleteSuccess,
+    });
+  };
+
+  handleImageDeleteFailure = () => {
+    const { onFailure } = this.props;
+
+    if (onFailure) {
+      onFailure();
+    }
+  };
+
+  handleImageDeleteSuccess = () => {
+    const { onSuccess } = this.props;
+
+    if (onSuccess) {
+      onSuccess();
+    }
   };
 
   handleDeletePDFFailure = () => {
@@ -98,9 +137,11 @@ class SightEventMultimediaForm extends React.Component {
   };
 
   handleMediaManagerClose = () => {
-    const { clearError, createMainImageCancel, createPDFCancel } = this.props;
+    const {
+      clearError, createImageCancel, createMainImageCancel, createPDFCancel,
+    } = this.props;
     const { mediaManagerData } = this.state;
-    const { fileType } = mediaManagerData;
+    const { uploadType } = mediaManagerData;
     let action = () => {};
 
     this.setState({
@@ -108,9 +149,11 @@ class SightEventMultimediaForm extends React.Component {
       mediaManagerData: {},
     });
 
-    if (fileType === 'image/jpeg') {
+    if (uploadType === UPLOAD_TYPE.MAIN_IMAGE) {
       action = createMainImageCancel;
-    } else if (fileType === 'application/pdf') {
+    } else if (uploadType === UPLOAD_TYPE.GALLERY) {
+      action = createImageCancel;
+    } else if (uploadType === UPLOAD_TYPE.ATTACHMENT) {
       action = createPDFCancel;
     }
 
@@ -137,14 +180,16 @@ class SightEventMultimediaForm extends React.Component {
   };
 
   handleMediaManagerSubmit = ({ data, options }) => {
-    const { createMainImage, createPDF } = this.props;
+    const { createImage, createMainImage, createPDF } = this.props;
     const { mediaManagerData } = this.state;
-    const { fileType, itemId } = mediaManagerData;
+    const { uploadType, itemId } = mediaManagerData;
     let action = () => {};
 
-    if (fileType === 'image/jpeg') {
+    if (uploadType === UPLOAD_TYPE.MAIN_IMAGE) {
       action = createMainImage;
-    } else if (fileType === 'application/pdf') {
+    } else if (uploadType === UPLOAD_TYPE.GALLERY) {
+      action = createImage;
+    } else if (uploadType === UPLOAD_TYPE.ATTACHMENT) {
       action = createPDF;
     }
 
@@ -157,11 +202,11 @@ class SightEventMultimediaForm extends React.Component {
     });
   };
 
-  handleUploadModalOpen = (itemId, fileType) => this.setState({
+  handleUploadModalOpen = (itemId, uploadType) => this.setState({
     mediaManager: true,
     mediaManagerData: {
       itemId,
-      fileType,
+      uploadType,
     },
   });
 
@@ -171,28 +216,52 @@ class SightEventMultimediaForm extends React.Component {
       classes, data, defaultTranslation, itemId, requestError, translation,
     } = this.props;
     const isDefaultTranslation = defaultTranslation === translation;
-    const images = (data && data.filter(item => item.type === 'image/jpeg')) || [];
-    const documents = (data && data.filter(item => item.type === 'application/pdf')) || [];
+
+    const mainImage = data.mainImage ? [data.mainImage] : [];
+    const images = data.images ? data.images : [];
+    const attachments = data.attachments ? data.attachments : [];
 
     return (
       <React.Fragment>
         <div className={classes.section}>
           <Grid container alignItems="center" justify="space-between">
             <Grid item>
-              <Typography variant="h6">Obrazy</Typography>
+              <Typography variant="h6">Zdjęcie promocyjne</Typography>
             </Grid>
             <Grid item>
               <IconButton
                 aria-label="Dodaj"
                 disabled={!isDefaultTranslation}
-                onClick={() => this.handleUploadModalOpen(itemId, 'image/jpeg')}
+                onClick={() => this.handleUploadModalOpen(itemId, UPLOAD_TYPE.MAIN_IMAGE)}
                 title="Dodaj"
               >
                 <AddIcon />
               </IconButton>
             </Grid>
           </Grid>
-          <MultimediaSection items={images} onDelete={this.handleDelete} />
+          <MultimediaSection items={mainImage} sectionType={UPLOAD_TYPE.MAIN_IMAGE} />
+        </div>
+        <div className={classes.section}>
+          <Grid container alignItems="center" justify="space-between">
+            <Grid item>
+              <Typography variant="h6">Galeria zdjęć</Typography>
+            </Grid>
+            <Grid item>
+              <IconButton
+                aria-label="Dodaj"
+                disabled={!isDefaultTranslation}
+                onClick={() => this.handleUploadModalOpen(itemId, UPLOAD_TYPE.GALLERY)}
+                title="Dodaj"
+              >
+                <AddIcon />
+              </IconButton>
+            </Grid>
+          </Grid>
+          <MultimediaSection
+            items={images}
+            sectionType={UPLOAD_TYPE.GALLERY}
+            onDelete={this.handleDelete}
+          />
         </div>
         <div className={classes.section}>
           <Grid container alignItems="center" justify="space-between">
@@ -203,14 +272,18 @@ class SightEventMultimediaForm extends React.Component {
               <IconButton
                 aria-label="Dodaj"
                 disabled={!isDefaultTranslation}
-                onClick={() => this.handleUploadModalOpen(itemId, 'application/pdf')}
+                onClick={() => this.handleUploadModalOpen(itemId, UPLOAD_TYPE.ATTACHMENT)}
                 title="Dodaj"
               >
                 <AddIcon />
               </IconButton>
             </Grid>
           </Grid>
-          <MultimediaSection items={documents} onDelete={this.handleDelete} />
+          <MultimediaSection
+            items={attachments}
+            sectionType={UPLOAD_TYPE.ATTACHMENT}
+            onDelete={this.handleDelete}
+          />
         </div>
         <MediaManager
           disableBackdropClick
@@ -232,12 +305,15 @@ class SightEventMultimediaForm extends React.Component {
 SightEventMultimediaForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
+  createImage: PropTypes.func.isRequired,
+  createImageCancel: PropTypes.func.isRequired,
   createMainImage: PropTypes.func.isRequired,
   createMainImageCancel: PropTypes.func.isRequired,
   createPDF: PropTypes.func.isRequired,
   createPDFCancel: PropTypes.func.isRequired,
   data: PropTypes.arrayOf(PropTypes.shape({})),
   defaultTranslation: PropTypes.string,
+  deleteImage: PropTypes.func.isRequired,
   deletePDF: PropTypes.func.isRequired,
   itemId: PropTypes.number.isRequired,
   onFailure: PropTypes.func,
@@ -263,10 +339,13 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearError: sightEventsActions.clearError,
+  createImage: sightEventsActions.createImage,
+  createImageCancel: sightEventsActions.createImageCancel,
   createMainImage: sightEventsActions.createMainImage,
   createMainImageCancel: sightEventsActions.createMainImageCancel,
   createPDF: sightEventsActions.createPDF,
   createPDFCancel: sightEventsActions.createPDFCancel,
+  deleteImage: sightEventsActions.deleteImage,
   deletePDF: sightEventsActions.deletePDF,
 };
 

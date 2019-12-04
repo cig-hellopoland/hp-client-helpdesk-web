@@ -14,7 +14,7 @@ import {
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import AlertDialog from 'components/AlertDialog';
 import MediaManager from 'components/MediaManager';
-import MultimediaSection from './Section';
+import MultimediaSection from 'components/Multimedia/Section';
 
 const UPLOAD_TYPE = {
   ATTACHMENT: 'ATTACHMENT',
@@ -75,22 +75,6 @@ class SightMultimediaForm extends React.Component {
     this.setState({ alertDialog });
   };
 
-  handleDeletePDFFailure = () => {
-    const { onFailure } = this.props;
-
-    if (onFailure) {
-      onFailure();
-    }
-  };
-
-  handleDeletePDFSuccess = () => {
-    const { onSuccess } = this.props;
-
-    if (onSuccess) {
-      onSuccess();
-    }
-  };
-
   handleImageDelete = (imageId) => {
     const { deleteImage, itemId } = this.props;
 
@@ -119,9 +103,9 @@ class SightMultimediaForm extends React.Component {
   };
 
   handleMediaManagerClose = () => {
-    const { clearError, createMainImageCancel } = this.props;
+    const { clearError, createImageCancel, createMainImageCancel } = this.props;
     const { mediaManagerData } = this.state;
-    const { fileType } = mediaManagerData;
+    const { uploadType } = mediaManagerData;
     let action = () => {};
 
     this.setState({
@@ -129,8 +113,10 @@ class SightMultimediaForm extends React.Component {
       mediaManagerData: {},
     });
 
-    if (fileType === 'image/jpeg') {
+    if (uploadType === UPLOAD_TYPE.MAIN_IMAGE) {
       action = createMainImageCancel;
+    } else if (uploadType === UPLOAD_TYPE.GALLERY) {
+      action = createImageCancel;
     }
 
     action();
@@ -259,13 +245,13 @@ SightMultimediaForm.propTypes = {
   createImageCancel: PropTypes.func.isRequired,
   createMainImage: PropTypes.func.isRequired,
   createMainImageCancel: PropTypes.func.isRequired,
-  deleteImage: PropTypes.func.isRequired,
   data: PropTypes.shape({
     attachments: PropTypes.arrayOf(PropTypes.shape({})),
     images: PropTypes.arrayOf(PropTypes.shape({})),
     mainImage: PropTypes.shape({}),
   }),
   defaultTranslation: PropTypes.string,
+  deleteImage: PropTypes.func.isRequired,
   itemId: PropTypes.number.isRequired,
   onFailure: PropTypes.func,
   onSuccess: PropTypes.func,

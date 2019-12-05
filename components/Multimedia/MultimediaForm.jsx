@@ -41,6 +41,7 @@ class MultimediaForm extends React.Component {
     },
     mediaManager: false,
     mediaManagerData: {},
+    uploadError: false,
   };
 
   handleAlertDialogCancel = () => this.setState({
@@ -164,6 +165,8 @@ class MultimediaForm extends React.Component {
       });
     }
 
+    this.setState({ uploadError: false });
+
     if (onSuccess) {
       onSuccess();
     }
@@ -200,6 +203,8 @@ class MultimediaForm extends React.Component {
   handleMediaManagerSubmitFailure = () => {
     const { onFailure } = this.props;
 
+    this.setState({ uploadError: true });
+
     if (onFailure) {
       onFailure();
     }
@@ -224,10 +229,10 @@ class MultimediaForm extends React.Component {
   });
 
   render() {
-    const { alertDialog, mediaManager } = this.state;
+    const { alertDialog, mediaManager, uploadError } = this.state;
     const {
       classes, AttachmentProps, ImageGalleryProps, MainImageProps, defaultTranslation, itemId,
-      error, translation,
+      translation,
     } = this.props;
     const isDefaultTranslation = defaultTranslation === translation;
 
@@ -312,7 +317,7 @@ class MultimediaForm extends React.Component {
         )}
         <MediaManager
           disableBackdropClick
-          error={error}
+          error={uploadError}
           onClose={this.handleMediaManagerClose}
           onSubmit={this.handleMediaManagerSubmit}
           open={mediaManager}
@@ -351,7 +356,6 @@ MultimediaForm.propTypes = {
   onFailure: PropTypes.func,
   onSuccess: PropTypes.func,
   translation: PropTypes.string,
-  error: PropTypes.bool,
 };
 
 MultimediaForm.defaultProps = {
@@ -362,7 +366,6 @@ MultimediaForm.defaultProps = {
   onFailure: null,
   onSuccess: null,
   translation: DEFAULT_LANGUAGE,
-  error: false,
 };
 
 export default withStyles(styles)(MultimediaForm);

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
   actions as sightsActions,
-  selectors as sightsSelectors,
 } from '@hello-poland/commons/redux/sights';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import MultimediaForm from 'components/Multimedia/MultimediaForm';
@@ -11,13 +10,12 @@ import MultimediaForm from 'components/Multimedia/MultimediaForm';
 function SightMultimediaForm(props) {
   const {
     clearError, createImage, createImageCancel, createMainImage, createMainImageCancel,
-    deleteImage, data, defaultTranslation, itemId, onFailure, onSuccess, requestError, translation,
+    deleteImage, data, defaultTranslation, itemId, onFailure, onSuccess, translation,
   } = props;
 
   return (
     <MultimediaForm
       defaultTranslation={defaultTranslation}
-      error={!!requestError}
       ImageGalleryProps={{
         createImage,
         createImageCancel,
@@ -60,9 +58,6 @@ SightMultimediaForm.propTypes = {
   onFailure: PropTypes.func,
   onSuccess: PropTypes.func,
   translation: PropTypes.string,
-  requestError: PropTypes.shape({
-    message: PropTypes.string,
-  }),
 };
 
 SightMultimediaForm.defaultProps = {
@@ -71,12 +66,7 @@ SightMultimediaForm.defaultProps = {
   onFailure: null,
   onSuccess: null,
   translation: DEFAULT_LANGUAGE,
-  requestError: null,
 };
-
-const mapStateToProps = state => ({
-  requestError: sightsSelectors.getError(state),
-});
 
 const mapDispatchToProps = {
   clearError: sightsActions.clearError,
@@ -87,4 +77,4 @@ const mapDispatchToProps = {
   deleteImage: sightsActions.deleteImage,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(SightMultimediaForm);
+export default connect(null, mapDispatchToProps)(SightMultimediaForm);

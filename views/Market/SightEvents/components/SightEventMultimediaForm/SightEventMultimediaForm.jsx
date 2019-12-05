@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
   actions as sightEventsActions,
-  selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import MultimediaForm from 'components/Multimedia/MultimediaForm';
@@ -12,7 +11,7 @@ function SightEventMultimediaForm(props) {
   const {
     clearError, createImage, createImageCancel, createMainImage, createMainImageCancel, createPDF,
     createPDFCancel, data, defaultTranslation, deleteImage, deletePDF, itemId, onFailure, onSuccess,
-    requestError, translation,
+    translation,
   } = props;
 
   return (
@@ -24,7 +23,6 @@ function SightEventMultimediaForm(props) {
         items: data.attachments,
       }}
       defaultTranslation={defaultTranslation}
-      error={!!requestError}
       ImageGalleryProps={{
         createImage,
         createImageCancel,
@@ -70,23 +68,15 @@ SightEventMultimediaForm.propTypes = {
   onFailure: PropTypes.func,
   onSuccess: PropTypes.func,
   translation: PropTypes.string,
-  requestError: PropTypes.shape({
-    message: PropTypes.string,
-  }),
 };
 
 SightEventMultimediaForm.defaultProps = {
-  data: [],
+  data: {},
   defaultTranslation: DEFAULT_LANGUAGE,
   onFailure: null,
   onSuccess: null,
   translation: DEFAULT_LANGUAGE,
-  requestError: null,
 };
-
-const mapStateToProps = state => ({
-  requestError: sightEventsSelectors.getError(state),
-});
 
 const mapDispatchToProps = {
   clearError: sightEventsActions.clearError,
@@ -100,4 +90,4 @@ const mapDispatchToProps = {
   deletePDF: sightEventsActions.deletePDF,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(SightEventMultimediaForm);
+export default connect(null, mapDispatchToProps)(SightEventMultimediaForm);

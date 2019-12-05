@@ -173,10 +173,12 @@ class SightEdit extends React.Component {
   handleRequestFailure = () => {
     const { clearError, error } = this.props;
 
-    this.handleSnackbarOpen(error && error.message);
+    if (error) {
+      this.handleSnackbarOpen(error && error.message);
 
-    if (clearError) {
-      clearError();
+      if (clearError) {
+        clearError();
+      }
     }
   };
 

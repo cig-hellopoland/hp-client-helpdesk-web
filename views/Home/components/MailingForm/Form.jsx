@@ -43,7 +43,7 @@ class MailingForm extends Component {
     const { orderId } = values;
     const { sendTicketEmail } = this.props;
     const payload = {
-      p24Statement: orderId,
+      orderId,
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
     };

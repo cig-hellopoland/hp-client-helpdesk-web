@@ -6,8 +6,8 @@ import { logic as profileLogic } from 'redux/profile';
 import { logic as sightEventsLogic } from '@hello-poland/commons/redux/sightEvents';
 import { logic as sightsLogic } from '@hello-poland/commons/redux/sights';
 import { logic as tagsLogic } from '@hello-poland/commons/redux/tags';
-import { logic as ticketDefinitions } from '@hello-poland/commons/redux/ticketDefinitions';
-
+import { logic as ticketDefinitionsLogic } from 'redux/ticketDefinitions';
+import { logic as ticketPoolDefinitionsLogic } from '@hello-poland/commons/redux/ticketPoolDefinitions';
 
 export default parseReduxLogic({
   bookingLogic,
@@ -17,5 +17,6 @@ export default parseReduxLogic({
   sightEventsLogic,
   sightsLogic,
   tagsLogic,
-  ticketDefinitions,
+  ticketDefinitionsLogic,
+  ticketPoolDefinitionsLogic,
 });

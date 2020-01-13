@@ -126,22 +126,17 @@ class TicketsEditView extends React.Component {
   });
 
   handleSubmitSuccess = (submittedItemId, actions) => {
-    const { selectedTranslation } = this.state;
-    const { itemId } = this.props;
+    const { partnerId } = this.props;
     const { setSubmitting } = actions;
 
     setSubmitting(false);
 
-    if (itemId) {
-      this.handleFetchItem(itemId, selectedTranslation);
-    } else {
-      const { router } = this.props;
+    const { router } = this.props;
 
-      const path = `${this.baseURL}/edit?itemId=${submittedItemId}`;
-      const pathname = `${this.baseURL}/${submittedItemId}/edit`;
+    const path = `/market/partners/edit?itemId=${partnerId}`;
+    const pathname = `/market/partners/${partnerId}/edit`;
 
-      router.push(path, pathname);
-    }
+    router.push(path, pathname);
   };
 
   render() {
@@ -184,6 +179,7 @@ TicketsEditView.propTypes = {
   fetchItem: PropTypes.func.isRequired,
   item: PropTypes.shape({}),
   itemId: PropTypes.number,
+  partnerId: PropTypes.number,
   router: PropTypes.shape({}).isRequired,
 };
 
@@ -191,6 +187,7 @@ TicketsEditView.defaultProps = {
   error: null,
   item: null,
   itemId: null,
+  partnerId: null,
 };
 
 const mapStateToProps = state => ({

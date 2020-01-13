@@ -316,6 +316,7 @@ const fetchItemSuccess = data => ({
  * @callback successCallback
  * @param {Object} params
  * @param {Object} [params.data] - request data
+ * @param {Number} partnerId - partner ID
  * @param {Object} [params.options] - request config
  * @param {failureCallback} [params.onFailure] - failure callback
  * @param {successCallback} [params.onSuccess] - success callback
@@ -327,11 +328,11 @@ const fetchItemSuccess = data => ({
  * }}
  */
 const fetchList = ({
-  data, options, onFailure, onSuccess,
+  data, partnerId, options, onFailure, onSuccess,
 } = {}) => ({
   type: FETCH_LIST,
   payload: {
-    url: apiURL,
+    url: partnerId ? `${apiURL}?partnerId=${partnerId}` : apiURL,
     method: 'get',
     ...options,
     data,

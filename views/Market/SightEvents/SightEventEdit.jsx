@@ -23,6 +23,7 @@ import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
+import { actions as ticketPoolDefinitionActions } from '@hello-poland/commons/redux/ticketPoolDefinitions';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
@@ -376,6 +377,35 @@ class SightEventEdit extends React.Component {
     resetForm();
   };
 
+  handleTPDDelete = (poolId) => {
+    const { selectedTranslation } = this.state;
+    const { deleteTicketPoolDefinition, itemId } = this.props;
+
+    if (poolId) {
+      deleteTicketPoolDefinition({
+        id: poolId,
+        onFailure: () => this.handleSnackbarOpen('Wystąpił błąd podczas usuwania puli biletów'),
+        onSuccess: () => this.handleFetchItem(itemId, selectedTranslation),
+      });
+    }
+  };
+
+  handleTPDUpdate = (data) => {
+    const { selectedTranslation } = this.state;
+    const { updateTicketPoolDefinition, itemId } = this.props;
+
+    if (data) {
+      const { id } = data;
+
+      updateTicketPoolDefinition({
+        id,
+        data,
+        onFailure: () => this.handleSnackbarOpen('Wystąpił błąd podczas edycji puli biletów'),
+        onSuccess: () => this.handleFetchItem(itemId, selectedTranslation),
+      });
+    }
+  };
+
   render() {
     const {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
@@ -383,7 +413,7 @@ class SightEventEdit extends React.Component {
     const {
       categoriesList, classes, item, itemId, tagsList,
     } = this.props;
-    const { defaultLanguage } = item || {};
+    const { defaultLanguage, partnerId } = item || {};
 
     const pageTitle = itemId ? 'Edycja oferty' : 'Nowa oferta';
     const hasLanguageActions = !!(item && item.id);
@@ -480,7 +510,12 @@ class SightEventEdit extends React.Component {
           }
           {selectedTab === 4
             && (
-              <TicketPoolDefinitionsList data={item.ticketPoolDefinitions} />
+              <TicketPoolDefinitionsList
+                data={item.ticketPoolDefinitions}
+                partnerId={partnerId}
+                onTPDDelete={this.handleTPDDelete}
+                onTPDUpdate={this.handleTPDUpdate}
+              />
             )
           }
           <Snackbar
@@ -507,6 +542,7 @@ SightEventEdit.propTypes = {
   clearItem: PropTypes.func.isRequired,
   deleteItemCategory: PropTypes.func.isRequired,
   deleteItemTag: PropTypes.func.isRequired,
+  deleteTicketPoolDefinition: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
   fetchCategoriesList: PropTypes.func.isRequired,
@@ -520,6 +556,7 @@ SightEventEdit.propTypes = {
   tagsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   updateItemCategory: PropTypes.func.isRequired,
   updateItemTag: PropTypes.func.isRequired,
+  updateTicketPoolDefinition: PropTypes.func.isRequired,
 };
 
 SightEventEdit.defaultProps = {
@@ -541,12 +578,14 @@ const mapDispatchToProps = {
   clearItem: sightEventsActions.clearItem,
   deleteItemCategory: sightEventsActions.deleteItemCategory,
   deleteItemTag: sightEventsActions.deleteItemTag,
+  deleteTicketPoolDefinition: ticketPoolDefinitionActions.deleteItem,
   deleteTranslation: sightEventsActions.deleteTranslation,
   fetchCategoriesList: categoriesActions.fetchList,
   fetchTagsList: tagsActions.fetchList,
   fetchItem: sightEventsActions.fetchItem,
   updateItemCategory: sightEventsActions.updateItemCategory,
   updateItemTag: sightEventsActions.updateItemTag,
+  updateTicketPoolDefinition: ticketPoolDefinitionActions.updateItem,
 };
 
 export default compose(

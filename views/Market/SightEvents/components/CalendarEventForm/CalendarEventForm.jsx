@@ -514,13 +514,13 @@ class CalendarEventForm extends React.Component {
                           >
                             Dodaj do puli
                           </Button>
-                          <Button
-                            variant="outlined"
-                            color="primary"
-                            onClick={handleDefinitionFormOpen}
-                          >
-                            Nowy bilet
-                          </Button>
+                          {/*<Button*/}
+                          {/*  variant="outlined"*/}
+                          {/*  color="primary"*/}
+                          {/*  onClick={handleDefinitionFormOpen}*/}
+                          {/*>*/}
+                          {/*  Nowy bilet*/}
+                          {/*</Button>*/}
                         </div>
                       </div>
                     )

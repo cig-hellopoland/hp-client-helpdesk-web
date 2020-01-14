@@ -22,6 +22,7 @@ import ContentTranslation from 'components/ContentTranslation';
 import PartnerMarketForm from './components/PartnerMarketForm';
 import PartnerCompanyForm from './components/PartnerCompanyForm';
 import PartnerMultimediaForm from './components/PartnerMultimediaForm';
+import TicketsListView from './components/TicketsListView';
 
 const styles = theme => ({
   root: {
@@ -283,6 +284,7 @@ class PartnersEdit extends React.Component {
             <Tab label="Dane firmy" />
             <Tab label="Wizytówka" />
             <Tab label="Multimedia" />
+            <Tab label="Definicje biletów" />
             <Tab label="Komentarze" disabled />
           </Tabs>
           {selectedTab === 0
@@ -313,6 +315,15 @@ class PartnersEdit extends React.Component {
                 itemId={itemId}
                 onFailure={() => this.handleRequestFailure()}
                 onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}
+                translation={selectedTranslation}
+              />
+            )
+          }
+          {selectedTab === 3
+            && (
+              <TicketsListView
+                defaultTranslation={defaultLanguage}
+                partnerId={itemId}
                 translation={selectedTranslation}
               />
             )

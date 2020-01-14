@@ -238,7 +238,7 @@ class CalendarEventForm extends React.Component {
             editMode, formData, entryStartDateOffset, frequencyEndDateType, frequencyType,
             selectedTicketDefinitionId, ticketDefinitionsList, poolDate, fetchTicketDefinitions,
             handleAvailableTicketsChange, handleDateChange, handleDefinitionFormClose,
-            handleDefinitionFormOpen, handleFormDataChange, handleEntryStartDateOffsetChange,
+            handleFormDataChange, handleEntryStartDateOffsetChange,
             handleFrequencyDataChange, handleFrequencyDataFieldChange,
             handleFrequencyEndDateTypeChange, handleFrequencyItemChange, handleFullDayChange,
             handlePoolDateChange, handlePropFromEventChange, handleTicketDefinitionAdd,
@@ -514,13 +514,13 @@ class CalendarEventForm extends React.Component {
                           >
                             Dodaj do puli
                           </Button>
-                          {/*<Button*/}
-                          {/*  variant="outlined"*/}
-                          {/*  color="primary"*/}
-                          {/*  onClick={handleDefinitionFormOpen}*/}
-                          {/*>*/}
-                          {/*  Nowy bilet*/}
-                          {/*</Button>*/}
+                          {/* <Button */}
+                          {/*  variant="outlined" */}
+                          {/*  color="primary" */}
+                          {/*  onClick={handleDefinitionFormOpen} */}
+                          {/* > */}
+                          {/*  Nowy bilet */}
+                          {/* </Button> */}
                         </div>
                       </div>
                     )

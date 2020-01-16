@@ -3,6 +3,11 @@ import PropTypes from 'prop-types';
 import _isEqual from 'lodash/isEqual';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
@@ -38,7 +43,11 @@ class TicketPoolDefinitionsList extends React.Component {
 
     const { data } = this.props;
 
-    this.state = { tpdData: this.parseTPD(data) };
+    this.state = {
+      dialogOpen: false,
+      dialogProps: {},
+      tpdData: this.parseTPD(data),
+    };
   }
 
   componentDidUpdate(prevProps) {
@@ -67,6 +76,23 @@ class TicketPoolDefinitionsList extends React.Component {
     tpdData: this.parseTPD(data),
   });
 
+  handleDialogAccept = () => {
+    const { dialogProps } = this.state;
+    const { itemId } = dialogProps || {};
+
+    if (itemId) {
+      this.handleTPDDelete(itemId);
+    }
+
+    this.handleDialogClose();
+  };
+
+  handleDialogClose = () => this.setState({ dialogOpen: false });
+
+  handleDialogExited = () => this.setState({ dialogProps: {} });
+
+  handleDialogOpen = dialogProps => this.setState({ dialogOpen: true, dialogProps });
+
   handleTPDChange = formData => this.setState(state => ({
     tpdData: {
       ...state.tpdData,
@@ -92,7 +118,7 @@ class TicketPoolDefinitionsList extends React.Component {
   };
 
   render() {
-    const { tpdData } = this.state;
+    const { dialogOpen, dialogProps, tpdData } = this.state;
     const { classes, partnerId } = this.props;
 
     const poolDefinitions = Object.values(tpdData);
@@ -112,38 +138,67 @@ class TicketPoolDefinitionsList extends React.Component {
             const { id: poolId, name: poolName } = poolDefinition;
 
             return (
-              <ExpansionPanel key={poolId} elevation={0}>
-                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.summary}>
-                  <Typography className={classes.heading}>{poolName}</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <Grid container>
-                    <Grid item>
-                      <TicketPoolDefinitionForm
-                        data={{
-                          ...poolDefinition,
-                          partnerId,
-                        }}
-                        onChange={this.handleTPDChange}
-                      />
-                    </Grid>
-                    <Grid container item className={classes.actionButtons} justify="flex-end">
+              <React.Fragment>
+                <ExpansionPanel key={poolId} elevation={0}>
+                  <ExpansionPanelSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    className={classes.summary}
+                  >
+                    <Typography className={classes.heading}>{poolName}</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <Grid container>
                       <Grid item>
-                        <Button onClick={() => this.handleTPDDelete(poolId)} color="primary">
-                          Usuń
-                        </Button>
-                        <Button
-                          onClick={() => this.handleTPDUpdate(poolId)}
-                          color="primary"
-                          variant="contained"
-                        >
-                          Zapisz
-                        </Button>
+                        <TicketPoolDefinitionForm
+                          data={{
+                            ...poolDefinition,
+                            partnerId,
+                          }}
+                          onChange={this.handleTPDChange}
+                        />
+                      </Grid>
+                      <Grid container item className={classes.actionButtons} justify="flex-end">
+                        <Grid item>
+                          <Button onClick={() => this.handleDialogOpen({ itemId: poolId, name: poolName })} color="primary">
+                            Usuń
+                          </Button>
+                          <Button
+                            onClick={() => this.handleTPDUpdate(poolId)}
+                            color="primary"
+                            variant="contained"
+                          >
+                            Zapisz
+                          </Button>
+                        </Grid>
                       </Grid>
                     </Grid>
-                  </Grid>
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+                <Dialog
+                  open={dialogOpen}
+                  onClose={this.handleDialogClose}
+                  onExited={this.handleDialogExited}
+                  aria-labelledby="alert-dialog-title"
+                  aria-describedby="alert-dialog-description"
+                >
+                  <DialogTitle id="alert-dialog-title">
+                    Usuń ofertę
+                  </DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                      {`Czy napewno usunąć ofertę "${dialogProps.name}"?`}
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.handleDialogClose} color="primary">
+                      Anuluj
+                    </Button>
+                    <Button onClick={this.handleDialogAccept} color="primary">
+                      OK
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+              </React.Fragment>
             );
           })}
       </React.Fragment>

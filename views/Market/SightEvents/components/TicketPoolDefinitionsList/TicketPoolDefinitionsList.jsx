@@ -138,8 +138,8 @@ class TicketPoolDefinitionsList extends React.Component {
             const { id: poolId, name: poolName } = poolDefinition;
 
             return (
-              <React.Fragment>
-                <ExpansionPanel key={poolId} elevation={0}>
+              <React.Fragment key={`${poolId}-${poolName}`}>
+                <ExpansionPanel elevation={0}>
                   <ExpansionPanelSummary
                     expandIcon={<ExpandMoreIcon />}
                     className={classes.summary}

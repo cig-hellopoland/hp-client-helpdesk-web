@@ -182,11 +182,11 @@ class TicketPoolDefinitionsList extends React.Component {
                   aria-describedby="alert-dialog-description"
                 >
                   <DialogTitle id="alert-dialog-title">
-                    Usuń ofertę
+                    Usuń pulę biletów
                   </DialogTitle>
                   <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                      {`Czy napewno usunąć ofertę "${dialogProps.name}"?`}
+                      {`Czy napewno usunąć pulę "${dialogProps.name}"?`}
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>

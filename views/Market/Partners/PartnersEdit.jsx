@@ -17,7 +17,6 @@ import {
 } from 'redux/partners';
 import {
   actions as usersActions,
-  selectors as usersSelectors,
 } from 'redux/users';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';

@@ -15,6 +15,10 @@ import {
   actions as partnersActions,
   selectors as partnersSelectors,
 } from 'redux/partners';
+import {
+  actions as usersActions,
+  selectors as usersSelectors,
+} from 'redux/users';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
@@ -22,6 +26,7 @@ import ContentTranslation from 'components/ContentTranslation';
 import PartnerMarketForm from './components/PartnerMarketForm';
 import PartnerCompanyForm from './components/PartnerCompanyForm';
 import PartnerMultimediaForm from './components/PartnerMultimediaForm';
+import PartnerUsersList from './components/PartnerUsersList';
 import TicketsListView from './components/TicketsListView';
 
 const styles = theme => ({
@@ -134,6 +139,20 @@ class PartnersEdit extends React.Component {
       onFailure: this.handleFetchItemFailure,
       onSuccess: this.handleFetchItemSuccess,
     });
+  };
+
+  handlePasswordChange = (userId, password) => {
+    const { changePassword } = this.props;
+
+    if (changePassword) {
+      changePassword({
+        id: userId,
+        data: {
+          password,
+        },
+        onFailure: () => this.handleSnackbarOpen('Wystąpił błąd podczas zmiany hasła użytkownika'),
+      });
+    }
   };
 
   handleRequestFailure = () => {
@@ -285,6 +304,7 @@ class PartnersEdit extends React.Component {
             <Tab label="Wizytówka" />
             <Tab label="Multimedia" />
             <Tab label="Definicje biletów" />
+            <Tab label="Użytkownicy" />
             <Tab label="Komentarze" disabled />
           </Tabs>
           {selectedTab === 0
@@ -328,6 +348,15 @@ class PartnersEdit extends React.Component {
               />
             )
           }
+          {selectedTab === 4
+            && (
+              <PartnerUsersList
+                items={item.users}
+                onFetchItems={() => this.handleFetchItem(itemId, selectedTranslation)}
+                onPasswordChange={this.handlePasswordChange}
+              />
+            )
+          }
           <Snackbar
             anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             open={snackbarOpen}
@@ -346,6 +375,7 @@ class PartnersEdit extends React.Component {
 PartnersEdit.propTypes = {
   itemId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
+  changePassword: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
@@ -372,6 +402,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   changeDefaultTranslation: partnersActions.changeDefaultTranslation,
+  changePassword: usersActions.changePassword,
   clearError: partnersActions.clearError,
   clearItem: partnersActions.clearItem,
   deleteTranslation: partnersActions.deleteTranslation,

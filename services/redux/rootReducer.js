@@ -8,6 +8,7 @@ import sights, { name as sightsName } from '@hello-poland/commons/redux/sights';
 import tags, { name as tagsName } from '@hello-poland/commons/redux/tags';
 import ticketDefinitions, { name as ticketDefinitionsName } from 'redux/ticketDefinitions';
 import ticketPoolDefinitions, { name as ticketPoolDefinitionsName } from '@hello-poland/commons/redux/ticketPoolDefinitions';
+import users, { name as usersName } from 'redux/users';
 
 export default combineReducers({
   [bookingsName]: bookings(),
@@ -19,4 +20,5 @@ export default combineReducers({
   [tagsName]: tags(),
   [ticketDefinitionsName]: ticketDefinitions(),
   [ticketPoolDefinitionsName]: ticketPoolDefinitions(),
+  [usersName]: users(),
 });

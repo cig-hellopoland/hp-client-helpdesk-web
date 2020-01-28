@@ -55,7 +55,7 @@ class SightEventEdit extends React.Component {
 
   state = {
     availableTranslations: CONTENT_LANGUAGES,
-    selectedTab: 0,
+    selectedTab: 4,
     selectedTranslation: DEFAULT_LANGUAGE,
     snackbarOpen: false,
     snackbarMessage: '',

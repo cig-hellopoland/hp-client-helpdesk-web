@@ -4,7 +4,6 @@ import _find from 'lodash/find';
 import { connect } from 'react-redux';
 import _cloneDeep from 'lodash/cloneDeep';
 import _isEqual from 'lodash/isEqual';
-import _isNumber from 'lodash/isNumber';
 import addMinutes from 'date-fns/addMinutes';
 import addMonths from 'date-fns/addMonths';
 import differenceInMinutes from 'date-fns/differenceInMinutes';
@@ -440,7 +439,6 @@ class CalendarEventController extends React.Component {
 
   handleTicketDefinitionChange = (ticketDefinition) => {
     const { formData } = this.state;
-    console.log(ticketDefinition);
 
     this.handleChange(({
       formData: {

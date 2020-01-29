@@ -1,15 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import _isNumber from 'lodash/isNumber';
-import List from '@material-ui/core/List/List';
-import ListItem from '@material-ui/core/ListItem/ListItem';
-import ListItemText from '@material-ui/core/ListItemText/ListItemText';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction/ListItemSecondaryAction';
+import withStyles from '@material-ui/core/styles/withStyles';
+import Grid from '@material-ui/core/Grid';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import TextField from '@material-ui/core/TextField';
 import CardGiftcardIcon from '@material-ui/icons/CardGiftcard';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton/IconButton';
-import formatPrice from './utils/formatPrice';
+import formatPrice from 'utils/formatPrice';
+import TicketDiscountForm from './TicketDiscountForm';
 
 const DISCOUNT_TYPES = {
   FLAT: 'FLAT',
@@ -21,9 +23,19 @@ const formattedDiscountType = {
   [DISCOUNT_TYPES.PERCENT]: '%',
 };
 
+const styles = theme => ({
+  availabilityTextfield: {
+    width: 150,
+  },
+  discountWrapper: {
+    padding: [[0, theme.spacing.unit * 6]],
+    paddingBottom: theme.spacing.unit * 4,
+  },
+});
+
 class TicketDefinitionList extends React.Component {
   state = {
-    discountSettings: [],
+    activeDiscountSettings: [],
   };
 
   getPriceTag = (ticketDefinition) => {
@@ -39,7 +51,7 @@ class TicketDefinitionList extends React.Component {
     result = `${result} / Cena promocyjna: ${formatPrice(price)}`;
 
     if (discountType && discountValue) {
-      result = `${result} (rabat: ${discountValue} ${formattedDiscountType[discountType]})`;
+      result = `${result} (rabat ${discountValue} ${formattedDiscountType[discountType]})`;
     }
 
     return result;
@@ -72,6 +84,7 @@ class TicketDefinitionList extends React.Component {
 
   handlePropertyChange = (event, item) => {
     const { name, value } = event.target || {};
+    console.log('handlePropertyChange', name, value);
 
     if (name) {
       this.handleChange({ ...item, [name]: this.parsePropertyValue(name, value) });
@@ -79,22 +92,24 @@ class TicketDefinitionList extends React.Component {
   };
 
   toggleDiscountSettings = (itemId) => {
-    const { discountSettings } = this.state;
+    const { activeDiscountSettings } = this.state;
 
-    if (discountSettings.includes(itemId)) {
-      const itemIndex = discountSettings.indexOf(itemId);
+    if (activeDiscountSettings.includes(itemId)) {
+      const itemIndex = activeDiscountSettings.indexOf(itemId);
 
-      discountSettings.splice(itemIndex, 1);
+      activeDiscountSettings.splice(itemIndex, 1);
     } else {
-      discountSettings.push(itemId);
+      activeDiscountSettings.push(itemId);
     }
 
-    this.setState({ discountSettings });
+    this.setState({ activeDiscountSettings });
   };
 
   render() {
-    const { discountSettings } = this.state;
-    const { items, onDelete, readOnly } = this.props;
+    const { activeDiscountSettings } = this.state;
+    const {
+      classes, items, onDelete, readOnly,
+    } = this.props;
 
     return (items && items.length
       ? (
@@ -102,18 +117,18 @@ class TicketDefinitionList extends React.Component {
           {items.map((item) => {
             const key = `${item.name}-${item.id}`;
             const isDisabled = readOnly;
-            const hasDiscount = !!item.discuntValue;
+            const hasDiscount = !!item.discount;
             const availableTicketsNumber = item.availableTicketsNumber > 0
               ? item.availableTicketsNumber
               : '';
 
             return (
               <React.Fragment>
-                <ListItem key={key}>
+                <ListItem key={`${key}-details`} ContainerComponent="div">
                   <ListItemText primary={item.name} required secondary={this.getPriceTag(item)} />
                   <ListItemSecondaryAction>
                     <TextField
-                      style={{ width: '150px' }}
+                      className={classes.availabilityTextfield}
                       helperText="Puste pole - brak limitu"
                       label="Limit biletów"
                       disabled={isDisabled}
@@ -140,8 +155,17 @@ class TicketDefinitionList extends React.Component {
                     )}
                   </ListItemSecondaryAction>
                 </ListItem>
-                {discountSettings.includes(item.id) && (
-                  <div>omg, settings!</div>
+                {activeDiscountSettings.includes(item.id) && (
+                  <ListItem key={`${key}-discount`} component="div" className={classes.discountWrapper}>
+                    <Grid container>
+                      <TicketDiscountForm
+                        commissionRate={10}
+                        enableCustomCommission
+                        onSubmit={console.log}
+                        ticketDefinition={item}
+                      />
+                    </Grid>
+                  </ListItem>
                 )}
               </React.Fragment>
             );
@@ -154,21 +178,23 @@ class TicketDefinitionList extends React.Component {
 }
 
 TicketDefinitionList.propTypes = {
-  disableAvailability: PropTypes.bool, // rem
+  classes: PropTypes.shape({}).isRequired,
   onChange: PropTypes.func,
   onDelete: PropTypes.func,
   items: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number.isRequired,
     availableTicketsNumber: PropTypes.number,
+    name: PropTypes.string,
+    originalPrice: PropTypes.number,
+    price: PropTypes.number,
   })).isRequired, // rename
   readOnly: PropTypes.bool,
 };
 
 TicketDefinitionList.defaultProps = {
-  disableAvailability: false,
   onChange: null,
   onDelete: null,
   readOnly: false,
 };
 
-export default TicketDefinitionList;
+export default withStyles(styles)(TicketDefinitionList);

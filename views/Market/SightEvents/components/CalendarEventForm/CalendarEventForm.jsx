@@ -525,8 +525,7 @@ class CalendarEventForm extends React.Component {
                       </div>
                     )
                     }
-                    {formData.ticketDefinitions
-                    && (
+                    {formData.ticketDefinitions && (
                       <TicketDefinitionList
                         disableAvailability={
                           Number.isInteger(formData.availableTicketsNumber)
@@ -545,8 +544,7 @@ class CalendarEventForm extends React.Component {
                         })}
                         readOnly={readOnly}
                       />
-                    )
-                    }
+                    )}
                     {isDefinitionFormVisible && !readOnly
                     && (
                       <div className={classNames(classes.section, classes.fullWidth)}>

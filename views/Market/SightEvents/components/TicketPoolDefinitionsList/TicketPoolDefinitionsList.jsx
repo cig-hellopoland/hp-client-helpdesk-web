@@ -118,10 +118,10 @@ class TicketPoolDefinitionsList extends React.Component {
   };
 
   render() {
-    const { dialogOpen, dialogProps, tpdData } = this.state;
-    const { classes, partnerId } = this.props;
+    const { dialogOpen, dialogProps } = this.state;
+    const { classes, data, partnerId } = this.props;
 
-    const poolDefinitions = Object.values(tpdData);
+    const poolDefinitions = data;
     return (
       <React.Fragment>
         {(!poolDefinitions || poolDefinitions.length === 0)

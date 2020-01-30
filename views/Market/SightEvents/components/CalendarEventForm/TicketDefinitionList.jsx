@@ -162,6 +162,7 @@ class TicketDefinitionList extends React.Component {
                         commissionRate={10}
                         enableCustomCommission
                         onSubmit={console.log}
+                        onReset={console.log}
                         ticketDefinition={item}
                       />
                     </Grid>

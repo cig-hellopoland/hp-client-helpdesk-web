@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _isNumber from 'lodash/isNumber';
 import { Formik, Form, Field } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-material-ui';
 import FormControl from '@material-ui/core/FormControl';
@@ -13,6 +14,9 @@ import TableCell from '@material-ui/core/TableCell';
 import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
 import formatPrice from 'utils/formatPrice';
+import yupNumber from 'yup/lib/number';
+import yupObject from 'yup/lib/object';
+import yupString from 'yup/lib/string';
 
 const DISCOUNT_TYPES = {
   FLAT: 'FLAT',
@@ -36,25 +40,36 @@ class TicketDiscountForm extends React.Component {
     this.state = {
       initialValues: this.getInitialValues(props.ticketDefinition),
     };
+
+    this.validationSchema = yupObject().shape({
+      type: yupString().required(),
+      value: yupNumber().min(0).required(),
+    });
   }
 
   getInitialValues = (initialValues) => {
     const { discount = {} } = initialValues || {};
 
     return {
-      hplPart: discount.hplPart || '',
+      amount: _isNumber(discount.amount) ? discount.amount : '',
+      hplPart: _isNumber(discount.hplPart)
+        ? this.convertBaseCurrencyToCurrency(discount.hplPart)
+        : '',
       isCustomCommission: discount.isCustomCommission || false,
-      partnerPart: discount.partnerPart || '',
+      partnerPart: _isNumber(discount.partnerPart)
+        ? this.convertBaseCurrencyToCurrency(discount.partnerPart)
+        : '',
+      price: _isNumber(discount.price) ? discount.price : '',
       type: discount.type || '',
-      value: discount.value || '',
+      value: _isNumber(discount.value) ? discount.value : '',
     };
   };
 
-  calculateDiscountAmount = (discountPrice) => {
+  calculateDiscountAmount = (baseDiscountPrice) => {
     const { ticketDefinition } = this.props;
     const { originalPrice } = ticketDefinition || {};
 
-    return originalPrice - discountPrice;
+    return originalPrice - baseDiscountPrice;
   };
 
   calculateDiscountPrice = (type, value) => {
@@ -63,29 +78,24 @@ class TicketDiscountForm extends React.Component {
     let calculatedValue = 0;
 
     if (type === DISCOUNT_TYPES.FLAT) {
-      calculatedValue = Number(value * 100).toFixed(0);
-    }
-
-    if (type === DISCOUNT_TYPES.PERCENT) {
+      calculatedValue = +(value * 100).toFixed(0);
+    } else if (type === DISCOUNT_TYPES.PERCENT) {
       calculatedValue = Number(originalPrice * value / 100).toFixed(0);
     }
 
     return originalPrice - calculatedValue;
   };
 
-  calculateBaseCommission = () => {
-    const { commissionRate, ticketDefinition } = this.props;
-    const { originalPrice } = ticketDefinition || {};
+  calculatePartnerCommission = (baseCommission, baseAmount) => baseAmount - baseCommission;
 
-    return Number(originalPrice * commissionRate / 100).toFixed(0);
-  };
+  convertBaseCurrencyToCurrency = baseCurrency => Number(baseCurrency / 100).toFixed(2);
 
-  calculatePartnerCommision = (baseCommission, discountAmount) => discountAmount - baseCommission;
+  convertCurrencyToBaseCurrency = currency => Number(currency * 100).toFixed(0);
 
   render() {
     const { initialValues } = this.state;
     const {
-      disabled, enableCustomCommission, FormikProps, onSubmit, ticketDefinition,
+      disabled, enableCustomCommission, FormikProps, onReset, onSubmit, ticketDefinition,
     } = this.props;
 
     return (
@@ -93,12 +103,12 @@ class TicketDiscountForm extends React.Component {
         enableReinitialize
         {...FormikProps}
         initialValues={initialValues}
-        // validationSchema={this.validationSchema}
+        validationSchema={this.validationSchema}
         onSubmit={onSubmit}
+        onReset={onReset}
       >
-        {({ dirty, values, ...formikBag } = {}) => (
+        {({ setFieldValue, values } = {}) => (
           <Form autoComplete="off" noValidate style={{ width: '100%' }}>
-            {console.log(formikBag, values)}
             <Grid container spacing={24}>
               <Grid item xs={3}>
                 <Typography variant="subtitle2" paragraph>Ustawienia</Typography>
@@ -112,6 +122,19 @@ class TicketDiscountForm extends React.Component {
                         inputProps={{
                           id: 'discount-type',
                           name: 'type',
+                          onChange: (event) => {
+                            const { name, value } = event.target;
+
+                            setFieldValue(name, value);
+
+                            if (values.value) {
+                              setFieldValue('value', '', false);
+                              setFieldValue('price', '');
+                              setFieldValue('amount', '');
+                              setFieldValue('hplPart', '');
+                              setFieldValue('partnerPart', '');
+                            }
+                          },
                         }}
                         name="type"
                       >
@@ -134,23 +157,44 @@ class TicketDiscountForm extends React.Component {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            {formattedDiscountType[values.type] || ''}
+                            {formattedDiscountType[values.type] || ' '}
                           </InputAdornment>
                         ),
+                        onChange: (event) => {
+                          const { name, value: dirtyValue } = event.target;
+                          const { value: currentValue } = values;
+                          let value = !dirtyValue || +dirtyValue > 0 ? dirtyValue : 0;
+                          let price = this.calculateDiscountPrice(values.type, value);
+
+                          if (price < 0) {
+                            value = currentValue;
+                            price = this.calculateDiscountPrice(values.type, value);
+                          }
+
+                          const amount = this.calculateDiscountAmount(price);
+                          const hplPart = 0;
+                          const partnerPart = this.calculatePartnerCommission(hplPart, amount);
+
+                          setFieldValue(name, value, true);
+                          setFieldValue('price', price);
+                          setFieldValue('amount', amount);
+                          setFieldValue('hplPart', this.convertBaseCurrencyToCurrency(hplPart));
+                          setFieldValue('partnerPart', this.convertBaseCurrencyToCurrency(partnerPart));
+                        },
                       }}
                     />
                   </Grid>
                 </Grid>
               </Grid>
               <Grid item xs>
-                <Typography variant="subtitle2" paragraph>Finansowanie rabatu</Typography>
-                <Typography paragraph>Kwota do podziału: 3.00 zł</Typography>
+                <Typography variant="subtitle2" paragraph>Podział kosztu rabatu</Typography>
+                <Typography paragraph>{`Wartość rabatu: ${formatPrice(values.amount)}`}</Typography>
                 {enableCustomCommission && (
                   <Field
                     component={CheckboxWithLabel}
                     disabled={disabled}
                     name="isCustomCommission"
-                    Label={{ label: 'Finansowanie niestandardowe' }}
+                    Label={{ label: 'Niestandardowy podział kosztu rabatu' }}
                   />
                 )}
                 <Grid container spacing={16}>
@@ -163,13 +207,36 @@ class TicketDiscountForm extends React.Component {
                       type="number"
                       InputProps={{
                         endAdornment: <InputAdornment position="end">zł</InputAdornment>,
+                        onBlur: (event) => {
+                          const { name, value } = event.target;
+                          let finalValue = value;
+
+                          if (!value) {
+                            finalValue = this.convertBaseCurrencyToCurrency(values.amount);
+
+                            setFieldValue('hplPart', 0);
+                          }
+
+                          setFieldValue(name, finalValue);
+                        },
+                        onChange: (event) => {
+                          const { name, value } = event.target;
+                          const basePartnerPart = this.convertCurrencyToBaseCurrency(value);
+
+                          if (basePartnerPart >= 0 && basePartnerPart <= values.amount) {
+                            setFieldValue(name, value);
+                            setFieldValue('hplPart', this.convertBaseCurrencyToCurrency(
+                              values.amount - basePartnerPart,
+                            ));
+                          }
+                        },
                       }}
                     />
                   </Grid>
                   <Grid item>
                     <Field
                       component={TextField}
-                      disabled={disabled || !enableCustomCommission || !values.isCustomCommission}
+                      disabled
                       label="Hello! Poland"
                       name="hplPart"
                       type="number"
@@ -193,17 +260,22 @@ class TicketDiscountForm extends React.Component {
                     <TableRow>
                       <TableCell>Wartość rabatu:</TableCell>
                       <TableCell align="right">
-                        3.00 zł
+                        {formatPrice(values.amount)}
                       </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Cena po rabacie:</TableCell>
                       <TableCell align="right">
-                        17.00 zł
+                        {formatPrice(
+                          _isNumber(values.price) ? values.price : ticketDefinition.originalPrice,
+                        )}
                       </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
+              </Grid>
+              <Grid item xs={12}>
+                omg
               </Grid>
             </Grid>
           </Form>
@@ -214,11 +286,11 @@ class TicketDiscountForm extends React.Component {
 }
 
 TicketDiscountForm.propTypes = {
-  commissionRate: PropTypes.number.isRequired,
   disabled: PropTypes.bool,
   enableCustomCommission: PropTypes.bool,
   FormikProps: PropTypes.shape({}),
   onSubmit: PropTypes.func.isRequired,
+  onReset: PropTypes.func.isRequired,
   ticketDefinition: PropTypes.shape({
     discount: PropTypes.shape({
       amount: PropTypes.number,

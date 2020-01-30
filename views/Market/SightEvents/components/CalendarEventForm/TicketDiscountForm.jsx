@@ -3,6 +3,12 @@ import PropTypes from 'prop-types';
 import _isNumber from 'lodash/isNumber';
 import { Formik, Form, Field } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-material-ui';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -39,6 +45,7 @@ class TicketDiscountForm extends React.Component {
 
     this.state = {
       initialValues: this.getInitialValues(props.ticketDefinition),
+      resetDialog: false,
     };
 
     this.validationSchema = yupObject().shape({
@@ -65,6 +72,15 @@ class TicketDiscountForm extends React.Component {
     };
   };
 
+  handleResetDialogAccept = () => {
+    this.handleReset();
+    this.handleResetDialogClose();
+  };
+
+  handleResetDialogClose = () => this.setState({ resetDialog: false });
+
+  handleResetDialogOpen = () => this.setState({ resetDialog: true });
+
   calculateDiscountAmount = (baseDiscountPrice) => {
     const { ticketDefinition } = this.props;
     const { originalPrice } = ticketDefinition || {};
@@ -80,7 +96,7 @@ class TicketDiscountForm extends React.Component {
     if (type === DISCOUNT_TYPES.FLAT) {
       calculatedValue = +(value * 100).toFixed(0);
     } else if (type === DISCOUNT_TYPES.PERCENT) {
-      calculatedValue = Number(originalPrice * value / 100).toFixed(0);
+      calculatedValue = +(originalPrice * value / 100).toFixed(0);
     }
 
     return originalPrice - calculatedValue;
@@ -88,14 +104,43 @@ class TicketDiscountForm extends React.Component {
 
   calculatePartnerCommission = (baseCommission, baseAmount) => baseAmount - baseCommission;
 
-  convertBaseCurrencyToCurrency = baseCurrency => Number(baseCurrency / 100).toFixed(2);
+  convertBaseCurrencyToCurrency = baseCurrency => +(baseCurrency / 100).toFixed(2);
 
-  convertCurrencyToBaseCurrency = currency => Number(currency * 100).toFixed(0);
+  convertCurrencyToBaseCurrency = currency => +(currency * 100).toFixed(0);
+
+  handleReset = () => {
+    const { onReset, ticketDefinition } = this.props;
+
+    if (onReset) {
+      const { discount, ...ticket } = ticketDefinition;
+
+      onReset({ ...ticket, price: ticket.originalPrice });
+    }
+  };
+
+  handleSubmit = (discount, { setSubmitting }) => {
+    const { onSubmit, ticketDefinition } = this.props;
+
+    if (onSubmit) {
+      onSubmit({
+        ...ticketDefinition,
+        price: discount.price,
+        discount: {
+          ...discount,
+          hplPart: this.convertCurrencyToBaseCurrency(discount.hplPart),
+          partnerPart: this.convertCurrencyToBaseCurrency(discount.partnerPart),
+          value: this.convertCurrencyToBaseCurrency(discount.value),
+        },
+      });
+    }
+
+    setSubmitting(false);
+  };
 
   render() {
-    const { initialValues } = this.state;
+    const { initialValues, resetDialog } = this.state;
     const {
-      disabled, enableCustomCommission, FormikProps, onReset, onSubmit, ticketDefinition,
+      disabled, enableCustomCommission, FormikProps, ticketDefinition,
     } = this.props;
 
     return (
@@ -104,8 +149,8 @@ class TicketDiscountForm extends React.Component {
         {...FormikProps}
         initialValues={initialValues}
         validationSchema={this.validationSchema}
-        onSubmit={onSubmit}
-        onReset={onReset}
+        onSubmit={this.handleSubmit}
+        onReset={this.handleResetDialogOpen}
       >
         {({ setFieldValue, values } = {}) => (
           <Form autoComplete="off" noValidate style={{ width: '100%' }}>
@@ -128,7 +173,7 @@ class TicketDiscountForm extends React.Component {
                             setFieldValue(name, value);
 
                             if (values.value) {
-                              setFieldValue('value', '', false);
+                              setFieldValue('value', '');
                               setFieldValue('price', '');
                               setFieldValue('amount', '');
                               setFieldValue('hplPart', '');
@@ -274,10 +319,37 @@ class TicketDiscountForm extends React.Component {
                   </TableBody>
                 </Table>
               </Grid>
-              <Grid item xs={12}>
-                omg
+              <Grid item container justify="flex-end">
+                <Button color="primary" type="reset">
+                  Usuń rabat
+                </Button>
+                <Button color="primary" variant="contained" type="submit">
+                  Zapisz rabat
+                </Button>
               </Grid>
             </Grid>
+            <Dialog
+              open={resetDialog}
+              aria-labelledby="reset-dialog-title"
+              aria-describedby="reset-dialog-description"
+            >
+              <DialogTitle id="reset-dialog-title">
+                Usuń rabat
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText id="reset-dialog-description">
+                  Czy napewno usunąć rabat dla wybranego rodzaju biletu?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={this.handleResetDialogClose} color="primary">
+                  Anuluj
+                </Button>
+                <Button onClick={this.handleResetDialogAccept} color="primary">
+                  OK
+                </Button>
+              </DialogActions>
+            </Dialog>
           </Form>
         )}
       </Formik>

@@ -58,7 +58,7 @@ class SightEventEdit extends React.Component {
 
   state = {
     availableTranslations: CONTENT_LANGUAGES,
-    selectedTab: 4,
+    selectedTab: 0,
     selectedTranslation: DEFAULT_LANGUAGE,
     snackbarOpen: false,
     snackbarMessage: '',
@@ -410,14 +410,10 @@ class SightEventEdit extends React.Component {
   };
 
   handleTPDError = () => {
-    const { clearErrorTPD, errorTPD } = this.props;
+    const { errorTPD } = this.props;
     const { data: errorData } = errorTPD || {};
 
     this.handleSnackbarOpen(errorData.message || 'Wystąpił błąd podczas edycji puli biletów');
-
-    if (clearErrorTPD) {
-      clearErrorTPD();
-    }
   };
 
   render() {
@@ -553,7 +549,6 @@ SightEventEdit.propTypes = {
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
-  clearErrorTPD: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
   deleteItemCategory: PropTypes.func.isRequired,
   deleteItemTag: PropTypes.func.isRequired,
@@ -593,7 +588,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   changeDefaultTranslation: sightEventsActions.changeDefaultTranslation,
   clearError: sightEventsActions.clearError,
-  clearErrorTPD: ticketPoolDefinitionActions.clearError,
   clearItem: sightEventsActions.clearItem,
   deleteItemCategory: sightEventsActions.deleteItemCategory,
   deleteItemTag: sightEventsActions.deleteItemTag,

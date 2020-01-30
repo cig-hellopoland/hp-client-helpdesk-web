@@ -174,33 +174,33 @@ class TicketPoolDefinitionsList extends React.Component {
                     </Grid>
                   </ExpansionPanelDetails>
                 </ExpansionPanel>
-                <Dialog
-                  open={dialogOpen}
-                  onClose={this.handleDialogClose}
-                  onExited={this.handleDialogExited}
-                  aria-labelledby="alert-dialog-title"
-                  aria-describedby="alert-dialog-description"
-                >
-                  <DialogTitle id="alert-dialog-title">
-                    Usuń pulę biletów
-                  </DialogTitle>
-                  <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                      {`Czy napewno usunąć pulę "${dialogProps.name}"?`}
-                    </DialogContentText>
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={this.handleDialogClose} color="primary">
-                      Anuluj
-                    </Button>
-                    <Button onClick={this.handleDialogAccept} color="primary">
-                      OK
-                    </Button>
-                  </DialogActions>
-                </Dialog>
               </React.Fragment>
             );
           })}
+        <Dialog
+          open={dialogOpen}
+          onClose={this.handleDialogClose}
+          onExited={this.handleDialogExited}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            Usuń pulę biletów
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {`Czy napewno usunąć pulę "${dialogProps.name}"?`}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleDialogClose} color="primary">
+              Anuluj
+            </Button>
+            <Button onClick={this.handleDialogAccept} color="primary">
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
       </React.Fragment>
     );
   }

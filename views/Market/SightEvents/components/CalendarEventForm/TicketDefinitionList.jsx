@@ -106,8 +106,8 @@ class TicketDefinitionList extends React.Component {
               : '';
 
             return (
-              <React.Fragment>
-                <ListItem key={`${key}-details`} ContainerComponent="div">
+              <React.Fragment key={`${key}-details`}>
+                <ListItem ContainerComponent="div">
                   <ListItemText primary={item.name} required secondary={this.getPriceTag(item)} />
                   <ListItemSecondaryAction>
                     <TextField
@@ -139,7 +139,7 @@ class TicketDefinitionList extends React.Component {
                   </ListItemSecondaryAction>
                 </ListItem>
                 {activeDiscountSettings.includes(item.id) && (
-                  <ListItem key={`${key}-discount`} component="div" className={classes.discountWrapper}>
+                  <ListItem component="div" className={classes.discountWrapper}>
                     <Grid container>
                       <TicketDiscountForm
                         disabled={isDisabled}

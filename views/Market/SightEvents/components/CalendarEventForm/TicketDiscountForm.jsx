@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _isEqual from 'lodash/isEqual';
 import _isNumber from 'lodash/isNumber';
 import { Formik, Form, Field } from 'formik';
 import { CheckboxWithLabel, Select, TextField } from 'formik-material-ui';
@@ -54,8 +55,22 @@ class TicketDiscountForm extends React.Component {
     });
   }
 
+  componentDidUpdate(prevProps) {
+    const { ticketDefinition: prevTicketDefinition } = prevProps;
+    const { ticketDefinition } = this.props;
+
+    if (!_isEqual(prevTicketDefinition, ticketDefinition)) {
+      this.setInitialValues(ticketDefinition);
+    }
+  }
+
   getInitialValues = (initialValues) => {
     const { discount = {} } = initialValues || {};
+    let value = _isNumber(discount.value) ? discount.value : '';
+
+    if (discount.type === DISCOUNT_TYPES.FLAT) {
+      value = this.convertBaseCurrencyToCurrency(value);
+    }
 
     return {
       amount: _isNumber(discount.amount) ? discount.amount : '',
@@ -68,13 +83,21 @@ class TicketDiscountForm extends React.Component {
         : '',
       price: _isNumber(discount.price) ? discount.price : '',
       type: discount.type || '',
-      value: _isNumber(discount.value) ? discount.value : '',
+      value,
     };
   };
 
-  handleResetDialogAccept = () => {
+  setInitialValues = initialValues => this.setState({
+    initialValues: this.getInitialValues(initialValues),
+  });
+
+  handleResetDialogAccept = ({ resetForm }) => {
     this.handleReset();
     this.handleResetDialogClose();
+
+    if (resetForm) {
+      resetForm();
+    }
   };
 
   handleResetDialogClose = () => this.setState({ resetDialog: false });
@@ -129,7 +152,9 @@ class TicketDiscountForm extends React.Component {
           ...discount,
           hplPart: this.convertCurrencyToBaseCurrency(discount.hplPart),
           partnerPart: this.convertCurrencyToBaseCurrency(discount.partnerPart),
-          value: this.convertCurrencyToBaseCurrency(discount.value),
+          value: discount.type === DISCOUNT_TYPES.FLAT
+            ? this.convertCurrencyToBaseCurrency(discount.value)
+            : +discount.value,
         },
       });
     }
@@ -150,9 +175,10 @@ class TicketDiscountForm extends React.Component {
         initialValues={initialValues}
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
-        onReset={this.handleResetDialogOpen}
       >
-        {({ setFieldValue, values } = {}) => (
+        {({
+          dirty, resetForm, setFieldValue, values,
+        } = {}) => (
           <Form autoComplete="off" noValidate style={{ width: '100%' }}>
             <Grid container spacing={24}>
               <Grid item xs={3}>
@@ -320,11 +346,11 @@ class TicketDiscountForm extends React.Component {
                 </Table>
               </Grid>
               <Grid item container justify="flex-end">
-                <Button color="primary" type="reset">
-                  Usuń rabat
+                <Button color="primary" onClick={this.handleResetDialogOpen}>
+                  Wyczyść rabat
                 </Button>
-                <Button color="primary" variant="contained" type="submit">
-                  Zapisz rabat
+                <Button color="primary" disabled={!dirty} variant="contained" type="submit">
+                  Ustaw rabat
                 </Button>
               </Grid>
             </Grid>
@@ -334,18 +360,18 @@ class TicketDiscountForm extends React.Component {
               aria-describedby="reset-dialog-description"
             >
               <DialogTitle id="reset-dialog-title">
-                Usuń rabat
+                Wyczyść rabat
               </DialogTitle>
               <DialogContent>
                 <DialogContentText id="reset-dialog-description">
-                  Czy napewno usunąć rabat dla wybranego rodzaju biletu?
+                  Czy napewno wyczyścić rabat dla wybranego rodzaju biletu?
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
                 <Button onClick={this.handleResetDialogClose} color="primary">
                   Anuluj
                 </Button>
-                <Button onClick={this.handleResetDialogAccept} color="primary">
+                <Button onClick={() => this.handleResetDialogAccept({ resetForm })} color="primary">
                   OK
                 </Button>
               </DialogActions>

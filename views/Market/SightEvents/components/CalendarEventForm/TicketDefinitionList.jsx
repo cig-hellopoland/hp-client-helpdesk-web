@@ -13,16 +13,6 @@ import IconButton from '@material-ui/core/IconButton/IconButton';
 import formatPrice from 'utils/formatPrice';
 import TicketDiscountForm from './TicketDiscountForm';
 
-const DISCOUNT_TYPES = {
-  FLAT: 'FLAT',
-  PERCENT: 'PERCENT',
-};
-
-const formattedDiscountType = {
-  [DISCOUNT_TYPES.FLAT]: 'zł',
-  [DISCOUNT_TYPES.PERCENT]: '%',
-};
-
 const styles = theme => ({
   availabilityTextfield: {
     width: 150,
@@ -39,20 +29,14 @@ class TicketDefinitionList extends React.Component {
   };
 
   getPriceTag = (ticketDefinition) => {
-    const {
-      discountType, discountValue, price, originalPrice,
-    } = ticketDefinition;
+    const { discount, price, originalPrice } = ticketDefinition;
     let result = `Cena biletu: ${formatPrice(originalPrice)}`;
 
-    if (price === originalPrice) {
+    if (!discount) {
       return result;
     }
 
     result = `${result} / Cena promocyjna: ${formatPrice(price)}`;
-
-    if (discountType && discountValue) {
-      result = `${result} (rabat ${discountValue} ${formattedDiscountType[discountType]})`;
-    }
 
     return result;
   };
@@ -84,7 +68,6 @@ class TicketDefinitionList extends React.Component {
 
   handlePropertyChange = (event, item) => {
     const { name, value } = event.target || {};
-    console.log('handlePropertyChange', name, value);
 
     if (name) {
       this.handleChange({ ...item, [name]: this.parsePropertyValue(name, value) });
@@ -108,7 +91,7 @@ class TicketDefinitionList extends React.Component {
   render() {
     const { activeDiscountSettings } = this.state;
     const {
-      classes, items, onDelete, readOnly,
+      classes, disableAvailability, items, onDelete, readOnly,
     } = this.props;
 
     return (items && items.length
@@ -131,7 +114,7 @@ class TicketDefinitionList extends React.Component {
                       className={classes.availabilityTextfield}
                       helperText="Puste pole - brak limitu"
                       label="Limit biletów"
-                      disabled={isDisabled}
+                      disabled={isDisabled || disableAvailability}
                       onChange={event => this.handlePropertyChange(event, item)}
                       name="availableTicketsNumber"
                       type="number"
@@ -159,10 +142,10 @@ class TicketDefinitionList extends React.Component {
                   <ListItem key={`${key}-discount`} component="div" className={classes.discountWrapper}>
                     <Grid container>
                       <TicketDiscountForm
-                        commissionRate={10}
+                        disabled={isDisabled}
                         enableCustomCommission
-                        onSubmit={console.log}
-                        onReset={console.log}
+                        onSubmit={this.handleChange}
+                        onReset={this.handleChange}
                         ticketDefinition={item}
                       />
                     </Grid>
@@ -180,6 +163,7 @@ class TicketDefinitionList extends React.Component {
 
 TicketDefinitionList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
+  disableAvailability: PropTypes.bool,
   onChange: PropTypes.func,
   onDelete: PropTypes.func,
   items: PropTypes.arrayOf(PropTypes.shape({
@@ -193,6 +177,7 @@ TicketDefinitionList.propTypes = {
 };
 
 TicketDefinitionList.defaultProps = {
+  disableAvailability: false,
   onChange: null,
   onDelete: null,
   readOnly: false,

@@ -234,7 +234,10 @@ class TicketDiscountForm extends React.Component {
                         onChange: (event) => {
                           const { name, value: dirtyValue } = event.target;
                           const { value: currentValue } = values;
-                          let value = !dirtyValue || +dirtyValue > 0 ? dirtyValue : 0;
+                          let value = !dirtyValue || +dirtyValue > 0 ? +dirtyValue : 0;
+
+                          value = values.type === DISCOUNT_TYPES.FLAT ? value : value.toFixed(0);
+
                           let price = this.calculateDiscountPrice(values.type, value);
 
                           if (price < 0) {
@@ -246,7 +249,7 @@ class TicketDiscountForm extends React.Component {
                           const hplPart = 0;
                           const partnerPart = this.calculatePartnerCommission(hplPart, amount);
 
-                          setFieldValue(name, value, true);
+                          setFieldValue(name, value);
                           setFieldValue('price', price);
                           setFieldValue('amount', amount);
                           setFieldValue('hplPart', this.convertBaseCurrencyToCurrency(hplPart));

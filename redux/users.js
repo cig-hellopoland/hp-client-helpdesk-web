@@ -18,6 +18,20 @@ export const name = 'users';
 const prefix = `${name}/`;
 
 
+/**
+ * Default state model.
+ * @type {object}
+ * @property {object} credentials - user authentication credentials
+ * @property {object|null} error - submission error
+ * @property {boolean} isAuthenticated - determines if user is authenticated
+ * @property {object} profile - stores user profile information
+ */
+export const defaultInitialState = {
+  errors: {},
+  users: [],
+};
+
+
 /*
  * TYPES
  */
@@ -40,10 +54,17 @@ const CHANGE_PASSWORD_FAILURE = `${prefix}CHANGE_PASSWORD_FAILURE`;
  */
 const CHANGE_PASSWORD_SUCCESS = `${prefix}CHANGE_PASSWORD_SUCCESS`;
 
+/**
+ * Type used for handling user fetching.
+ * @type {string}
+ */
+const CLEAR_ERROR = `${prefix}CLEAR_ERROR`;
+
 export const types = {
   CHANGE_PASSWORD,
   CHANGE_PASSWORD_FAILURE,
   CHANGE_PASSWORD_SUCCESS,
+  CLEAR_ERROR,
 };
 
 
@@ -91,9 +112,9 @@ const changePassword = ({
  *   errors: [{details: string, status: string}]
  * }}
  */
-const changePasswordFailure = ({ errors } = {}) => ({
+const changePasswordFailure = ({ data = defaultInitialState.errors } = {}) => ({
   type: CHANGE_PASSWORD_FAILURE,
-  errors: errors || [],
+  errors: data,
 });
 
 /**
@@ -107,10 +128,18 @@ const changePasswordSuccess = data => ({
   data,
 });
 
+/**
+ * Creates action for error clearing
+ * @method
+ * @return {{type: string}}
+ */
+const clearErrors = () => ({ type: CLEAR_ERROR });
+
 export const actions = {
   changePassword,
   changePasswordFailure,
   changePasswordSuccess,
+  clearErrors,
 };
 
 
@@ -168,16 +197,14 @@ const changePasswordLogic = createLogic({
           onSuccess();
         }
       } else {
-        dispatch(changePasswordFailure(data));
+        dispatch(changePasswordFailure(response));
 
         if (onFailure) {
           onFailure();
         }
       }
     } catch ({ response }) {
-      const { data } = response;
-
-      dispatch(changePasswordFailure(data));
+      dispatch(changePasswordFailure(response));
 
       if (onFailure) {
         onFailure();
@@ -197,19 +224,6 @@ export const logic = {
  */
 
 /**
- * Default state model.
- * @type {object}
- * @property {object} credentials - user authentication credentials
- * @property {object|null} error - submission error
- * @property {boolean} isAuthenticated - determines if user is authenticated
- * @property {object} profile - stores user profile information
- */
-export const defaultInitialState = {
-  errors: [],
-  users: [],
-};
-
-/**
  * Module's reducer function.
  * @method
  * @param {object} initialState - allows initializing reducer with custom state
@@ -223,6 +237,7 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
         errors: action.errors,
       };
     case CHANGE_PASSWORD_SUCCESS:
+    case CLEAR_ERROR:
       return {
         ...state,
         errors: initialState.errors,

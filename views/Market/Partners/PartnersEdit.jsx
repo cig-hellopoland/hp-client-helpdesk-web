@@ -17,6 +17,7 @@ import {
 } from 'redux/partners';
 import {
   actions as usersActions,
+  selectors as usersSelectors,
 } from 'redux/users';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
@@ -149,7 +150,16 @@ class PartnersEdit extends React.Component {
         data: {
           password,
         },
-        onFailure: () => this.handleSnackbarOpen('Wystąpił błąd podczas zmiany hasła użytkownika'),
+        onFailure: () => {
+          const { clearUsersError, errorUsers } = this.props;
+          const { message } = errorUsers || {};
+
+          this.handleSnackbarOpen(message || 'Wystąpił błąd podczas zmiany hasła użytkownika');
+
+          if (clearUsersError) {
+            clearUsersError();
+          }
+        },
       });
     }
   };
@@ -377,9 +387,11 @@ PartnersEdit.propTypes = {
   changePassword: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
+  clearUsersError: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
+  errorUsers: PropTypes.shape({}),
   fetchItem: PropTypes.func.isRequired,
   item: PropTypes.shape({
     id: PropTypes.number,
@@ -391,11 +403,13 @@ PartnersEdit.propTypes = {
 PartnersEdit.defaultProps = {
   itemId: null,
   error: null,
+  errorUsers: null,
   item: null,
 };
 
 const mapStateToProps = state => ({
   error: partnersSelectors.getError(state),
+  errorUsers: usersSelectors.getErrors(state),
   item: partnersSelectors.getItem(state),
 });
 
@@ -403,6 +417,7 @@ const mapDispatchToProps = {
   changeDefaultTranslation: partnersActions.changeDefaultTranslation,
   changePassword: usersActions.changePassword,
   clearError: partnersActions.clearError,
+  clearUsersError: usersActions.clearErrors,
   clearItem: partnersActions.clearItem,
   deleteTranslation: partnersActions.deleteTranslation,
   fetchItem: partnersActions.fetchItem,

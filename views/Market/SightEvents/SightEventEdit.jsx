@@ -23,7 +23,10 @@ import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
-import { actions as ticketPoolDefinitionActions } from '@hello-poland/commons/redux/ticketPoolDefinitions';
+import {
+  actions as ticketPoolDefinitionActions,
+  selectors as ticketPoolDefinitionSelectors,
+} from '@hello-poland/commons/redux/ticketPoolDefinitions';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
@@ -384,7 +387,7 @@ class SightEventEdit extends React.Component {
     if (poolId) {
       deleteTicketPoolDefinition({
         id: poolId,
-        onFailure: () => this.handleSnackbarOpen('Wystąpił błąd podczas usuwania puli biletów'),
+        onFailure: this.handleTPDError,
         onSuccess: () => this.handleFetchItem(itemId, selectedTranslation),
       });
     }
@@ -400,10 +403,17 @@ class SightEventEdit extends React.Component {
       updateTicketPoolDefinition({
         id,
         data,
-        onFailure: () => this.handleSnackbarOpen('Wystąpił błąd podczas edycji puli biletów'),
+        onFailure: this.handleTPDError,
         onSuccess: () => this.handleFetchItem(itemId, selectedTranslation),
       });
     }
+  };
+
+  handleTPDError = () => {
+    const { errorTPD } = this.props;
+    const { data: errorData } = errorTPD || {};
+
+    this.handleSnackbarOpen(errorData.message || 'Wystąpił błąd podczas edycji puli biletów');
   };
 
   render() {
@@ -545,6 +555,7 @@ SightEventEdit.propTypes = {
   deleteTicketPoolDefinition: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
+  errorTPD: PropTypes.shape({}),
   fetchCategoriesList: PropTypes.func.isRequired,
   fetchItem: PropTypes.func.isRequired,
   fetchTagsList: PropTypes.func.isRequired,
@@ -562,12 +573,14 @@ SightEventEdit.propTypes = {
 SightEventEdit.defaultProps = {
   itemId: null,
   error: null,
+  errorTPD: null,
   item: null,
 };
 
 const mapStateToProps = state => ({
   categoriesList: categoriesSelectors.getList(state),
   error: sightEventsSelectors.getError(state),
+  errorTPD: ticketPoolDefinitionSelectors.getError(state),
   item: sightEventsSelectors.getSightEvent(state),
   tagsList: tagsSelectors.getList(state),
 });

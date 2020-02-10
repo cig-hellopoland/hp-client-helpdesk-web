@@ -307,7 +307,6 @@ const changeDefaultTranslationSuccess = () => ({
   type: CHANGE_DEFAULT_TRANSLATION_SUCCESS,
 });
 
-
 /**
  * Creates action for error clearing
  * @method

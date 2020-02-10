@@ -23,4 +23,8 @@ module.exports = [
     page: '/market/tags/edit',
     path: '/market/tags/:itemId/edit',
   },
+  {
+    page: '/market/tickets/edit',
+    path: '/market/tickets/:itemId/edit',
+  },
 ];

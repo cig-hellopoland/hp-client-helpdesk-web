@@ -40,5 +40,12 @@
     "variants": [
       "svg"
     ]
+  },
+  {
+    "category": "CUSTOM",
+    "name": "zdrowie",
+    "variants": [
+      "svg"
+    ]
   }
 ]

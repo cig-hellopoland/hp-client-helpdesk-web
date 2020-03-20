@@ -112,7 +112,7 @@ class CalendarEventController extends React.Component {
 
   getInitialFrequecyType = (frequencyData) => {
     const { daysOfWeek, frequencyType } = frequencyData || {};
-    let formType = 'NONE';
+    let formType = frequencyType || 'NONE';
 
     if (frequencyType === 'WEEKLY') {
       if (_isEqual(daysOfWeek, [1, 2, 3, 4, 5])) {

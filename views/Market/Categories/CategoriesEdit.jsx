@@ -18,6 +18,7 @@ import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
 import CategoryForm from './components/CategoryForm';
+import TagForm from '../Tags/components/TagForm/TagForm';
 
 const styles = theme => ({
   root: {
@@ -241,6 +242,15 @@ class CategoriesEdit extends React.Component {
     }
   };
 
+  handleUploadSuccess = () => {
+    const { itemId } = this.props;
+    const { selectedTranslation } = this.state;
+
+    if (itemId) {
+      this.handleFetchItem(itemId, selectedTranslation);
+    }
+  }
+
   render() {
     const {
       availableTranslations, selectedTranslation, snackbarOpen, snackbarMessage,
@@ -282,6 +292,7 @@ class CategoriesEdit extends React.Component {
             initialValues={this.getFormValues(item)}
             language={selectedTranslation}
             onSubmitSuccess={this.handleSubmitSuccess}
+            onUploadSuccess={this.handleUploadSuccess}
           />
           <Snackbar
             anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}

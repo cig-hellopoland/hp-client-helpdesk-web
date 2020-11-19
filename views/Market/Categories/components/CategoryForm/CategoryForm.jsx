@@ -56,7 +56,7 @@ class CategoryForm extends React.Component {
     };
 
     this.validationSchema = yupObject().shape({
-      iconUrl: yupString().trim().required(),
+      iconUrl: yupString().trim(),
       label: yupString().trim().required(),
       recommended: yupBoolean(),
       restricted: yupBoolean(),
@@ -91,7 +91,7 @@ class CategoryForm extends React.Component {
   handleIconUploadDialogClose = () => {
     const { clearError } = this.props;
 
-    this.setState({ iconUploadDialog: false });
+    this.setState({ iconUploadDialog: false, iconUploadError: '' });
 
     if (clearError) {
       clearError();
@@ -133,9 +133,15 @@ class CategoryForm extends React.Component {
   };
 
   handleIconUploadSuccess = () => {
+    const { onUploadSuccess } = this.props;
+
     this.handleIconUploadDialogClose();
 
     this.setState({ iconUploadError: '' });
+
+    if (onUploadSuccess) {
+      onUploadSuccess();
+    }
   };
 
   handleSubmit = (values, actions) => {
@@ -222,7 +228,8 @@ class CategoryForm extends React.Component {
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
     const { defaultLanguage, id: itemId } = itemValues || {};
-    const isDisabled = itemId === undefined || defaultLanguage !== language;
+    const isIconSelectDisabled = itemId && defaultLanguage !== language;
+    const isIconUploadDisabled = itemId === undefined || defaultLanguage !== language;
     const { brandName } = (config && config.public) || {};
 
     return (
@@ -256,11 +263,17 @@ class CategoryForm extends React.Component {
                       ? <img src={values.iconUrl} height={48} width={48} alt="" />
                       : <ErrorOutlineIcon color="error" className={classes.errorIcon} />
                     }
-                    <Button onClick={this.handleIconSelectDialogOpen} disabled={isDisabled}>
+                    <Button
+                      onClick={this.handleIconSelectDialogOpen}
+                      disabled={isIconSelectDisabled}
+                    >
                       Wybierz ikonę
                     </Button>
                     <Typography>lub</Typography>
-                    <Button onClick={this.handleIconUploadDialogOpen} disabled={isDisabled}>
+                    <Button
+                      onClick={this.handleIconUploadDialogOpen}
+                      disabled={isIconUploadDisabled}
+                    >
                       Prześlij ikonę
                     </Button>
                   </GridItem>
@@ -275,7 +288,7 @@ class CategoryForm extends React.Component {
               </GridItem>
               <GridItem container md={4} sm={4} alignItems="flex-end">
                 <Field
-                  disabled={isDisabled}
+                  disabled={isIconSelectDisabled}
                   name="restricted"
                   Label={{ label: `Zastrzeżona dla ${brandName || 'administratora'}` }}
                   component={CheckboxWithLabel}
@@ -283,7 +296,7 @@ class CategoryForm extends React.Component {
               </GridItem>
               <GridItem container md={4} sm={4} alignItems="flex-end">
                 <Field
-                  disabled={isDisabled}
+                  disabled={isIconSelectDisabled}
                   name="recommended"
                   Label={{ label: 'Polecana' }}
                   component={CheckboxWithLabel}
@@ -347,6 +360,7 @@ CategoryForm.propTypes = {
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
+  onUploadSuccess: PropTypes.func,
   requestError: PropTypes.shape({
     message: PropTypes.string,
   }),
@@ -363,6 +377,7 @@ CategoryForm.defaultProps = {
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
+  onUploadSuccess: null,
   requestError: null,
 };
 

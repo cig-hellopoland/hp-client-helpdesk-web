@@ -91,7 +91,7 @@ class TagForm extends React.Component {
   handleIconUploadDialogClose = () => {
     const { clearError } = this.props;
 
-    this.setState({ iconUploadDialog: false });
+    this.setState({ iconUploadDialog: false, iconUploadError: '' });
 
     if (clearError) {
       clearError();
@@ -362,6 +362,7 @@ TagForm.propTypes = {
     message: PropTypes.string,
   }),
   updateItem: PropTypes.func.isRequired,
+  uploadIcon: PropTypes.func.isRequired,
 };
 
 TagForm.defaultProps = {

@@ -23,6 +23,7 @@ import {
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 import IconGalleryDialog from 'components/IconGallery/IconGalleryDialog';
+import config from 'config';
 
 const commonProps = {
   fullWidth: true,
@@ -175,6 +176,7 @@ class CategoryForm extends React.Component {
     const { message: errorMessage } = errorData || {};
     const { defaultLanguage, id: itemId } = itemValues || {};
     const isDisabled = itemId && defaultLanguage !== language;
+    const { brandName } = (config && config.public) || {};
 
     return (
       <Formik
@@ -224,7 +226,7 @@ class CategoryForm extends React.Component {
                 <Field
                   disabled={isDisabled}
                   name="restricted"
-                  Label={{ label: 'Zastrzeżona dla Hello! Poland' }}
+                  Label={{ label: `Zastrzeżona dla ${brandName || 'administratora'}` }}
                   component={CheckboxWithLabel}
                 />
               </GridItem>

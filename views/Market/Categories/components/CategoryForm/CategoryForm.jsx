@@ -23,6 +23,8 @@ import {
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 import IconGalleryDialog from 'components/IconGallery/IconGalleryDialog';
+import IconUploadDialog from 'components/IconGallery/IconUploadDialog';
+import MediaManager from 'components/MediaManager';
 import config from 'config';
 
 const commonProps = {
@@ -48,7 +50,9 @@ class CategoryForm extends React.Component {
     const { initialValues } = this.props;
 
     this.state = {
-      iconDialog: false,
+      iconSelectDialog: false,
+      iconUploadDialog: false,
+      iconUploadError: '',
       initialValues: this.getInitialValues(initialValues || {}),
     };
 
@@ -81,15 +85,55 @@ class CategoryForm extends React.Component {
     initialValues: this.getInitialValues(initialValues || {}),
   });
 
-  handleIconDialogClose = () => this.setState({ iconDialog: false });
+  handleIconSelectDialogClose = () => this.setState({ iconSelectDialog: false });
 
-  handleIconDialogOpen = () => this.setState({ iconDialog: true });
+  handleIconSelectDialogOpen = () => this.setState({ iconSelectDialog: true });
+
+  handleIconUploadDialogClose = () => this.setState({ iconUploadDialog: false });
+
+  handleIconUploadDialogOpen = () => this.setState({ iconUploadDialog: true });
 
   handleIconSelect = actions => (iconURL) => {
     const { setFieldValue } = actions;
 
     if (iconURL) {
       setFieldValue('iconUrl', iconURL);
+    }
+  };
+
+  handleIconUpload = ({ data, options }) => {
+    const { initialValues, uploadIcon } = this.props;
+    const { id } = initialValues || {};
+
+    if (uploadIcon && id) {
+      uploadIcon({
+        id,
+        data,
+        options,
+        onFailure: this.handleIconUploadFailure,
+        onSuccess: this.handleIconUploadSuccess,
+      });
+    }
+  };
+
+
+  handleIconUploadFailure = () => {
+    const { requestError } = this.props;
+    const { data: errorData } = requestError || {};
+    const { message: errorMessage } = errorData || {};
+
+    this.setState({ iconUploadError: errorMessage });
+  };
+
+  handleIconUploadSuccess = () => {
+    const { clearError } = this.props;
+
+    this.handleIconUploadDialogClose();
+
+    this.setState({ iconUploadError: '' });
+
+    if (clearError) {
+      clearError();
     }
   };
 
@@ -171,11 +215,13 @@ class CategoryForm extends React.Component {
       classes, FormikProps, hideButtons, hideErrors, initialValues: itemValues, language,
       requestError,
     } = this.props;
-    const { iconDialog, initialValues } = this.state;
+    const {
+      iconSelectDialog, iconUploadDialog, iconUploadError, initialValues,
+    } = this.state;
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
     const { defaultLanguage, id: itemId } = itemValues || {};
-    const isDisabled = itemId && defaultLanguage !== language;
+    const isDisabled = itemId === undefined || defaultLanguage !== language;
     const { brandName } = (config && config.public) || {};
 
     return (
@@ -209,8 +255,12 @@ class CategoryForm extends React.Component {
                       ? <img src={values.iconUrl} height={48} width={48} alt="" />
                       : <ErrorOutlineIcon color="error" className={classes.errorIcon} />
                     }
-                    <Button onClick={this.handleIconDialogOpen} disabled={isDisabled}>
+                    <Button onClick={this.handleIconSelectDialogOpen} disabled={isDisabled}>
                       Wybierz ikonę
+                    </Button>
+                    <Typography>lub</Typography>
+                    <Button onClick={this.handleIconUploadDialogOpen} disabled={isDisabled}>
+                      Prześlij ikonę
                     </Button>
                   </GridItem>
                   {errors.iconUrl
@@ -263,9 +313,18 @@ class CategoryForm extends React.Component {
               )
             }
             <IconGalleryDialog
-              open={iconDialog}
-              onClose={this.handleIconDialogClose}
+              open={iconSelectDialog}
+              onClose={this.handleIconSelectDialogClose}
               onSelect={this.handleIconSelect(formikBag)}
+            />
+            <MediaManager
+              disableBackdropClick
+              error={!!iconUploadError}
+              errorMessage={iconUploadError}
+              onClose={this.handleIconUploadDialogClose}
+              onSubmit={this.handleIconUpload}
+              open={iconUploadDialog}
+              title="Prześlij ikonę"
             />
           </Form>
         )}
@@ -291,6 +350,7 @@ CategoryForm.propTypes = {
     message: PropTypes.string,
   }),
   updateItem: PropTypes.func.isRequired,
+  uploadIcon: PropTypes.func.isRequired,
 };
 
 CategoryForm.defaultProps = {
@@ -314,6 +374,7 @@ const mapDispatchToProps = {
   createItem: categoriesActions.createItem,
   createTranslation: categoriesActions.createTranslation,
   updateItem: categoriesActions.updateItem,
+  uploadIcon: categoriesActions.uploadIcon,
 };
 
 export default compose(

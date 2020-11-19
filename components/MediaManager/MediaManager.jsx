@@ -61,7 +61,7 @@ class MediaManager extends Component {
 
   render() {
     const {
-      error, imageUpload, onClose, title, ...rest
+      error, errorMessage, imageUpload, onClose, title, ...rest
     } = this.props;
     const { processing } = this.state;
 
@@ -83,7 +83,7 @@ class MediaManager extends Component {
             <Typography style={{ color: 'red' }}>
               {imageUpload
                 ? 'Obrazek powinien być w formacie JPEG, a jego szerokość musi wynosić minimum 2000px.'
-                : 'Wystąpił błąd podczas zapisywania pliku.'
+                : errorMessage
               }
             </Typography>
           )
@@ -97,6 +97,7 @@ class MediaManager extends Component {
 
 MediaManager.propTypes = {
   error: PropTypes.bool,
+  errorMessage: PropTypes.string,
   imageUpload: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
@@ -106,6 +107,7 @@ MediaManager.propTypes = {
 
 MediaManager.defaultProps = {
   error: false,
+  errorMessage: 'Wystąpił błąd podczas zapisywania pliku.',
   imageUpload: false,
   open: false,
   title: null,

@@ -23,6 +23,7 @@ import {
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 import IconGalleryDialog from 'components/IconGallery/IconGalleryDialog';
+import MediaManager from 'components/MediaManager';
 import config from 'config';
 
 const commonProps = {
@@ -48,12 +49,14 @@ class TagForm extends React.Component {
     const { initialValues } = this.props;
 
     this.state = {
-      iconDialog: false,
+      iconSelectDialog: false,
+      iconUploadDialog: false,
+      iconUploadError: '',
       initialValues: this.getInitialValues(initialValues || {}),
     };
 
     this.validationSchema = yupObject().shape({
-      iconUrl: yupString().trim().required(),
+      iconUrl: yupString().trim(),
       label: yupString().trim().required(),
       recommended: yupBoolean(),
       restricted: yupBoolean(),
@@ -81,15 +84,63 @@ class TagForm extends React.Component {
     initialValues: this.getInitialValues(initialValues || {}),
   });
 
-  handleIconDialogClose = () => this.setState({ iconDialog: false });
+  handleIconSelectDialogClose = () => this.setState({ iconSelectDialog: false });
 
-  handleIconDialogOpen = () => this.setState({ iconDialog: true });
+  handleIconSelectDialogOpen = () => this.setState({ iconSelectDialog: true });
+
+  handleIconUploadDialogClose = () => {
+    const { clearError } = this.props;
+
+    this.setState({ iconUploadDialog: false });
+
+    if (clearError) {
+      clearError();
+    }
+  }
+
+  handleIconUploadDialogOpen = () => this.setState({ iconUploadDialog: true });
 
   handleIconSelect = actions => (iconURL) => {
     const { setFieldValue } = actions;
 
     if (iconURL) {
       setFieldValue('iconUrl', iconURL);
+    }
+  };
+
+  handleIconUpload = ({ data, options }) => {
+    const { initialValues, uploadIcon } = this.props;
+    const { id } = initialValues || {};
+
+    if (uploadIcon && id) {
+      uploadIcon({
+        id,
+        data,
+        options,
+        onFailure: this.handleIconUploadFailure,
+        onSuccess: this.handleIconUploadSuccess,
+      });
+    }
+  };
+
+
+  handleIconUploadFailure = () => {
+    const { requestError } = this.props;
+    const { data: errorData } = requestError || {};
+    const { message: errorMessage } = errorData || {};
+
+    this.setState({ iconUploadError: errorMessage });
+  };
+
+  handleIconUploadSuccess = () => {
+    const { onUploadSuccess } = this.props;
+
+    this.handleIconUploadDialogClose();
+
+    this.setState({ iconUploadError: '' });
+
+    if (onUploadSuccess) {
+      onUploadSuccess();
     }
   };
 
@@ -168,11 +219,14 @@ class TagForm extends React.Component {
       classes, FormikProps, hideButtons, hideErrors, initialValues: itemValues, language,
       requestError,
     } = this.props;
-    const { iconDialog, initialValues } = this.state;
+    const {
+      iconSelectDialog, iconUploadDialog, iconUploadError, initialValues,
+    } = this.state;
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
     const { defaultLanguage, id: itemId } = itemValues || {};
-    const isDisabled = itemId && defaultLanguage !== language;
+    const isIconSelectDisabled = itemId && defaultLanguage !== language;
+    const isIconUploadDisabled = itemId === undefined || defaultLanguage !== language;
     const { brandName } = (config && config.public) || {};
 
     return (
@@ -206,8 +260,18 @@ class TagForm extends React.Component {
                       ? <img src={values.iconUrl} height={48} width={48} alt="" />
                       : <ErrorOutlineIcon color="error" className={classes.errorIcon} />
                     }
-                    <Button onClick={this.handleIconDialogOpen} disabled={isDisabled}>
+                    <Button
+                      onClick={this.handleIconSelectDialogOpen}
+                      disabled={isIconSelectDisabled}
+                    >
                       Wybierz ikonę
+                    </Button>
+                    <Typography>lub</Typography>
+                    <Button
+                      onClick={this.handleIconUploadDialogOpen}
+                      disabled={isIconUploadDisabled}
+                    >
+                      Prześlij ikonę
                     </Button>
                   </GridItem>
                   {errors.iconUrl
@@ -221,7 +285,7 @@ class TagForm extends React.Component {
               </GridItem>
               <GridItem container md={4} sm={4} alignItems="flex-end">
                 <Field
-                  disabled={isDisabled}
+                  disabled={isIconSelectDisabled}
                   name="restricted"
                   Label={{ label: `Zastrzeżony dla ${brandName || 'administratora'}` }}
                   component={CheckboxWithLabel}
@@ -229,7 +293,7 @@ class TagForm extends React.Component {
               </GridItem>
               <GridItem container md={4} sm={4} alignItems="flex-end">
                 <Field
-                  disabled={isDisabled}
+                  disabled={isIconSelectDisabled}
                   name="recommended"
                   Label={{ label: 'Polecany' }}
                   component={CheckboxWithLabel}
@@ -260,9 +324,18 @@ class TagForm extends React.Component {
               )
             }
             <IconGalleryDialog
-              open={iconDialog}
-              onClose={this.handleIconDialogClose}
+              open={iconSelectDialog}
+              onClose={this.handleIconSelectDialogClose}
               onSelect={this.handleIconSelect(formikBag)}
+            />
+            <MediaManager
+              disableBackdropClick
+              error={!!iconUploadError}
+              errorMessage={iconUploadError}
+              onClose={this.handleIconUploadDialogClose}
+              onSubmit={this.handleIconUpload}
+              open={iconUploadDialog}
+              title="Prześlij ikonę"
             />
           </Form>
         )}
@@ -284,6 +357,7 @@ TagForm.propTypes = {
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
+  onUploadSuccess: PropTypes.func,
   requestError: PropTypes.shape({
     message: PropTypes.string,
   }),
@@ -299,6 +373,7 @@ TagForm.defaultProps = {
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
+  onUploadSuccess: null,
   requestError: null,
 };
 
@@ -311,6 +386,7 @@ const mapDispatchToProps = {
   createItem: tagsActions.createItem,
   createTranslation: tagsActions.createTranslation,
   updateItem: tagsActions.updateItem,
+  uploadIcon: tagsActions.uploadIcon,
 };
 
 export default compose(

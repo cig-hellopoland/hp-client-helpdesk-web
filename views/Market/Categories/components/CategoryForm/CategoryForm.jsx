@@ -23,7 +23,6 @@ import {
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 import IconGalleryDialog from 'components/IconGallery/IconGalleryDialog';
-import IconUploadDialog from 'components/IconGallery/IconUploadDialog';
 import MediaManager from 'components/MediaManager';
 import config from 'config';
 
@@ -89,7 +88,15 @@ class CategoryForm extends React.Component {
 
   handleIconSelectDialogOpen = () => this.setState({ iconSelectDialog: true });
 
-  handleIconUploadDialogClose = () => this.setState({ iconUploadDialog: false });
+  handleIconUploadDialogClose = () => {
+    const { clearError } = this.props;
+
+    this.setState({ iconUploadDialog: false });
+
+    if (clearError) {
+      clearError();
+    }
+  }
 
   handleIconUploadDialogOpen = () => this.setState({ iconUploadDialog: true });
 
@@ -126,15 +133,9 @@ class CategoryForm extends React.Component {
   };
 
   handleIconUploadSuccess = () => {
-    const { clearError } = this.props;
-
     this.handleIconUploadDialogClose();
 
     this.setState({ iconUploadError: '' });
-
-    if (clearError) {
-      clearError();
-    }
   };
 
   handleSubmit = (values, actions) => {

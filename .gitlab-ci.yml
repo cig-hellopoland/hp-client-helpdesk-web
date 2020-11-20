@@ -154,7 +154,7 @@ Stop Testing Environment:
     - docker rm "${FRM_TESTING_CONTAINER_NAME}"
     - docker rmi "${FRM_DOCKER_IMAGE}"
 
-Deploy Hello! Poland Production Environment:
+Deploy Hello Poland Production Environment:
   stage: deploy
   dependencies: []
   only:
@@ -172,10 +172,10 @@ Deploy Hello! Poland Production Environment:
     - hellopoland-production
   when: manual
   environment:
-    name: Hello! Poland Production Environment
+    name: Hello Poland Production Environment
     url: https://${FRM_PRODUCTION_URL}
 
-Deploy Wrocław ON Production Environment:
+Deploy Wroclaw ON Production Environment:
   stage: deploy
   dependencies: []
   only:
@@ -193,5 +193,5 @@ Deploy Wrocław ON Production Environment:
     - hellopoland-production
   when: manual
   environment:
-    name: Wrocław ON Production Environment
+    name: Wroclaw ON Production Environment
     url: https://${FRM_WON_PRODUCTION_URL}

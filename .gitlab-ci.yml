@@ -6,9 +6,9 @@ stages:
   - deploy
 
 variables:
-  NODE_VERSION: "8"
-  ARTIFACT_NAME: "${CI_PROJECT_NAME}_${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_ID}"
-  DOCKER_IMAGE_NAME: "${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_REF_SLUG}"
+  NODE_VERSION: "10"
+  ARTIFACT_PREFIX: "${CI_PROJECT_NAME}_${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_ID}"
+  FRM_DOCKER_IMAGE: "${FRM_DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_REF_SLUG}"
 
 before_script:
   - . envcfg
@@ -21,14 +21,15 @@ node_modules:
   only:
     - merge_requests
     - web
+  tags:
+    - node
   artifacts:
-    name: "${ARTIFACT_NAME}-node_modules"
+    name: "${ARTIFACT_PREFIX}-node_modules"
     expire_in: 30 mins
     paths:
       - node_modules
   script:
     - npm install
-
 
 #
 # test stage tasks
@@ -38,6 +39,8 @@ audit:
   only:
     - merge_requests
     - web
+  tags:
+    - node
   allow_failure: true
   dependencies:
     - node_modules
@@ -49,6 +52,8 @@ linter:
   only:
     - merge_requests
     - web
+  tags:
+    - node
   dependencies:
     - node_modules
   script:
@@ -59,6 +64,8 @@ unit_tests:
   only:
     - merge_requests
     - web
+  tags:
+    - node
   dependencies:
     - node_modules
   script:
@@ -72,10 +79,12 @@ next_build:
   only:
     - merge_requests
     - web
+  tags:
+    - node
   dependencies:
     - node_modules
   artifacts:
-    name: "${ARTIFACT_NAME}-next_build"
+    name: "${ARTIFACT_PREFIX}-next_build"
     expire_in: 30 mins
     paths:
       - .next
@@ -90,41 +99,99 @@ docker_image:
   only:
     - merge_requests
     - web
+  tags:
+    - docker
   dependencies:
     - next_build
   script:
-    - docker build -t "${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}" --build-arg NPM_REGISTRY="$(cat ~/.npmrc)" .
-    - docker push "${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}"
-
+    - echo $FRM_DOCKER_IMAGE
+    - docker build -t "${FRM_DOCKER_IMAGE}" --build-arg NPM_RC="$(cat ~/.npmrc)" .
+    - docker push "${FRM_DOCKER_IMAGE}"
 
 #
 # deploy stage tasks
 #
-#deploy_feature:
-#  stage: deploy
-#  only:
-#    - /^feature\/.*$/
-#    - merge-requests
-#    - web
-#  allow_failure: false
-#  when: manual
-#  environment:
-#    name: ${CI_COMMIT_REF_NAME}
-#    url: https://${ENV_URL_TESTING}
-#    on_stop: stop_deploy_feature
-#  script:
-#    - ssh ${ENV_USER_TESTING}@${ENV_HOST_TESTING} "docker pull ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}"
-##    - ssh ${ENV_USER_TESTING}@${ENV_HOST_TESTING} "docker run -d -p ${DOCKER_PORT_TESTING}:3000 -v ${DOCKER_VOLUME_TESTING}:/data ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}"
-#
-#stop_deploy_feature:
-#  stage: deploy
-#  only:
-#    - /^feature\/.*$/
-#    - merge-requests
-#    - web
-#  when: manual
-#  environment:
-#    name: ${CI_COMMIT_REF_NAME}
-#    action: stop
-#  script:
-#    - ssh ${ENV_USER_TESTING}@${ENV_HOST_TESTING} "rm deployment"
+Deploy Testing Environment:
+  stage: deploy
+  dependencies: []
+  only:
+    - /^feature\/.*$/
+    - merge-requests
+    - web
+  allow_failure: false
+  before_script:
+    - echo "Starting feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
+  script:
+    - docker pull "${FRM_DOCKER_IMAGE}"
+    - docker ps -aq --filter "name=${FRM_TESTING_CONTAINER_NAME}" | grep -q . && docker stop "${FRM_TESTING_CONTAINER_NAME}" && docker rm "${FRM_TESTING_CONTAINER_NAME}"
+    - docker run -d -v ${FRM_TESTING_VOLUME}:/data -p ${FRM_TESTING_PORT}:3000 --restart "${FRM_TESTING_RESTART_POLICY}" --name "${FRM_TESTING_CONTAINER_NAME}" "${FRM_DOCKER_IMAGE}"
+  tags:
+    - qs1-server
+  when: manual
+  environment:
+    name: Testing Environment
+    url: https://${FRM_TESTING_URL}
+    on_stop: Stop Testing Environment
+
+Stop Testing Environment:
+  stage: deploy
+  dependencies: []
+  allow_failure: false
+  before_script:
+    - echo "Stopping feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
+  only:
+    - /^feature\/.*$/
+    - merge-requests
+    - web
+  when: manual
+  tags:
+    - qs1-server
+  environment:
+    name: Testing Environment
+    action: stop
+  script:
+    - docker stop "${FRM_TESTING_CONTAINER_NAME}"
+    - docker rm "${FRM_TESTING_CONTAINER_NAME}"
+    - docker rmi "${FRM_DOCKER_IMAGE}"
+
+Deploy Hello! Poland Production Environment:
+  stage: deploy
+  dependencies: []
+  only:
+    - master
+    - merge-requests
+    - web
+  allow_failure: false
+  before_script:
+    - echo "Starting feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
+  script:
+    - docker pull "${FRM_DOCKER_IMAGE}"
+    - docker ps -aq --filter "name=${FRM_PRODUCTION_CONTAINER_NAME}" | grep -q . && docker stop "${FRM_PRODUCTION_CONTAINER_NAME}" && docker rm "${FRM_PRODUCTION_CONTAINER_NAME}"
+    - docker run -d -v ${FRM_PRODUCTION_VOLUME}:/data -p ${FRM_PRODUCTION_PORT}:3000 --restart "${FRM_PRODUCTION_RESTART_POLICY}" --name "${FRM_PRODUCTION_CONTAINER_NAME}" "${FRM_DOCKER_IMAGE}"
+  tags:
+    - hellopoland-production
+  when: manual
+  environment:
+    name: Hello! Poland Production Environment
+    url: https://${FRM_PRODUCTION_URL}
+
+Deploy Wrocław ON Production Environment:
+  stage: deploy
+  dependencies: []
+  only:
+    - master
+    - merge-requests
+    - web
+  allow_failure: false
+  before_script:
+    - echo "Starting feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
+  script:
+    - docker pull "${FRM_DOCKER_IMAGE}"
+    - docker ps -aq --filter "name=${FRM_WON_PRODUCTION_CONTAINER_NAME}" | grep -q . && docker stop "${FRM_WON_PRODUCTION_CONTAINER_NAME}" && docker rm "${FRM_WON_PRODUCTION_CONTAINER_NAME}"
+    - docker run -d -v ${FRM_WON_PRODUCTION_VOLUME}:/data -p ${FRM_WON_PRODUCTION_PORT}:3000 --restart "${FRM_WON_PRODUCTION_RESTART_POLICY}" --name "${FRM_WON_PRODUCTION_CONTAINER_NAME}" "${FRM_DOCKER_IMAGE}"
+  tags:
+    - hellopoland-production
+  when: manual
+  environment:
+    name: Wrocław ON Production Environment
+    url: https://${FRM_WON_PRODUCTION_URL}

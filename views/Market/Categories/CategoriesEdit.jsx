@@ -18,7 +18,6 @@ import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import ContentTranslation from 'components/ContentTranslation';
 import CategoryForm from './components/CategoryForm';
-import TagForm from '../Tags/components/TagForm/TagForm';
 
 const styles = theme => ({
   root: {

@@ -241,6 +241,15 @@ class CategoriesEdit extends React.Component {
     }
   };
 
+  handleUploadSuccess = () => {
+    const { itemId } = this.props;
+    const { selectedTranslation } = this.state;
+
+    if (itemId) {
+      this.handleFetchItem(itemId, selectedTranslation);
+    }
+  }
+
   render() {
     const {
       availableTranslations, selectedTranslation, snackbarOpen, snackbarMessage,
@@ -282,6 +291,7 @@ class CategoriesEdit extends React.Component {
             initialValues={this.getFormValues(item)}
             language={selectedTranslation}
             onSubmitSuccess={this.handleSubmitSuccess}
+            onUploadSuccess={this.handleUploadSuccess}
           />
           <Snackbar
             anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}

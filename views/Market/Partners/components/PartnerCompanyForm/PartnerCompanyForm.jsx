@@ -26,6 +26,7 @@ import {
 } from 'redux/partners';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
+import config from '../../../../../config';
 
 const commonProps = {
   fullWidth: true,
@@ -282,6 +283,7 @@ class PartnerCompanyForm extends Component {
     const { initialValues } = this.state;
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
+    const { brandName } = (config && config.public) || {};
 
     return (
       <Formik
@@ -299,7 +301,9 @@ class PartnerCompanyForm extends Component {
                 <Typography variant="h6">Dane partnera</Typography>
                 {values.id
                   && (
-                    <Typography color="error">UWAGA: Modyfikujesz dane w systemie Hello! Poland. Upewnij się, że partner zaktualizuje je w Przelewach24.</Typography>
+                    <Typography color="error">
+                      {`UWAGA: Modyfikujesz dane w systemie ${brandName}. Upewnij się, że partner zaktualizuje je w Przelewach24.`}
+                    </Typography>
                   )
                 }
               </GridItem>

@@ -1,38 +1,28 @@
 # Securely install npm dependencies
-FROM node:8.15.1-alpine AS dependencies
+FROM node:10-alpine AS dependencies
 
-ARG NPM_REGISTRY
+ARG NPM_RC
 ENV NODE_ENV="production"
 
 WORKDIR /home/node/app/
 
-COPY package*.json /home/node/app/
+COPY .npmrc ./
+COPY package*.json ./
 
-RUN echo ${NPM_REGISTRY} > .npmrc && \
-    npm install --only=production --registry=https://packages.fream.pl/repository/npm/ && \
-    rm -f .npmrc
+RUN echo ${NPM_RC} > ~/.npmrc && \
+    npm install --only=production && \
+    rm -f ~/.npmrc
 
 # Build final image
-FROM node:8.15.1-alpine
+FROM node:10-alpine
 
 ENV CONFIG_PATH="/data/etc/config.json"
 ENV NODE_ENV="production"
 
 WORKDIR /home/node/app/
 
-COPY --from=dependencies /home/node/app/ .
-COPY ./next.config.js .
-COPY ./config/index.js ./config
-COPY ./src/* ./src/
-COPY ./utils/* ./utils/
-COPY ./server/* ./server/
-COPY ./static/* ./static/
-COPY ./pages/* ./pages/
-COPY ./services/* ./services/
-COPY ./redux/* ./redux/
-COPY ./views/* ./views/
-COPY ./components/* ./components/
-COPY ./.next/* ./.next/
+COPY --from=dependencies /home/node/app/ ./
+COPY ./ ./
 
 EXPOSE 3000
 

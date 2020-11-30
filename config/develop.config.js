@@ -10,6 +10,7 @@ module.exports = {
   // Will be available on both server and client
   public: {
     name: 'Hello! Poland - Help Desk',
+    brandName: 'Hello! Poland',
     axios: {
       baseURL: 'http://localhost:3000/api',
     },

@@ -162,6 +162,8 @@ Deploy Hello Poland Production Environment:
     - merge-requests
     - web
   allow_failure: false
+  variables:
+    GIT_STRATEGY: none
   before_script:
     - echo "Starting feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
   script:
@@ -183,6 +185,8 @@ Deploy Wroclaw ON Production Environment:
     - merge-requests
     - web
   allow_failure: false
+  variables:
+    GIT_STRATEGY: none
   before_script:
     - echo "Starting feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
   script:

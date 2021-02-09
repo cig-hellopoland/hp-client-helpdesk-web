@@ -413,7 +413,7 @@ class SightEventEdit extends React.Component {
     const { errorTPD } = this.props;
     const { data: errorData } = errorTPD || {};
 
-    this.handleSnackbarOpen(errorData.message || 'Wystąpił błąd podczas edycji puli biletów');
+    this.handleSnackbarOpen(errorData.message || 'Wystąpił błąd podczas edycji puli produktów');
   };
 
   render() {
@@ -466,7 +466,7 @@ class SightEventEdit extends React.Component {
             <Tab label="Kategorie" />
             <Tab label="Tagi" />
             <Tab label="Multimedia" />
-            <Tab label="Pule biletów" />
+            <Tab label="Pule produktów" />
             <Tab label="Komentarze" disabled />
           </Tabs>
           {selectedTab === 0

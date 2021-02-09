@@ -33,7 +33,7 @@ import {
 import Button from '@material-ui/core/Button';
 
 const tableColumns = [
-  { id: 'name', label: 'Nazwa biletu' },
+  { id: 'name', label: 'Nazwa produktu' },
   { id: 'price', label: 'Cena' },
   { id: 'menu', label: '' },
 ];
@@ -187,9 +187,9 @@ class TicketsListView extends React.Component {
           {sortedList.length === 0 && (
             <EmptyView
               image={LocalOfferIcon}
-              label="Brak biletów"
+              label="Brak produktów"
               loading={isFetching}
-              message="Dodaj bilet lub ponów zapytanie aby wyświetlić listę."
+              message="Dodaj produkt lub ponów zapytanie aby wyświetlić listę."
               onRefresh={this.handleFetchItems}
             />
           )}
@@ -244,11 +244,11 @@ class TicketsListView extends React.Component {
                 aria-describedby="alert-dialog-description"
               >
                 <DialogTitle id="alert-dialog-title">
-                  Usuń bilet
+                  Usuń produkt
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText id="alert-dialog-description">
-                    {`Czy napewno usunąć bilet "${dialogProps.name}"?`}
+                    {`Czy na pewno usunąć produkt "${dialogProps.name}"?`}
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions>

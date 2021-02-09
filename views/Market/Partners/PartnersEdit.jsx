@@ -312,7 +312,7 @@ class PartnersEdit extends React.Component {
             <Tab label="Dane firmy" />
             <Tab label="Wizytówka" />
             <Tab label="Multimedia" />
-            <Tab label="Definicje biletów" />
+            <Tab label="Definicje produktów" />
             <Tab label="Użytkownicy" />
             <Tab label="Komentarze" disabled />
           </Tabs>

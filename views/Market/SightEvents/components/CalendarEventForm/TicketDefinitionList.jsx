@@ -30,7 +30,7 @@ class TicketDefinitionList extends React.Component {
 
   getPriceTag = (ticketDefinition) => {
     const { discount, price, originalPrice } = ticketDefinition;
-    let result = `Cena biletu: ${formatPrice(originalPrice)}`;
+    let result = `Cena produktu: ${formatPrice(originalPrice)}`;
 
     if (!discount) {
       return result;
@@ -113,7 +113,7 @@ class TicketDefinitionList extends React.Component {
                     <TextField
                       className={classes.availabilityTextfield}
                       helperText="Puste pole - brak limitu"
-                      label="Limit biletów"
+                      label="Limit produktów"
                       disabled={isDisabled || disableAvailability}
                       onChange={event => this.handlePropertyChange(event, item)}
                       name="availableTicketsNumber"
@@ -129,9 +129,9 @@ class TicketDefinitionList extends React.Component {
                     </IconButton>
                     {!readOnly && onDelete && (
                       <IconButton
-                        aria-label="Usuń bilet z puli"
+                        aria-label="Usuń produkt z puli"
                         onClick={() => this.handleDelete(item)}
-                        title="Usuń bilet z puli"
+                        title="Usuń produkt z puli"
                       >
                         <DeleteIcon />
                       </IconButton>

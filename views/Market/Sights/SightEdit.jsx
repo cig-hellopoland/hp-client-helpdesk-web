@@ -280,7 +280,7 @@ class SightEdit extends React.Component {
     const { classes, item, itemId } = this.props;
     const { defaultLanguage } = item || {};
 
-    const pageTitle = 'Edycja atrakcji';
+    const pageTitle = 'Edycja obiektów';
     const hasLanguageActions = !!(item && item.id);
 
     return (

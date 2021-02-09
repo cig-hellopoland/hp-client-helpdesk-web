@@ -21,7 +21,7 @@ export default [
     label: 'Partnerzy', href: '/market/partners', Icon: DomainIcon,
   },
   {
-    disabled: true, label: 'Sprzedaż', href: '/market/sales', Icon: ShoppingCartIcon,
+    disabled: true, label: 'Sprzedaż/Raporty', href: '/market/sales', Icon: ShoppingCartIcon,
   },
   {
     label: 'Kategorie', href: '/market/categories', Icon: CategoryIcon,
@@ -30,7 +30,7 @@ export default [
     label: 'Tagi', href: '/market/tags', Icon: LabelIcon,
   },
   {
-    label: 'Atrakcje', href: '/market/sights', Icon: PlaceIcon,
+    label: 'Obiekty', href: '/market/sights', Icon: PlaceIcon,
   },
   {
     label: 'Oferty', href: '/market/sight-events', Icon: LocalPlayIcon,

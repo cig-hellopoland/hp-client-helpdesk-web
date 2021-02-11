@@ -46,7 +46,7 @@ function SightEvents({ classes, items }) {
             <LocalPlayIcon className={classes.image} />
             <Typography variant="h6">Oferty</Typography>
             <Typography>
-              Partner nie zdefiniował żadnych ofert powiązanych z tą atrakcją.
+              Partner nie zdefiniował żadnych ofert powiązanych z tym obiektem.
             </Typography>
           </Grid>
         )

@@ -34,7 +34,7 @@ const Home = ({ classes }) => (
       </Grid>
       <Grid container item md={4} direction="column">
         <Grid item>
-          <Typography variant="h6" gutterBottom>Wyślij email z biletami</Typography>
+          <Typography variant="h6" gutterBottom>Wyślij email z produktami</Typography>
           <MailingForm />
         </Grid>
       </Grid>

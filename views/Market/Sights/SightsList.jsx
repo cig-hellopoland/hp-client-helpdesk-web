@@ -36,7 +36,7 @@ import SortableTableHead from '../Partners/components/ListingViewTable/SortableT
 
 const tableColumns = [
   { id: 'item-id', label: '# ID' },
-  { id: 'name', label: 'Nazwa atrakcji' },
+  { id: 'name', label: 'Nazwa obiektu' },
   { id: 'location', label: 'Lokalizacja' },
   { id: 'partner', label: 'Partner' },
   { id: 'details', label: '' },
@@ -281,7 +281,7 @@ class SightsList extends React.Component {
               && (
                 <EmptyView
                   image={PlaceIcon}
-                  label="Brak atrakcji"
+                  label="Brak obiektu"
                   loading={isFetching}
                   message="Ponów zapytanie aby wyświetlić listę."
                   onRefresh={this.handleFetchItems}
@@ -350,11 +350,11 @@ class SightsList extends React.Component {
                     aria-describedby="alert-dialog-description"
                   >
                     <DialogTitle id="alert-dialog-title">
-                      Usuń atrakcję
+                      Usuń obiekt
                     </DialogTitle>
                     <DialogContent>
                       <DialogContentText id="alert-dialog-description">
-                        {`Czy napewno usunąć atrakcję "${dialogProps.name}"?`}
+                        {`Czy na pewno usunąć obiekt "${dialogProps.name}"?`}
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>

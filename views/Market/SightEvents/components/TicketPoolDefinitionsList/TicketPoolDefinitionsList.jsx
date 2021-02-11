@@ -128,8 +128,8 @@ class TicketPoolDefinitionsList extends React.Component {
           && (
             <Grid container item direction="column" alignItems="center" justify="center">
               <EventIcon className={classes.image} />
-              <Typography variant="h6">Pule biletów</Typography>
-              <Typography>Partner nie zdefiniował żadnych pul biletów.</Typography>
+              <Typography variant="h6">Pule produktów</Typography>
+              <Typography>Partner nie zdefiniował żadnych pul produktów.</Typography>
             </Grid>
           )
         }
@@ -185,7 +185,7 @@ class TicketPoolDefinitionsList extends React.Component {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">
-            Usuń pulę biletów
+            Usuń pulę produktów
           </DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">

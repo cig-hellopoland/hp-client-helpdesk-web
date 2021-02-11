@@ -132,7 +132,7 @@ class PartnerUsersList extends React.Component {
           {sortedList.length === 0 && (
             <EmptyView
               image={LocalOfferIcon}
-              label="Brak biletów"
+              label="Brak produktów"
               loading={isFetching}
               message="Dodaj użytkownika lub ponów zapytanie aby wyświetlić listę."
               onRefresh={this.handleFetchItems}

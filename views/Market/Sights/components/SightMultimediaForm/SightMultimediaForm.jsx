@@ -6,34 +6,31 @@ import {
 } from '@hello-poland/commons/redux/sights';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import MultimediaForm from 'components/Multimedia/MultimediaForm';
+import { actions as filesActions } from '@hello-poland/commons/redux/files';
 
 function SightMultimediaForm(props) {
   const {
-    clearError, createImage, createImageCancel, createMainImage, createMainImageCancel,
-    deleteImage, data, defaultTranslation, itemId, onFailure, onSuccess, translation,
+    clearError, createFile, createFileCancel, deleteFile, MainImageProps,
+    ImageGalleryProps, defaultTranslation, itemId, onFailure, onSuccess, translation,
+    partnerId,
   } = props;
 
   return (
     <MultimediaForm
       defaultTranslation={defaultTranslation}
-      ImageGalleryProps={{
-        createImage,
-        createImageCancel,
-        deleteImage,
-        items: data.images,
-      }}
+      ImageGalleryProps={{ ...ImageGalleryProps }}
       itemId={itemId}
-      MainImageProps={{
-        createMainImage,
-        createMainImageCancel,
-        item: data.mainImage,
-      }}
+      createFile={createFile}
+      createFileCancel={createFileCancel}
+      deleteFile={deleteFile}
+      MainImageProps={{ ...MainImageProps }}
       onFailure={onFailure}
-      onSuccess={() => {
+      partnerId={partnerId}
+      onSuccess={(data) => {
         clearError();
 
         if (onSuccess) {
-          onSuccess();
+          onSuccess(data);
         }
       }}
       translation={translation}
@@ -43,26 +40,27 @@ function SightMultimediaForm(props) {
 
 SightMultimediaForm.propTypes = {
   clearError: PropTypes.func.isRequired,
-  createImage: PropTypes.func.isRequired,
-  createImageCancel: PropTypes.func.isRequired,
-  createMainImage: PropTypes.func.isRequired,
-  createMainImageCancel: PropTypes.func.isRequired,
-  data: PropTypes.shape({
-    attachments: PropTypes.arrayOf(PropTypes.shape({})),
-    images: PropTypes.arrayOf(PropTypes.shape({})),
-    mainImage: PropTypes.shape({}),
-  }),
+  createFile: PropTypes.func.isRequired,
+  createFileCancel: PropTypes.func.isRequired,
+  deleteFile: PropTypes.func.isRequired,
   defaultTranslation: PropTypes.string,
-  deleteImage: PropTypes.func.isRequired,
   itemId: PropTypes.number.isRequired,
+  ImageGalleryProps: PropTypes.shape({
+    item: PropTypes.shape({}),
+  }),
+  MainImageProps: PropTypes.shape({
+    item: PropTypes.shape({}),
+  }),
   onFailure: PropTypes.func,
   onSuccess: PropTypes.func,
+  partnerId: PropTypes.number,
   translation: PropTypes.string,
 };
 
 SightMultimediaForm.defaultProps = {
-  data: {},
   defaultTranslation: DEFAULT_LANGUAGE,
+  ImageGalleryProps: null,
+  MainImageProps: null,
   onFailure: null,
   onSuccess: null,
   translation: DEFAULT_LANGUAGE,
@@ -70,11 +68,10 @@ SightMultimediaForm.defaultProps = {
 
 const mapDispatchToProps = {
   clearError: sightsActions.clearError,
-  createImage: sightsActions.createImage,
-  createImageCancel: sightsActions.createImageCancel,
-  createMainImage: sightsActions.createMainImage,
-  createMainImageCancel: sightsActions.createMainImageCancel,
-  deleteImage: sightsActions.deleteImage,
+  createFile: filesActions.createFile,
+  createFileCancel: filesActions.createFileCancel,
+  deleteFile: filesActions.deleteFile,
+  partnerId: null,
 };
 
 export default connect(null, mapDispatchToProps)(SightMultimediaForm);

@@ -44,16 +44,10 @@ class MediaManager extends Component {
     this.handleDropStart();
 
     acceptedFiles.forEach((acceptedFile) => {
-      const { arrayBuffer, metadata } = acceptedFile;
-      const data = new Uint8Array(arrayBuffer);
-      const options = {
-        headers: {
-          'content-type': metadata.type,
-        },
-        timeout: 0,
-      };
+      const formData = new FormData();
+      formData.append('file', acceptedFile, acceptedFile.name);
 
-      onSubmit({ data, options });
+      onSubmit({ data: formData });
     });
   };
 
@@ -61,7 +55,7 @@ class MediaManager extends Component {
 
   render() {
     const {
-      error, errorMessage, imageUpload, onClose, title, ...rest
+      error, imageUpload, onClose, title, ...rest
     } = this.props;
     const { processing } = this.state;
 
@@ -79,14 +73,14 @@ class MediaManager extends Component {
         </DialogContent>
         <DialogActions>
           { error
-          && (
+            && (
             <Typography style={{ color: 'red' }}>
               {imageUpload
                 ? 'Obrazek powinien być w formacie JPEG, a jego szerokość musi wynosić minimum 2000px.'
-                : errorMessage
+                : 'Wystąpił błąd podczas zapisywania pliku.'
               }
             </Typography>
-          )
+            )
           }
           <Button onClick={this.handleClose} color="primary">Zamknij</Button>
         </DialogActions>
@@ -97,7 +91,6 @@ class MediaManager extends Component {
 
 MediaManager.propTypes = {
   error: PropTypes.bool,
-  errorMessage: PropTypes.string,
   imageUpload: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
@@ -107,7 +100,6 @@ MediaManager.propTypes = {
 
 MediaManager.defaultProps = {
   error: false,
-  errorMessage: 'Wystąpił błąd podczas zapisywania pliku.',
   imageUpload: false,
   open: false,
   title: null,

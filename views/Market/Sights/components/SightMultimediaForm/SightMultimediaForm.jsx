@@ -63,6 +63,7 @@ SightMultimediaForm.defaultProps = {
   MainImageProps: null,
   onFailure: null,
   onSuccess: null,
+  partnerId: null,
   translation: DEFAULT_LANGUAGE,
 };
 

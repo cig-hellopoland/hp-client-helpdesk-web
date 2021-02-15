@@ -6,41 +6,33 @@ import {
 } from '@hello-poland/commons/redux/sightEvents';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import MultimediaForm from 'components/Multimedia/MultimediaForm';
+import { actions as filesActions } from '@hello-poland/commons/redux/files';
 
+
+// Maby not partner id. check it
 function SightEventMultimediaForm(props) {
   const {
-    clearError, createImage, createImageCancel, createMainImage, createMainImageCancel, createPDF,
-    createPDFCancel, data, defaultTranslation, deleteImage, deletePDF, itemId, onFailure, onSuccess,
-    translation,
+    clearError, defaultTranslation, itemId, onFailure, onSuccess, createFile, createFileCancel,
+    deleteFile, translation, ImageGalleryProps, MainImageProps, AttachmentProps, partnerId,
   } = props;
 
   return (
     <MultimediaForm
-      AttachmentProps={{
-        createAttachment: createPDF,
-        createAttachmentCancel: createPDFCancel,
-        deleteAttachment: deletePDF,
-        items: data.attachments,
-      }}
+      createFile={createFile}
+      createFileCancel={createFileCancel}
+      deleteFile={deleteFile}
+      AttachmentProps={{ ...AttachmentProps }}
+      ImageGalleryProps={{ ...ImageGalleryProps }}
+      MainImageProps={{ ...MainImageProps }}
       defaultTranslation={defaultTranslation}
-      ImageGalleryProps={{
-        createImage,
-        createImageCancel,
-        deleteImage,
-        items: data.images,
-      }}
       itemId={itemId}
-      MainImageProps={{
-        createMainImage,
-        createMainImageCancel,
-        item: data.mainImage,
-      }}
+      partnerId={partnerId}
       onFailure={onFailure}
-      onSuccess={() => {
+      onSuccess={(data) => {
         clearError();
 
         if (onSuccess) {
-          onSuccess();
+          onSuccess(data);
         }
       }}
       translation={translation}
@@ -49,45 +41,44 @@ function SightEventMultimediaForm(props) {
 }
 
 SightEventMultimediaForm.propTypes = {
-  clearError: PropTypes.func.isRequired,
-  createImage: PropTypes.func.isRequired,
-  createImageCancel: PropTypes.func.isRequired,
-  createMainImage: PropTypes.func.isRequired,
-  createMainImageCancel: PropTypes.func.isRequired,
-  createPDF: PropTypes.func.isRequired,
-  createPDFCancel: PropTypes.func.isRequired,
-  data: PropTypes.shape({
-    attachments: PropTypes.arrayOf(PropTypes.shape({})),
-    images: PropTypes.arrayOf(PropTypes.shape({})),
-    mainImage: PropTypes.shape({}),
+  AttachmentProps: PropTypes.shape({
+    item: PropTypes.shape({}),
   }),
+  clearError: PropTypes.func.isRequired,
+  createFile: PropTypes.func.isRequired,
+  createFileCancel: PropTypes.func.isRequired,
+  deleteFile: PropTypes.func.isRequired,
   defaultTranslation: PropTypes.string,
-  deleteImage: PropTypes.func.isRequired,
-  deletePDF: PropTypes.func.isRequired,
+  ImageGalleryProps: PropTypes.shape({
+    item: PropTypes.shape({}),
+  }),
   itemId: PropTypes.number.isRequired,
+  MainImageProps: PropTypes.shape({
+    item: PropTypes.shape({}),
+  }),
   onFailure: PropTypes.func,
   onSuccess: PropTypes.func,
+  partnerId: PropTypes.number,
   translation: PropTypes.string,
 };
 
 SightEventMultimediaForm.defaultProps = {
-  data: {},
+  AttachmentProps: null,
   defaultTranslation: DEFAULT_LANGUAGE,
+  ImageGalleryProps: null,
+  MainImageProps: null,
   onFailure: null,
   onSuccess: null,
+  partnerId: null,
   translation: DEFAULT_LANGUAGE,
 };
 
 const mapDispatchToProps = {
   clearError: sightEventsActions.clearError,
-  createImage: sightEventsActions.createImage,
-  createImageCancel: sightEventsActions.createImageCancel,
-  createMainImage: sightEventsActions.createMainImage,
-  createMainImageCancel: sightEventsActions.createMainImageCancel,
-  createPDF: sightEventsActions.createPDF,
-  createPDFCancel: sightEventsActions.createPDFCancel,
-  deleteImage: sightEventsActions.deleteImage,
-  deletePDF: sightEventsActions.deletePDF,
+  createFile: filesActions.createFile,
+  createFileCancel: filesActions.createFileCancel,
+  deleteFile: filesActions.deleteFile,
+  partnerId: null,
 };
 
 export default connect(null, mapDispatchToProps)(SightEventMultimediaForm);

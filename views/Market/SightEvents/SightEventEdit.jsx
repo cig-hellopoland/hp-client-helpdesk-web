@@ -62,6 +62,7 @@ class SightEventEdit extends React.Component {
     selectedTranslation: DEFAULT_LANGUAGE,
     snackbarOpen: false,
     snackbarMessage: '',
+    uploadedMultimedia: { images: [], mainImage: {}, pdfAttachment: {} },
   };
 
   componentDidMount() {
@@ -114,14 +115,8 @@ class SightEventEdit extends React.Component {
       const { id, ...downloadUrl } = mainImage;
 
       data.mainImage = {
-        createdBy: '',
-        createdDate: '',
         id,
-        modifiedBy: '',
-        modifiedDate: '',
         name: 'Zdjęcie promocyjne',
-        path: '/home/hpl/var/DMS/omg/1234.jpg',
-        size: 12345,
         type: 'image/jpeg',
         downloadUrl,
       };
@@ -131,14 +126,8 @@ class SightEventEdit extends React.Component {
       data.images = images.map((image) => {
         const { id, ...downloadUrl } = image;
         return {
-          createdBy: '',
-          createdDate: '',
           id,
-          modifiedBy: '',
-          modifiedDate: '',
           name: `Zdjęcie galerii (id #${id})`,
-          path: '/home/hpl/var/DMS/omg/1234.jpg',
-          size: 12345,
           type: 'image/jpeg',
           downloadUrl,
         };
@@ -146,21 +135,14 @@ class SightEventEdit extends React.Component {
     }
 
     if (pdfAttachment) {
-      data.attachments = [
-        {
-          ...pdfAttachment,
-          createdBy: '',
-          createdDate: '',
-          modifiedBy: '',
-          modifiedDate: '',
-          size: 12345,
-          type: 'application/pdf',
-        },
-      ];
+      data.pdfAttachment = {
+        ...pdfAttachment,
+        type: 'PDF',
+      };
     }
 
     return data;
-  };
+  }
 
   setSelectedTab = (event, selectedTab) => this.setState({ selectedTab });
 
@@ -359,6 +341,31 @@ class SightEventEdit extends React.Component {
     });
   };
 
+  fileActionSuccess = (itemId, language, data) => {
+    const { updateItem, item } = this.props;
+    this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
+    if (itemId && data) {
+      updateItem({
+        id: itemId,
+        data: {
+          ...item,
+          ...data,
+        },
+        onSuccess: this.handleFetchItem(itemId, language),
+        pathParams: {
+          languageVersion: language,
+        },
+        options: {
+          headers: {
+            'Content-Language': language,
+          },
+        },
+      });
+    } else if (itemId && !data) {
+      this.handleFetchItem(itemId, language);
+    }
+  }
+
   handleSnackbarOpen = message => this.setState({
     snackbarOpen: true,
     snackbarMessage: typeof message === 'string' ? message : 'Wystąpił nieznany błąd.',
@@ -418,7 +425,8 @@ class SightEventEdit extends React.Component {
 
   render() {
     const {
-      availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
+      availableTranslations, selectedTab, selectedTranslation, snackbarOpen,
+      snackbarMessage, uploadedMultimedia,
     } = this.state;
     const {
       categoriesList, classes, item, itemId, tagsList,
@@ -427,6 +435,8 @@ class SightEventEdit extends React.Component {
 
     const pageTitle = itemId ? 'Edycja oferty' : 'Nowa oferta';
     const hasLanguageActions = !!(item && item.id);
+
+    const multimedia = this.getMultimediaFromItem(item);
 
     return (
       <Layout>
@@ -509,11 +519,19 @@ class SightEventEdit extends React.Component {
           {selectedTab === 3
             && (
               <SightEventMultimediaForm
-                data={this.getMultimediaFromItem(item)}
+                ImageGalleryProps={{
+                  items: uploadedMultimedia.images.length
+                    ? uploadedMultimedia.images : multimedia.images || [],
+                }}
+                MainImageProps={{
+                  item: uploadedMultimedia.mainImage.id
+                    ? uploadedMultimedia.mainImage : multimedia.mainImage,
+                }}
                 defaultTranslation={defaultLanguage}
                 itemId={itemId}
+                partnerId={partnerId}
                 onFailure={() => this.handleRequestFailure()}
-                onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}
+                onSuccess={data => this.fileActionSuccess(itemId, selectedTranslation, data)}
                 translation={selectedTranslation}
               />
             )
@@ -565,6 +583,7 @@ SightEventEdit.propTypes = {
   }),
   router: PropTypes.shape({}).isRequired,
   tagsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  updateItem: PropTypes.func.isRequired,
   updateItemCategory: PropTypes.func.isRequired,
   updateItemTag: PropTypes.func.isRequired,
   updateTicketPoolDefinition: PropTypes.func.isRequired,
@@ -596,6 +615,7 @@ const mapDispatchToProps = {
   fetchCategoriesList: categoriesActions.fetchList,
   fetchTagsList: tagsActions.fetchList,
   fetchItem: sightEventsActions.fetchItem,
+  updateItem: sightEventsActions.updateItem,
   updateItemCategory: sightEventsActions.updateItemCategory,
   updateItemTag: sightEventsActions.updateItemTag,
   updateTicketPoolDefinition: ticketPoolDefinitionActions.updateItem,

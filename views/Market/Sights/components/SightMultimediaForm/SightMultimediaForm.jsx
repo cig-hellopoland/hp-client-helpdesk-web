@@ -44,10 +44,10 @@ SightMultimediaForm.propTypes = {
   createFileCancel: PropTypes.func.isRequired,
   deleteFile: PropTypes.func.isRequired,
   defaultTranslation: PropTypes.string,
-  itemId: PropTypes.number.isRequired,
   ImageGalleryProps: PropTypes.shape({
     item: PropTypes.shape({}),
   }),
+  itemId: PropTypes.number.isRequired,
   MainImageProps: PropTypes.shape({
     item: PropTypes.shape({}),
   }),

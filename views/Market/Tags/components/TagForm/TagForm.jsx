@@ -23,7 +23,7 @@ import {
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 import IconGalleryDialog from 'components/IconGallery/IconGalleryDialog';
-import MediaManager from 'components/MediaManager';
+import ArrayBufferMediaManager from 'components/MediaManager/ArrayBufferMediaManager';
 import config from 'config';
 
 const commonProps = {
@@ -328,7 +328,7 @@ class TagForm extends React.Component {
               onClose={this.handleIconSelectDialogClose}
               onSelect={this.handleIconSelect(formikBag)}
             />
-            <MediaManager
+            <ArrayBufferMediaManager
               disableBackdropClick
               error={!!iconUploadError}
               errorMessage={iconUploadError}

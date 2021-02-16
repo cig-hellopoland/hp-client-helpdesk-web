@@ -520,6 +520,10 @@ class SightEventEdit extends React.Component {
           {selectedTab === 3
             && (
               <SightEventMultimediaForm
+                AttachmentProps={{
+                  item: uploadedMultimedia.pdfAttachment.id
+                    ? uploadedMultimedia.pdfAttachment : multimedia.pdfAttachment,
+                }}
                 ImageGalleryProps={{
                   items: uploadedMultimedia.images.length
                     ? uploadedMultimedia.images : multimedia.images || [],

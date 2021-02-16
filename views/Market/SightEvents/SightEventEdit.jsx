@@ -229,6 +229,7 @@ class SightEventEdit extends React.Component {
     this.setState({
       availableTranslations: availableLanguageVersions,
       selectedTranslation: language || DEFAULT_LANGUAGE,
+      uploadedMultimedia: { images: [], mainImage: {}, pdfAttachment: {} },
     });
   };
 
@@ -351,7 +352,7 @@ class SightEventEdit extends React.Component {
           ...item,
           ...data,
         },
-        onSuccess: this.handleFetchItem(itemId, language),
+        onSuccess: () => this.handleFetchItem(itemId, language),
         pathParams: {
           languageVersion: language,
         },

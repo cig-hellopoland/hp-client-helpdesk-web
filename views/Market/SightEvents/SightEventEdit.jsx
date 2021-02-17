@@ -486,6 +486,7 @@ class SightEventEdit extends React.Component {
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                uploadedMultimedia={uploadedMultimedia}
               />
             )
           }

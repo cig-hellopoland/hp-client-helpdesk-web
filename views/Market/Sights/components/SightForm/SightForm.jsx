@@ -149,7 +149,10 @@ class SightForm extends React.Component {
   };
 
   getInitialValues = (initialValues) => {
-    const { location: initialLocation, openingHours, ...details } = initialValues || {};
+    const {
+      location: initialLocation, openingHours, mainImage,
+      images, ...details
+    } = initialValues || {};
     const location = initialLocation || {};
 
     return {
@@ -168,6 +171,8 @@ class SightForm extends React.Component {
         city: location.city || '',
         country: location.country || 'Polska',
       },
+      mainImage,
+      images,
     };
   };
 
@@ -237,11 +242,19 @@ class SightForm extends React.Component {
       return;
     }
 
-    const { createItem, createTranslation, updateItem } = this.props;
+    const {
+      createItem, createTranslation,
+      updateItem, uploadedMultimedia,
+    } = this.props;
     const { id, ...data } = values;
 
     const payload = {
-      data,
+      data: {
+        ...data,
+        mainImage: uploadedMultimedia.mainImage.id
+          ? uploadedMultimedia.mainImage : values.mainImage,
+        images: uploadedMultimedia.images.length ? uploadedMultimedia.images : values.images,
+      },
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
       options: {
@@ -497,6 +510,7 @@ SightForm.propTypes = {
     message: PropTypes.string,
   }),
   updateItem: PropTypes.func.isRequired,
+  uploadedMultimedia: PropTypes.shape({}),
 };
 
 SightForm.defaultProps = {
@@ -509,6 +523,7 @@ SightForm.defaultProps = {
   onSubmitFailure: null,
   onSubmitSuccess: null,
   requestError: null,
+  uploadedMultimedia: null,
 };
 
 const mapStateToProps = state => ({

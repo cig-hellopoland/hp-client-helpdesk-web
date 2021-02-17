@@ -44,6 +44,7 @@ class SightEdit extends React.Component {
     selectedTranslation: DEFAULT_LANGUAGE,
     snackbarOpen: false,
     snackbarMessage: '',
+    uploadedMultimedia: { images: [], mainImage: {} },
   };
 
   componentDidMount() {
@@ -86,21 +87,15 @@ class SightEdit extends React.Component {
   };
 
   getMultimediaFromItem = (item) => {
-    const { images, mainImage, pdfAttachment } = item;
+    const { images, mainImage } = item;
     const data = {};
 
     if (mainImage) {
       const { id, ...downloadUrl } = mainImage;
 
       data.mainImage = {
-        createdBy: '',
-        createdDate: '',
         id,
-        modifiedBy: '',
-        modifiedDate: '',
         name: 'Zdjęcie promocyjne',
-        path: '/home/hpl/var/DMS/omg/1234.jpg',
-        size: 12345,
         type: 'image/jpeg',
         downloadUrl,
       };
@@ -110,32 +105,12 @@ class SightEdit extends React.Component {
       data.images = images.map((image) => {
         const { id, ...downloadUrl } = image;
         return {
-          createdBy: '',
-          createdDate: '',
           id,
-          modifiedBy: '',
-          modifiedDate: '',
           name: `Zdjęcie galerii (id #${id})`,
-          path: '/home/hpl/var/DMS/omg/1234.jpg',
-          size: 12345,
           type: 'image/jpeg',
           downloadUrl,
         };
       });
-    }
-
-    if (pdfAttachment) {
-      data.attachments = [
-        {
-          ...pdfAttachment,
-          createdBy: '',
-          createdDate: '',
-          modifiedBy: '',
-          modifiedDate: '',
-          size: 12345,
-          type: 'application/pdf',
-        },
-      ];
     }
 
     return data;
@@ -152,6 +127,7 @@ class SightEdit extends React.Component {
     this.setState({
       availableTranslations: availableLanguageVersions,
       selectedTranslation: language || DEFAULT_LANGUAGE,
+      uploadedMultimedia: { images: [], mainImage: {} },
     });
   };
 
@@ -252,6 +228,31 @@ class SightEdit extends React.Component {
     });
   };
 
+  fileActionSuccess = (itemId, language, data) => {
+    const { updateItem, item } = this.props;
+    this.setState(state => ({ uploadedMultimedia: { ...state.uploadedMultimedia, ...data } }));
+    if (itemId && data) {
+      updateItem({
+        id: itemId,
+        data: {
+          ...item,
+          ...data,
+        },
+        onSuccess: () => this.handleFetchItem(itemId, language),
+        pathParams: {
+          languageVersion: language,
+        },
+        options: {
+          headers: {
+            'Content-Language': language,
+          },
+        },
+      });
+    } else if (itemId && !data) {
+      this.handleFetchItem(itemId, language);
+    }
+  }
+
   handleSnackbarOpen = message => this.setState({
     snackbarOpen: true,
     snackbarMessage: typeof message === 'string' ? message : 'Wystąpił nieznany błąd.',
@@ -275,13 +276,16 @@ class SightEdit extends React.Component {
 
   render() {
     const {
-      availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
+      availableTranslations, selectedTab, selectedTranslation, snackbarOpen,
+      snackbarMessage, uploadedMultimedia,
     } = this.state;
     const { classes, item, itemId } = this.props;
-    const { defaultLanguage } = item || {};
+    const { defaultLanguage, partnerId } = item || {};
 
     const pageTitle = 'Edycja obiektów';
     const hasLanguageActions = !!(item && item.id);
+
+    const multimedia = this.getMultimediaFromItem(item);
 
     return (
       <Layout>
@@ -340,11 +344,19 @@ class SightEdit extends React.Component {
           {selectedTab === 2
             && (
               <SightMultimediaForm
-                data={this.getMultimediaFromItem(item)}
+                ImageGalleryProps={{
+                  items: uploadedMultimedia.images.length
+                    ? uploadedMultimedia.images : multimedia.images || [],
+                }}
+                MainImageProps={{
+                  item: uploadedMultimedia.mainImage.id
+                    ? uploadedMultimedia.mainImage : multimedia.mainImage,
+                }}
+                partnerId={partnerId}
                 defaultTranslation={defaultLanguage}
                 itemId={itemId}
                 onFailure={() => this.handleRequestFailure()}
-                onSuccess={() => this.handleFetchItem(itemId, selectedTranslation)}
+                onSuccess={data => this.fileActionSuccess(itemId, selectedTranslation, data)}
                 translation={selectedTranslation}
               />
             )
@@ -383,6 +395,7 @@ SightEdit.propTypes = {
     label: PropTypes.string,
   }),
   router: PropTypes.shape({}).isRequired,
+  updateItem: PropTypes.func.isRequired,
 };
 
 SightEdit.defaultProps = {
@@ -402,6 +415,7 @@ const mapDispatchToProps = {
   clearItem: sightsActions.clearItem,
   deleteTranslation: sightsActions.deleteTranslation,
   fetchItem: sightsActions.fetchItem,
+  updateItem: sightsActions.updateItem,
 };
 
 export default compose(

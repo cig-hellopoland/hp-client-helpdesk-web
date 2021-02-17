@@ -45,7 +45,6 @@ class SightEdit extends React.Component {
     snackbarOpen: false,
     snackbarMessage: '',
     uploadedMultimedia: { images: [], mainImage: {} },
-    formChanges: null,
   };
 
   componentDidMount() {
@@ -68,7 +67,7 @@ class SightEdit extends React.Component {
 
   getFormValues = (item) => {
     const { itemId } = this.props;
-    const { selectedTranslation, formChanges } = this.state;
+    const { selectedTranslation } = this.state;
 
     if (item && itemId === item.id) {
       const { availableLanguageVersions } = item;
@@ -79,10 +78,6 @@ class SightEdit extends React.Component {
         const { label, ...itemProps } = item;
 
         return { ...itemProps };
-      }
-
-      if (formChanges) {
-        return { ...item, ...formChanges };
       }
 
       return { ...item };
@@ -341,6 +336,7 @@ class SightEdit extends React.Component {
                 language={selectedTranslation}
                 onSubmitSuccess={this.handleSubmitSuccess}
                 uploadedMultimedia={uploadedMultimedia}
+                FormikProps={{ ref: this.formikRef }}
               />
             )
           }

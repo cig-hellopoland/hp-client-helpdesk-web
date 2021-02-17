@@ -238,7 +238,9 @@ class SightEdit extends React.Component {
           ...item,
           ...data,
         },
-        onSuccess: () => this.handleFetchItem(itemId, language),
+        onSuccess: () => {
+          this.handleFetchItem(itemId, language);
+        },
         pathParams: {
           languageVersion: language,
         },
@@ -333,6 +335,8 @@ class SightEdit extends React.Component {
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                uploadedMultimedia={uploadedMultimedia}
+                FormikProps={{ ref: this.formikRef }}
               />
             )
           }

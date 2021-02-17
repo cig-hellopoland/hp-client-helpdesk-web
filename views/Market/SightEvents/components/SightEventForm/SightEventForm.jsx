@@ -94,7 +94,10 @@ class SightEventForm extends React.Component {
   }
 
   getInitialValues = (initialValues) => {
-    const { location: initialLocation, pdfAttachment: files, ...details } = initialValues || {};
+    const {
+      location: initialLocation, pdfAttachment: files,
+      mainImage, images, pdfAttachment, ...details
+    } = initialValues || {};
     const location = initialLocation || {};
 
     return {
@@ -114,6 +117,9 @@ class SightEventForm extends React.Component {
         city: location.city || '',
         country: location.country || '',
       },
+      mainImage,
+      images,
+      pdfAttachment,
     };
   };
 
@@ -130,11 +136,21 @@ class SightEventForm extends React.Component {
       return;
     }
 
-    const { createItem, createTranslation, updateItem } = this.props;
+    const {
+      createItem, createTranslation, updateItem,
+      uploadedMultimedia,
+    } = this.props;
     const { id, ...data } = values;
 
     const payload = {
-      data,
+      data: {
+        ...data,
+        mainImage: uploadedMultimedia.mainImage.id
+          ? uploadedMultimedia.mainImage : values.mainImage,
+        images: uploadedMultimedia.images.length ? uploadedMultimedia.images : values.images,
+        pdfAttachment: uploadedMultimedia.pdfAttachment.id
+          ? uploadedMultimedia.pdfAttachment : values.pdfAttachment,
+      },
       onFailure: this.handleSubmitFailure(actions),
       onSuccess: this.handleSubmitSuccess(actions),
       options: {
@@ -351,6 +367,7 @@ SightEventForm.propTypes = {
     message: PropTypes.string,
   }),
   updateItem: PropTypes.func.isRequired,
+  uploadedMultimedia: PropTypes.shape({}),
 };
 
 SightEventForm.defaultProps = {
@@ -363,6 +380,7 @@ SightEventForm.defaultProps = {
   onSubmitFailure: null,
   onSubmitSuccess: null,
   requestError: null,
+  uploadedMultimedia: null,
 };
 
 const mapStateToProps = state => ({

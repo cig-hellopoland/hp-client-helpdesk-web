@@ -192,8 +192,8 @@ class SightEventForm extends React.Component {
   };
 
   handleSubmitSuccess = actions => (sightId) => {
-    const { onSubmitSuccess, clearError } = this.props;
-
+    const { onSubmitSuccess, clearError, clearFormChanges } = this.props;
+    clearFormChanges();
     if (onSubmitSuccess) {
       onSubmitSuccess(sightId, actions);
 
@@ -353,6 +353,7 @@ class SightEventForm extends React.Component {
 SightEventForm.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
+  clearFormChanges: PropTypes.func.isRequired,
   createItem: PropTypes.func.isRequired,
   createTranslation: PropTypes.func.isRequired,
   FormikProps: PropTypes.shape({}),

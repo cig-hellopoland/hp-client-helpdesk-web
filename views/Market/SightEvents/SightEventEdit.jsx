@@ -56,6 +56,8 @@ const styles = theme => ({
 class SightEventEdit extends React.Component {
   baseURL = '/market/sight-events';
 
+  formikRef = React.createRef();
+
   state = {
     availableTranslations: CONTENT_LANGUAGES,
     selectedTab: 0,
@@ -63,6 +65,7 @@ class SightEventEdit extends React.Component {
     snackbarOpen: false,
     snackbarMessage: '',
     uploadedMultimedia: { images: [], mainImage: {}, pdfAttachment: {} },
+    formChanges: null,
   };
 
   componentDidMount() {
@@ -88,7 +91,7 @@ class SightEventEdit extends React.Component {
 
   getFormValues = (item) => {
     const { itemId } = this.props;
-    const { selectedTranslation } = this.state;
+    const { selectedTranslation, formChanges } = this.state;
 
     if (item && itemId === item.id) {
       const { availableLanguageVersions } = item;
@@ -99,6 +102,10 @@ class SightEventEdit extends React.Component {
         const { label, ...itemProps } = item;
 
         return { ...itemProps };
+      }
+
+      if (formChanges) {
+        return { ...item, ...formChanges };
       }
 
       return { ...item };
@@ -144,7 +151,22 @@ class SightEventEdit extends React.Component {
     return data;
   }
 
-  setSelectedTab = (event, selectedTab) => this.setState({ selectedTab });
+  setSelectedTab = (event, selectedTab) => {
+    const { current } = this.formikRef;
+    if (current && current.getFormikBag) {
+      const { values } = current.getFormikBag();
+      const {
+        images, mainImage, pdfAttachment, ...rest
+      } = values || {};
+      this.setState({ selectedTab, formChanges: rest });
+    } else {
+      this.setState({ selectedTab });
+    }
+  };
+
+  clearFormChanges = () => {
+    this.setState({ formChanges: null });
+  }
 
   handleItemDataTypeDeleteFailure = () => this.handleRequestFailure();
 
@@ -483,10 +505,12 @@ class SightEventEdit extends React.Component {
           {selectedTab === 0
             && (
               <SightEventForm
+                FormikProps={{ ref: this.formikRef }}
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
                 onSubmitSuccess={this.handleSubmitSuccess}
                 uploadedMultimedia={uploadedMultimedia}
+                clearFormChanges={this.clearFormChanges}
               />
             )
           }

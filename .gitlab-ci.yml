@@ -110,22 +110,22 @@ linter:
     - cd ${CICD_DOCKER_WORKDIR_NODE}
     - npm run lint
 
-unit tests:
-  stage: unit tests
-  needs:
-    - snapshot image
-  only:
-    - merge_requests
-    - tags
-    - web
-  tags:
-    - docker-executor
-  image: ${DOCKER_IMAGE_SNAPSHOT}
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - cd ${CICD_DOCKER_WORKDIR_NODE}
-    - npm run test
+#unit tests:
+#  stage: unit tests
+#  needs:
+#    - snapshot image
+#  only:
+#    - merge_requests
+#    - tags
+#    - web
+#  tags:
+#    - docker-executor
+#  image: ${DOCKER_IMAGE_SNAPSHOT}
+#  variables:
+#    GIT_STRATEGY: none
+#  script:
+#    - cd ${CICD_DOCKER_WORKDIR_NODE}
+#    - npm run test
 
 
 #

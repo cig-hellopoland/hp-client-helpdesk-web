@@ -1,0 +1,11 @@
+# dev dependencies
+__mocks__/
+bundles/
+config/develop.config.js
+node_modules/
+./.*
+!./.next
+!./.npmrc
+Dockerfile*
+jest*.js
+jsdoc.json

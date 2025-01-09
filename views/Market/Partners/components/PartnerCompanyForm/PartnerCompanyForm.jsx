@@ -80,17 +80,17 @@ class PartnerCompanyForm extends Component {
     };
 
     this.validationSchema = yupObject().shape({
-      affiliation: yupBoolean().required(),
-      bankAccount: yupString().trim().required(),
+      affiliation: yupBoolean(), // disabled per client's request
+      // bankAccount: yupString().trim(), // disabled per client's request
       businessType: yupNumber().required(),
-      commission: yupNumber().min(0).max(100).required(),
+      // commission: yupNumber().min(0).max(100), // disabled per client's request
       contactPerson: yupObject().shape({
         email: yupString().email().trim().required(),
         name: yupString().required(),
         phone: yupString().trim().required(),
       }),
       email: yupString().email().trim().required(),
-      invoiceEmail: yupString().email().trim().required(),
+      // invoiceEmail: yupString().email().trim(), // disabled per client's request
       krs: yupString().when('businessType', {
         is: businessType => businessType > 3,
         then: yupString().required(),
@@ -107,7 +107,7 @@ class PartnerCompanyForm extends Component {
         is: businessType => businessType > 1,
         then: yupString().required(),
       }),
-      servicesDescription: yupString().required(),
+      // servicesDescription: yupString(), // disabled per client's request
       socialNumber: yupString().when('businessType', {
         is: businessType => businessType === 1,
         then: yupString().required(),
@@ -137,18 +137,18 @@ class PartnerCompanyForm extends Component {
 
     return {
       id: details.id || '',
-      affiliation: details.affiliation || true,
-      bankAccount: details.bankAccount || '',
+      affiliation: details.affiliation || true, // disabled per client's request
+      // bankAccount: details.bankAccount || '', // disabled per client's request
       blocked: details.blocked || false,
       businessType: details.businessType || '',
-      commission: details.commission || '0',
+      // commission: details.commission || '0', // disabled per client's request
       contactPerson: {
         email: contactPerson.email || '',
         name: contactPerson.name || '',
         phone: contactPerson.phone || '',
       },
       email: details.email || '',
-      invoiceEmail: details.invoiceEmail || '',
+      // invoiceEmail: details.invoiceEmail || '', // disabled per client's request
       krs: details.krs || '',
       location: {
         city: location.city || '',
@@ -159,7 +159,7 @@ class PartnerCompanyForm extends Component {
       name: details.name || '',
       phone: details.phone || '',
       regon: details.regon || '',
-      servicesDescription: details.servicesDescription || '',
+      // servicesDescription: details.servicesDescription || '', // disabled per client's request
       socialNumber: details.socialNumber || '',
       taxNumber: details.taxNumber || '',
     };
@@ -416,18 +416,43 @@ class PartnerCompanyForm extends Component {
                 <Field disabled={disabled} name="contactPerson.email" type="email" label="E-mail" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem className={classes.section}>
-                <Typography variant="h6">Płatności</Typography>
+                <Typography variant="h6">Ustawienia dodatkowe</Typography>
               </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field disabled={disabled} name="bankAccount" label="Konto bankowe" helperText="Format: tylko cyfry, bez spacji" required component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={4} sm={4}>
-                <Field disabled={disabled} name="invoiceEmail" type="email" label="E-mail do faktur" required component={TextField} {...commonProps} />
-              </GridItem>
-              <GridItem md={4} sm={4} />
-              <GridItem md={4} sm={4}>
-                <Field disabled={disabled} name="commission" type="number" label="Prowizja (%)" required component={TextField} {...commonProps} />
-              </GridItem>
+              {/* <GridItem className={classes.section}> */}
+              {/*  <Typography variant="h6">Płatności</Typography> */}
+              {/* </GridItem> */}
+              {/* <GridItem md={4} sm={4}> */}
+              {/*  <Field */}
+              {/*    disabled={disabled} */}
+              {/*    name="bankAccount" */}
+              {/*    label="Konto bankowe" */}
+              {/*    helperText="Format: tylko cyfry, bez spacji" */}
+              {/*    component={TextField} */}
+              {/*    {...commonProps} */}
+              {/*  /> */}
+              {/* </GridItem> */}
+              {/* <GridItem md={4} sm={4}> */}
+              {/*  <Field */}
+              {/*    disabled={disabled} */}
+              {/*    name="invoiceEmail" */}
+              {/*    type="email" */}
+              {/*    label="E-mail do faktur" */}
+              {/*    component={TextField} */}
+              {/*    {...commonProps} */}
+              {/*  /> */}
+              {/* </GridItem> */}
+              {/* <GridItem md={4} sm={4} /> */}
+              {/* <GridItem md={4} sm={4}> */}
+              {/*  <Field */}
+              {/*    disabled={disabled} */}
+              {/*    name="commission" */}
+              {/*    type="number" */}
+              {/*    label="Prowizja (%)" */}
+              {/*    required */}
+              {/*    component={TextField} */}
+              {/*    {...commonProps} */}
+              {/*  /> */}
+              {/* </GridItem> */}
               <GridItem container md={4} sm={4} alignItems="flex-end">
                 <Field
                   disabled={disabled}
@@ -436,13 +461,19 @@ class PartnerCompanyForm extends Component {
                   component={CheckboxWithLabel}
                 />
               </GridItem>
-              <GridItem md={4} sm={4} />
-              <GridItem className={classes.section}>
-                <Typography variant="h6">Przelewy24</Typography>
-              </GridItem>
-              <GridItem>
-                <Field disabled={disabled} name="servicesDescription" label="Opis usługi partnera" required component={TextField} {...commonProps} />
-              </GridItem>
+              {/* <GridItem md={4} sm={4} /> */}
+              {/* <GridItem className={classes.section}> */}
+              {/*  <Typography variant="h6">Przelewy24</Typography> */}
+              {/* </GridItem> */}
+              {/* <GridItem> */}
+              {/*  <Field */}
+              {/*    disabled={disabled} */}
+              {/*    name="servicesDescription" */}
+              {/*    label="Opis usługi partnera" */}
+              {/*    component={TextField} */}
+              {/*    {...commonProps} */}
+              {/*  /> */}
+              {/* </GridItem> */}
             </Grid>
             {(!hideButtons || (!hideErrors && errorMessage))
               && (

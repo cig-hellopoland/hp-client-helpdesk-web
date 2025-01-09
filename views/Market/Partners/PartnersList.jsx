@@ -68,8 +68,8 @@ const styles = theme => ({
 const tableColumns = [
   { id: 'item-id', label: '# ID' },
   { id: 'name', label: 'Nazwa' },
-  { id: 'p24MerchantId', label: 'P24 Merchant ID' },
-  { id: 'commission', label: 'Prowizja (%)' },
+  // { id: 'p24MerchantId', label: 'P24 Merchant ID' },
+  // { id: 'commission', label: 'Prowizja (%)' },
   { id: 'affiliation', label: 'Kod afiliacyjny' },
   { id: 'contact', label: 'Dane kontaktowe' },
   { id: 'details', label: '' },
@@ -267,8 +267,8 @@ class PartnersList extends Component {
                         <TableRow key={partner.id} hover>
                           <TableCell>{partner.id}</TableCell>
                           <TableCell>{partner.name}</TableCell>
-                          <TableCell>{partner.p24MerchantId}</TableCell>
-                          <TableCell>{`${partner.commission} %`}</TableCell>
+                          {/* <TableCell>{partner.p24MerchantId}</TableCell> */}
+                          {/* <TableCell>{`${partner.commission} %`}</TableCell> */}
                           <TableCell>{partner.affiliateCode}</TableCell>
                           <TableCell>
                             <Typography>{partner.email}</Typography>

@@ -151,6 +151,10 @@ build dist:
     - BUILD_DIR="$(pwd)"
     - cd ${CICD_DOCKER_WORKDIR_NODE}
     - NODE_ENV="production" npm run build
+    - echo "CICD_DIST_DIR=${CICD_DIST_DIR}"
+    - echo "BUILD_DIR=${BUILD_DIR}"
+    - echo "CICD_DOCKER_WORKDIR_NODE=${CICD_DOCKER_WORKDIR_NODE}"
+    - echo "BUILD_DIR=${BUILD_DIR}"
     - mv ${CICD_DIST_DIR} ${BUILD_DIR}
 
 

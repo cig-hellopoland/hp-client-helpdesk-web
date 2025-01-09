@@ -10,6 +10,7 @@ ENV NODE_ENV="development"
 WORKDIR /home/node/app/
 
 COPY .npmrc ./
+COPY .gitignore ./
 COPY package*.json ./
 
 RUN --mount=type=secret,id=npmrc,target=/root/.npmrc \

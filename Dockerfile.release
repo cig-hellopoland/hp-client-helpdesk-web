@@ -31,7 +31,7 @@ ENV CONFIG_PATH="/data/etc/config.json"
 ARG DIST_DIR=""
 ARG DEST_DIR=""
 
-COPY ./config/config.json ${CONFIG_PATH}
+#COPY ./config/config.json ${CONFIG_PATH}
 COPY ${DIST_DIR} ./${DEST_DIR}
 
 EXPOSE 3000

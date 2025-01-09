@@ -159,22 +159,33 @@ build dist:
 
 
 
-##
-## build stage tasks
-##
-#docker_image:
-#  stage: docker
-#  only:
-#    - merge_requests
-#    - web
-#  tags:
-#    - docker
-#  dependencies:
-#    - next_build
-#  script:
-#    - echo $FRM_DOCKER_IMAGE
-#    - docker build -t "${FRM_DOCKER_IMAGE}" --build-arg NPM_RC="$(cat ~/.npmrc)" .
-#    - docker push "${FRM_DOCKER_IMAGE}"
+#
+# docker stage jobs
+#
+release_node image:
+  stage: docker
+  needs:
+    - baseline_node image
+    - build dist
+  only:
+    - merge_requests
+    - tags
+    - web
+  tags:
+    - shell-executor
+  dependencies:
+    - build dist
+  variables:
+    BUILD_TYPE: "release_node"
+  script:
+#    - CICD_APP_CONFIG=$(if [ -n "${CI_COMMIT_TAG}" ]; then echo "${CICD_APP_CONFIG_PRODUCTION}"; else echo "${CICD_APP_CONFIG_TESTING}"; fi)
+    - DOCKER_IMAGE_REF="$(docker images ${DOCKER_IMAGE} --format "{{.ID}}")" # references previously built image
+#    - cp ${CICD_APP_CONFIG} ./config/config.json
+    - DOCKER_BUILDKIT=1 docker build -t ${DOCKER_IMAGE} -f Dockerfile.release --build-arg BUILD_TYPE=${BUILD_TYPE} --build-arg DIST_DIR=${CICD_DIST_DIR} --build-arg DEST_DIR=${CICD_DEST_DIR} --build-arg RELEASE_SOURCE=${DOCKER_IMAGE_RELEASE} --progress=plain .
+    - echo "Removing old image..." && [[ ${DOCKER_IMAGE_REF} && ${DOCKER_IMAGE_REF} != $(docker images ${DOCKER_IMAGE} --format "{{.ID}}") ]] && docker image rm ${DOCKER_IMAGE_REF}
+    - docker push ${DOCKER_IMAGE}
+
+
 #
 ##
 ## deploy stage tasks

@@ -40,7 +40,7 @@ snapshot image:
     - tags
     - web
   tags:
-    - docker
+    - shell-executor
   script:
     - NODE_VERSION="$(grep -P ${PCRE_NODE_ENGINE} package.json | grep -P -o ${PCRE_SEMVER})" || true # "grep -P" not supported on macOS so falling back to CICD_NODE_VERSION
     - NODE_IMAGE_VERSION="${NODE_VERSION:-$CICD_NODE_VERSION}-alpine"
@@ -58,7 +58,7 @@ baseline_node image:
     - tags
     - web
   tags:
-    - docker
+    - shell-executor
   variables:
     BUILD_TYPE: "baseline_node"
   script:

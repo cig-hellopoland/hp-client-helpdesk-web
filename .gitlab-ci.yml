@@ -254,7 +254,7 @@ Deploy Hello Poland Production Environment:
   when: manual
   environment:
     name: Hello Poland Production Environment
-    url: https://${FRM_PRODUCTION_URL}
+    url: https://${CICD_ENVIRONMENT_URL}
 
 #Deploy Wroclaw ON Production Environment:
 #  stage: deploy

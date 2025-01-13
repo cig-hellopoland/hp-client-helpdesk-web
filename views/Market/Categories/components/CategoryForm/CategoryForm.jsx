@@ -56,6 +56,7 @@ class CategoryForm extends React.Component {
     };
 
     this.validationSchema = yupObject().shape({
+      backgroundUrl: yupString().trim(),
       iconUrl: yupString().trim(),
       label: yupString().trim().required(),
       recommended: yupBoolean(),
@@ -74,6 +75,7 @@ class CategoryForm extends React.Component {
 
   getInitialValues = initialValues => ({
     id: initialValues.id || undefined,
+    backgroundUrl: initialValues.backgroundUrl || '',
     iconUrl: initialValues.iconUrl || '',
     label: initialValues.label || '',
     recommended: initialValues.recommended || false,
@@ -286,7 +288,10 @@ class CategoryForm extends React.Component {
                   }
                 </Grid>
               </GridItem>
-              <GridItem container md={4} sm={4} alignItems="flex-end">
+              <GridItem>
+                <Field name="backgroundUrl" label="URL pliku z tłem" component={TextField} {...commonProps} />
+              </GridItem>
+              <GridItem container md={4} sm={4}>
                 <Field
                   disabled={isIconSelectDisabled}
                   name="restricted"
@@ -294,7 +299,7 @@ class CategoryForm extends React.Component {
                   component={CheckboxWithLabel}
                 />
               </GridItem>
-              <GridItem container md={4} sm={4} alignItems="flex-end">
+              <GridItem container md={4} sm={4}>
                 <Field
                   disabled={isIconSelectDisabled}
                   name="recommended"
@@ -302,7 +307,6 @@ class CategoryForm extends React.Component {
                   component={CheckboxWithLabel}
                 />
               </GridItem>
-              <GridItem md={4} sm={4} />
             </Grid>
             {(!hideButtons || (!hideErrors && errorMessage))
               && (

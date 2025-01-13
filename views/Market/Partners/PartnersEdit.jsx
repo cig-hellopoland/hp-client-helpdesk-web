@@ -244,6 +244,37 @@ class PartnersEdit extends React.Component {
     });
   };
 
+  handleEmailResetFailure = () => {
+    console.log('handleEmailResetFailure');
+    const { clearUsersError } = this.props;
+
+    this.handleSnackbarOpen('Nie udało się zmienić hasła użytkownika Partnera.');
+
+    if (clearUsersError) {
+      clearUsersError();
+    }
+  }
+
+  handleEmailResetSuccess = () => {
+    const { itemId } = this.props;
+    const { selectedTranslation } = this.state;
+
+    if (itemId) {
+      this.handleFetchItem(itemId, selectedTranslation);
+    }
+  }
+
+  handleEmailReset = ({ email, partnerId }) => {
+    const { resetEmail } = this.props;
+
+    resetEmail({
+      id: partnerId,
+      data: { email },
+      onFailure: this.handleEmailResetFailure,
+      onSuccess: this.handleEmailResetSuccess,
+    });
+  }
+
   handleSnackbarOpen = message => this.setState({
     snackbarOpen: true,
     snackbarMessage: typeof message === 'string' ? message : 'Wystąpił nieznany błąd.',
@@ -321,9 +352,11 @@ class PartnersEdit extends React.Component {
               <PartnerCompanyForm
                 disabled={selectedTranslation !== defaultLanguage}
                 hideButtons={selectedTranslation !== defaultLanguage}
+                isEditMode
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                onResetEmailSuccess={this.handleEmailReset}
               />
             )
           }
@@ -397,6 +430,7 @@ PartnersEdit.propTypes = {
     id: PropTypes.number,
     label: PropTypes.string,
   }),
+  resetEmail: PropTypes.func.isRequired,
   router: PropTypes.shape({}).isRequired,
 };
 
@@ -421,6 +455,7 @@ const mapDispatchToProps = {
   clearItem: partnersActions.clearItem,
   deleteTranslation: partnersActions.deleteTranslation,
   fetchItem: partnersActions.fetchItem,
+  resetEmail: usersActions.resetEmail,
 };
 
 export default compose(

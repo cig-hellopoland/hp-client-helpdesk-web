@@ -1,4 +1,5 @@
 export default {
+  CUSTOM: 'CUSTOM',
   ACTION: 'ACTION',
   ALERT: 'ALERT',
   AV: 'AV',
@@ -15,5 +16,4 @@ export default {
   PLACES: 'PLACES',
   SOCIAL: 'SOCIAL',
   TOGGLE: 'TOGGLE',
-  CUSTOM: 'CUSTOM',
 };

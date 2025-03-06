@@ -223,7 +223,7 @@ class CalendarEventForm extends React.Component {
 
   hasTicketAvailabilityLimit = ticketDefinitions => ticketDefinitions
     .some(({ availableTicketsNumber }) => (
-      Number.isInteger(availableTicketsNumber) && availableTicketsNumber > 0
+      Number.isInteger(availableTicketsNumber) && availableTicketsNumber >= 0
     ));
 
   render() {
@@ -271,7 +271,8 @@ class CalendarEventForm extends React.Component {
                   onChange={handleAvailableTicketsChange}
                   type="number"
                   value={
-                    formData.availableTicketsNumber && formData.availableTicketsNumber > 0
+                    Number.isInteger(formData.availableTicketsNumber)
+                    && formData.availableTicketsNumber >= 0
                       ? formData.availableTicketsNumber : ''
                   }
                 />

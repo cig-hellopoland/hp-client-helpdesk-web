@@ -21,6 +21,11 @@ const styles = theme => ({
     padding: [[0, theme.spacing.unit * 6]],
     paddingBottom: theme.spacing.unit * 4,
   },
+  listItem: {
+    '&:hover': {
+      backgroundColor: theme.palette.grey[50],
+    },
+  },
 });
 
 class TicketDefinitionList extends React.Component {
@@ -59,8 +64,8 @@ class TicketDefinitionList extends React.Component {
 
   parsePropertyValue = (name, value) => {
     if (name === 'availableTicketsNumber') {
-      const parsedValue = Number(value);
-      return parsedValue > 0 ? parsedValue : -1;
+      const parsedValue = value !== '' ? Number(value) : value;
+      return Number.isInteger(parsedValue) && parsedValue >= 0 ? parsedValue : -1;
     }
 
     return value;
@@ -101,13 +106,13 @@ class TicketDefinitionList extends React.Component {
             const key = `${item.name}-${item.id}`;
             const isDisabled = readOnly;
             const hasDiscount = !!item.discount;
-            const availableTicketsNumber = item.availableTicketsNumber > 0
+            const availableTicketsNumber = item.availableTicketsNumber >= 0
               ? item.availableTicketsNumber
               : '';
 
             return (
               <React.Fragment key={`${key}-details`}>
-                <ListItem ContainerComponent="div">
+                <ListItem ContainerComponent="div" className={classes.listItem}>
                   <ListItemText primary={item.name} required secondary={this.getPriceTag(item)} />
                   <ListItemSecondaryAction>
                     <TextField

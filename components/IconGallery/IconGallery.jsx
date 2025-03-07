@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import config from 'config';
 import GridItem from 'components/GridItem';
+import axios from 'axios';
 import categories from './categories';
 import variants from './variants';
 import icons from './icons';
@@ -22,9 +24,20 @@ const styles = theme => ({
 });
 
 function IconGallery({ classes, onSelect }) {
-  const { iconBaseURL } = config.public;
+  const [iconsManifest, setIconsManifest] = useState();
+  const { axios: axiosConfig, iconBaseURL } = config.public;
   const sections = Object.values(categories);
   const variant = 'svg';
+
+  const fetchCustomIconsManifest = async () => {
+    try {
+      const { data } = await axios.get(`${axiosConfig.baseURL}/v1/static/icons/custom/manifest.json`);
+      setIconsManifest(data);
+    } catch {
+      console.error('Failed to fetch custom icons manifest.');
+      setIconsManifest(null);
+    }
+  };
 
   function handleIconClick(event, iconSrc) {
     if (onSelect) {
@@ -32,8 +45,34 @@ function IconGallery({ classes, onSelect }) {
     }
   }
 
+  useEffect(() => {
+    fetchCustomIconsManifest();
+  }, []);
+
   return (
     <React.Fragment>
+      <Grid container className={classes.section}>
+        <GridItem>
+          <Typography variant="h6" className={classes.header}>
+            Ikony Hello Poland
+          </Typography>
+          {iconsManifest === undefined && (<CircularProgress />)}
+          {iconsManifest === null && ('Błąd podczas ładowania ikon.')}
+          {iconsManifest && iconsManifest.icons
+            .filter(({ variants: iconVariants }) => iconVariants.includes(variant))
+            .map(({ name }) => {
+              const variantPath = `custom${variants[variant].path}`;
+              const src = `${iconBaseURL}/${variantPath}/${name}.${variant}`;
+
+              return (
+                <IconButton key={src} onClick={event => handleIconClick(event, src)}>
+                  <img src={src} alt={name} height={48} width={48} title={name} />
+                </IconButton>
+              );
+            })
+          }
+        </GridItem>
+      </Grid>
       {sections.map((sectionName) => {
         const sectionIcons = icons[sectionName];
 

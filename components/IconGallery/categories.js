@@ -1,5 +1,4 @@
 export default {
-  CUSTOM: 'CUSTOM',
   ACTION: 'ACTION',
   ALERT: 'ALERT',
   AV: 'AV',

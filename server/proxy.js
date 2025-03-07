@@ -9,6 +9,12 @@ const serverConfig = config.server;
 const baseURL = serverConfig.apiURL || `http://localhost:${port}/api`;
 
 const proxySettings = {
+  '/api/v1/static/icons': {
+    target: serverConfig.apiIconsURL,
+    changeOrigin: true,
+    pathRewrite: { '^/api/v1/static/icons': '' },
+    // logLevel: 'debug',
+  },
   '/api': {
     target: baseURL,
     changeOrigin: true,

@@ -57,6 +57,13 @@
   },
   {
     "category": "CUSTOM",
+    "name": "culinary",
+    "variants": [
+      "svg"
+    ]
+  },
+  {
+    "category": "CUSTOM",
     "name": "culture",
     "variants": [
       "svg"

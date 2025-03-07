@@ -31,7 +31,7 @@ function IconGallery({ classes, onSelect }) {
 
   const fetchCustomIconsManifest = async () => {
     try {
-      const { data } = await axios.get(`${axiosConfig.baseURL}/v1/static/icons/custom/manifest.json`);
+      const { data } = await axios.get(`${axiosConfig.iconManifestURL}/custom/manifest.json`);
       setIconsManifest(data);
     } catch {
       console.error('Failed to fetch custom icons manifest.');
@@ -73,7 +73,7 @@ function IconGallery({ classes, onSelect }) {
           }
         </GridItem>
       </Grid>
-      {sections.map((sectionName) => {
+      {iconsManifest !== undefined && sections.map((sectionName) => {
         const sectionIcons = icons[sectionName];
 
         if (!sectionIcons) {

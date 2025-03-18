@@ -94,7 +94,7 @@ class PartnerCompanyForm extends Component {
       affiliation: yupBoolean(), // disabled per client's request
       // bankAccount: yupString().trim(), // disabled per client's request
       businessType: yupNumber().required(),
-      // commission: yupNumber().min(0).max(100), // disabled per client's request
+      commission: yupNumber().min(0).max(100),
       contactPerson: yupObject().shape({
         email: yupString().email().trim().required(),
         name: yupString().required(),
@@ -152,7 +152,7 @@ class PartnerCompanyForm extends Component {
       // bankAccount: details.bankAccount || '', // disabled per client's request
       blocked: details.blocked || false,
       businessType: details.businessType || '',
-      // commission: details.commission || '0', // disabled per client's request
+      commission: Number.isInteger(details.commission) ? details.commission : '',
       contactPerson: {
         email: contactPerson.email || '',
         name: contactPerson.name || '',
@@ -486,17 +486,17 @@ class PartnerCompanyForm extends Component {
                 {/*  /> */}
                 {/* </GridItem> */}
                 {/* <GridItem md={4} sm={4} /> */}
-                {/* <GridItem md={4} sm={4}> */}
-                {/*  <Field */}
-                {/*    disabled={disabled} */}
-                {/*    name="commission" */}
-                {/*    type="number" */}
-                {/*    label="Prowizja (%)" */}
-                {/*    required */}
-                {/*    component={TextField} */}
-                {/*    {...commonProps} */}
-                {/*  /> */}
-                {/* </GridItem> */}
+                <GridItem md={4} sm={4}>
+                  <Field
+                    disabled={disabled}
+                    name="commission"
+                    type="number"
+                    label="Prowizja (%)"
+                    required
+                    component={TextField}
+                    {...commonProps}
+                  />
+                </GridItem>
                 <GridItem container md={4} sm={4} alignItems="flex-end">
                   <Field
                     disabled={disabled}

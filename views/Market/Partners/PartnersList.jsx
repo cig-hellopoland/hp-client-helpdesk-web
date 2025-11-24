@@ -24,6 +24,11 @@ import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import DomainIcon from '@material-ui/icons/Domain';
 import LockIcon from '@material-ui/icons/Lock';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import TextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import SearchIcon from '@material-ui/icons/Search';
+
+
 import Link from 'next/link';
 import { withRouter } from 'next/router';
 import {
@@ -66,13 +71,13 @@ const styles = theme => ({
 });
 
 const tableColumns = [
-  { id: 'item-id', label: '# ID' },
-  { id: 'name', label: 'Nazwa' },
-  { id: 'p24MerchantId', label: 'P24 Merchant ID' },
-  { id: 'commission', label: 'Prowizja (%)' },
-  { id: 'affiliation', label: 'Kod afiliacyjny' },
-  { id: 'contact', label: 'Dane kontaktowe' },
-  { id: 'details', label: '' },
+  { id: 'item-id', label: '# ID', sortable: true  },
+  { id: 'name', label: 'Nazwa', sortable: true  },
+  { id: 'p24MerchantId', label: 'P24 Merchant ID', sortable: true  },
+  { id: 'commission', label: 'Prowizja (%)', sortable: true  },
+  { id: 'affiliation', label: 'Kod afiliacyjny', sortable: false },
+  { id: 'contact', label: 'Dane kontaktowe', sortable: true  },
+  { id: 'details', label: '', sortable: false  },
 ];
 
 class PartnersList extends Component {
@@ -84,6 +89,9 @@ class PartnersList extends Component {
     menuItemId: null,
     snackbarOpen: false,
     snackbarMessage: '',
+    order: 'asc',
+    orderBy: 'item-id',
+    filterText: '',
   };
 
   componentDidMount() {
@@ -112,6 +120,26 @@ class PartnersList extends Component {
 
     this.handleMenuClose();
   };
+
+ handleRequestSort = (event, property) => {
+    this.setState((prevState) => {
+      const isSameField = prevState.orderBy === property;
+      const isAsc = prevState.order === 'asc';
+
+      return {
+        ...prevState,
+        order: isSameField && isAsc ? 'desc' : 'asc',
+        orderBy: property,
+      };
+    });
+  };
+
+handleFilterChange = (event) => {
+    this.setState({
+      filterText: event.target.value,
+    });
+  };
+
 
   handleItemEdit = (itemId) => {
     const { router } = this.props;
@@ -204,18 +232,103 @@ class PartnersList extends Component {
   };
 
   render() {
-    const {
-      isFetching, menuAnchor, menuItemId, snackbarMessage, snackbarOpen,
-    } = this.state;
-    const { classes, items: sortedList } = this.props;
-    const colorActive = 'primary';
-    const colorInactive = 'disabled';
+const {
+  isFetching, menuAnchor, menuItemId, snackbarMessage, snackbarOpen,
+  order, orderBy, filterText,
+} = this.state;
+const { classes, items } = this.props;
 
+// 1. lista bazowa
+const baseList = items || [];
+const hasItems = baseList.length > 0;
+
+// 2. filtrowanie po tekście
+const query = (filterText || '').toLowerCase();
+
+const filteredList = baseList.filter((partner) => {
+  if (!query) return true;
+
+  const name = (partner.name || '').toLowerCase();
+  const p24MerchantId = (partner.p24MerchantId != null ? String(partner.p24MerchantId) : '').toLowerCase();
+  const commission = (partner.commission != null ? String(partner.commission) : '').toLowerCase();
+  const affiliateCode = (partner.affiliateCode || '').toLowerCase();
+  const email = (partner.email || '').toLowerCase();
+  const phone = (partner.phone || '').toLowerCase();
+
+  return (
+    name.includes(query)
+    || p24MerchantId.includes(query)
+    || commission.includes(query)
+    || affiliateCode.includes(query)
+    || email.includes(query)
+    || phone.includes(query)
+  );
+});
+
+// 3. sortowanie
+const sortedList = [...filteredList].sort((a, b) => {
+  let aValue;
+  let bValue;
+
+  switch (orderBy) {
+    case 'item-id':
+      aValue = a.id;
+      bValue = b.id;
+      break;
+    case 'p24MerchantId':
+      aValue = a.p24MerchantId || '';
+      bValue = b.p24MerchantId || '';
+      break;
+    case 'commission':
+      aValue = a.commission || 0;
+      bValue = b.commission || 0;
+      break;
+    case 'affiliation':
+      aValue = a.affiliateCode || '';
+      bValue = b.affiliateCode || '';
+      break;
+    case 'contact':
+      aValue = `${a.email || ''} ${a.phone || ''}`;
+      bValue = `${b.email || ''} ${b.phone || ''}`;
+      break;
+    case 'name':
+    default:
+      aValue = a.name || '';
+      bValue = b.name || '';
+      break;
+  }
+
+  if (aValue < bValue) return order === 'asc' ? -1 : 1;
+  if (aValue > bValue) return order === 'asc' ? 1 : -1;
+  return 0;
+});
+
+const colorActive = 'primary';
+const colorInactive = 'disabled';
     return (
-      <Layout>
-        <Grid container className={classes.root}>
+     <Layout>
+       <Grid container className={classes.root}>
           <Paper className={classes.paper}>
             <Grid container direction="column" className={classes.toolbar}>
+  {hasItems && (
+    <Grid container item justify="flex-end" style={{ marginBottom: 8 }}>
+      <Grid item xs={12} sm={6} md={4}>
+        <TextField
+          fullWidth
+          label="Filtruj (nazwa, ID, e-mail, tel, P24, kod afiliacyjny)"
+          value={filterText}
+          onChange={this.handleFilterChange}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Grid>
+    </Grid>
+  )}
               <Grid container item justify="flex-end">
                 <Grid item>
                   <Link href={`${this.baseURL}/create`} passHref prefetch>
@@ -227,8 +340,7 @@ class PartnersList extends Component {
                 </Grid>
               </Grid>
             </Grid>
-            {(sortedList.length === 0)
-            && (
+            {!hasItems && (
               <Grid container item className={classes.placeholder} direction="column" alignItems="center" justify="center">
                 {isFetching
                   ? (
@@ -253,14 +365,30 @@ class PartnersList extends Component {
               </Grid>
             )
             }
-            {sortedList.length > 0
-              && (
-                <Table aria-labelledby="tableTitle">
-                  <SortableTableHead
-                    columns={tableColumns}
-                    orderBy="name"
-                    onRequestSort={() => {}}
-                  />
+          {hasItems && sortedList.length === 0 && (
+            <Grid
+              container
+              item
+              className={classes.placeholder}
+              direction="column"
+              alignItems="center"
+              justify="center"
+            >
+              <Typography variant="h6">Brak wyników dla filtra</Typography>
+              <Typography>
+                Zmień tekst w polu filtrowania powyżej.
+              </Typography>
+            </Grid>
+          )}
+
+{hasItems && sortedList.length > 0 && (
+  <Table aria-labelledby="tableTitle">
+    <SortableTableHead
+      columns={tableColumns}
+      order={order}
+      orderBy={orderBy}
+      onRequestSort={this.handleRequestSort}
+    />
                   <TableBody>
                     {
                       sortedList.map(partner => (

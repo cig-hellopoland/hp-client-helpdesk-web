@@ -26,6 +26,9 @@ import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import LockIcon from '@material-ui/icons/Lock';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import StarIcon from '@material-ui/icons/Star';
+import TextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import SearchIcon from '@material-ui/icons/Search';
 import Link from 'next/link';
 import { withRouter } from 'next/router';
 import {
@@ -40,10 +43,10 @@ import EmptyView from 'components/EmptyView';
 import SortableTableHead from '../Partners/components/ListingViewTable/SortableTableHead';
 
 const tableColumns = [
-  { id: 'icon', label: 'Ikona' },
-  { id: 'name', label: 'Nazwa kategorii' },
-  { id: 'count', label: 'Liczba ofert' },
-  { id: 'details', label: '' },
+  { id: 'icon', label: 'Ikona', sortable: true },
+  { id: 'name', label: 'Nazwa tagu', sortable: true },
+  { id: 'count', label: 'Liczba ofert', sortable: true },
+  { id: 'details', label: '', sortable: false },
 ];
 
 const styles = theme => ({
@@ -76,6 +79,9 @@ class TagsList extends React.Component {
     menuItemId: null,
     snackbarOpen: false,
     snackbarMessage: '',
+    order: 'asc',
+    orderBy: 'name',
+    filterText: '',
   };
 
   componentDidMount() {
@@ -156,6 +162,26 @@ class TagsList extends React.Component {
     this.setState({ isFetching: true });
   };
 
+  handleRequestSort = (event, property) => {
+    this.setState((prevState) => {
+      const isSameField = prevState.orderBy === property;
+      const isAsc = prevState.order === 'asc';
+
+      return {
+        ...prevState,
+        order: isSameField && isAsc ? 'desc' : 'asc',
+        orderBy: property,
+      };
+    });
+  };
+
+  handleFilterChange = (event) => {
+    this.setState({
+      filterText: event.target.value,
+    });
+  };
+
+
   handleItemEdit = () => {
     const { menuItemId } = this.state;
     const { router } = this.props;
@@ -191,8 +217,49 @@ class TagsList extends React.Component {
   render() {
     const {
       dialogOpen, dialogProps, isFetching, menuAnchor, snackbarMessage, snackbarOpen,
+      order, orderBy, filterText,
     } = this.state;
-    const { classes, items: sortedList } = this.props;
+    const { classes, items } = this.props;
+    const baseList = items || [];
+    const hasItems = baseList.length > 0;
+
+    // filtrowanie po nazwie tagu
+    const query = (filterText || '').toLowerCase();
+
+    const filteredList = baseList.filter((item) => {
+      if (!query) return true;
+
+      const name = (item.label || '').toLowerCase();
+
+      return name.includes(query);
+    });
+
+    // sortowanie
+    const sortedList = [...filteredList].sort((a, b) => {
+      let aValue;
+      let bValue;
+
+      switch (orderBy) {
+        case 'icon':
+          aValue = a.iconUrl || '';
+          bValue = b.iconUrl || '';
+          break;
+        case 'count':
+          aValue = a.assignedItemsCount || 0;
+          bValue = b.assignedItemsCount || 0;
+          break;
+        case 'name':
+        default:
+          aValue = a.label || '';
+          bValue = b.label || '';
+          break;
+      }
+
+      if (aValue < bValue) return order === 'asc' ? -1 : 1;
+      if (aValue > bValue) return order === 'asc' ? 1 : -1;
+      return 0;
+    });
+
 
     const colorActive = 'primary';
     const colorInactive = 'disabled';
@@ -213,109 +280,135 @@ class TagsList extends React.Component {
                 </Grid>
               </Grid>
             </Grid>
-            {sortedList.length === 0
-              && (
-                <EmptyView
-                  image={LocalOfferIcon}
-                  label="Brak tagów"
-                  loading={isFetching}
-                  message="Dodaj tag lub ponów zapytanie aby wyświetlić listę."
-                  onRefresh={this.handleFetchItems}
+            <Grid container justify="flex-end" className={classes.toolbar}>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  fullWidth
+                  label="Filtruj (nazwa tagu)"
+                  value={filterText}
+                  onChange={this.handleFilterChange}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
-              )
-            }
-            {sortedList.length > 0
-              && (
-                <React.Fragment>
-                  <Table aria-labelledby="items-list">
-                    <SortableTableHead columns={tableColumns} orderBy="name" onRequestSort={() => {}} />
-                    <TableBody>
-                      {
-                        sortedList.map(({
-                          assignedItemsCount, label, iconUrl, id: listItemId, restricted,
-                          recommended,
-                        }) => (
-                          <TableRow key={listItemId} hover>
-                            <TableCell className={classes.iconCell} align="center">
-                              {iconUrl
-                                ? <img src={iconUrl} height={48} width={48} alt={label} />
-                                : <ErrorOutlineIcon color="error" />
-                              }
-                            </TableCell>
-                            <TableCell>
-                              <Typography>{label}</Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography>{assignedItemsCount}</Typography>
-                            </TableCell>
-                            <TableCell align="right">
-                              <IconButton disabled>
-                                <LockIcon color={restricted ? colorActive : colorInactive} />
-                              </IconButton>
-                              <IconButton disabled>
-                                <StarIcon color={recommended ? colorActive : colorInactive} />
-                              </IconButton>
-                              <IconButton
-                                aria-owns={menuAnchor ? 'item-menu' : undefined}
-                                aria-haspopup="true"
-                                onClick={event => this.handleMenuOpen(event, listItemId)}
-                              >
-                                <MoreVertIcon />
-                              </IconButton>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      }
-                    </TableBody>
-                  </Table>
-                  <Menu
-                    id="item-menu"
-                    anchorEl={menuAnchor}
-                    open={Boolean(menuAnchor)}
-                    onClose={this.handleMenuClose}
-                  >
-                    <MenuItem onClick={this.handleItemEdit}>
-                      Edytuj
-                    </MenuItem>
-                    <MenuItem onClick={this.handleDialogOpen}>
-                      Usuń
-                    </MenuItem>
-                  </Menu>
-                  <Dialog
-                    open={dialogOpen}
-                    onClose={this.handleDialogClose}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                  >
-                    <DialogTitle id="alert-dialog-title">
-                      Usuń element
-                    </DialogTitle>
-                    <DialogContent>
-                      <DialogContentText id="alert-dialog-description">
-                        {`Czy napewno usunąć element "${dialogProps.itemName}"?`}
-                      </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={this.handleDialogClose} color="primary" disabled={dialogProps.deleting}>
-                        Anuluj
-                      </Button>
-                      <Button onClick={() => this.handleDeleteItem(dialogProps.itemId)} color="primary" disabled={dialogProps.deleting}>
-                        OK
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
-                  <Snackbar
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                    open={snackbarOpen}
-                    onClose={this.handleSnackbarClose}
-                    ContentProps={{
-                      'aria-describedby': 'message-id',
-                    }}
-                    message={snackbarMessage}
-                  />
-                </React.Fragment>
-              )
-            }
+              </Grid>
+            </Grid>
+           {!hasItems && (
+             <EmptyView
+               image={LocalOfferIcon}
+               label="Brak tagów"
+               loading={isFetching}
+               message="Dodaj tag lub ponów zapytanie aby wyświetlić listę."
+               onRefresh={this.handleFetchItems}
+             />
+           )}
+
+           {hasItems && (
+             <React.Fragment>
+               {sortedList.length === 0 ? (
+                 <Grid container justify="center" style={{ padding: 16 }}>
+                   <Typography variant="subtitle1">
+                     Brak wyników dla filtra: "{filterText}"
+                   </Typography>
+                 </Grid>
+               ) : (
+                 <Table aria-labelledby="items-list">
+                   <SortableTableHead
+                     columns={tableColumns}
+                     order={order}
+                     orderBy={orderBy}
+                     onRequestSort={this.handleRequestSort}
+                   />
+                   <TableBody>
+                     {sortedList.map(({
+                       assignedItemsCount, label, iconUrl, id: listItemId, restricted, recommended,
+                     }) => (
+                       <TableRow key={listItemId} hover>
+                         <TableCell className={classes.iconCell} align="center">
+                           {iconUrl
+                             ? <img src={iconUrl} height={48} width={48} alt={label} />
+                             : <ErrorOutlineIcon color="error" />
+                           }
+                         </TableCell>
+                         <TableCell>
+                           <Typography>{label}</Typography>
+                         </TableCell>
+                         <TableCell>
+                           <Typography>{assignedItemsCount}</Typography>
+                         </TableCell>
+                         <TableCell align="right">
+                           <IconButton disabled>
+                             <LockIcon color={restricted ? 'primary' : 'disabled'} />
+                           </IconButton>
+                           <IconButton disabled>
+                             <StarIcon color={recommended ? 'primary' : 'disabled'} />
+                           </IconButton>
+                           <IconButton
+                             aria-owns={menuAnchor ? 'item-menu' : undefined}
+                             aria-haspopup="true"
+                             onClick={event => this.handleMenuOpen(event, listItemId)}
+                           >
+                             <MoreVertIcon />
+                           </IconButton>
+                         </TableCell>
+                       </TableRow>
+                     ))}
+                   </TableBody>
+                 </Table>
+               )}
+
+               <Menu
+                 id="item-menu"
+                 anchorEl={menuAnchor}
+                 open={Boolean(menuAnchor)}
+                 onClose={this.handleMenuClose}
+               >
+                 <MenuItem onClick={this.handleItemEdit}>
+                   Edytuj
+                 </MenuItem>
+                 <MenuItem onClick={this.handleDialogOpen}>
+                   Usuń
+                 </MenuItem>
+               </Menu>
+               <Dialog
+                 open={dialogOpen}
+                 onClose={this.handleDialogClose}
+                 aria-labelledby="alert-dialog-title"
+                 aria-describedby="alert-dialog-description"
+               >
+                 <DialogTitle id="alert-dialog-title">
+                   Usuń element
+                 </DialogTitle>
+                 <DialogContent>
+                   <DialogContentText id="alert-dialog-description">
+                     {`Czy napewno usunąć element "${dialogProps.itemName}"?`}
+                   </DialogContentText>
+                 </DialogContent>
+                 <DialogActions>
+                   <Button onClick={this.handleDialogClose} color="primary" disabled={dialogProps.deleting}>
+                     Anuluj
+                   </Button>
+                   <Button onClick={() => this.handleDeleteItem(dialogProps.itemId)} color="primary" disabled={dialogProps.deleting}>
+                     OK
+                   </Button>
+                 </DialogActions>
+               </Dialog>
+               <Snackbar
+                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                 open={snackbarOpen}
+                 onClose={this.handleSnackbarClose}
+                 ContentProps={{
+                   'aria-describedby': 'message-id',
+                 }}
+                 message={snackbarMessage}
+               />
+             </React.Fragment>
+           )}
+
           </Paper>
         </Grid>
       </Layout>

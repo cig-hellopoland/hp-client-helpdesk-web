@@ -24,6 +24,7 @@ import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import config from 'config';
 
+/*
 const DIALOG_TYPE = {
   COMBINED: 'COMBINED',
   PUBLIC: 'PUBLIC',
@@ -52,234 +53,281 @@ const styles = theme => ({
     width: 70,
   },
 });
+*/
+const DIALOG_TYPE = {
+  PUBLIC: 'PUBLIC',
+  RESTRICTED: 'RESTRICTED',
+};
 
-function CategoriesForm({
-  categories, classes, defaultTranslation, items, managePublic, manageRestricted, onSubmit,
-  onDelete, translation,
-}) {
-  const { brandName } = (config && config.public) || {};
-  const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [dialogType, setDialogType] = React.useState(null);
-  const [selectedCategoryId, setSelectedCategoryId] = React.useState('');
+const styles = theme => ({
+  section: {
+    marginTop: theme.spacing.unit * 4,
+    marginBottom: theme.spacing.unit * 4,
+  },
+  actionCell: {
+    width: 120,
+  },
+  tableContainer: {
+    marginTop: theme.spacing.unit * 2,
+  },
+});
 
-  function getCategoriesByRestriction(originalItems, isRestricted) {
+class CategoriesForm extends React.Component {
+  state = {
+    dialogOpen: false,
+    dialogType: null,
+    selectedCategoryId: '',
+  };
+
+  // wcześniej: function getCategoriesByRestriction(...)
+  getCategoriesByRestriction = (originalItems, isRestricted) => {
     if (Array.isArray(originalItems)) {
       return originalItems.filter(({ restricted }) => restricted === isRestricted);
     }
 
     return [];
-  }
+  };
 
-  function handleChangeSelectedCategoryId(event) {
-    const { value } = event.target;
+  handleDialogOpen = (type) => {
+    this.setState({
+      dialogOpen: true,
+      dialogType: type,
+      selectedCategoryId: '',
+    });
+  };
 
-    setSelectedCategoryId(value);
-  }
+  handleDialogClose = () => {
+    this.setState({
+      dialogOpen: false,
+      dialogType: null,
+      selectedCategoryId: '',
+    });
+  };
 
-  function handleDialogClose() {
-    setDialogOpen(false);
-    setDialogType(null);
-    setSelectedCategoryId('');
-  }
+  handleChangeSelectedCategoryId = (event) => {
+    this.setState({
+      selectedCategoryId: event.target.value,
+    });
+  };
 
-  function handleDialogOpen(type) {
-    setDialogOpen(true);
-    setDialogType(type);
-  }
+  handleCategoryDelete = (categoryId) => {
+    const { onDelete } = this.props;
 
-  function handleCategoryDelete(categoryId) {
     if (categoryId && onDelete) {
       onDelete(categoryId);
     }
-  }
+  };
 
-  function handleCategorySubmit(categoryId) {
+  handleCategorySubmit = (categoryId) => {
+    const { onSubmit } = this.props;
+
     if (categoryId && onSubmit) {
       onSubmit(categoryId);
     }
 
-    handleDialogClose();
-  }
+    this.handleDialogClose();
+  };
 
-  const publicCategories = getCategoriesByRestriction(items, false);
-  const restrictedCategories = getCategoriesByRestriction(items, true);
-  const isDefaultTranslation = defaultTranslation === translation;
+  render() {
+    const {
+      categories,
+      classes,
+      defaultTranslation,
+      items,
+      managePublic,
+      manageRestricted,
+      translation,
+    } = this.props;
 
-  return (
-    <React.Fragment>
-      <Grid container alignItems="center" justify="space-between" className={classes.section}>
-        <Grid item>
-          <Typography variant="h6">Kategorie partnera</Typography>
-        </Grid>
-        {managePublic
-          && (
+    const {
+      dialogOpen,
+      dialogType,
+      selectedCategoryId,
+    } = this.state;
+
+    const { brandName } = (config && config.public) || {};
+
+    const publicCategories = this.getCategoriesByRestriction(items, false);
+    const restrictedCategories = this.getCategoriesByRestriction(items, true);
+    const isDefaultTranslation = translation === defaultTranslation;
+
+    return (
+      <React.Fragment>
+        {/* KATEGORIE PARTNERA */}
+        <Grid container alignItems="center" justify="space-between" className={classes.section}>
+          <Grid item>
+            <Typography variant="h6">Kategorie partnera</Typography>
+          </Grid>
+          {managePublic && (
             <Grid item>
               <IconButton
                 aria-label="Dodaj"
                 disabled={!isDefaultTranslation}
-                onClick={() => handleDialogOpen(DIALOG_TYPE.PUBLIC)}
+                onClick={() => this.handleDialogOpen(DIALOG_TYPE.PUBLIC)}
                 title="Dodaj"
               >
                 <AddIcon />
               </IconButton>
             </Grid>
-          )
-        }
-      </Grid>
-      {(publicCategories.length === 0)
-        && (
-          <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>Brak kategorii przypisanych przez partnera.</Typography>
-          </Grid>
-        )
-      }
-      {publicCategories.length > 0
-        && (
-          <Grid container>
-            {publicCategories.length
-              && (
-                <Table>
-                  <TableBody>
-                    {publicCategories.map(({ iconUrl, id: itemId, label }) => (
-                      <TableRow key={`${label}-${itemId}`} hover={managePublic}>
-                        <TableCell className={classes.thumbnail} padding="none">
-                          {iconUrl
-                            ? <img src={iconUrl} height={32} width={32} alt={label} />
-                            : <InsertDriveFileIcon />
-                          }
-                        </TableCell>
-                        <TableCell>{label}</TableCell>
-                        <TableCell align="right" padding="none">
-                          {managePublic
-                            && (
-                              <IconButton
-                                aria-label="Usuń"
-                                disabled={!isDefaultTranslation}
-                                onClick={() => handleCategoryDelete(itemId)}
-                                title="Usuń"
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            )
-                          }
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )
-            }
-          </Grid>
-        )
-      }
-      <Grid container alignItems="center" justify="space-between" className={classes.section}>
-        <Grid item>
-          <Typography variant="h6">{`Kategorie ${brandName || 'administratora'}`}</Typography>
+          )}
         </Grid>
-        {manageRestricted
-          && (
+
+        {managePublic && (
+          <Grid container className={classes.tableContainer}>
+            {publicCategories.length === 0 ? (
+              <Typography>Brak kategorii partnera</Typography>
+            ) : (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell># ID</TableCell>
+                    <TableCell>Nazwa kategorii</TableCell>
+                    <TableCell className={classes.actionCell} />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {publicCategories.map(({ id: categoryId, label }) => (
+                    <TableRow key={categoryId}>
+                      <TableCell>{categoryId}</TableCell>
+                      <TableCell>{label}</TableCell>
+                      <TableCell align="right">
+                        <Button
+                          color="primary"
+                          disabled={!isDefaultTranslation}
+                          onClick={() => this.handleCategoryDelete(categoryId)}
+                        >
+                          Usuń
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </Grid>
+        )}
+
+        {/* KATEGORIE ADMINISTRATORA / BRANDU */}
+        <Grid container alignItems="center" justify="space-between" className={classes.section}>
+          <Grid item>
+            <Typography variant="h6">
+              {`Kategorie ${brandName || 'administratora'}`}
+            </Typography>
+          </Grid>
+          {manageRestricted && (
             <Grid item>
               <IconButton
                 aria-label="Dodaj"
                 disabled={!isDefaultTranslation}
-                onClick={() => handleDialogOpen(DIALOG_TYPE.RESTRICTED)}
+                onClick={() => this.handleDialogOpen(DIALOG_TYPE.RESTRICTED)}
                 title="Dodaj"
               >
                 <AddIcon />
               </IconButton>
             </Grid>
-          )
-        }
-      </Grid>
-      {(restrictedCategories.length === 0)
-        && (
-          <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>{`Brak kategorii przypisanych przez ${brandName || 'administratora'}.`}</Typography>
+          )}
+        </Grid>
+
+        {manageRestricted && (
+          <Grid container className={classes.tableContainer}>
+            {restrictedCategories.length === 0 ? (
+              <Typography>Brak kategorii administratora</Typography>
+            ) : (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell># ID</TableCell>
+                    <TableCell>Nazwa kategorii</TableCell>
+                    <TableCell className={classes.actionCell} />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {restrictedCategories.map(({ id: categoryId, label }) => (
+                    <TableRow key={categoryId}>
+                      <TableCell>{categoryId}</TableCell>
+                      <TableCell>{label}</TableCell>
+                      <TableCell align="right">
+                        <Button
+                          color="primary"
+                          disabled={!isDefaultTranslation}
+                          onClick={() => this.handleCategoryDelete(categoryId)}
+                        >
+                          Usuń
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </Grid>
-        )
-      }
-      {restrictedCategories.length > 0
-        && (
-          <Grid container>
-            {restrictedCategories.length
-              && (
-                <Table>
-                  <TableBody>
-                    {restrictedCategories.map(({ iconUrl, id: itemId, label }) => (
-                      <TableRow key={`${label}-${itemId}`} hover={manageRestricted}>
-                        <TableCell className={classes.thumbnail} padding="none">
-                          {iconUrl
-                            ? <img src={iconUrl} height={32} width={32} alt={label} />
-                            : <InsertDriveFileIcon />
-                          }
-                        </TableCell>
-                        <TableCell>{label}</TableCell>
-                        <TableCell align="right" padding="none">
-                          {manageRestricted
-                            && (
-                              <IconButton
-                                aria-label="Usuń"
-                                disabled={!isDefaultTranslation}
-                                onClick={() => handleCategoryDelete(itemId)}
-                                title="Usuń"
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            )
-                          }
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )
-            }
-          </Grid>
-        )
-      }
-      <Dialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title">Dodaj kategorię</DialogTitle>
-        <DialogContent>
-          <FormControl className={classes.formControl}>
-            <InputLabel htmlFor="selected-category">Kategoria</InputLabel>
-            <Select
-              input={<Input id="selected-category" />}
-              onChange={handleChangeSelectedCategoryId}
-              value={selectedCategoryId}
+        )}
+
+        {/* DIALOG DODAWANIA KATEGORII */}
+        <Dialog
+          open={dialogOpen}
+          onClose={this.handleDialogClose}
+          aria-labelledby="category-dialog-title"
+          aria-describedby="category-dialog-description"
+        >
+          <DialogTitle id="category-dialog-title">
+            Dodaj kategorię
+          </DialogTitle>
+          <DialogContent>
+            <FormControl fullWidth>
+              <InputLabel shrink={!!selectedCategoryId} htmlFor="category-select">
+                Wybierz kategorię
+              </InputLabel>
+              <Select
+                value={selectedCategoryId}
+                onChange={this.handleChangeSelectedCategoryId}
+                inputProps={{
+                  id: 'category-select',
+                }}
+              >
+                {categories.filter(({ id: categoryId, restricted }) => {
+                  const publicAssigned = this.getCategoriesByRestriction(items, false);
+                  const restrictedAssigned = this.getCategoriesByRestriction(items, true);
+
+                  const isExistingCategory = [
+                    ...publicAssigned,
+                    ...restrictedAssigned,
+                  ].some(({ id }) => id === categoryId);
+
+                  switch (dialogType) {
+                    case DIALOG_TYPE.RESTRICTED:
+                      return !isExistingCategory && restricted;
+                    case DIALOG_TYPE.PUBLIC:
+                      return !isExistingCategory && !restricted;
+                    default:
+                      return !isExistingCategory;
+                  }
+                }).map(({ id: categoryId, label }) => (
+                  <MenuItem key={categoryId} value={categoryId}>
+                    {label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleDialogClose} color="primary">
+              Anuluj
+            </Button>
+            <Button
+              onClick={() => this.handleCategorySubmit(selectedCategoryId)}
+              color="primary"
+              disabled={!selectedCategoryId}
             >
-              {categories.filter(({ id: categoryId, restricted }) => {
-                const isExistingCategory = items.some(item => item.id === categoryId);
-
-                switch (dialogType) {
-                  case DIALOG_TYPE.RESTRICTED:
-                    return !isExistingCategory && restricted;
-                  case DIALOG_TYPE.PUBLIC:
-                    return !isExistingCategory && !restricted;
-                  default:
-                    return !isExistingCategory;
-                }
-              }).map(({ id: categoryId, label }) => (
-                <MenuItem key={categoryId} value={categoryId}>{label}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            Anuluj
-          </Button>
-          <Button onClick={() => handleCategorySubmit(selectedCategoryId)} color="primary">
-            Dodaj
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </React.Fragment>
-  );
+              Dodaj
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </React.Fragment>
+    );
+  }
 }
+
 
 CategoriesForm.propTypes = {
   categories: PropTypes.arrayOf(PropTypes.shape({})),

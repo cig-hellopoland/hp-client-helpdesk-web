@@ -81,7 +81,7 @@ class PartnerCompanyForm extends Component {
 
     this.validationSchema = yupObject().shape({
       affiliation: yupBoolean().required(),
-      bankAccount: yupString().trim().required(),
+      bankAccount: yupString().trim(),
       businessType: yupNumber().required(),
       commission: yupNumber().min(0).max(100).required(),
       contactPerson: yupObject().shape({
@@ -90,7 +90,7 @@ class PartnerCompanyForm extends Component {
         phone: yupString().trim().required(),
       }),
       email: yupString().email().trim().required(),
-      invoiceEmail: yupString().email().trim().required(),
+      invoiceEmail: yupString().email().trim(),
       krs: yupString().when('businessType', {
         is: businessType => businessType > 3,
         then: yupString().required(),
@@ -107,7 +107,7 @@ class PartnerCompanyForm extends Component {
         is: businessType => businessType > 1,
         then: yupString().required(),
       }),
-      servicesDescription: yupString().required(),
+      servicesDescription: yupString(),
       socialNumber: yupString().when('businessType', {
         is: businessType => businessType === 1,
         then: yupString().required(),
@@ -299,13 +299,13 @@ class PartnerCompanyForm extends Component {
             <Grid container spacing={16}>
               <GridItem>
                 <Typography variant="h6">Dane partnera</Typography>
-                {values.id
+                {/*{values.id
                   && (
                     <Typography color="error">
                       {`UWAGA: Modyfikujesz dane w systemie ${brandName}. Upewnij się, że partner zaktualizuje je w Przelewach24.`}
                     </Typography>
                   )
-                }
+                }*/}
               </GridItem>
               <GridItem>
                 <Field disabled={disabled} name="name" label="Nazwa" required component={TextField} {...commonProps} />
@@ -418,13 +418,13 @@ class PartnerCompanyForm extends Component {
               <GridItem className={classes.section}>
                 <Typography variant="h6">Płatności</Typography>
               </GridItem>
-              <GridItem md={4} sm={4}>
+             {/* <GridItem md={4} sm={4}>
                 <Field disabled={disabled} name="bankAccount" label="Konto bankowe" helperText="Format: tylko cyfry, bez spacji" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
                 <Field disabled={disabled} name="invoiceEmail" type="email" label="E-mail do faktur" required component={TextField} {...commonProps} />
               </GridItem>
-              <GridItem md={4} sm={4} />
+              <GridItem md={4} sm={4} />*/}
               <GridItem md={4} sm={4}>
                 <Field disabled={disabled} name="commission" type="number" label="Prowizja (%)" required component={TextField} {...commonProps} />
               </GridItem>
@@ -437,12 +437,12 @@ class PartnerCompanyForm extends Component {
                 />
               </GridItem>
               <GridItem md={4} sm={4} />
-              <GridItem className={classes.section}>
+              {/*<GridItem className={classes.section}>
                 <Typography variant="h6">Przelewy24</Typography>
               </GridItem>
               <GridItem>
                 <Field disabled={disabled} name="servicesDescription" label="Opis usługi partnera" required component={TextField} {...commonProps} />
-              </GridItem>
+              </GridItem> */}
             </Grid>
             {(!hideButtons || (!hideErrors && errorMessage))
               && (

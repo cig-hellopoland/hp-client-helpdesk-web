@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -25,84 +25,112 @@ const styles = theme => ({
   },
 });
 
-const PromotionDialog = ({
-  classes, error, onClose, onSubmit, open, sightEvents,
-}) => {
-  const [promotedSightEvent, setPromotedSightEvent] = useState({ id: '', value: '' });
-  const { id, value } = promotedSightEvent;
-  const handleClose = () => {
-    setPromotedSightEvent({ id: '', value: '' });
+class PromotionDialog extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      id: '',
+      value: '',
+    };
+  }
+
+  handleClose = () => {
+    const { onClose } = this.props;
+
+    this.setState({ id: '', value: '' });
     onClose();
   };
-  const handleSubmit = () => {
+
+  handleSubmit = () => {
+    const { onSubmit } = this.props;
+    const { id, value } = this.state;
+
     onSubmit(id, value);
-    setPromotedSightEvent({ id: '', value: '' });
+    this.setState({ id: '', value: '' });
   };
-  return (
-    <Dialog
-      aria-labelledby="dialog-title"
-      aria-describedby="alert-dialog-description"
-      onClose={handleClose}
-      open={open}
-    >
-      <DialogTitle id="alert-dialog-title">Promocja oferty</DialogTitle>
-      <DialogContent className={classes.root}>
-        <DialogContentText
-          id="alert-dialog-description"
-          className={classes.dialogBodyText}
-        >
-          Wybierz ofertę, którą chcesz promować
-        </DialogContentText>
-        <Grid container justify="space-between" spacing={16}>
-          <Grid item md={6}>
-            <TextField
-              type="number"
-              label="Kolejność"
-              fullWidth
-              value={value}
-              InputLabelProps={{ shrink: true }}
-              inputProps={{ min: 1, max: 3 }}
-              onChange={event => setPromotedSightEvent({
-                ...promotedSightEvent, value: event.target.value,
-              })}
-            />
-          </Grid>
-          <Grid item md={6}>
-            <FormControl fullWidth>
-              <InputLabel htmlFor="sight-events-select" shrink>Oferta</InputLabel>
-              <Select
-                id="sight-events-select"
-                value={id}
-                onChange={event => setPromotedSightEvent({
-                  ...promotedSightEvent, id: event.target.value,
-                })}
-              >
-                {
-                  sightEvents.map(({ name, id: sightEventId }) => (
+
+  handleChangeValue = (event) => {
+    this.setState({ value: event.target.value });
+  };
+
+  handleChangeId = (event) => {
+    this.setState({ id: event.target.value });
+  };
+
+  render() {
+    const {
+      classes, error, open, sightEvents,
+    } = this.props;
+    const { id, value } = this.state;
+
+    return (
+      <Dialog
+        aria-labelledby="dialog-title"
+        aria-describedby="alert-dialog-description"
+        onClose={this.handleClose}
+        open={open}
+      >
+        <DialogTitle id="alert-dialog-title">Promocja oferty</DialogTitle>
+        <DialogContent className={classes.root}>
+          <DialogContentText
+            id="alert-dialog-description"
+            className={classes.dialogBodyText}
+          >
+            Wybierz ofertę, którą chcesz promować
+          </DialogContentText>
+          <Grid container justify="space-between" spacing={16}>
+            <Grid item md={6}>
+              <TextField
+                type="number"
+                label="Kolejność"
+                fullWidth
+                value={value}
+                InputLabelProps={{ shrink: true }}
+                inputProps={{ min: 1, max: 3 }}
+                onChange={this.handleChangeValue}
+              />
+            </Grid>
+            <Grid item md={6}>
+              <FormControl fullWidth>
+                <InputLabel htmlFor="sight-events-select" shrink>Oferta</InputLabel>
+                <Select
+                  id="sight-events-select"
+                  value={id}
+                  onChange={this.handleChangeId}
+                >
+                  {sightEvents.map(({ name, id: sightEventId }) => (
                     <MenuItem key={sightEventId} value={sightEventId}>
                       {name || ''}
                     </MenuItem>
-                  ))
-                }
-              </Select>
-            </FormControl>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        {error
-          && (
+        </DialogContent>
+        <DialogActions>
+          {error && (
             <Typography style={{ color: 'red' }}>
               Wystąpił błąd podczas zapisywania.
             </Typography>
-          )
-        }
-        <Button onClick={handleClose} color="primary">Anuluj</Button>
-        <Button onClick={handleSubmit} disabled={!id || !value} color="primary" autoFocus>Zapisz</Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
+          )}
+          <Button onClick={this.handleClose} color="primary">
+            Anuluj
+          </Button>
+          <Button
+            onClick={this.handleSubmit}
+            disabled={!id || !value}
+            color="primary"
+            autoFocus
+          >
+            Zapisz
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
+
 
 PromotionDialog.propTypes = {
   classes: PropTypes.shape({}).isRequired,

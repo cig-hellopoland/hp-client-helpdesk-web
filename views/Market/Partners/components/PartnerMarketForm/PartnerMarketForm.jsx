@@ -52,7 +52,7 @@ class PartnerMarketForm extends React.Component {
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
       published: yupBoolean(),
-      description: yupString().min(10).max(2500).required(),
+      description: yupString().max(2500),
       location: yupObject().shape({
         directions: yupString(),
       }),
@@ -184,7 +184,7 @@ class PartnerMarketForm extends React.Component {
                 </GridItem>
               </Hidden>
               <GridItem>
-                <Field name="description" label="Opis partnera" required component={TextField} {...commonProps} multiline rowsMax={20} />
+                <Field name="description" label="Opis partnera" component={TextField} {...commonProps} multiline rowsMax={20} />
               </GridItem>
               <GridItem>
                 <Typography variant="h6" className={classes.section}>Lokalizacja</Typography>

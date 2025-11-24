@@ -116,6 +116,8 @@ class SightEventForm extends React.Component {
         zipCode: location.zipCode || '',
         city: location.city || '',
         country: location.country || '',
+        latitude: location.latitude || '',
+        longitude: location.longitude || '',
       },
       mainImage,
       images,
@@ -159,6 +161,24 @@ class SightEventForm extends React.Component {
         },
       },
     };
+
+  if (payload.data && payload.data.location) {
+    const loc = payload.data.location;
+
+    if (typeof loc.latitude === 'string' && loc.latitude.trim() !== '') {
+      const fixed = loc.latitude.replace(',', '.');
+      loc.latitude = parseFloat(fixed);
+    } else if (loc.latitude === '' || loc.latitude === undefined) {
+      loc.latitude = null;
+    }
+
+    if (typeof loc.longitude === 'string' && loc.longitude.trim() !== '') {
+      const fixed = loc.longitude.replace(',', '.');
+      loc.longitude = parseFloat(fixed);
+    } else if (loc.longitude === '' || loc.longitude === undefined) {
+      loc.longitude = null;
+    }
+  }
 
     let submitAction = createItem;
 
@@ -314,6 +334,12 @@ class SightEventForm extends React.Component {
                     <GridItem md={4} sm={4}>
                       <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
                     </GridItem>
+                      <GridItem md={6} sm={6}>
+                        <Field name="location.latitude" label="Szerokość geograficzna (lat)"  component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9\\.-]*", }} {...commonProps} />
+                      </GridItem>
+                      <GridItem md={6} sm={6}>
+                        <Field name="location.longitude" label="Długość geograficzna (lon)" component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9\\.-]*", }} {...commonProps} />
+                      </GridItem>
                   </React.Fragment>
                 )
               }

@@ -19,13 +19,16 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import CategoryIcon from '@material-ui/icons/Category';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import LockIcon from '@material-ui/icons/Lock';
 import StarIcon from '@material-ui/icons/Star';
+import TextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import SearchIcon from '@material-ui/icons/Search';
+import Typography from '@material-ui/core/Typography';
 import Link from 'next/link';
 import { withRouter } from 'next/router';
 import {
@@ -40,10 +43,10 @@ import EmptyView from 'components/EmptyView';
 import SortableTableHead from '../Partners/components/ListingViewTable/SortableTableHead';
 
 const tableColumns = [
-  { id: 'icon', label: 'Ikona' },
-  { id: 'name', label: 'Nazwa kategorii' },
-  { id: 'count', label: 'Liczba ofert' },
-  { id: 'details', label: '' },
+  { id: 'icon', label: 'Ikona', sortable: true  },
+  { id: 'name', label: 'Nazwa kategorii', sortable: true  },
+  { id: 'count', label: 'Liczba ofert', sortable: true  },
+  { id: 'details', label: '', sortable: false  },
 ];
 
 const styles = theme => ({
@@ -76,6 +79,9 @@ class CategoriesList extends React.Component {
     menuItemId: null,
     snackbarOpen: false,
     snackbarMessage: '',
+    order: 'asc',
+    orderBy: 'name',
+    filterText: '',
   };
 
   componentDidMount() {
@@ -168,6 +174,26 @@ class CategoriesList extends React.Component {
     this.handleMenuClose();
   };
 
+handleRequestSort = (event, property) => {
+  this.setState((prevState) => {
+    const isSameField = prevState.orderBy === property;
+    const isAsc = prevState.order === 'asc';
+
+    return {
+      ...prevState,
+      order: isSameField && isAsc ? 'desc' : 'asc',
+      orderBy: property,
+    };
+  });
+};
+
+handleFilterChange = (event) => {
+  this.setState({
+    filterText: event.target.value,
+  });
+};
+
+
   handleMenuOpen = (event, itemId) => this.setState({
     menuAnchor: event.currentTarget,
     menuItemId: itemId,
@@ -191,8 +217,48 @@ class CategoriesList extends React.Component {
   render() {
     const {
       dialogOpen, dialogProps, isFetching, menuAnchor, snackbarMessage, snackbarOpen,
+      order, orderBy, filterText,
     } = this.state;
-    const { classes, items: sortedList } = this.props;
+    const { classes, items } = this.props;
+    const baseList = items || [];
+    const hasItems = baseList.length > 0;
+
+// filtr tekstowy
+    const query = (filterText || '').toLowerCase();
+
+    const filteredList = baseList.filter((item) => {
+      if (!query) return true;
+
+      const name = (item.label || '').toLowerCase();
+
+      return name.includes(query);
+    });
+
+    // sortowanie
+    const sortedList = [...filteredList].sort((a, b) => {
+      let aValue;
+      let bValue;
+
+      switch (orderBy) {
+        case 'icon':
+          aValue = a.iconUrl || '';
+          bValue = b.iconUrl || '';
+          break;
+        case 'count':
+          aValue = a.assignedItemsCount || 0;
+          bValue = b.assignedItemsCount || 0;
+          break;
+        case 'name':
+        default:
+          aValue = a.label || '';
+          bValue = b.label || '';
+          break;
+      }
+
+      if (aValue < bValue) return order === 'asc' ? -1 : 1;
+      if (aValue > bValue) return order === 'asc' ? 1 : -1;
+      return 0;
+    });
 
     const colorActive = 'primary';
     const colorInactive = 'disabled';
@@ -213,61 +279,76 @@ class CategoriesList extends React.Component {
                 </Grid>
               </Grid>
             </Grid>
-            {sortedList.length === 0
-              && (
-                <EmptyView
-                  image={CategoryIcon}
-                  label="Brak kategorii"
-                  loading={isFetching}
-                  message="Dodaj kategorię lub ponów zapytanie aby wyświetlić listę."
-                  onRefresh={this.handleFetchItems}
+            <Grid container justify="flex-end" className={classes.toolbar}>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  fullWidth
+                  label="Filtruj (nazwa kategorii)"
+                  value={filterText}
+                  onChange={this.handleFilterChange}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
-              )
-            }
-            {sortedList.length > 0
-              && (
-                <React.Fragment>
+              </Grid>
+            </Grid>
+
+            {!hasItems && (
+              <EmptyView
+                image={CategoryIcon}
+                label="Brak kategorii"
+                loading={isFetching}
+                message="Dodaj kategorię lub ponów zapytanie aby wyświetlić listę."
+                onRefresh={this.handleFetchItems}
+              />
+            )}
+
+            {hasItems && (
+              <React.Fragment>
+
+                {sortedList.length === 0 ? (
+                  <Grid container justify="center" style={{ padding: 16 }}>
+                    <Typography variant="subtitle1">
+                      Brak wyników dla filtra: "{filterText}"
+                    </Typography>
+                  </Grid>
+                ) : (
                   <Table aria-labelledby="items-list">
-                    <SortableTableHead columns={tableColumns} orderBy="name" onRequestSort={() => {}} />
+                    <SortableTableHead
+                      columns={tableColumns}
+                      order={order}
+                      orderBy={orderBy}
+                      onRequestSort={this.handleRequestSort}
+                    />
                     <TableBody>
-                      {
-                        sortedList.map(({
-                          assignedItemsCount, label, iconUrl, id: listItemId, restricted,
-                          recommended,
-                        }) => (
-                          <TableRow key={listItemId} hover>
-                            <TableCell className={classes.iconCell} align="center">
-                              {iconUrl
-                                ? <img src={iconUrl} height={48} width={48} alt={label} />
-                                : <ErrorOutlineIcon color="error" />
-                              }
-                            </TableCell>
-                            <TableCell>
-                              <Typography>{label}</Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography>{assignedItemsCount}</Typography>
-                            </TableCell>
-                            <TableCell align="right">
-                              <IconButton disabled>
-                                <LockIcon color={restricted ? colorActive : colorInactive} />
-                              </IconButton>
-                              <IconButton disabled>
-                                <StarIcon color={recommended ? colorActive : colorInactive} />
-                              </IconButton>
-                              <IconButton
-                                aria-owns={menuAnchor ? 'item-menu' : undefined}
-                                aria-haspopup="true"
-                                onClick={event => this.handleMenuOpen(event, listItemId)}
-                              >
-                                <MoreVertIcon />
-                              </IconButton>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      }
+                      {sortedList.map(({ assignedItemsCount, label, iconUrl, id, restricted, recommended }) => (
+                        <TableRow key={id} hover>
+                          <TableCell className={classes.iconCell} align="center">
+                            {iconUrl
+                              ? <img src={iconUrl} height={48} width={48} alt={label} />
+                              : <ErrorOutlineIcon color="error" />
+                            }
+                          </TableCell>
+
+                          <TableCell><Typography>{label}</Typography></TableCell>
+                          <TableCell><Typography>{assignedItemsCount}</Typography></TableCell>
+
+                          <TableCell align="right">
+                            <IconButton disabled><LockIcon color={restricted ? 'primary' : 'disabled'} /></IconButton>
+                            <IconButton disabled><StarIcon color={recommended ? 'primary' : 'disabled'} /></IconButton>
+                            <IconButton onClick={event => this.handleMenuOpen(event, id)}>
+                              <MoreVertIcon />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
+                )}
                   <Menu
                     id="item-menu"
                     anchorEl={menuAnchor}
@@ -313,9 +394,9 @@ class CategoriesList extends React.Component {
                     }}
                     message={snackbarMessage}
                   />
-                </React.Fragment>
-              )
-            }
+
+              </React.Fragment>
+            )}
           </Paper>
         </Grid>
       </Layout>

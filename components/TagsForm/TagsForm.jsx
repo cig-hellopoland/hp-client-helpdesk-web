@@ -52,226 +52,271 @@ const styles = theme => ({
     width: 70,
   },
 });
+class TagsForm extends React.Component {
+  constructor(props) {
+    super(props);
 
-function TagsForm({
-  tags, classes, defaultTranslation, items, managePublic, manageRestricted, onSubmit,
-  onDelete, translation,
-}) {
-  const { brandName } = (config && config.public) || {};
-  const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [dialogType, setDialogType] = React.useState(null);
-  const [selectedTagId, setSelectedTagId] = React.useState('');
+    this.state = {
+      dialogOpen: false,
+      dialogType: null,
+      selectedTagId: '',
+    };
+  }
 
-  function getItemsByRestriction(originalItems, isRestricted) {
+  getItemsByRestriction = (originalItems, isRestricted) => {
     if (Array.isArray(originalItems)) {
       return originalItems.filter(({ restricted }) => restricted === isRestricted);
     }
 
     return [];
-  }
+  };
 
-  function handleChangeSelectedTagId(event) {
-    const { value } = event.target;
+  handleDialogClose = () => {
+    this.setState({
+      dialogOpen: false,
+      dialogType: null,
+      selectedTagId: '',
+    });
+  };
 
-    setSelectedTagId(value);
-  }
+  handleDialogOpen = (type) => {
+    this.setState({
+      dialogOpen: true,
+      dialogType: type,
+    });
+  };
 
-  function handleDialogClose() {
-    setDialogOpen(false);
-    setDialogType(null);
-    setSelectedTagId('');
-  }
+  handleItemDelete = (itemId) => {
+    const { onDelete } = this.props;
 
-  function handleDialogOpen(type) {
-    setDialogOpen(true);
-    setDialogType(type);
-  }
-
-  function handleItemDelete(itemId) {
     if (itemId && onDelete) {
       onDelete(itemId);
     }
-  }
+  };
 
-  function handleItemSubmit(itemId) {
+  handleItemSubmit = (itemId) => {
+    const { onSubmit } = this.props;
+
     if (itemId && onSubmit) {
       onSubmit(itemId);
     }
 
-    handleDialogClose();
-  }
+    this.handleDialogClose();
+  };
 
-  const publicItems = getItemsByRestriction(items, false);
-  const restrictedItems = getItemsByRestriction(items, true);
-  const isDefaultTranslation = defaultTranslation === translation;
+  handleSelectChange = (event) => {
+    this.setState({
+      selectedTagId: event.target.value,
+    });
+  };
 
-  return (
-    <React.Fragment>
-      <Grid container alignItems="center" justify="space-between" className={classes.section}>
-        <Grid item>
-          <Typography variant="h6">Tagi partnera</Typography>
-        </Grid>
-        {managePublic
-          && (
+  render() {
+    const {
+      tags, classes, defaultTranslation, items, managePublic, manageRestricted, translation,
+    } = this.props;
+
+    const { dialogOpen, dialogType, selectedTagId } = this.state;
+    const { brandName } = (config && config.public) || {};
+
+    const publicItems = this.getItemsByRestriction(items, false);
+    const restrictedItems = this.getItemsByRestriction(items, true);
+    const isDefaultTranslation = defaultTranslation === translation;
+
+    return (
+      <React.Fragment>
+        {/* SEKCJA: Tagi partnera (publiczne) */}
+        <Grid container alignItems="center" justify="space-between" className={classes.section}>
+          <Grid item>
+            <Typography variant="h6">Tagi partnera</Typography>
+          </Grid>
+          {managePublic && (
             <Grid item>
               <IconButton
                 aria-label="Dodaj"
                 disabled={!isDefaultTranslation}
-                onClick={() => handleDialogOpen(DIALOG_TYPE.PUBLIC)}
+                onClick={() => this.handleDialogOpen(DIALOG_TYPE.PUBLIC)}
                 title="Dodaj"
               >
                 <AddIcon />
               </IconButton>
             </Grid>
-          )
-        }
-      </Grid>
-      {(publicItems.length === 0)
-        && (
+          )}
+        </Grid>
+
+        {publicItems.length === 0 && (
           <Grid container item direction="column" alignItems="center" justify="center">
             <Typography>Brak tagów przypisanych przez partnera.</Typography>
           </Grid>
-        )
-      }
-      {publicItems.length > 0
-        && (
+        )}
+
+        {publicItems.length > 0 && (
           <Grid container>
             <Table>
               <TableBody>
-                {publicItems.map(({ iconUrl, id: itemId, label }) => (
-                  <TableRow key={`${label}-${itemId}`} hover={managePublic}>
-                    <TableCell className={classes.thumbnail} padding="none">
-                      {iconUrl
-                        ? <img src={iconUrl} height={32} width={32} alt={label} />
-                        : <InsertDriveFileIcon />
-                      }
+                {publicItems.map(({ id, label, iconUrl }) => (
+                  <TableRow hover key={id}>
+                    <TableCell padding="none" className={classes.listItem}>
+                      <Grid container spacing={16} alignItems="center">
+                        <Grid item>
+                          {!iconUrl && <CategoryIcon className={classes.image} />}
+                          {iconUrl && (
+                            <img alt={label} src={iconUrl} className={classes.thumbnail} />
+                          )}
+                        </Grid>
+                        <Grid item>
+                          <Grid container direction="column">
+                            <Typography variant="subtitle1">
+                              {label}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Grid>
                     </TableCell>
-                    <TableCell>{label}</TableCell>
-                    <TableCell align="right" padding="none">
-                      {managePublic
-                        && (
-                          <IconButton
-                            aria-label="Usuń"
-                            disabled={!isDefaultTranslation}
-                            onClick={() => handleItemDelete(itemId)}
+                    {managePublic && (
+                      <TableCell padding="default">
+                        <Grid container alignItems="center" justify="flex-end">
+                          <Button
+                            color="secondary"
+                            variant="contained"
+                            onClick={() => this.handleItemDelete(id)}
                             title="Usuń"
                           >
-                            <DeleteIcon />
-                          </IconButton>
-                        )
-                      }
-                    </TableCell>
+                            Usuń
+                          </Button>
+                        </Grid>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </Grid>
-        )
-      }
-      <Grid container alignItems="center" justify="space-between" className={classes.section}>
-        <Grid item>
-          <Typography variant="h6">{`Tagi ${brandName || 'administratora'}`}</Typography>
-        </Grid>
-        {manageRestricted
-          && (
+        )}
+
+        {/* SEKCJA: Tagi przypisane przez administratora / brand */}
+        <Grid container alignItems="center" justify="space-between" className={classes.section}>
+          <Grid item>
+            <Typography variant="h6">
+              {`Tagi przypisane przez ${brandName || 'administratora'}`}
+            </Typography>
+          </Grid>
+          {manageRestricted && (
             <Grid item>
               <IconButton
                 aria-label="Dodaj"
                 disabled={!isDefaultTranslation}
-                onClick={() => handleDialogOpen(DIALOG_TYPE.RESTRICTED)}
+                onClick={() => this.handleDialogOpen(DIALOG_TYPE.RESTRICTED)}
                 title="Dodaj"
               >
                 <AddIcon />
               </IconButton>
             </Grid>
-          )
-        }
-      </Grid>
-      {(restrictedItems.length === 0)
-        && (
+          )}
+        </Grid>
+
+        {restrictedItems.length === 0 && (
           <Grid container item direction="column" alignItems="center" justify="center">
-            <Typography>{`Brak tagów przypisanych przez ${brandName || 'administratora'}.`}</Typography>
+            <Typography>
+              {`Brak tagów przypisanych przez ${brandName || 'administratora'}.`}
+            </Typography>
           </Grid>
-        )
-      }
-      {restrictedItems.length > 0
-        && (
+        )}
+
+        {restrictedItems.length > 0 && (
           <Grid container>
             <Table>
               <TableBody>
-                {restrictedItems.map(({ iconUrl, id: itemId, label }) => (
-                  <TableRow key={`${label}-${itemId}`} hover={manageRestricted}>
-                    <TableCell className={classes.thumbnail} padding="none">
-                      {iconUrl
-                        ? <img src={iconUrl} height={32} width={32} alt={label} />
-                        : <InsertDriveFileIcon />
-                      }
+                {restrictedItems.map(({ id, label, iconUrl }) => (
+                  <TableRow hover key={id}>
+                    <TableCell padding="none" className={classes.listItem}>
+                      <Grid container spacing={16} alignItems="center">
+                        <Grid item>
+                          {!iconUrl && <CategoryIcon className={classes.image} />}
+                          {iconUrl && (
+                            <img alt={label} src={iconUrl} className={classes.thumbnail} />
+                          )}
+                        </Grid>
+                        <Grid item>
+                          <Grid container direction="column">
+                            <Typography variant="subtitle1">
+                              {label}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Grid>
                     </TableCell>
-                    <TableCell>{label}</TableCell>
-                    <TableCell align="right" padding="none">
-                      {manageRestricted
-                        && (
-                          <IconButton
-                            aria-label="Usuń"
-                            disabled={!isDefaultTranslation}
-                            onClick={() => handleItemDelete(itemId)}
+                    {manageRestricted && (
+                      <TableCell padding="default">
+                        <Grid container alignItems="center" justify="flex-end">
+                          <Button
+                            color="secondary"
+                            variant="contained"
+                            onClick={() => this.handleItemDelete(id)}
                             title="Usuń"
                           >
-                            <DeleteIcon />
-                          </IconButton>
-                        )
-                      }
-                    </TableCell>
+                            Usuń
+                          </Button>
+                        </Grid>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </Grid>
-        )
-      }
-      <Dialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title">Dodaj kategorię</DialogTitle>
-        <DialogContent>
-          <FormControl className={classes.formControl}>
-            <InputLabel htmlFor="selected-category">Kategoria</InputLabel>
-            <Select
-              input={<Input id="selected-category" />}
-              onChange={handleChangeSelectedTagId}
-              value={selectedTagId}
-            >
-              {tags.filter(({ id: categoryId, restricted }) => {
-                const isExistingCategory = items.some(item => item.id === categoryId);
+        )}
 
-                switch (dialogType) {
-                  case DIALOG_TYPE.RESTRICTED:
-                    return !isExistingCategory && restricted;
-                  case DIALOG_TYPE.PUBLIC:
-                    return !isExistingCategory && !restricted;
-                  default:
-                    return !isExistingCategory;
-                }
-              }).map(({ id: categoryId, label }) => (
-                <MenuItem key={categoryId} value={categoryId}>{label}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            Anuluj
-          </Button>
-          <Button onClick={() => handleItemSubmit(selectedTagId)} color="primary">
-            Dodaj
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </React.Fragment>
-  );
+        {/* DIALOG dodawania tagu */}
+        <Dialog open={dialogOpen} onClose={this.handleDialogClose}>
+          <DialogTitle>
+            {dialogType === DIALOG_TYPE.COMBINED && 'Dodaj / Usuń tag'}
+            {dialogType === DIALOG_TYPE.PUBLIC && 'Dodaj tag partnera'}
+            {dialogType === DIALOG_TYPE.RESTRICTED
+              && `Dodaj tag przypisany przez ${brandName || 'administratora'}`}
+          </DialogTitle>
+          <DialogContent>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="tag">Tag</InputLabel>
+              <Select
+                value={selectedTagId}
+                onChange={this.handleSelectChange}
+                input={<Input id="tag" />}
+              >
+                {tags
+                  .filter(({ id: categoryId, restricted }) => {
+                    const isExistingCategory = items.some(item => item.id === categoryId);
+
+                    switch (dialogType) {
+                      case DIALOG_TYPE.RESTRICTED:
+                        return !isExistingCategory && restricted;
+                      case DIALOG_TYPE.PUBLIC:
+                        return !isExistingCategory && !restricted;
+                      default:
+                        return !isExistingCategory;
+                    }
+                  })
+                  .map(({ id: categoryId, label }) => (
+                    <MenuItem key={categoryId} value={categoryId}>
+                      {label}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleDialogClose} color="primary">
+              Anuluj
+            </Button>
+            <Button onClick={() => this.handleItemSubmit(selectedTagId)} color="primary">
+              Dodaj
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </React.Fragment>
+    );
+  }
 }
+
 
 TagsForm.propTypes = {
   tags: PropTypes.arrayOf(PropTypes.shape({})),

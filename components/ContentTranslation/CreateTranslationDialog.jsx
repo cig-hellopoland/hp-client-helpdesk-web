@@ -1,75 +1,129 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
-import InputLabel from '@material-ui/core/InputLabel';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import { getLanguageLabel } from 'utils/translations';
 
-const CreateTranslationDialog = ({
-  onCancel, onCancelText, onClose, onCloseText, onSuccess, onSuccessText, translations, ...props
-}) => {
-  const [selected, setSelected] = React.useState(null);
+class CreateTranslationDialog extends React.Component {
+  state = {
+    selected: null,
+  };
 
-  const handleChange = (event) => {
+  handleChange = (event) => {
     const { value } = event.target;
 
-    setSelected(value);
+    this.setState({
+      selected: value,
+    });
   };
 
-  const resetState = () => setSelected(null);
-
-  const handleCancel = () => {
-    onCancel();
-    resetState();
+  resetState = () => {
+    this.setState({
+      selected: null,
+    });
   };
 
-  const handleClose = () => {
-    onClose();
-    resetState();
+  handleCancel = () => {
+    const { onCancel } = this.props;
+
+    if (onCancel) {
+      onCancel();
+    }
+
+    this.resetState();
   };
 
-  const handleSuccess = () => {
-    onSuccess(selected);
-    resetState();
+  handleClose = () => {
+    const { onClose } = this.props;
+
+    if (onClose) {
+      onClose();
+    }
+
+    this.resetState();
   };
 
-  return (
-    <Dialog {...props}>
-      <DialogTitle>
-        Dodaj tłumaczenie
-      </DialogTitle>
-      <DialogContent>
-        <FormControl fullWidth>
-          <InputLabel shrink={!!selected} htmlFor="translation-select">Wybierz język</InputLabel>
-          <Select
-            value={selected || ''}
-            onChange={handleChange}
-            inputProps={{
-              id: 'translation-select',
-            }}
-          >
-            {
-              translations.map(item => (
-                <MenuItem key={item} value={item}>{getLanguageLabel(item, { locale: 'pl-PL' })}</MenuItem>
-              ))
-            }
-          </Select>
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
-        {onClose && <Button onClick={handleClose} color="primary">{onCloseText}</Button>}
-        {onCancel && <Button onClick={handleCancel} color="primary">{onCancelText}</Button>}
-        {onSuccess && <Button onClick={handleSuccess} disabled={!selected} color="primary">{onSuccessText}</Button>}
-      </DialogActions>
-    </Dialog>
-  );
-};
+  handleSuccess = () => {
+    const { onSuccess } = this.props;
+    const { selected } = this.state;
+
+    if (onSuccess && selected) {
+      onSuccess(selected);
+      this.resetState();
+    }
+  };
+
+  render() {
+    const {
+      onCancel, // używane tylko do warunku renderowania przycisku
+      onCancelText,
+      onClose,
+      onCloseText,
+      onSuccess,
+      onSuccessText,
+      translations,
+      ...props
+    } = this.props;
+
+    const { selected } = this.state;
+
+    return (
+      <Dialog {...props}>
+        <DialogTitle>
+          Dodaj tłumaczenie
+        </DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth>
+            <InputLabel shrink={!!selected} htmlFor="translation-select">
+              Wybierz język
+            </InputLabel>
+            <Select
+              value={selected || ''}
+              onChange={this.handleChange}
+              inputProps={{
+                id: 'translation-select',
+              }}
+            >
+              {translations.map(item => (
+                <MenuItem key={item} value={item}>
+                  {getLanguageLabel(item, { locale: 'pl-PL' })}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          {onClose && (
+            <Button onClick={this.handleClose} color="primary">
+              {onCloseText}
+            </Button>
+          )}
+          {onCancel && (
+            <Button onClick={this.handleCancel} color="primary">
+              {onCancelText}
+            </Button>
+          )}
+          {onSuccess && (
+            <Button
+              onClick={this.handleSuccess}
+              disabled={!selected}
+              color="primary"
+            >
+              {onSuccessText}
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
 
 CreateTranslationDialog.propTypes = {
   onCancel: PropTypes.func,

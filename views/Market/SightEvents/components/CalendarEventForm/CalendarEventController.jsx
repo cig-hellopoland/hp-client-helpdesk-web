@@ -171,7 +171,7 @@ class CalendarEventController extends React.Component {
         fieldValue = event.target.value;
       }
 
-      if (event.target.type === 'number') {
+      if (event.target.type === 'number' && fieldValue !== '') {
         fieldValue = +fieldValue;
       }
     }
@@ -183,11 +183,12 @@ class CalendarEventController extends React.Component {
     const { formData } = this.state;
     const key = this.getKeyFromEvent(...args);
     const value = this.getValueFromEvent(...args);
+    const parsedValue = value !== '' ? Number(value) : value;
 
     this.handleChange({
       formData: {
         ...formData,
-        [key]: value > 0 ? value : -1,
+        [key]: Number.isInteger(parsedValue) && parsedValue >= 0 ? parsedValue : -1,
       },
     });
   };

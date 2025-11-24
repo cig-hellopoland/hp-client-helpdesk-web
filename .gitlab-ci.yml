@@ -1,158 +1,233 @@
+#
+# CI/CD for web applications
+# Revision: 2
+# See README.md for detailed description.
+#
+
 stages:
-  - install
-  - test
+  - prepare
+  - unit tests
   - build
   - docker
   - deploy
+  - cleanup
 
 variables:
-  NODE_VERSION: "10"
   ARTIFACT_PREFIX: "${CI_PROJECT_NAME}_${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_ID}"
-  FRM_DOCKER_IMAGE: "${FRM_DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_REF_SLUG}"
+  CICD_DEST_DIR: "${CICD_DIST_DIR}"
+  CICD_DOCKER_PORT: "127.0.0.1:3000"
+  CICD_DOCKER_RESTART_POLICY: "unless-stopped"
+  CICD_DOCKER_VOLUME: ""
+  CICD_NODE_VERSION: "10"
+  CICD_DOCKER_WORKDIR_NODE: "/home/node/app"
+  DOCKER_CONTAINER_NAME: '${CI_PROJECT_PATH_SLUG}'
+  DOCKER_IMAGE: "${CICD_REGISTRY_DOCKER}${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_REF_SLUG}"
+  DOCKER_IMAGE_RELEASE: "${CICD_REGISTRY_DOCKER}${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_REF_SLUG}-release"
+  DOCKER_IMAGE_SNAPSHOT: "${CICD_REGISTRY_DOCKER}${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_REF_SLUG}-snapshot"
+  PCRE_NODE_ENGINE: '.*\"node\":\s\"(.*)\".*' # matches line with node version in the "engine" section of package.json
+  PCRE_SEMVER: '(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?'
 
 before_script:
-  - . envcfg
+  - DOCKER_CONTAINER_NAME="${DOCKER_CONTAINER_NAME//-/_}" # replace dash with underscore for easier selection in the console
 
 #
-# install stage tasks
+# prepare stage jobs
 #
-node_modules:
-  stage: install
+snapshot image:
+  stage: prepare
   only:
     - merge_requests
+    - tags
     - web
   tags:
-    - node
-  artifacts:
-    name: "${ARTIFACT_PREFIX}-node_modules"
-    expire_in: 30 mins
-    paths:
-      - node_modules
+    - shell-executor
   script:
-    - npm install
+    - NODE_VERSION="$(grep -P ${PCRE_NODE_ENGINE} package.json | grep -P -o ${PCRE_SEMVER})" || true # "grep -P" not supported on macOS so falling back to CICD_NODE_VERSION
+    - NODE_IMAGE_VERSION="${NODE_VERSION:-$CICD_NODE_VERSION}-alpine"
+    - CICD_NPMRC="${CICD_NPMRC:-$HOME/.npmrc}"
+    - DOCKER_IMAGE_SNAPSHOT_REF="$(docker images ${DOCKER_IMAGE_SNAPSHOT} --format "{{.ID}}")" # references previously built image
+    - echo "Building snapshot image using node:${NODE_IMAGE_VERSION} with .npmrc from ${CICD_NPMRC}"
+    - DOCKER_BUILDKIT=1 docker build -t ${DOCKER_IMAGE_SNAPSHOT} -f Dockerfile.snapshot --build-arg NODE_VERSION=${NODE_IMAGE_VERSION} --secret id=npmrc,src=${CICD_NPMRC} --progress=plain .
+    - echo "Removing old image..." && [[ ${DOCKER_IMAGE_SNAPSHOT_REF} && ${DOCKER_IMAGE_SNAPSHOT_REF} != $(docker images ${DOCKER_IMAGE_SNAPSHOT} --format "{{.ID}}") ]] && docker image rm ${DOCKER_IMAGE_SNAPSHOT_REF}
+    - docker push ${DOCKER_IMAGE_SNAPSHOT}
+
+baseline_node image:
+  stage: prepare
+  only:
+    - merge_requests
+    - tags
+    - web
+  tags:
+    - shell-executor
+  variables:
+    BUILD_TYPE: "baseline_node"
+  script:
+    - NODE_VERSION="$(grep -P ${PCRE_NODE_ENGINE} package.json | grep -P -o ${PCRE_SEMVER})" || true # "grep -P" not supported on macOS so falling back to CICD_NODE_VERSION
+    - NODE_IMAGE_VERSION="${NODE_VERSION:-$CICD_NODE_VERSION}-alpine"
+    - CICD_NPMRC="${CICD_NPMRC:-$HOME/.npmrc}"
+    - DOCKER_IMAGE_RELEASE_REF="$(docker images ${DOCKER_IMAGE_RELEASE} --format "{{.ID}}")" # references previously built image
+    - echo "Building ${BUILD_TYPE} image using node:${NODE_IMAGE_VERSION} with .npmrc from ${CICD_NPMRC}"
+    - DOCKER_BUILDKIT=1 docker build -t ${DOCKER_IMAGE_RELEASE} -f Dockerfile.release --build-arg BUILD_TYPE=${BUILD_TYPE} --build-arg NODE_VERSION=${NODE_IMAGE_VERSION} --secret id=npmrc,src=${CICD_NPMRC} --progress=plain .
+    - echo "Removing old image..." && [[ ${DOCKER_IMAGE_RELEASE_REF} && ${DOCKER_IMAGE_RELEASE_REF} != $(docker images ${DOCKER_IMAGE_RELEASE} --format "{{.ID}}") ]] && docker image rm ${DOCKER_IMAGE_RELEASE_REF}
+    - docker push ${DOCKER_IMAGE_RELEASE}
+
 
 #
-# test stage tasks
+# unit tests stage jobs
 #
 audit:
-  stage: test
+  stage: unit tests
+  needs:
+    - snapshot image
   only:
     - merge_requests
+    - tags
     - web
   tags:
-    - node
+    - docker-executor
   allow_failure: true
-  dependencies:
-    - node_modules
+  image: ${DOCKER_IMAGE_SNAPSHOT}
+  variables:
+    GIT_STRATEGY: none
   script:
-    - npm run audit
+    - cd ${CICD_DOCKER_WORKDIR_NODE}
+    - npm audit
 
 linter:
-  stage: test
+  stage: unit tests
+  needs:
+    - snapshot image
   only:
     - merge_requests
+    - tags
     - web
   tags:
-    - node
-  dependencies:
-    - node_modules
+    - docker-executor
+  image: ${DOCKER_IMAGE_SNAPSHOT}
+  variables:
+    GIT_STRATEGY: none
   script:
+    - cd ${CICD_DOCKER_WORKDIR_NODE}
     - npm run lint
 
-unit_tests:
-  stage: test
-  only:
-    - merge_requests
-    - web
-  tags:
-    - node
-  dependencies:
-    - node_modules
-  script:
-    - npm run test
+#unit tests:
+#  stage: unit tests
+#  needs:
+#    - snapshot image
+#  only:
+#    - merge_requests
+#    - tags
+#    - web
+#  tags:
+#    - docker-executor
+#  image: ${DOCKER_IMAGE_SNAPSHOT}
+#  variables:
+#    GIT_STRATEGY: none
+#  script:
+#    - cd ${CICD_DOCKER_WORKDIR_NODE}
+#    - npm run test
+
 
 #
-# build stage tasks
+# build stage jobs
 #
-next_build:
+build dist:
   stage: build
+  needs:
+    - snapshot image
   only:
     - merge_requests
+    - tags
     - web
   tags:
-    - node
-  dependencies:
-    - node_modules
+    - docker-executor
+  image: ${DOCKER_IMAGE_SNAPSHOT}
   artifacts:
-    name: "${ARTIFACT_PREFIX}-next_build"
-    expire_in: 30 mins
+    name: "${ARTIFACT_PREFIX}-dist"
+    expire_in: 60 mins
     paths:
-      - .next
+      - ${CICD_DIST_DIR}
   script:
+    - BUILD_DIR="$(pwd)"
+    - cd ${CICD_DOCKER_WORKDIR_NODE}
     - NODE_ENV="production" npm run build
+    - mv ${CICD_DIST_DIR} ${BUILD_DIR}
+
+
 
 #
-# build stage tasks
+# docker stage jobs
 #
-docker_image:
+release_node image:
   stage: docker
+  needs:
+    - baseline_node image
+    - build dist
   only:
     - merge_requests
+    - tags
     - web
   tags:
-    - docker
+    - shell-executor
   dependencies:
-    - next_build
+    - build dist
+  variables:
+    BUILD_TYPE: "release_node"
   script:
-    - echo $FRM_DOCKER_IMAGE
-    - docker build -t "${FRM_DOCKER_IMAGE}" --build-arg NPM_RC="$(cat ~/.npmrc)" .
-    - docker push "${FRM_DOCKER_IMAGE}"
+#    - CICD_APP_CONFIG=$(if [ -n "${CI_COMMIT_TAG}" ]; then echo "${CICD_APP_CONFIG_PRODUCTION}"; else echo "${CICD_APP_CONFIG_TESTING}"; fi)
+    - DOCKER_IMAGE_REF="$(docker images ${DOCKER_IMAGE} --format "{{.ID}}")" # references previously built image
+#    - cp ${CICD_APP_CONFIG} ./config/config.json
+    - DOCKER_BUILDKIT=1 docker build -t ${DOCKER_IMAGE} -f Dockerfile.release --build-arg BUILD_TYPE=${BUILD_TYPE} --build-arg DIST_DIR=${CICD_DIST_DIR} --build-arg DEST_DIR=${CICD_DEST_DIR} --build-arg RELEASE_SOURCE=${DOCKER_IMAGE_RELEASE} --progress=plain .
+    - echo "Removing old image..." && [[ ${DOCKER_IMAGE_REF} && ${DOCKER_IMAGE_REF} != $(docker images ${DOCKER_IMAGE} --format "{{.ID}}") ]] && docker image rm ${DOCKER_IMAGE_REF}
+    - docker push ${DOCKER_IMAGE}
+
 
 #
-# deploy stage tasks
+##
+## deploy stage tasks
+##
+#Deploy Testing Environment:
+#  stage: deploy
+#  dependencies: []
+#  only:
+#    - /^feature\/.*$/
+#    - merge-requests
+#    - web
+#  allow_failure: false
+#  before_script:
+#    - echo "Starting feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
+#  script:
+#    - docker pull "${FRM_DOCKER_IMAGE}"
+#    - docker ps -aq --filter "name=${FRM_TESTING_CONTAINER_NAME}" | grep -q . && docker stop "${FRM_TESTING_CONTAINER_NAME}" && docker rm "${FRM_TESTING_CONTAINER_NAME}"
+#    - docker run -d -v ${FRM_TESTING_VOLUME}:/data -p ${FRM_TESTING_PORT}:3000 --restart "${FRM_TESTING_RESTART_POLICY}" --name "${FRM_TESTING_CONTAINER_NAME}" "${FRM_DOCKER_IMAGE}"
+#  tags:
+#    - qs1-server
+#  when: manual
+#  environment:
+#    name: Testing Environment
+#    url: https://${FRM_TESTING_URL}
+#    on_stop: Stop Testing Environment
 #
-Deploy Testing Environment:
-  stage: deploy
-  dependencies: []
-  only:
-    - /^feature\/.*$/
-    - merge-requests
-    - web
-  allow_failure: false
-  before_script:
-    - echo "Starting feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
-  script:
-    - docker pull "${FRM_DOCKER_IMAGE}"
-    - docker ps -aq --filter "name=${FRM_TESTING_CONTAINER_NAME}" | grep -q . && docker stop "${FRM_TESTING_CONTAINER_NAME}" && docker rm "${FRM_TESTING_CONTAINER_NAME}"
-    - docker run -d -v ${FRM_TESTING_VOLUME}:/data -p ${FRM_TESTING_PORT}:3000 --restart "${FRM_TESTING_RESTART_POLICY}" --name "${FRM_TESTING_CONTAINER_NAME}" "${FRM_DOCKER_IMAGE}"
-  tags:
-    - qs1-server
-  when: manual
-  environment:
-    name: Testing Environment
-    url: https://${FRM_TESTING_URL}
-    on_stop: Stop Testing Environment
-
-Stop Testing Environment:
-  stage: deploy
-  dependencies: []
-  allow_failure: false
-  before_script:
-    - echo "Stopping feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
-  only:
-    - /^feature\/.*$/
-    - merge-requests
-    - web
-  when: manual
-  tags:
-    - qs1-server
-  environment:
-    name: Testing Environment
-    action: stop
-  script:
-    - docker stop "${FRM_TESTING_CONTAINER_NAME}"
-    - docker rm "${FRM_TESTING_CONTAINER_NAME}"
-    - docker rmi "${FRM_DOCKER_IMAGE}"
+#Stop Testing Environment:
+#  stage: deploy
+#  dependencies: []
+#  allow_failure: false
+#  before_script:
+#    - echo "Stopping feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
+#  only:
+#    - /^feature\/.*$/
+#    - merge-requests
+#    - web
+#  when: manual
+#  tags:
+#    - qs1-server
+#  environment:
+#    name: Testing Environment
+#    action: stop
+#  script:
+#    - docker stop "${FRM_TESTING_CONTAINER_NAME}"
+#    - docker rm "${FRM_TESTING_CONTAINER_NAME}"
+#    - docker rmi "${FRM_DOCKER_IMAGE}"
 
 Deploy Hello Poland Production Environment:
   stage: deploy
@@ -164,44 +239,42 @@ Deploy Hello Poland Production Environment:
   allow_failure: false
   variables:
     GIT_STRATEGY: none
-  before_script:
-    - echo "Starting feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
   script:
-    - docker pull "${FRM_DOCKER_IMAGE}"
-    - docker ps -aq --filter "name=${FRM_PRODUCTION_CONTAINER_NAME}" | grep -q . && docker stop "${FRM_PRODUCTION_CONTAINER_NAME}" && docker rm "${FRM_PRODUCTION_CONTAINER_NAME}"
-    - docker run -d -v ${FRM_PRODUCTION_VOLUME}:/data -p ${FRM_PRODUCTION_PORT}:3000 --restart "${FRM_PRODUCTION_RESTART_POLICY}" --name "${FRM_PRODUCTION_CONTAINER_NAME}" "${FRM_DOCKER_IMAGE}"
-    - CICD_NOTIFICATION_MESSAGE="{\"payload\":{\"commitShortSHA\":\"${CI_COMMIT_SHORT_SHA}\",\"environmentName\":\"${CI_ENVIRONMENT_NAME}\",\"environmentURL\":\"${CI_ENVIRONMENT_URL}\",\"jobStartedAt\":\"${CI_JOB_STARTED_AT}\",\"notificationRecipients\":\"${CICD_NOTIFICATION_RECIPIENTS}\",\"pipelineURL\":\"${CI_PIPELINE_URL}\",\"projectName\":\"${CI_PROJECT_NAME}\",\"projectNamespace\":\"${CI_PROJECT_NAMESPACE}\",\"projectURL\":\"${CI_PROJECT_URL}\",\"userName\":\"${GITLAB_USER_NAME}\",\"userEmail\":\"${GITLAB_USER_EMAIL}\"}}"
-    - |
-      curl -s -X POST -H 'Content-type: application/json' --data "${CICD_NOTIFICATION_MESSAGE}" ${CICD_NOTIFICATION_URL}
+    - DOCKER_IMAGE_REF="$(docker images ${DOCKER_IMAGE} --format "{{.ID}}")" # references previously built image
+    - echo "Deploying ${CI_COMMIT_REF_NAME} from ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
+    - docker pull "${DOCKER_IMAGE}"
+    - echo "Removing old container..." && docker ps -aq --filter "name=${DOCKER_CONTAINER_NAME}" | grep -q . && docker stop ${DOCKER_CONTAINER_NAME} && docker container rm ${DOCKER_CONTAINER_NAME}
+#    - echo "Removing old image..." && [[ ${DOCKER_IMAGE_REF} && ${DOCKER_IMAGE_REF} != $(docker images ${DOCKER_IMAGE} --format "{{.ID}}") ]] && docker image rm ${DOCKER_IMAGE_REF}
+#    - docker ps -aq --filter "name=${DOCKER_CONTAINER_NAME}" | grep -q . && docker stop "${DOCKER_CONTAINER_NAME}" && docker rm "${DOCKER_CONTAINER_NAME}"
+#    - docker run -d -v ${FRM_PRODUCTION_VOLUME}:/data -p ${FRM_PRODUCTION_PORT}:3000 --restart "${FRM_PRODUCTION_RESTART_POLICY}" --name "${FRM_PRODUCTION_CONTAINER_NAME}" "${FRM_DOCKER_IMAGE}"
+    - docker run -d -v ${CICD_DOCKER_VOLUME}:/data -p ${CICD_DOCKER_PORT}:3000 --restart ${CICD_DOCKER_RESTART_POLICY} --name ${DOCKER_CONTAINER_NAME} ${DOCKER_IMAGE}
+    - echo "Deployed as ${DOCKER_CONTAINER_NAME}"
   tags:
     - hpl-prod
   when: manual
   environment:
     name: Hello Poland Production Environment
-    url: https://${FRM_PRODUCTION_URL}
+    url: https://${CICD_ENVIRONMENT_URL}
 
-Deploy Wroclaw ON Production Environment:
-  stage: deploy
-  dependencies: []
-  only:
-    - master
-    - merge-requests
-    - web
-  allow_failure: false
-  variables:
-    GIT_STRATEGY: none
-  before_script:
-    - echo "Starting feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
-  script:
-    - docker pull "${FRM_DOCKER_IMAGE}"
-    - docker ps -aq --filter "name=${FRM_WON_PRODUCTION_CONTAINER_NAME}" | grep -q . && docker stop "${FRM_WON_PRODUCTION_CONTAINER_NAME}" && docker rm "${FRM_WON_PRODUCTION_CONTAINER_NAME}"
-    - docker run -d -v ${FRM_WON_PRODUCTION_VOLUME}:/data -p ${FRM_WON_PRODUCTION_PORT}:3000 --restart "${FRM_WON_PRODUCTION_RESTART_POLICY}" --name "${FRM_WON_PRODUCTION_CONTAINER_NAME}" "${FRM_DOCKER_IMAGE}"
-    - CICD_NOTIFICATION_MESSAGE="{\"payload\":{\"commitShortSHA\":\"${CI_COMMIT_SHORT_SHA}\",\"environmentName\":\"${CI_ENVIRONMENT_NAME}\",\"environmentURL\":\"${CI_ENVIRONMENT_URL}\",\"jobStartedAt\":\"${CI_JOB_STARTED_AT}\",\"notificationRecipients\":\"${CICD_NOTIFICATION_RECIPIENTS}\",\"pipelineURL\":\"${CI_PIPELINE_URL}\",\"projectName\":\"${CI_PROJECT_NAME}\",\"projectNamespace\":\"${CI_PROJECT_NAMESPACE}\",\"projectURL\":\"${CI_PROJECT_URL}\",\"userName\":\"${GITLAB_USER_NAME}\",\"userEmail\":\"${GITLAB_USER_EMAIL}\"}}"
-    - |
-      curl -s -X POST -H 'Content-type: application/json' --data "${CICD_NOTIFICATION_MESSAGE}" ${CICD_NOTIFICATION_URL}
-  tags:
-    - hpl-prod
-  when: manual
-  environment:
-    name: Wroclaw ON Production Environment
-    url: https://${FRM_WON_PRODUCTION_URL}
+#Deploy Wroclaw ON Production Environment:
+#  stage: deploy
+#  dependencies: []
+#  only:
+#    - master
+#    - merge-requests
+#    - web
+#  allow_failure: false
+#  variables:
+#    GIT_STRATEGY: none
+#  before_script:
+#    - echo "Starting feature ${CI_COMMIT_REF_NAME} of ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
+#  script:
+#    - docker pull "${FRM_DOCKER_IMAGE}"
+#    - docker ps -aq --filter "name=${FRM_WON_PRODUCTION_CONTAINER_NAME}" | grep -q . && docker stop "${FRM_WON_PRODUCTION_CONTAINER_NAME}" && docker rm "${FRM_WON_PRODUCTION_CONTAINER_NAME}"
+#    - docker run -d -v ${FRM_WON_PRODUCTION_VOLUME}:/data -p ${FRM_WON_PRODUCTION_PORT}:3000 --restart "${FRM_WON_PRODUCTION_RESTART_POLICY}" --name "${FRM_WON_PRODUCTION_CONTAINER_NAME}" "${FRM_DOCKER_IMAGE}"
+#  tags:
+#    - hpl-prod
+#  when: manual
+#  environment:
+#    name: Wroclaw ON Production Environment
+#    url: https://${FRM_WON_PRODUCTION_URL}

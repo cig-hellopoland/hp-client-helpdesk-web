@@ -1,0 +1,21 @@
+#
+# SNAPSHOT IMAGE
+# Securely installs npm dependencies and creates cached layers for in-between builds.
+#
+ARG NODE_VERSION="14-alpine"
+FROM node:${NODE_VERSION}
+
+ENV NODE_ENV="development"
+
+WORKDIR /home/node/app/
+
+COPY .npmrc ./
+COPY .gitignore ./
+COPY package*.json ./
+
+RUN --mount=type=secret,id=npmrc,target=/root/.npmrc \
+  echo "Installing dependencies for ${NODE_ENV} environment..." && \
+  npm install
+
+COPY ./ ./
+

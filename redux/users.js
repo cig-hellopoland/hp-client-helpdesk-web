@@ -60,11 +60,30 @@ const CHANGE_PASSWORD_SUCCESS = `${prefix}CHANGE_PASSWORD_SUCCESS`;
  */
 const CLEAR_ERROR = `${prefix}CLEAR_ERROR`;
 
+/**
+ * Type used for handling resetting partner's main user email.
+ * @type {string}
+ */
+const RESET_EMAIL = `${prefix}RESET_EMAIL`;
+
+/**
+ * Type used for handling resetting partner's main user email failure.
+ * @type {string}
+ */
+const RESET_EMAIL_FAILURE = `${prefix}RESET_EMAIL_FAILURE`;
+
+/**
+ * Type used for handling resetting partner's main user email success.
+ * @type {string}
+ */
+const RESET_EMAIL_SUCCESS = `${prefix}RESET_EMAIL_SUCCESS`;
+
 export const types = {
   CHANGE_PASSWORD,
   CHANGE_PASSWORD_FAILURE,
   CHANGE_PASSWORD_SUCCESS,
   CLEAR_ERROR,
+  RESET_EMAIL,
 };
 
 
@@ -135,11 +154,58 @@ const changePasswordSuccess = data => ({
  */
 const clearErrors = () => ({ type: CLEAR_ERROR });
 
+/**
+ * Creates action for partner's default user email reset.
+ * @method
+ * @return {{type: string, data: *}}
+ */
+const resetEmail = ({
+  id, data, options, onFailure, onSuccess,
+} = {}) => ({
+  type: RESET_EMAIL,
+  payload: {
+    url: `/partners/${id}/reset`,
+    method: 'patch',
+    ...options,
+    data,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for partner's default user email reset failure.
+ * @method
+ * @param {Object[]} errors - list of errors returned from response
+ * @return {{
+ *   type: string,
+ *   errors: [{details: string, status: string}]
+ * }}
+ */
+const resetEmailFailure = ({ data = defaultInitialState.errors } = {}) => ({
+  type: RESET_EMAIL_FAILURE,
+  errors: data,
+});
+
+/**
+ * Creates action for partner's default user email reset success.
+ * @method
+ * @param {Object} data - response body
+ * @return {{type: string, data: *}}
+ */
+const resetEmailSuccess = data => ({
+  type: RESET_EMAIL_SUCCESS,
+  data,
+});
+
 export const actions = {
   changePassword,
   changePasswordFailure,
   changePasswordSuccess,
   clearErrors,
+  resetEmail,
+  resetEmailFailure,
+  resetEmailSuccess,
 };
 
 
@@ -215,8 +281,47 @@ const changePasswordLogic = createLogic({
   },
 });
 
+const resetEmailLogic = createLogic({
+  type: [
+    RESET_EMAIL,
+  ],
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(resetEmailSuccess(data));
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(resetEmailFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(resetEmailFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
+  },
+});
+
 export const logic = {
   changePasswordLogic,
+  resetEmailLogic,
 };
 
 /*
@@ -232,12 +337,14 @@ export const logic = {
 const reducer = (initialState = defaultInitialState) => (state = initialState, action) => {
   switch (action.type) {
     case CHANGE_PASSWORD_FAILURE:
+    case RESET_EMAIL_FAILURE:
       return {
         ...state,
         errors: action.errors,
       };
     case CHANGE_PASSWORD_SUCCESS:
     case CLEAR_ERROR:
+    case RESET_EMAIL_SUCCESS:
       return {
         ...state,
         errors: initialState.errors,

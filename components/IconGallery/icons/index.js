@@ -3,7 +3,6 @@ import ALERT from './alert';
 import AV from './av';
 import COMMUNICATION from './communication';
 import CONTENT from './content';
-import CUSTOM from './custom';
 import DEVICE from './device';
 import EDITOR from './editor';
 import FILE from './file';
@@ -22,7 +21,6 @@ export default {
   AV,
   COMMUNICATION,
   CONTENT,
-  CUSTOM,
   DEVICE,
   EDITOR,
   FILE,

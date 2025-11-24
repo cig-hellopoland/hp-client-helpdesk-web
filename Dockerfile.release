@@ -1,0 +1,44 @@
+#
+# BASE NODE IMAGE
+# Securely installs npm dependencies and creates cached layers for in-between builds.
+#
+ARG BUILD_TYPE="baseline_node"
+ARG NODE_VERSION="14-alpine"
+ARG RELEASE_SOURCE="baseline_node"
+
+FROM node:${NODE_VERSION} AS baseline_node
+
+ENV NODE_ENV="production"
+
+WORKDIR /home/node/app/
+
+COPY .npmrc ./
+COPY package*.json ./
+
+RUN --mount=type=secret,id=npmrc,target=/root/.npmrc \
+  echo "Installing dependencies for ${NODE_ENV} environment..." && \
+  npm install
+
+COPY ./ ./
+
+#
+# NODE RELEASE IMAGE
+#
+FROM ${RELEASE_SOURCE} AS release_node
+WORKDIR /home/node/app
+
+ENV CONFIG_PATH="/data/etc/config.json"
+ARG DIST_DIR=""
+ARG DEST_DIR=""
+
+#COPY ./config/config.json ${CONFIG_PATH}
+COPY ${DIST_DIR} ./${DEST_DIR}
+
+EXPOSE 3000
+CMD node ./server/server.js
+
+#
+# PARAMETRIZED IMAGE
+#
+FROM ${BUILD_TYPE}
+

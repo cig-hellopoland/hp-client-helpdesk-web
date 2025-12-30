@@ -118,6 +118,9 @@ class SightEventForm extends React.Component {
         country: location.country || '',
         latitude: location.latitude || '',
         longitude: location.longitude || '',
+        commune: location.commune || '',
+        county: location.county || '',
+        voivodeship: location.voivodeship || '',
       },
       mainImage,
       images,
@@ -334,6 +337,16 @@ class SightEventForm extends React.Component {
                     <GridItem md={4} sm={4}>
                       <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
                     </GridItem>
+                    <GridItem md={4} sm={4}>
+                      <Field name="location.voivodeship" label="Województwo" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={4} sm={4}>
+                      <Field name="location.county" label="Powiat" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={4} sm={4}>
+                      <Field name="location.commune" label="Gmina" component={TextField} {...commonProps} />
+                    </GridItem>
+
                       <GridItem md={6} sm={6}>
                         <Field name="location.latitude" label="Szerokość geograficzna (lat)"  component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9\\.-]*", }} {...commonProps} />
                       </GridItem>

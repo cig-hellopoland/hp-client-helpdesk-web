@@ -28,6 +28,9 @@ import {
 } from '@hello-poland/commons/redux/sights';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormGroup from '@material-ui/core/FormGroup';
+
 
 const i18n = {
   days: {
@@ -164,6 +167,13 @@ class SightForm extends React.Component {
       description: details.description || '',
       email: details.email || '',
       phone: details.phone || '',
+      animalsAllowed: details.animalsAllowed || false,
+      carParkAvailable: details.carParkAvailable || false,
+      foodAndDrinkAvailable: details.foodAndDrinkAvailable || false,
+
+      disabledAccessHearing: details.disabledAccessHearing || false,
+      disabledAccessMovement: details.disabledAccessMovement || false,
+      disabledAccessVision: details.disabledAccessVision || false,
       openingHours: this.getInitialOpeningHours(openingHours),
       location: {
         street: location.street || '',
@@ -172,6 +182,9 @@ class SightForm extends React.Component {
         country: location.country || 'Polska',
         latitude: location.latitude || '',
         longitude: location.longitude || '',
+        commune: location.commune || '',
+        county: location.county || '',
+        voivodeship: location.voivodeship || '',
       },
       mainImage,
       images,
@@ -462,6 +475,45 @@ class SightForm extends React.Component {
                   </React.Fragment>
                 )
               }
+              {isDefaultTranslation && (
+                <React.Fragment>
+                  <GridItem>
+                    <Typography variant="h6" className={classes.section}>
+                      Udogodnienia i dostępność
+                    </Typography>
+                </GridItem>
+
+                <GridItem>
+                  <FormGroup row>
+                    <Field name="animalsAllowed" render={p => (
+                      <FormControlLabel control={<Checkbox {...fieldToSwitch(p)} />} label="Zwierzęta dozwolone" />
+                    )}/>
+                    <Field name="carParkAvailable" render={p => (
+                      <FormControlLabel control={<Checkbox {...fieldToSwitch(p)} />} label="Parking" />
+                    )}/>
+                    <Field name="foodAndDrinkAvailable" render={p => (
+                      <FormControlLabel control={<Checkbox {...fieldToSwitch(p)} />} label="Jedzenie i napoje" />
+                    )}/>
+                  </FormGroup>
+                </GridItem>
+
+                <GridItem>
+                  <FormGroup row>
+                    <Field name="disabledAccessMovement" render={p => (
+                      <FormControlLabel control={<Checkbox {...fieldToSwitch(p)} />} label="Dostępność ruchowa" />
+                    )}/>
+                    <Field name="disabledAccessVision" render={p => (
+                      <FormControlLabel control={<Checkbox {...fieldToSwitch(p)} />} label="Dostępność wzrokowa" />
+                    )}/>
+                    <Field name="disabledAccessHearing" render={p => (
+                      <FormControlLabel control={<Checkbox {...fieldToSwitch(p)} />} label="Dostępność słuchowa" />
+                    )}/>
+                  </FormGroup>
+                </GridItem>
+              </React.Fragment>
+              )}
+
+
               {isDefaultTranslation
                 && (
                   <React.Fragment>
@@ -479,6 +531,15 @@ class SightForm extends React.Component {
                     </GridItem>
                     <GridItem md={4} sm={4}>
                       <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={4} sm={4}>
+                      <Field name="location.voivodeship"  label="Województwo" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={4} sm={4}>
+                      <Field name="location.county" label="Powiat" component={TextField} {...commonProps} />
+                    </GridItem>
+                    <GridItem md={4} sm={4}>
+                      <Field name="location.commune" label="Gmina" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem md={6} sm={6}>
                       <Field name="location.latitude" label="Szerokość geograficzna (lat)" component={TextField} type="text" inputProps={{ inputMode: "decimal",  pattern: "[0-9\\.-]*", }} {...commonProps} />

@@ -43,6 +43,8 @@ const businesTypes = [
   { label: 'Spółka z ograniczoną odpowiedzialnością', value: 8 },
   { label: 'Stowarzyszenie, fundacja, organizacja pożytku publicznego', value: 9 },
   { label: 'Spółdzielnia', value: 10 },
+  { label: 'Instytucja Kultury', value: 11 },
+  { label: 'Jednostka Samorządu Terytorialnego', value: 12 },
 ];
 
 // TODO: remove this function and change Switch implementation after it's fixed.
@@ -92,8 +94,9 @@ class PartnerCompanyForm extends Component {
       email: yupString().email().trim().required(),
       invoiceEmail: yupString().email().trim(),
       krs: yupString().when('businessType', {
-        is: businessType => businessType > 3,
-        then: yupString().required(),
+      is: businessType => Number(businessType) > 3 && Number(businessType) !== 11 && Number(businessType) !== 12,
+      then: yupString().required(),
+      otherwise: yupString().nullable(true),
       }),
       location: yupObject().shape({
         city: yupString().required(),
@@ -155,6 +158,9 @@ class PartnerCompanyForm extends Component {
         country: location.country || 'PL',
         street: location.street || '',
         zipCode: location.zipCode || '',
+        commune: location.commune || '',
+        county: location.county || '',
+        voivodeship: location.voivodeship || '',
       },
       name: details.name || '',
       phone: details.phone || '',
@@ -181,7 +187,7 @@ class PartnerCompanyForm extends Component {
       parsedValues.taxNumber = taxNumber;
     }
 
-    if (values.businessType > 3) {
+    if (values.businessType > 3 && values.businessType !== 11 && values.businessType !== 12) {
       parsedValues.krs = krs;
     }
 
@@ -191,10 +197,13 @@ class PartnerCompanyForm extends Component {
   handleBusinessTypeChange = actions => (event) => {
     const { setFieldValue } = actions;
     const { name, value } = event.target;
+    const numValue = Number(value);
 
-    setFieldValue(name, value);
+    //setFieldValue(name, value);
+    setFieldValue(name, numValue);
 
-    if (value === 1) {
+    //if (value === 1) {
+    if (numValue === 1) {
       setFieldValue('taxNumber', '');
       setFieldValue('regon', '');
       setFieldValue('krs', '');
@@ -202,7 +211,12 @@ class PartnerCompanyForm extends Component {
       setFieldValue('socialNumber', '');
     }
 
-    if (value > 1 && value < 4) {
+    //if (value > 1 && value < 4) {
+    if (numValue > 1 && numValue < 4) {
+      setFieldValue('krs', '');
+    }
+
+    if (numValue === 11 || numValue === 12) {
       setFieldValue('krs', '');
     }
   };
@@ -211,11 +225,23 @@ class PartnerCompanyForm extends Component {
 
   handleSubmit = (values, actions) => {
     const { initialValues, language, onSubmit } = this.props;
-    const parsedValues = this.getParsedValues(values);
+
+    // businessType może być liczbą albo obiektem {label, value}
+    const bt =
+      values.businessType && values.businessType.value != null
+        ? values.businessType.value
+        : values.businessType;
+
+    const parsedValues = this.getParsedValues({
+      ...values,
+      businessType: Number(bt),
+    });
+
+    // dla pewności po parserze jeszcze raz twardo ustawiamy liczbę
+    parsedValues.businessType = Number(bt);
 
     if (onSubmit) {
       onSubmit(parsedValues, actions);
-
       return;
     }
 
@@ -248,6 +274,7 @@ class PartnerCompanyForm extends Component {
 
     submitAction(payload);
   };
+
 
   handleSubmitFailure = actions => () => {
     const { onSubmitFailure } = this.props;
@@ -349,6 +376,16 @@ class PartnerCompanyForm extends Component {
                 </FormControl>
               </GridItem>
               <GridItem md={4} sm={4}>
+                <Field  name="location.voivodeship" label="Województwo" component={TextField} {...commonProps} />
+              </GridItem>
+              <GridItem md={4} sm={4}>
+                <Field name="location.county" label="Powiat" component={TextField} {...commonProps} />
+              </GridItem>
+              <GridItem md={4} sm={4}>
+                <Field name="location.commune" label="Gmina" component={TextField} {...commonProps}/>
+              </GridItem>
+
+              <GridItem md={4} sm={4}>
                 <Field disabled={disabled} name="phone" type="tel" label="Telefon" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
@@ -389,13 +426,12 @@ class PartnerCompanyForm extends Component {
                   </Fragment>
                 )
               }
-              {values.businessType && values.businessType > 3
+              {values.businessType && values.businessType > 3 && values.businessType !== 11 && values.businessType !== 12
                 && (
                   <GridItem md={3} sm={3}>
                     <Field disabled={disabled} name="krs" label="KRS" required component={TextField} {...commonProps} />
                   </GridItem>
-                )
-              }
+                )}
               {values.businessType && values.businessType === 1
                 && (
                   <GridItem md={3} sm={3}>

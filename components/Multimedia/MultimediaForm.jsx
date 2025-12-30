@@ -185,8 +185,9 @@ class MultimediaForm extends React.Component {
       };
     } else {
       const newPdfAttachment = data.files[0];
+      const displayName = newPdfAttachment.originalName || newPdfAttachment.name;
       multimedia = {
-        pdfAttachment: { ...newPdfAttachment },
+        pdfAttachment: { ...newPdfAttachment, name: displayName },
         mainImage: { ...mainImage },
         images: [...images],
       };
@@ -218,6 +219,7 @@ class MultimediaForm extends React.Component {
       translation, createFile,
     } = this.props;
     const isDefaultTranslation = defaultTranslation === translation;
+    const attachmentItems = AttachmentProps && AttachmentProps.item  ? [{ ...AttachmentProps.item,name: AttachmentProps.item.originalName || AttachmentProps.item.name,}] : [];
 
     return (
       <React.Fragment>
@@ -272,32 +274,34 @@ class MultimediaForm extends React.Component {
             />
           </div>
         )}
-        {AttachmentProps && (
-          <div className={classes.section}>
-            <Grid container alignItems="center" justify="space-between">
-              <Grid item>
-                <Typography variant="h6">Pliki</Typography>
-              </Grid>
-              {createFile && (
-                <Grid item>
-                  <IconButton
-                    aria-label="Dodaj"
-                    disabled={!isDefaultTranslation}
-                    onClick={() => this.handleUploadModalOpen(itemId, UPLOAD_TYPE.ATTACHMENT)}
-                    title="Dodaj"
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </Grid>
-              )}
+      {AttachmentProps && (
+        <div className={classes.section}>
+          <Grid container alignItems="center" justify="space-between">
+            <Grid item>
+              <Typography variant="h6">Pliki</Typography>
             </Grid>
-            <MultimediaSection
-              items={AttachmentProps.item ? [AttachmentProps.item] : []}
-              sectionType={UPLOAD_TYPE.ATTACHMENT}
-              onDelete={this.handleDelete}
-            />
-          </div>
-        )}
+            {createFile && (
+              <Grid item>
+                <IconButton
+                  aria-label="Dodaj"
+                  disabled={!isDefaultTranslation}
+                  onClick={() => this.handleUploadModalOpen(itemId, UPLOAD_TYPE.ATTACHMENT)}
+                  title="Dodaj"
+                >
+                  <AddIcon />
+                </IconButton>
+              </Grid>
+            )}
+          </Grid>
+
+          <MultimediaSection
+            items={attachmentItems}
+            sectionType={UPLOAD_TYPE.ATTACHMENT}
+            onDelete={this.handleDelete}
+          />
+        </div>
+      )}
+
         <MediaManager
           disableBackdropClick
           error={uploadError}

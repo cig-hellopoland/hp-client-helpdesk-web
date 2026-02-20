@@ -23,6 +23,7 @@ import CategoriesForm from 'components/CategoriesForm';
 import SightForm from './components/SightForm';
 import SightMultimediaForm from './components/SightMultimediaForm';
 import SightEvents from './components/SightEvents';
+import TagsForm from 'components/TagsForm';
 
 const styles = theme => ({
   root: {
@@ -296,6 +297,47 @@ class SightEdit extends React.Component {
     resetForm();
   };
 
+
+  getAggregatedCategoriesFromOffers = (sightEvents = []) => {
+    const activeOffers = sightEvents.filter(
+      ({ published, blocked }) => published && !blocked
+    );
+
+    const allCategories = activeOffers.flatMap(
+      ({ categories = [] }) => categories
+    );
+
+    const uniqueById = Object.values(
+      allCategories.reduce((acc, category) => {
+        acc[category.id] = category;
+        return acc;
+      }, {})
+    );
+
+    return uniqueById;
+  };
+
+  getAggregatedTagsFromOffers = (events) => {
+    if (!Array.isArray(events)) return [];
+
+    const map = new Map();
+
+    events
+      .filter(e => e && e.published && !e.blocked)
+      .forEach(e => {
+        if (Array.isArray(e.tags)) {
+          e.tags.forEach(tag => {
+            if (!map.has(tag.id)) {
+              map.set(tag.id, tag);
+            }
+          });
+        }
+      });
+
+    return Array.from(map.values());
+  };
+
+
   render() {
     const {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen,
@@ -307,7 +349,12 @@ class SightEdit extends React.Component {
     const pageTitle = 'Edycja obiektów';
     const hasLanguageActions = !!(item && item.id);
 
-    const multimedia = this.getMultimediaFromItem(item);
+    //const multimedia = this.getMultimediaFromItem(item);
+    const multimedia = item
+      ? this.getMultimediaFromItem(item)
+      : { images: [], mainImage: {} };
+
+
 
     return (
       <Layout>
@@ -345,6 +392,7 @@ class SightEdit extends React.Component {
           >
             <Tab label="Szczegóły" />
             <Tab label="Kategorie" />
+            <Tab label="Tagi" />
             <Tab label="Multimedia" />
             <Tab label="Oferty" />
             <Tab label="Komentarze" disabled />
@@ -363,10 +411,31 @@ class SightEdit extends React.Component {
           }
           {selectedTab === 1
             && (
-              <CategoriesForm items={item.categories} />
+              <CategoriesForm
+                items={this.getAggregatedCategoriesFromOffers(
+                  item && item.sightEvents ? item.sightEvents : []
+                )}
+                managePublic
+                manageRestricted
+                defaultTranslation="__readonly__"
+                translation="pl-PL"
+              />
+
+
             )
           }
-          {selectedTab === 2
+          {selectedTab === 2 && (
+            <TagsForm
+              items={this.getAggregatedTagsFromOffers(
+                item && item.sightEvents ? item.sightEvents : []
+              )}
+              managePublic={false}
+              manageRestricted={false}
+              defaultTranslation="__readonly__"
+              translation="pl-PL"
+            />
+          )}
+          {selectedTab === 3
             && (
               <SightMultimediaForm
                 ImageGalleryProps={{
@@ -386,7 +455,7 @@ class SightEdit extends React.Component {
               />
             )
           }
-          {selectedTab === 3
+          {selectedTab === 4
             && (
               <SightEvents items={item.sightEvents} />
             )

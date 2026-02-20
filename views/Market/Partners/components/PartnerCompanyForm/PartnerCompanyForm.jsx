@@ -84,8 +84,8 @@ class PartnerCompanyForm extends Component {
     this.validationSchema = yupObject().shape({
       affiliation: yupBoolean().required(),
       bankAccount: yupString().trim(),
-      businessType: yupNumber().required(),
-      commission: yupNumber().min(0).max(100).required(),
+      businessType: yupNumber().transform((v, orig) => (orig === '' || orig == null ? undefined : Number(orig))).required(),
+      commission: yupNumber().transform((v, orig) => (orig === '' || orig == null ? undefined : Number(orig))).min(0).max(100).required(),
       contactPerson: yupObject().shape({
         email: yupString().email().trim().required(),
         name: yupString().required(),
@@ -140,11 +140,17 @@ class PartnerCompanyForm extends Component {
 
     return {
       id: details.id || '',
-      affiliation: details.affiliation || true,
+      affiliation: details.affiliation == null ? true : details.affiliation,
       bankAccount: details.bankAccount || '',
       blocked: details.blocked || false,
-      businessType: details.businessType || '',
-      commission: details.commission || '0',
+      businessType:
+        details.businessType != null && details.businessType !== ''
+          ? Number(details.businessType)
+          : '',
+      commission:
+        details.commission != null && details.commission !== ''
+          ? Number(details.commission)
+          : 0,
       contactPerson: {
         email: contactPerson.email || '',
         name: contactPerson.name || '',
@@ -321,7 +327,9 @@ class PartnerCompanyForm extends Component {
         validationSchema={this.validationSchema}
         onSubmit={this.handleSubmit}
       >
-        {({ isSubmitting, values, setFieldValue } = {}) => (
+        {({ isSubmitting, values, setFieldValue, errors, isValid, submitCount } = {}) => {
+          const bt = Number(values.businessType);
+          return (
           <Form autoComplete="off" noValidate>
             <Grid container spacing={16}>
               <GridItem>
@@ -414,8 +422,7 @@ class PartnerCompanyForm extends Component {
                   </Field>
                 </FormControl>
               </GridItem>
-              {values.businessType && values.businessType !== 1
-                && (
+              {bt && bt !== 1 && (
                   <Fragment>
                     <GridItem md={3} sm={3}>
                       <Field disabled={disabled} name="taxNumber" label="NIP" helperText="Format: tylko cyfry, bez spacji" required component={TextField} {...commonProps} />
@@ -426,14 +433,12 @@ class PartnerCompanyForm extends Component {
                   </Fragment>
                 )
               }
-              {values.businessType && values.businessType > 3 && values.businessType !== 11 && values.businessType !== 12
-                && (
+              {bt && bt > 3 && bt !== 11 && bt !== 12 && (
                   <GridItem md={3} sm={3}>
                     <Field disabled={disabled} name="krs" label="KRS" required component={TextField} {...commonProps} />
                   </GridItem>
                 )}
-              {values.businessType && values.businessType === 1
-                && (
+              {bt === 1 &&  (
                   <GridItem md={3} sm={3}>
                     <Field disabled={disabled} name="socialNumber" label="PESEL" required component={TextField} {...commonProps} />
                   </GridItem>
@@ -493,7 +498,7 @@ class PartnerCompanyForm extends Component {
                   {!hideButtons
                     && (
                       <GridItem container md={3} sm={3} justify="flex-end">
-                        <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
+                        <Button variant="contained" color="primary" type="submit" disabled={isSubmitting} >
                           Zapisz
                         </Button>
                       </GridItem>
@@ -503,7 +508,8 @@ class PartnerCompanyForm extends Component {
               )
             }
           </Form>
-        )}
+        );
+       }}
       </Formik>
     );
   }

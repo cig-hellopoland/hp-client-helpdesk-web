@@ -9,6 +9,7 @@ import withAuth from 'services/auth/withAuth';
 import SalesExport from './components/SalesExport';
 import PromotedSightEvents from './components/PromotedSightEvents';
 import MailingForm from './components/MailingForm';
+import SalesReport from './components/SalesReport';
 
 const styles = {
   content: {
@@ -20,27 +21,42 @@ const styles = {
 };
 
 const Home = ({ classes }) => (
-  <Layout>
-    <Grid container className={classes.content}>
-      <Grid container item md={4} direction="column">
-        <Grid item className={classes.item}>
-          <Typography variant="h6" gutterBottom>Statystyki sprzedaży</Typography>
-          <SalesExport />
-        </Grid>
-        <Grid item className={classes.item}>
-          <Typography variant="h6" gutterBottom>Promowane oferty</Typography>
-          <PromotedSightEvents />
+<Layout>
+  <div className={classes.content}>
+    <Grid container spacing={3}>
+      <Grid item xs={12} md={4}>
+        <Grid container direction="column">
+          <Grid item className={classes.item}>
+            <Typography variant="h6" gutterBottom>
+              Statystyki sprzedaży
+            </Typography>
+            <SalesExport />
+          </Grid>
+
+          <Grid item className={classes.item}>
+            <Typography variant="h6" gutterBottom>
+              Promowane oferty
+            </Typography>
+            <PromotedSightEvents />
+          </Grid>
         </Grid>
       </Grid>
-      <Grid container item md={4} direction="column">
-        <Grid item>
-          <Typography variant="h6" gutterBottom>Wyślij email z produktami</Typography>
-          <MailingForm />
-        </Grid>
+
+      <Grid item xs={12} md={4}>
+        <Typography variant="h6" gutterBottom>
+          Wyślij email z produktami
+        </Typography>
+        <MailingForm />
       </Grid>
-      <Grid container item md={4} direction="column" />
     </Grid>
-  </Layout>
+
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
+        <SalesReport />
+      </Grid>
+    </Grid>
+  </div>
+</Layout>
 );
 
 Home.propTypes = {
@@ -48,6 +64,6 @@ Home.propTypes = {
 };
 
 export default compose(
-  withStyles(styles),
   withAuth(),
+  withStyles(styles),
 )(Home);

@@ -83,7 +83,6 @@ class CalendarEventController extends React.Component {
 
   getFormattedDate = (dateObj) => {
     const date = typeof dateObj === 'string' ? parseISO(dateObj) : dateObj;
-
     return format(date, DATE_FORMAT);
   };
 
@@ -213,7 +212,7 @@ class CalendarEventController extends React.Component {
     if (key === 'startDate') {
       dates.startDate = this.getFormattedDate(dateObj);
 
-      const entryStartDateWithOffset = subMinutes(dates.startDate, entryStartDateOffset);
+      const entryStartDateWithOffset = subMinutes(dateObj, entryStartDateOffset);
       dates.entryStartDate = this.getFormattedDate(entryStartDateWithOffset);
     } else {
       dates.endDate = this.getFormattedDate(dateObj);
@@ -236,8 +235,7 @@ class CalendarEventController extends React.Component {
     const { formData } = this.state;
     const { startDate } = formData;
     const value = this.getValueFromEvent(event);
-    const entryStartDate = this.getFormattedDate(subMinutes(startDate, value));
-
+    const entryStartDate = this.getFormattedDate(subMinutes(parseISO(startDate), value));
 
     this.handleChange({
       entryStartDateOffset: value,
@@ -300,7 +298,6 @@ class CalendarEventController extends React.Component {
 
     if (key === 'endDate') {
       const endDate = setMinutes(setHours(value, 23), 59);
-
       value = this.getFormattedDate(endDate);
     }
 
@@ -321,7 +318,9 @@ class CalendarEventController extends React.Component {
     let endDate = null;
 
     if (type === 'SINGLE') {
-      endDate = this.getFormattedDate(addMonths(setMinutes(setHours(formData.endDate, 23), 59), 3));
+      endDate = this.getFormattedDate(
+        addMonths(setMinutes(setHours(parseISO(formData.endDate), 23), 59), 3),
+      );
     }
 
     this.handleChange({
@@ -362,13 +361,18 @@ class CalendarEventController extends React.Component {
     const key = this.getKeyFromEvent(...args);
     const value = this.getValueFromEvent(...args);
 
+    const endDateObj = parseISO(endDate);
+    const entryEndDateObj = parseISO(entryEndDate);
+    const entryStartDateObj = parseISO(entryStartDate);
+    const startDateObj = parseISO(startDate);
+
     this.handleChange({
       formData: {
         ...formData,
-        endDate: this.getFormattedDate(setMinutes(setHours(endDate, 23), 59)),
-        entryEndDate: this.getFormattedDate(setMinutes(setHours(entryEndDate, 23), 59)),
-        entryStartDate: this.getFormattedDate(setMinutes(setHours(entryStartDate, 0), 0)),
-        startDate: this.getFormattedDate(setMinutes(setHours(startDate, 0), 0)),
+        endDate: this.getFormattedDate(setMinutes(setHours(endDateObj, 23), 59)),
+        entryEndDate: this.getFormattedDate(setMinutes(setHours(entryEndDateObj, 23), 59)),
+        entryStartDate: this.getFormattedDate(setMinutes(setHours(entryStartDateObj, 0), 0)),
+        startDate: this.getFormattedDate(setMinutes(setHours(startDateObj, 0), 0)),
         [key]: value,
       },
     });
@@ -382,14 +386,19 @@ class CalendarEventController extends React.Component {
       endDate, entryEndDate, entryStartDate, startDate,
     } = formData;
 
-    const year = getYear(poolDate);
-    const month = getMonth(poolDate);
-    const date = getDate(poolDate);
+    const endDateObj = parseISO(endDate);
+    const entryEndDateObj = parseISO(entryEndDate);
+    const entryStartDateObj = parseISO(entryStartDate);
+    const startDateObj = parseISO(startDate);
 
-    const eD = setDate(setMonth(setYear(endDate, year), month), date);
-    const eED = setDate(setMonth(setYear(entryEndDate, year), month), date);
-    const sD = setDate(setMonth(setYear(startDate, year), month), date);
-    const eSD = setDate(setMonth(setYear(entryStartDate, year), month), date);
+    const year = getYear(dateObj);
+    const month = getMonth(dateObj);
+    const date = getDate(dateObj);
+
+    const eD = setDate(setMonth(setYear(endDateObj, year), month), date);
+    const eED = setDate(setMonth(setYear(entryEndDateObj, year), month), date);
+    const sD = setDate(setMonth(setYear(startDateObj, year), month), date);
+    const eSD = setDate(setMonth(setYear(entryStartDateObj, year), month), date);
 
     const dates = {
       endDate: this.getFormattedDate(eD),
@@ -398,8 +407,8 @@ class CalendarEventController extends React.Component {
       startDate: this.getFormattedDate(sD),
     };
 
-    if (!isSameDay(entryStartDate, startDate)) {
-      dates.entryStartDate = this.getFormattedDate(subDays(dates.entryStartDate, 1));
+    if (!isSameDay(entryStartDateObj, startDateObj)) {
+      dates.entryStartDate = this.getFormattedDate(subDays(parseISO(dates.entryStartDate), 1));
     }
 
     this.handleChange({
@@ -424,7 +433,7 @@ class CalendarEventController extends React.Component {
       const ticketDefinition = _find(formData.ticketDefinitions, { id: ticketDefinitionId });
 
       if (!ticketDefinition) {
-        this.handleChange(({
+        this.handleChange({
           formData: {
             ...formData,
             ticketDefinitions: [
@@ -433,7 +442,7 @@ class CalendarEventController extends React.Component {
             ],
           },
           selectedTicketDefinitionId: '',
-        }));
+        });
       }
     }
   };
@@ -441,7 +450,7 @@ class CalendarEventController extends React.Component {
   handleTicketDefinitionChange = (ticketDefinition) => {
     const { formData } = this.state;
 
-    this.handleChange(({
+    this.handleChange({
       formData: {
         ...formData,
         ticketDefinitions: formData.ticketDefinitions.map((item) => {
@@ -452,7 +461,7 @@ class CalendarEventController extends React.Component {
           return item;
         }),
       },
-    }));
+    });
   };
 
   handleTicketDefinitionDelete = (ticketDefinitionId) => {
@@ -463,18 +472,17 @@ class CalendarEventController extends React.Component {
       const ticketDefinitions = formData.ticketDefinitions
         .filter(({ id }) => id !== ticketDefinitionId);
 
-      this.handleChange(({
+      this.handleChange({
         formData: {
           ...formData,
           ticketDefinitions,
         },
-      }));
+      });
     }
   };
 
   render() {
     const { children } = this.props;
-
     const { formData, ...state } = this.state;
 
     return children({

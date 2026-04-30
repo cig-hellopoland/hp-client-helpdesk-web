@@ -229,7 +229,7 @@ class CalendarEventForm extends React.Component {
   render() {
     const { alertDialog } = this.state;
     const {
-      classes, formData: initialFormData, onChange, readOnly,
+      classes, formData: initialFormData, onChange, readOnly,canEdit,
     } = this.props;
     return (
       <div>
@@ -251,7 +251,7 @@ class CalendarEventForm extends React.Component {
                   i rodzaje produktów. Dla każdej oferty możesz stworzyć kilka pul produktów.
                 </Typography>
                 <TextField
-                  disabled={readOnly}
+                  disabled={readOnly || !canEdit}
                   fullWidth
                   helperText="Nazwa puli będzie widoczna tylko w przypadku wielu pul w jednym dniu"
                   label="Nazwa puli"
@@ -263,7 +263,7 @@ class CalendarEventForm extends React.Component {
                 />
                 <TextField
                   fullWidth
-                  disabled={readOnly || this.hasTicketAvailabilityLimit(formData.ticketDefinitions)}
+                  disabled={!canEdit || readOnly || this.hasTicketAvailabilityLimit(formData.ticketDefinitions)}
                   helperText="Puste pole - brak limitu"
                   label="Limit produktów w puli"
                   margin="normal"
@@ -284,26 +284,26 @@ class CalendarEventForm extends React.Component {
                 <div className={classNames(classes.columns, classes.fullWidth)}>
                   <div className={classes.horizontal}>
                     <DateTimePicker
-                      disabled={readOnly || editMode}
+                      disabled={readOnly || !canEdit}
                       date={poolDate}
                       fullDay={formData.wholeDay}
                       hasTime={false}
                       name="poolDate"
                       onChange={handlePoolDateChange}
                       DatePickerProps={{
-                        disabled: readOnly || editMode,
-                        disablePast: !(readOnly || editMode),
+                        disabled: readOnly || !canEdit,
+                        disablePast: canEdit,
                         margin: 'dense',
                       }}
                     />
                     <CustomTimePicker
-                      disabled={readOnly || editMode}
+                      disabled={readOnly || !canEdit}
                       date={formData.startDate}
                       fullDay={formData.wholeDay}
                       name="startDate"
                       onChange={handleDateChange}
                       TimePickerProps={{
-                        disabled: readOnly || editMode,
+                        disabled: readOnly || !canEdit,
                         margin: 'dense',
                       }}
                     />
@@ -315,20 +315,20 @@ class CalendarEventForm extends React.Component {
                     )
                     }
                     <CustomTimePicker
-                      disabled={readOnly || editMode}
+                      disabled={readOnly || !canEdit}
                       date={formData.endDate}
                       fullDay={formData.wholeDay}
                       name="endDate"
                       onChange={handleDateChange}
                       TimePickerProps={{
-                        disabled: readOnly || editMode,
+                        disabled: readOnly || !canEdit,
                         margin: 'dense',
                       }}
                     />
                   </div>
                   <SwitchLabel
                     label="Cały dzień"
-                    disabled={readOnly || editMode}
+                    disabled={readOnly || !canEdit}
                     name="wholeDay"
                     onChange={handleFullDayChange}
                     value={formData.wholeDay}
@@ -340,7 +340,7 @@ class CalendarEventForm extends React.Component {
                       Powtarzaj co:
                     </Typography>
                     <TextField
-                      disabled={readOnly || editMode}
+                      disabled={readOnly || !canEdit}
                       onChange={this.handleBasicFrequencyChange(handleFrequencyDataChange)}
                       select
                       value={frequencyType}
@@ -365,7 +365,7 @@ class CalendarEventForm extends React.Component {
                         <Typography>Powtarzaj co:</Typography>
                         <TextField
                           className={classes.frequencyTextfield}
-                          disabled={readOnly || editMode}
+                          disabled={readOnly || !canEdit}
                           onChange={this.handleFrequencyPropChange(handleFrequencyDataChange)}
                           name="frequency"
                           type="number"
@@ -375,7 +375,7 @@ class CalendarEventForm extends React.Component {
                           }
                         />
                         <TextField
-                          disabled={readOnly || editMode}
+                          disabled={readOnly || !canEdit}
                           onChange={
                             this.handleFrequencyPropChange(
                               handleFrequencyDataChange,
@@ -407,7 +407,7 @@ class CalendarEventForm extends React.Component {
                               control={(
                                 <Checkbox
                                   checked={this.isChecked(formData.frequencyData.daysOfWeek, value)}
-                                  disabled={readOnly || editMode}
+                                  disabled={readOnly || !canEdit}
                                   onChange={handleFrequencyItemChange}
                                   name="daysOfWeek"
                                   value={`${value}`}
@@ -435,16 +435,16 @@ class CalendarEventForm extends React.Component {
                         <FormControlLabel
                           value="NONE"
                           control={<Radio />}
-                          disabled={readOnly || editMode}
+                          disabled={readOnly || !canEdit}
                           label="Nigdy"
                         />
                         <FormControlLabel
                           value="SINGLE"
-                          disabled={readOnly || editMode}
+                          disabled={readOnly || !canEdit}
                           control={<Radio />}
                           label={(
                             <div className={classNames(classes.frequencyRadioWrapper)}>
-                              <Typography className={classNames(readOnly || editMode
+                              <Typography className={classNames(readOnly || !canEdit
                                 ? [classes.disabled, classes.frequencyRadioLabel]
                                 : classes.frequencyRadioLabel)}
                               >
@@ -458,7 +458,7 @@ class CalendarEventForm extends React.Component {
                                   name="endDate"
                                   onChange={handleFrequencyDataFieldChange}
                                   DatePickerProps={{
-                                    disabled: readOnly || editMode,
+                                    disabled: readOnly || !canEdit,
                                     minDate: formData.endDate,
                                   }}
                                 />
@@ -577,7 +577,7 @@ class CalendarEventForm extends React.Component {
                 <div className={classNames(classes.section, classes.fullWidth)}>
                   <Typography variant="subtitle1">Sprawdzanie produktów:</Typography>
                   <TextField
-                    disabled={readOnly || editMode}
+                    disabled={readOnly || !canEdit}
                     onChange={handleEntryStartDateOffsetChange}
                     name="entryStartDateOffset"
                     select
@@ -616,12 +616,14 @@ CalendarEventForm.propTypes = {
   formData: PropTypes.shape({}),
   onChange: PropTypes.func,
   readOnly: PropTypes.bool,
+  canEdit: PropTypes.bool,
 };
 
 CalendarEventForm.defaultProps = {
   formData: null,
   onChange: null,
   readOnly: false,
+  canEdit: false,
 };
 
 export default withStyles(styles)(CalendarEventForm);

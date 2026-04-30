@@ -5,6 +5,7 @@ import DatePicker from 'material-ui-pickers/DatePicker';
 import TimePicker from 'material-ui-pickers/TimePicker';
 import getHours from 'date-fns/getHours';
 import getMinutes from 'date-fns/getMinutes';
+import parseISO from 'date-fns/parseISO';
 import setHours from 'date-fns/setHours';
 import setMinutes from 'date-fns/setMinutes';
 
@@ -34,10 +35,11 @@ class DateTimePicker extends Component {
 
     if (type === changeTypes.DATE) {
       const { date } = this.props;
+      const currentDate = typeof date === 'string' ? parseISO(date) : date;
 
       nextDateObj = new Date(dateObj);
-      nextDateObj = setMinutes(nextDateObj, getMinutes(date));
-      nextDateObj = setHours(nextDateObj, getHours(date));
+      nextDateObj = setMinutes(nextDateObj, getMinutes(currentDate));
+      nextDateObj = setHours(nextDateObj, getHours(currentDate));
     }
 
     if (onChange) {

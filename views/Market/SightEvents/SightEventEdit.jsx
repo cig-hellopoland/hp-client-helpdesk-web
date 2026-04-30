@@ -36,6 +36,7 @@ import TagsForm from 'components/TagsForm';
 import SightEventForm from './components/SightEventForm';
 import SightEventMultimediaForm from './components/SightEventMultimediaForm';
 import TicketPoolDefinitionsList from './components/TicketPoolDefinitionsList';
+import { selectors as profileSelectors } from 'redux/profile';
 
 const ITEM_DATA_TYPES = {
   CATEGORY: 'CATEGORY',
@@ -452,12 +453,14 @@ class SightEventEdit extends React.Component {
       snackbarMessage, uploadedMultimedia,
     } = this.state;
     const {
-      categoriesList, classes, item, itemId, tagsList,
+      categoriesList, classes, item, itemId, tagsList, profile,
     } = this.props;
     const { defaultLanguage, partnerId } = item || {};
 
     const pageTitle = itemId ? 'Edycja oferty' : 'Nowa oferta';
     const hasLanguageActions = !!(item && item.id);
+    const roles = (profile && profile.roles) || [];
+    const canEditTicketPools = roles.includes('ADMIN') || roles.includes('SALESMAN');
 
     const multimedia = this.getMultimediaFromItem(item);
 
@@ -573,6 +576,7 @@ class SightEventEdit extends React.Component {
                 partnerId={partnerId}
                 onTPDDelete={this.handleTPDDelete}
                 onTPDUpdate={this.handleTPDUpdate}
+                canEdit={canEditTicketPools}
               />
             )
           }
@@ -617,6 +621,7 @@ SightEventEdit.propTypes = {
   updateItemCategory: PropTypes.func.isRequired,
   updateItemTag: PropTypes.func.isRequired,
   updateTicketPoolDefinition: PropTypes.func.isRequired,
+  profile: PropTypes.shape({}),
 };
 
 SightEventEdit.defaultProps = {
@@ -624,6 +629,7 @@ SightEventEdit.defaultProps = {
   error: null,
   errorTPD: null,
   item: null,
+  profile: null,
 };
 
 const mapStateToProps = state => ({
@@ -632,6 +638,7 @@ const mapStateToProps = state => ({
   errorTPD: ticketPoolDefinitionSelectors.getError(state),
   item: sightEventsSelectors.getSightEvent(state),
   tagsList: tagsSelectors.getList(state),
+  profile: profileSelectors.getProfile(state),
 });
 
 const mapDispatchToProps = {

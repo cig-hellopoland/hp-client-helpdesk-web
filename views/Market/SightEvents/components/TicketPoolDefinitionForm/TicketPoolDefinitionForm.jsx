@@ -13,10 +13,10 @@ class TicketPoolDefinitionForm extends React.Component {
   };
 
   render() {
-    const { data, onChange } = this.props;
+    const { data, onChange, canEdit } = this.props;
 
     return (
-      <CalendarEventForm formData={data} onChange={onChange} />
+      <CalendarEventForm formData={data} onChange={onChange} canEdit={canEdit} />
     );
   }
 }
@@ -25,12 +25,14 @@ TicketPoolDefinitionForm.propTypes = {
   data: PropTypes.shape({
     id: PropTypes.number,
     sightEventId: PropTypes.number,
+    canEdit: PropTypes.bool,
   }),
   onChange: PropTypes.func.isRequired,
 };
 
 TicketPoolDefinitionForm.defaultProps = {
   data: null,
+  canEdit: false,
 };
 
 export default TicketPoolDefinitionForm;

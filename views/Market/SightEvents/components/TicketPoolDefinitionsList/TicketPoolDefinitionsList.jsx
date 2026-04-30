@@ -119,7 +119,7 @@ class TicketPoolDefinitionsList extends React.Component {
 
   render() {
     const { dialogOpen, dialogProps } = this.state;
-    const { classes, data, partnerId } = this.props;
+    const { classes, data, partnerId, canEdit  } = this.props;
 
     const poolDefinitions = data;
     return (
@@ -155,6 +155,7 @@ class TicketPoolDefinitionsList extends React.Component {
                             partnerId,
                           }}
                           onChange={this.handleTPDChange}
+                          canEdit={canEdit}
                         />
                       </Grid>
                       <Grid container item className={classes.actionButtons} justify="flex-end">
@@ -212,12 +213,14 @@ TicketPoolDefinitionsList.propTypes = {
   onTPDDelete: PropTypes.func,
   onTPDUpdate: PropTypes.func,
   partnerId: PropTypes.number.isRequired,
+  canEdit: PropTypes.bool,
 };
 
 TicketPoolDefinitionsList.defaultProps = {
   data: null,
   onTPDDelete: null,
   onTPDUpdate: null,
+  canEdit: false,
 };
 
 export default withStyles(styles)(TicketPoolDefinitionsList);

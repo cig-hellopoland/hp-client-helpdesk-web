@@ -119,6 +119,8 @@ const basicFrequencies = [
   },
 ];
 
+const NORMAL_TICKET_CODE = 'NORMALNY';
+
 const styles = theme => ({
   columns: {
     display: 'flex',
@@ -168,6 +170,14 @@ function getNormalizedDay(dateObj) {
   }
 
   return day;
+}
+
+function getTicketTypeCode(ticketDefinition) {
+  return ticketDefinition &&
+    ticketDefinition.ticketType &&
+    ticketDefinition.ticketType.code
+    ? ticketDefinition.ticketType.code
+    : null;
 }
 
 class CalendarEventForm extends React.Component {
@@ -226,6 +236,12 @@ class CalendarEventForm extends React.Component {
       Number.isInteger(availableTicketsNumber) && availableTicketsNumber >= 0
     ));
 
+  hasNormalTicket = ticketDefinitions =>
+    Array.isArray(ticketDefinitions) &&
+    ticketDefinitions.some(
+      ticketDefinition => getTicketTypeCode(ticketDefinition) === NORMAL_TICKET_CODE,
+    );
+
   render() {
     const { alertDialog } = this.state;
     const {
@@ -238,12 +254,27 @@ class CalendarEventForm extends React.Component {
             editMode, formData, entryStartDateOffset, frequencyEndDateType, frequencyType,
             selectedTicketDefinitionId, ticketDefinitionsList, poolDate, fetchTicketDefinitions,
             handleAvailableTicketsChange, handleDateChange, handleDefinitionFormClose,
-            handleFormDataChange, handleEntryStartDateOffsetChange,
+            handleDefinitionFormOpen, handleFormDataChange, handleEntryStartDateOffsetChange,
             handleFrequencyDataChange, handleFrequencyDataFieldChange,
             handleFrequencyEndDateTypeChange, handleFrequencyItemChange, handleFullDayChange,
             handlePoolDateChange, handlePropFromEventChange, handleTicketDefinitionAdd,
             handleTicketDefinitionChange, handleTicketDefinitionDelete, isDefinitionFormVisible,
-          }) => (
+          }) => {
+            const hasNormalTicket = this.hasNormalTicket(formData.ticketDefinitions);
+            const availableTicketDefinitions = (hasNormalTicket
+              ? ticketDefinitionsList
+              : (ticketDefinitionsList || []).filter(
+                ticketDefinition => getTicketTypeCode(ticketDefinition) === NORMAL_TICKET_CODE,
+              )) || [];
+            const isSelectedTicketDefinitionAvailable = availableTicketDefinitions.some(
+              ({ id }) => `${id}` === `${selectedTicketDefinitionId}`,
+            );
+            const normalizedSelectedTicketDefinitionId = isSelectedTicketDefinitionAvailable
+              ? selectedTicketDefinitionId
+              : '';
+            const canAddSelectedTicket = !!normalizedSelectedTicketDefinitionId;
+
+            return (
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <Grid container>
                 <Typography>
@@ -478,6 +509,13 @@ class CalendarEventForm extends React.Component {
                     <Typography variant="h6" gutterBottom>
                       Produkty
                     </Typography>
+                    {!hasNormalTicket
+                    && (
+                      <Typography color="error" gutterBottom>
+                        Najpierw dodaj do puli bilet typu Normalny. Potem mozna dodac pozostale typy biletow.
+                      </Typography>
+                    )
+                    }
                     {!readOnly
                     && (
                       <div className={classNames(classes.columns, classes.fullWidth)}>
@@ -488,7 +526,7 @@ class CalendarEventForm extends React.Component {
                           SelectProps={{
                             displayEmpty: true,
                           }}
-                          value={selectedTicketDefinitionId}
+                          value={normalizedSelectedTicketDefinitionId}
                         >
                           <MenuItem
                             disabled
@@ -496,32 +534,33 @@ class CalendarEventForm extends React.Component {
                           >
                             Wybierz rodzaj produktu
                           </MenuItem>
-                          {ticketDefinitionsList
-                          && ticketDefinitionsList.map(({ id, name, price }) => (
+                          {availableTicketDefinitions
+                          && availableTicketDefinitions.map(({ id, name, price, ticketType }) => (
                             <MenuItem
                               key={`${id}-${name}`}
                               value={id}
                             >
-                              {`${name} - ${formatPrice(price)}`}
+                              {`${ticketType ? ticketType.label : name} - ${name} - ${formatPrice(price)}`}
                             </MenuItem>
                           ))
                           }
                         </TextField>
                         <div>
                           <Button
-                            onClick={() => handleTicketDefinitionAdd(+selectedTicketDefinitionId)}
+                            disabled={!canAddSelectedTicket}
+                            onClick={() => handleTicketDefinitionAdd(+normalizedSelectedTicketDefinitionId)}
                             style={{ marginRight: 10 }}
                             variant="outlined"
                           >
                             Dodaj do puli
                           </Button>
-                          {/* <Button */}
-                          {/*  variant="outlined" */}
-                          {/*  color="primary" */}
-                          {/*  onClick={handleDefinitionFormOpen} */}
-                          {/* > */}
-                          {/*  Nowy produkt */}
-                          {/* </Button> */}
+                          <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={handleDefinitionFormOpen}
+                          >
+                            Nowy produkt
+                          </Button>
                         </div>
                       </div>
                     )
@@ -562,9 +601,12 @@ class CalendarEventForm extends React.Component {
                           </Grid>
                         </Grid>
                         <TicketDefinitionForm
+                          lockedTicketTypeCode={!hasNormalTicket ? NORMAL_TICKET_CODE : null}
                           onSubmitSuccess={(ticketDefinitionId) => {
-                            fetchTicketDefinitions();
-                            handleTicketDefinitionAdd(ticketDefinitionId);
+                            fetchTicketDefinitions({
+                              partnerId: formData.partnerId,
+                              onSuccess: () => handleTicketDefinitionAdd(ticketDefinitionId),
+                            });
                             handleDefinitionFormClose();
                           }}
                         />
@@ -599,7 +641,8 @@ class CalendarEventForm extends React.Component {
                 </div>
               </Grid>
             </MuiPickersUtilsProvider>
-          )}
+            );
+          }}
         </CalendarEventController>
         <AlertDialog
           onCancel={this.handleAlertDialogCancel}

@@ -9,6 +9,7 @@ import sights, { name as sightsName } from '@hello-poland/commons/redux/sights';
 import tags, { name as tagsName } from '@hello-poland/commons/redux/tags';
 import ticketDefinitions, { name as ticketDefinitionsName } from 'redux/ticketDefinitions';
 import ticketPoolDefinitions, { name as ticketPoolDefinitionsName } from '@hello-poland/commons/redux/ticketPoolDefinitions';
+import ticketTypes, { name as ticketTypesName } from 'redux/ticketTypes';
 import users, { name as usersName } from 'redux/users';
 
 export default combineReducers({
@@ -22,5 +23,6 @@ export default combineReducers({
   [tagsName]: tags(),
   [ticketDefinitionsName]: ticketDefinitions(),
   [ticketPoolDefinitionsName]: ticketPoolDefinitions(),
+  [ticketTypesName]: ticketTypes(),
   [usersName]: users(),
 });

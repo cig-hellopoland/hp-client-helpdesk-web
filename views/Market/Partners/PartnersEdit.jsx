@@ -164,6 +164,40 @@ class PartnersEdit extends React.Component {
     }
   };
 
+  handleDeleteUserFailure = () => {
+    const { clearUsersError, errorUsers } = this.props;
+    const { message } = errorUsers || {};
+
+    this.handleSnackbarOpen(message || 'Wystąpił błąd podczas usuwania użytkownika');
+
+    if (clearUsersError) {
+      clearUsersError();
+    }
+  };
+
+  handleDeleteUserSuccess = () => {
+    const { itemId } = this.props;
+    const { selectedTranslation } = this.state;
+
+    this.handleSnackbarOpen('Użytkownik został usunięty');
+
+    if (itemId) {
+      this.handleFetchItem(itemId, selectedTranslation);
+    }
+  };
+
+  handleDeleteUser = (userId) => {
+    const { deleteUser } = this.props;
+
+    if (deleteUser) {
+      deleteUser({
+        id: userId,
+        onFailure: this.handleDeleteUserFailure,
+        onSuccess: this.handleDeleteUserSuccess,
+      });
+    }
+  };
+
   handleRequestFailure = () => {
     const { clearError, error } = this.props;
 
@@ -245,7 +279,6 @@ class PartnersEdit extends React.Component {
   };
 
   handleEmailResetFailure = () => {
-    console.log('handleEmailResetFailure');
     const { clearUsersError } = this.props;
 
     this.handleSnackbarOpen('Nie udało się zmienić hasła użytkownika Partnera.');
@@ -300,7 +333,9 @@ class PartnersEdit extends React.Component {
     const {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
     } = this.state;
-    const { classes, item, itemId } = this.props;
+    const {
+      classes, item, itemId,
+    } = this.props;
     const { defaultLanguage } = item || {};
 
     const pageTitle = 'Edycja partnera';
@@ -393,9 +428,10 @@ class PartnersEdit extends React.Component {
           {selectedTab === 4
             && (
               <PartnerUsersList
-                items={item.users}
+                items={(item && item.users) || []}
                 onFetchItems={() => this.handleFetchItem(itemId, selectedTranslation)}
                 onPasswordChange={this.handlePasswordChange}
+                onDeleteItem={this.handleDeleteUser}
               />
             )
           }
@@ -423,12 +459,14 @@ PartnersEdit.propTypes = {
   clearUsersError: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
+  deleteUser: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
   errorUsers: PropTypes.shape({}),
   fetchItem: PropTypes.func.isRequired,
   item: PropTypes.shape({
     id: PropTypes.number,
     label: PropTypes.string,
+    users: PropTypes.arrayOf(PropTypes.shape({})),
   }),
   resetEmail: PropTypes.func.isRequired,
   router: PropTypes.shape({}).isRequired,
@@ -454,6 +492,7 @@ const mapDispatchToProps = {
   clearUsersError: usersActions.clearErrors,
   clearItem: partnersActions.clearItem,
   deleteTranslation: partnersActions.deleteTranslation,
+  deleteUser: usersActions.deleteUser,
   fetchItem: partnersActions.fetchItem,
   resetEmail: usersActions.resetEmail,
 };

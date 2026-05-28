@@ -17,7 +17,6 @@ export const name = 'users';
  */
 const prefix = `${name}/`;
 
-
 /**
  * Default state model.
  * @type {object}
@@ -30,7 +29,6 @@ export const defaultInitialState = {
   errors: {},
   users: [],
 };
-
 
 /*
  * TYPES
@@ -78,14 +76,32 @@ const RESET_EMAIL_FAILURE = `${prefix}RESET_EMAIL_FAILURE`;
  */
 const RESET_EMAIL_SUCCESS = `${prefix}RESET_EMAIL_SUCCESS`;
 
+/**
+ * Type used for handling user delete.
+ * @type {string}
+ */
+const DELETE_USER = `${prefix}DELETE_USER`;
+
+/**
+ * Type used for handling user delete failure.
+ * @type {string}
+ */
+const DELETE_USER_FAILURE = `${prefix}DELETE_USER_FAILURE`;
+
+/**
+ * Type used for handling user delete success.
+ * @type {string}
+ */
+const DELETE_USER_SUCCESS = `${prefix}DELETE_USER_SUCCESS`;
+
 export const types = {
   CHANGE_PASSWORD,
   CHANGE_PASSWORD_FAILURE,
   CHANGE_PASSWORD_SUCCESS,
   CLEAR_ERROR,
   RESET_EMAIL,
+  DELETE_USER,
 };
-
 
 /*
  * ACTIONS
@@ -198,6 +214,49 @@ const resetEmailSuccess = data => ({
   data,
 });
 
+/**
+ * Creates action for user delete.
+ * @method
+ * @return {{type: string, data: *}}
+ */
+const deleteUser = ({
+  id, options, onFailure, onSuccess,
+} = {}) => ({
+  type: DELETE_USER,
+  payload: {
+    url: `/users/${id}`,
+    method: 'delete',
+    ...options,
+  },
+  onFailure,
+  onSuccess,
+});
+
+/**
+ * Creates action for user delete failure.
+ * @method
+ * @param {Object[]} errors - list of errors returned from response
+ * @return {{
+ *   type: string,
+ *   errors: [{details: string, status: string}]
+ * }}
+ */
+const deleteUserFailure = ({ data = defaultInitialState.errors } = {}) => ({
+  type: DELETE_USER_FAILURE,
+  errors: data,
+});
+
+/**
+ * Creates action for user delete success.
+ * @method
+ * @param {Object} data - response body
+ * @return {{type: string, data: *}}
+ */
+const deleteUserSuccess = data => ({
+  type: DELETE_USER_SUCCESS,
+  data,
+});
+
 export const actions = {
   changePassword,
   changePasswordFailure,
@@ -206,8 +265,10 @@ export const actions = {
   resetEmail,
   resetEmailFailure,
   resetEmailSuccess,
+  deleteUser,
+  deleteUserFailure,
+  deleteUserSuccess,
 };
-
 
 /*
  * SELECTORS
@@ -233,7 +294,6 @@ export const selectors = {
   getErrors,
   getState,
 };
-
 
 /*
  * LOGIC
@@ -319,9 +379,48 @@ const resetEmailLogic = createLogic({
   },
 });
 
+const deleteUserLogic = createLogic({
+  type: [
+    DELETE_USER,
+  ],
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(deleteUserSuccess(data));
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(deleteUserFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(deleteUserFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
+  },
+});
+
 export const logic = {
   changePasswordLogic,
   resetEmailLogic,
+  deleteUserLogic,
 };
 
 /*
@@ -338,13 +437,15 @@ const reducer = (initialState = defaultInitialState) => (state = initialState, a
   switch (action.type) {
     case CHANGE_PASSWORD_FAILURE:
     case RESET_EMAIL_FAILURE:
+    case DELETE_USER_FAILURE:
       return {
         ...state,
         errors: action.errors,
       };
     case CHANGE_PASSWORD_SUCCESS:
-    case CLEAR_ERROR:
     case RESET_EMAIL_SUCCESS:
+    case DELETE_USER_SUCCESS:
+    case CLEAR_ERROR:
       return {
         ...state,
         errors: initialState.errors,

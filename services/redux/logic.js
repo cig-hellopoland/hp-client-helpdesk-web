@@ -9,6 +9,7 @@ import { logic as sightsLogic } from '@hello-poland/commons/redux/sights';
 import { logic as tagsLogic } from '@hello-poland/commons/redux/tags';
 import { logic as ticketDefinitionsLogic } from 'redux/ticketDefinitions';
 import { logic as ticketPoolDefinitionsLogic } from '@hello-poland/commons/redux/ticketPoolDefinitions';
+import { logic as ticketTypesLogic } from 'redux/ticketTypes';
 import { logic as usersLogic } from 'redux/users';
 
 export default parseReduxLogic({
@@ -22,5 +23,6 @@ export default parseReduxLogic({
   tagsLogic,
   ticketDefinitionsLogic,
   ticketPoolDefinitionsLogic,
+  ticketTypesLogic,
   usersLogic,
 });

@@ -35,6 +35,10 @@ import {
   actions as categoriesActions,
   selectors as categoriesSelectors,
 } from '@hello-poland/commons/redux/categories';
+import {
+  actions as categoriesOrderActions,
+  selectors as categoriesOrderSelectors,
+} from 'redux/categoriesOrder';
 import withAuth from 'services/auth/withAuth';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 
@@ -44,6 +48,7 @@ import SortableTableHead from '../Partners/components/ListingViewTable/SortableT
 
 const tableColumns = [
   { id: 'icon', label: 'Ikona', sortable: true  },
+  { id: 'displayOrder', label: 'Kolejność', sortable: true  },
   { id: 'name', label: 'Nazwa kategorii', sortable: true  },
   { id: 'count', label: 'Liczba ofert', sortable: true  },
   { id: 'details', label: '', sortable: false  },
@@ -66,6 +71,37 @@ const styles = theme => ({
   toolbar: {
     padding: theme.spacing.unit,
   },
+  orderDialogContent: {
+    maxWidth: '100%',
+    width: 480,
+  },
+  orderItem: {
+    alignItems: 'center',
+    borderBottom: '1px solid #e0e0e0',
+    cursor: 'move',
+    display: 'flex',
+    minHeight: 56,
+    padding: `${theme.spacing.unit}px 0`,
+  },
+  orderItemIndex: {
+    color: theme.palette.text.secondary,
+    width: 48,
+  },
+  orderItemIcon: {
+    width: 64,
+  },
+  orderItemName: {
+    flex: 1,
+  },
+  orderItemHandle: {
+    color: theme.palette.text.secondary,
+    paddingRight: theme.spacing.unit,
+  },
+  orderDropZone: {
+    color: theme.palette.text.secondary,
+    padding: `${theme.spacing.unit * 2}px 0`,
+    textAlign: 'center',
+  },
 });
 
 class CategoriesList extends React.Component {
@@ -80,8 +116,11 @@ class CategoriesList extends React.Component {
     snackbarOpen: false,
     snackbarMessage: '',
     order: 'asc',
-    orderBy: 'name',
+    orderBy: 'displayOrder',
     filterText: '',
+    orderDialogOpen: false,
+    orderItems: [],
+    draggedOrderItemId: null,
   };
 
   componentDidMount() {
@@ -193,6 +232,105 @@ handleFilterChange = (event) => {
   });
 };
 
+  getPortalOrderedItems = () => {
+    const { items } = this.props;
+
+    return [...(items || [])].sort((a, b) => {
+      const aValue = a.displayOrder || Number.MAX_SAFE_INTEGER;
+      const bValue = b.displayOrder || Number.MAX_SAFE_INTEGER;
+
+      if (aValue < bValue) return -1;
+      if (aValue > bValue) return 1;
+      if (a.id < b.id) return 1;
+      if (a.id > b.id) return -1;
+      return 0;
+    });
+  };
+
+  handleOrderDialogOpen = () => this.setState({
+    orderDialogOpen: true,
+    orderItems: this.getPortalOrderedItems(),
+  });
+
+  handleOrderDialogClose = () => this.setState({
+    orderDialogOpen: false,
+    orderItems: [],
+    draggedOrderItemId: null,
+  });
+
+  handleOrderDragStart = itemId => (event) => {
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', String(itemId));
+    }
+
+    this.setState({ draggedOrderItemId: itemId });
+  };
+
+  handleOrderDragOver = (event) => {
+    event.preventDefault();
+
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  };
+
+  handleOrderDrop = targetItemId => (event) => {
+    event.preventDefault();
+
+    this.setState((state) => {
+      const draggedItemId = state.draggedOrderItemId;
+
+      if (!draggedItemId || draggedItemId === targetItemId) {
+        return { draggedOrderItemId: null };
+      }
+
+      const nextItems = [...state.orderItems];
+      const draggedIndex = nextItems.findIndex(item => item.id === draggedItemId);
+
+      if (draggedIndex === -1) {
+        return { draggedOrderItemId: null };
+      }
+
+      const [draggedItem] = nextItems.splice(draggedIndex, 1);
+      const targetIndex = targetItemId === null
+        ? nextItems.length
+        : nextItems.findIndex(item => item.id === targetItemId);
+
+      if (targetIndex === -1) {
+        return { draggedOrderItemId: null };
+      }
+
+      nextItems.splice(targetIndex, 0, draggedItem);
+
+      return {
+        draggedOrderItemId: null,
+        orderItems: nextItems,
+      };
+    });
+  };
+
+  handleOrderSaveFailure = errorData => {
+    this.handleSnackbarOpen(errorData && errorData.message);
+  };
+
+  handleOrderSaveSuccess = () => {
+    this.handleOrderDialogClose();
+    this.handleSnackbarOpen('Kolejność została zapisana.');
+    this.handleFetchItems();
+  };
+
+  handleOrderSave = () => {
+    const { orderItems } = this.state;
+    const { saveOrder } = this.props;
+
+    saveOrder({
+      data: orderItems.map(item => item.id),
+      onFailure: this.handleOrderSaveFailure,
+      onSuccess: this.handleOrderSaveSuccess,
+    });
+  };
+
 
   handleMenuOpen = (event, itemId) => this.setState({
     menuAnchor: event.currentTarget,
@@ -217,9 +355,9 @@ handleFilterChange = (event) => {
   render() {
     const {
       dialogOpen, dialogProps, isFetching, menuAnchor, snackbarMessage, snackbarOpen,
-      order, orderBy, filterText,
+      order, orderBy, filterText, orderDialogOpen, orderItems,
     } = this.state;
-    const { classes, items } = this.props;
+    const { classes, items, orderSaving } = this.props;
     const baseList = items || [];
     const hasItems = baseList.length > 0;
 
@@ -248,6 +386,10 @@ handleFilterChange = (event) => {
           aValue = a.assignedItemsCount || 0;
           bValue = b.assignedItemsCount || 0;
           break;
+        case 'displayOrder':
+          aValue = a.displayOrder || Number.MAX_SAFE_INTEGER;
+          bValue = b.displayOrder || Number.MAX_SAFE_INTEGER;
+          break;
         case 'name':
         default:
           aValue = a.label || '';
@@ -269,6 +411,11 @@ handleFilterChange = (event) => {
           <Paper className={classes.paper}>
             <Grid container direction="column" className={classes.toolbar}>
               <Grid container item justify="flex-end">
+                <Grid item>
+                  <Button onClick={this.handleOrderDialogOpen}>
+                    Ustal kolejność
+                  </Button>
+                </Grid>
                 <Grid item>
                   <Link href={`${this.baseURL}/create`} passHref>
                     <Button component="a">
@@ -325,7 +472,9 @@ handleFilterChange = (event) => {
                       onRequestSort={this.handleRequestSort}
                     />
                     <TableBody>
-                      {sortedList.map(({ assignedItemsCount, label, iconUrl, id, restricted, recommended }) => (
+                      {sortedList.map(({
+                        assignedItemsCount, displayOrder, label, iconUrl, id, restricted, recommended,
+                      }) => (
                         <TableRow key={id} hover>
                           <TableCell className={classes.iconCell} align="center">
                             {iconUrl
@@ -334,6 +483,7 @@ handleFilterChange = (event) => {
                             }
                           </TableCell>
 
+                          <TableCell><Typography>{displayOrder}</Typography></TableCell>
                           <TableCell><Typography>{label}</Typography></TableCell>
                           <TableCell><Typography>{assignedItemsCount}</Typography></TableCell>
 
@@ -385,6 +535,58 @@ handleFilterChange = (event) => {
                       </Button>
                     </DialogActions>
                   </Dialog>
+                  <Dialog
+                    open={orderDialogOpen}
+                    onClose={this.handleOrderDialogClose}
+                    aria-labelledby="order-dialog-title"
+                  >
+                    <DialogTitle id="order-dialog-title">
+                      Ustal kolejność kategorii
+                    </DialogTitle>
+                    <DialogContent className={classes.orderDialogContent}>
+                      {orderItems.map((item, index) => (
+                        <div
+                          key={item.id}
+                          className={classes.orderItem}
+                          draggable
+                          onDragStart={this.handleOrderDragStart(item.id)}
+                          onDragOver={this.handleOrderDragOver}
+                          onDrop={this.handleOrderDrop(item.id)}
+                        >
+                          <Typography className={classes.orderItemIndex}>
+                            {index + 1}
+                          </Typography>
+                          <div className={classes.orderItemIcon}>
+                            {item.iconUrl
+                              ? <img src={item.iconUrl} height={32} width={32} alt={item.label} />
+                              : <ErrorOutlineIcon color="error" />
+                            }
+                          </div>
+                          <Typography className={classes.orderItemName}>
+                            {item.label}
+                          </Typography>
+                          <Typography className={classes.orderItemHandle}>
+                            ::
+                          </Typography>
+                        </div>
+                      ))}
+                      <div
+                        className={classes.orderDropZone}
+                        onDragOver={this.handleOrderDragOver}
+                        onDrop={this.handleOrderDrop(null)}
+                      >
+                        Upuść na koniec listy
+                      </div>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={this.handleOrderDialogClose} color="primary" disabled={orderSaving}>
+                        Anuluj
+                      </Button>
+                      <Button onClick={this.handleOrderSave} color="primary" disabled={orderSaving}>
+                        Zapisz
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
                   <Snackbar
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
                     open={snackbarOpen}
@@ -411,13 +613,16 @@ CategoriesList.propTypes = {
   fetchList: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({
     assignedItemsCount: PropTypes.number,
+    displayOrder: PropTypes.number,
     iconUrl: PropTypes.string,
     id: PropTypes.number,
     label: PropTypes.string,
     restricted: PropTypes.bool,
     recommended: PropTypes.bool,
   })).isRequired,
+  orderSaving: PropTypes.bool.isRequired,
   router: PropTypes.shape({}).isRequired,
+  saveOrder: PropTypes.func.isRequired,
 };
 
 CategoriesList.defaultProps = {
@@ -427,11 +632,13 @@ CategoriesList.defaultProps = {
 const mapStateToProps = state => ({
   error: categoriesSelectors.getError(state),
   items: categoriesSelectors.getList(state),
+  orderSaving: categoriesOrderSelectors.isSaving(state),
 });
 
 const mapDispatchToProps = {
   deleteItem: categoriesActions.deleteItem,
   fetchList: categoriesActions.fetchList,
+  saveOrder: categoriesOrderActions.saveOrder,
 };
 
 export default compose(

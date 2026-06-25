@@ -10,7 +10,6 @@ import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Table from '@material-ui/core/Table';
@@ -20,8 +19,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import config from 'config';
 
@@ -173,25 +170,25 @@ class CategoriesForm extends React.Component {
           )}
         </Grid>
 
-        {managePublic && (
-          <Grid container className={classes.tableContainer}>
-            {publicCategories.length === 0 ? (
-              <Typography>Brak kategorii partnera</Typography>
-            ) : (
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell># ID</TableCell>
-                    <TableCell>Nazwa kategorii</TableCell>
-                    <TableCell className={classes.actionCell} />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {publicCategories.map(({ id: categoryId, label }) => (
-                    <TableRow key={categoryId}>
-                      <TableCell>{categoryId}</TableCell>
-                      <TableCell>{label}</TableCell>
-                      <TableCell align="right">
+        <Grid container className={classes.tableContainer}>
+          {publicCategories.length === 0 ? (
+            <Typography>Brak kategorii partnera</Typography>
+          ) : (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell># ID</TableCell>
+                  <TableCell>Nazwa kategorii</TableCell>
+                  <TableCell className={classes.actionCell} />
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {publicCategories.map(({ id: categoryId, label }) => (
+                  <TableRow key={categoryId}>
+                    <TableCell>{categoryId}</TableCell>
+                    <TableCell>{label}</TableCell>
+                    <TableCell align="right">
+                      {managePublic && (
                         <Button
                           color="primary"
                           disabled={!isDefaultTranslation}
@@ -199,14 +196,14 @@ class CategoriesForm extends React.Component {
                         >
                           Usuń
                         </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </Grid>
-        )}
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </Grid>
 
         {/* KATEGORIE ADMINISTRATORA / BRANDU */}
         <Grid container alignItems="center" justify="space-between" className={classes.section}>
@@ -229,25 +226,25 @@ class CategoriesForm extends React.Component {
           )}
         </Grid>
 
-        {manageRestricted && (
-          <Grid container className={classes.tableContainer}>
-            {restrictedCategories.length === 0 ? (
-              <Typography>Brak kategorii administratora</Typography>
-            ) : (
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell># ID</TableCell>
-                    <TableCell>Nazwa kategorii</TableCell>
-                    <TableCell className={classes.actionCell} />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {restrictedCategories.map(({ id: categoryId, label }) => (
-                    <TableRow key={categoryId}>
-                      <TableCell>{categoryId}</TableCell>
-                      <TableCell>{label}</TableCell>
-                      <TableCell align="right">
+        <Grid container className={classes.tableContainer}>
+          {restrictedCategories.length === 0 ? (
+            <Typography>Brak kategorii administratora</Typography>
+          ) : (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell># ID</TableCell>
+                  <TableCell>Nazwa kategorii</TableCell>
+                  <TableCell className={classes.actionCell} />
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {restrictedCategories.map(({ id: categoryId, label }) => (
+                  <TableRow key={categoryId}>
+                    <TableCell>{categoryId}</TableCell>
+                    <TableCell>{label}</TableCell>
+                    <TableCell align="right">
+                      {manageRestricted && (
                         <Button
                           color="primary"
                           disabled={!isDefaultTranslation}
@@ -255,14 +252,14 @@ class CategoriesForm extends React.Component {
                         >
                           Usuń
                         </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </Grid>
-        )}
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </Grid>
 
         {/* DIALOG DODAWANIA KATEGORII */}
         <Dialog

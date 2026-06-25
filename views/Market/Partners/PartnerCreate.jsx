@@ -4,7 +4,11 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import withAuth from 'services/auth/withAuth';
 import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import { withRouter } from 'next/router';
 import Layout from 'components/Layout';
 import { actions as partnersActions } from 'redux/partners';
 import PartnerCompanyForm from './components/PartnerCompanyForm';
@@ -41,6 +45,12 @@ class PartnerCreate extends Component {
 
   handleSuccessDialogClose = () => this.setState({ successDialog: false });
 
+  handleCancel = () => {
+    const { router } = this.props;
+
+    router.push('/market/partners');
+  };
+
   render() {
     const { classes } = this.props;
     const { successDialog } = this.state;
@@ -48,6 +58,16 @@ class PartnerCreate extends Component {
     return (
       <Layout>
         <Paper className={classes.root}>
+          <Grid container justify="space-between" alignItems="center">
+            <Grid item>
+              <Typography variant="h6">Nowy partner</Typography>
+            </Grid>
+            <Grid item>
+              <Button color="primary" onClick={this.handleCancel}>
+                Anuluj
+              </Button>
+            </Grid>
+          </Grid>
           <PartnerCompanyForm onSubmitSuccess={this.handleSubmitSuccess} />
         </Paper>
         <SuccessDialog open={successDialog} onClose={this.handleSuccessDialogClose} />
@@ -60,6 +80,7 @@ class PartnerCreate extends Component {
 PartnerCreate.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
+  router: PropTypes.shape({}).isRequired,
 };
 
 const mapDispatchToProps = {
@@ -69,6 +90,7 @@ const mapDispatchToProps = {
 
 export default compose(
   withAuth(),
+  withRouter,
   withStyles(styles),
   connect(undefined, mapDispatchToProps),
 )(PartnerCreate);

@@ -1,9 +1,13 @@
 import PartnersEdit from 'views/Market/Partners/PartnersEdit';
 
 PartnersEdit.getInitialProps = ({ query }) => {
-  const { itemId } = query;
+  const { itemId, successMessage, tab } = query;
 
-  return { itemId: +itemId };
+  return {
+    itemId: +itemId,
+    successMessage: successMessage || null,
+    tab: tab || null,
+  };
 };
 
 export default PartnersEdit;

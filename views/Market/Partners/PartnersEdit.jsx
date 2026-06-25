@@ -28,6 +28,7 @@ import PartnerCompanyForm from './components/PartnerCompanyForm';
 import PartnerMultimediaForm from './components/PartnerMultimediaForm';
 import PartnerUsersList from './components/PartnerUsersList';
 import TicketsListView from './components/TicketsListView';
+import SightsList from '../Sights/SightsList';
 
 const styles = theme => ({
   root: {
@@ -39,6 +40,10 @@ const styles = theme => ({
     marginBottom: theme.spacing.unit * 3,
   },
 });
+
+const TAB_BY_QUERY_PARAM = {
+  objects: 3,
+};
 
 class PartnersEdit extends React.Component {
   baseURL = '/market/partners';
@@ -53,8 +58,16 @@ class PartnersEdit extends React.Component {
 
   componentDidMount() {
     const {
-      itemId, clearError, clearItem, error, item,
+      itemId, clearError, clearItem, error, item, successMessage, tab,
     } = this.props;
+
+    if (tab && Object.prototype.hasOwnProperty.call(TAB_BY_QUERY_PARAM, tab)) {
+      this.setState({ selectedTab: TAB_BY_QUERY_PARAM[tab] });
+    }
+
+    if (successMessage) {
+      this.handleSnackbarOpen(successMessage);
+    }
 
     if (item) {
       clearItem();
@@ -378,6 +391,7 @@ class PartnersEdit extends React.Component {
             <Tab label="Dane firmy" />
             <Tab label="Wizytówka" />
             <Tab label="Multimedia" />
+            <Tab label="Obiekty" />
             <Tab label="Definicje produktów" />
             <Tab label="Użytkownicy" />
             <Tab label="Komentarze" disabled />
@@ -418,6 +432,15 @@ class PartnersEdit extends React.Component {
           }
           {selectedTab === 3
             && (
+              <SightsList
+                embedded
+                partnerId={itemId}
+                showPartner={false}
+              />
+            )
+          }
+          {selectedTab === 4
+            && (
               <TicketsListView
                 defaultTranslation={defaultLanguage}
                 partnerId={itemId}
@@ -425,7 +448,7 @@ class PartnersEdit extends React.Component {
               />
             )
           }
-          {selectedTab === 4
+          {selectedTab === 5
             && (
               <PartnerUsersList
                 items={(item && item.users) || []}
@@ -470,6 +493,8 @@ PartnersEdit.propTypes = {
   }),
   resetEmail: PropTypes.func.isRequired,
   router: PropTypes.shape({}).isRequired,
+  successMessage: PropTypes.string,
+  tab: PropTypes.string,
 };
 
 PartnersEdit.defaultProps = {
@@ -477,6 +502,8 @@ PartnersEdit.defaultProps = {
   error: null,
   errorUsers: null,
   item: null,
+  successMessage: null,
+  tab: null,
 };
 
 const mapStateToProps = state => ({

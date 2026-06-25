@@ -46,10 +46,12 @@ class TicketDefinitionForm extends Component {
   }
 
   componentDidMount() {
-    const { fetchTicketTypes, ticketTypesList } = this.props;
+    const {
+      fetchTicketTypes, partnerId, ticketTypesList,
+    } = this.props;
 
-    if (!ticketTypesList || !ticketTypesList.length) {
-      fetchTicketTypes();
+    if (partnerId || !ticketTypesList || !ticketTypesList.length) {
+      fetchTicketTypes({ partnerId });
     }
   }
 
@@ -110,12 +112,13 @@ class TicketDefinitionForm extends Component {
       return;
     }
 
-    const { createItem, updateItem } = this.props;
+    const { createItem, partnerId, updateItem } = this.props;
     let action = createItem;
     const { id, ...data } = values;
     const payload = {
       data: {
         ...data,
+        partnerId,
         ticketTypeId: data.ticketTypeId ? +data.ticketTypeId : data.ticketTypeId,
         price: Math.round(`${data.price}e2`),
       },
@@ -253,6 +256,7 @@ TicketDefinitionForm.propTypes = {
   hideErrors: PropTypes.bool,
   initialValues: PropTypes.shape({}),
   lockedTicketTypeCode: PropTypes.string,
+  partnerId: PropTypes.number,
   onReset: PropTypes.func,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
@@ -274,6 +278,7 @@ TicketDefinitionForm.defaultProps = {
   hideErrors: false,
   initialValues: null,
   lockedTicketTypeCode: null,
+  partnerId: null,
   onReset: null,
   onSubmit: null,
   onSubmitFailure: null,

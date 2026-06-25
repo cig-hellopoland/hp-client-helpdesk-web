@@ -368,7 +368,13 @@ class PartnerCompanyForm extends Component {
               </GridItem>
               <GridItem md={3} sm={3}>
                 <FormControl className={classes.formControl} required>
-                  <InputLabel disabled={disabled} htmlFor="location-country">Kraj</InputLabel>
+                  <InputLabel
+                    disabled={disabled}
+                    htmlFor="location-country"
+                    shrink={!!(values.location && values.location.country)}
+                  >
+                    Kraj
+                  </InputLabel>
                   <Field
                     component={Select}
                     disabled={disabled}
@@ -404,7 +410,9 @@ class PartnerCompanyForm extends Component {
               </GridItem>
               <GridItem md={3} sm={3}>
                 <FormControl className={classes.formControl} required>
-                  <InputLabel htmlFor="business-type">Rodzaj działalności</InputLabel>
+                  <InputLabel htmlFor="business-type" shrink={!!values.businessType}>
+                    Rodzaj działalności
+                  </InputLabel>
                   <Field
                     component={Select}
                     disabled={disabled}

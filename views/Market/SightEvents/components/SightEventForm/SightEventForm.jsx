@@ -20,12 +20,18 @@ import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
+import { actions as sightEventCreationActions } from 'redux/sightEventCreation';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 
 const commonProps = {
   fullWidth: true,
 };
+
+const REQUIRED_FIELD_MESSAGE = 'To pole jest wymagane.';
+const MIN_LENGTH_MESSAGE = min => `Wpisz co najmniej ${min} znaków.`;
+const MAX_LENGTH_MESSAGE = max => `Wpisz maksymalnie ${max} znaków.`;
+const EMAIL_MESSAGE = 'Podaj poprawny adres e-mail.';
 
 // TODO: remove this function and change Switch implementation after it's fixed.
 // TODO: see https://github.com/stackworx/formik-material-ui/pull/42
@@ -67,20 +73,29 @@ class SightEventForm extends React.Component {
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
-      name: yupString().min(3).max(250).required(),
+      name: yupString()
+        .min(3, MIN_LENGTH_MESSAGE(3))
+        .max(250, MAX_LENGTH_MESSAGE(250))
+        .required(REQUIRED_FIELD_MESSAGE),
       published: yupBoolean(),
       // generalAdmission: yupBoolen(),
-      lead: yupString().min(10).max(250),
-      description: yupString().min(10).max(2500).required(),
-      email: yupString().email().trim(),
-      phone: yupString().min(9).trim(),
-      // location: yupObject().shape({
-      //   directions: yupString().min(5).max(255),
-      //   street: yupString().min(5),
-      //   zipCode: yupString().min(6).max(6),
-      //   city: yupString().min(3),
-      //   country: yupString().min(5),
-      // }),
+      lead: yupString()
+        .min(10, MIN_LENGTH_MESSAGE(10))
+        .max(250, MAX_LENGTH_MESSAGE(250))
+        .required(REQUIRED_FIELD_MESSAGE),
+      description: yupString()
+        .min(10, MIN_LENGTH_MESSAGE(10))
+        .max(2500, MAX_LENGTH_MESSAGE(2500))
+        .required(REQUIRED_FIELD_MESSAGE),
+      email: yupString().email(EMAIL_MESSAGE).trim(),
+      phone: yupString()
+        .min(9, MIN_LENGTH_MESSAGE(9))
+        .trim()
+        .required(REQUIRED_FIELD_MESSAGE),
+      location: yupObject().shape({
+        directions: yupString()
+          .max(1000, MAX_LENGTH_MESSAGE(1000)),
+      }),
     });
   }
 
@@ -115,7 +130,7 @@ class SightEventForm extends React.Component {
         street: location.street || '',
         zipCode: location.zipCode || '',
         city: location.city || '',
-        country: location.country || '',
+        country: location.country || 'Polska',
         latitude: location.latitude || '',
         longitude: location.longitude || '',
         commune: location.commune || '',
@@ -125,6 +140,8 @@ class SightEventForm extends React.Component {
       mainImage,
       images,
       pdfAttachment,
+      categories: details.categories || [],
+      tags: details.tags || [],
     };
   };
 
@@ -202,11 +219,11 @@ class SightEventForm extends React.Component {
     submitAction(payload);
   };
 
-  handleSubmitFailure = actions => () => {
+  handleSubmitFailure = actions => (error) => {
     const { onSubmitFailure } = this.props;
 
     if (onSubmitFailure) {
-      onSubmitFailure(actions);
+      onSubmitFailure(actions, error);
     }
 
     const { setSubmitting } = actions;
@@ -239,7 +256,7 @@ class SightEventForm extends React.Component {
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
     const { defaultLanguage, id: itemId } = itemValues || {};
-    const isDefaultTranslation = itemId && defaultLanguage === language;
+    const isDefaultTranslation = !itemId || defaultLanguage === language;
 
     return (
       <Formik
@@ -299,10 +316,10 @@ class SightEventForm extends React.Component {
                 )
               }
               <GridItem>
-                <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
+                <Field name="lead" label="Warunki oferty" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
-                <Field name="description" label="Opis oferty" required component={TextField} {...commonProps} multiline rowsMax={20} />
+                <Field name="description" label="Opis oferty" required component={TextField} {...commonProps} multiline rows={4} />
               </GridItem>
               {isDefaultTranslation
                 && (
@@ -314,7 +331,7 @@ class SightEventForm extends React.Component {
                       <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem md={6} sm={6}>
-                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
+                      <Field name="phone" label="Numer telefonu" required component={TextField} {...commonProps} />
                     </GridItem>
                   </React.Fragment>
                 )
@@ -357,7 +374,7 @@ class SightEventForm extends React.Component {
                 )
               }
               <GridItem>
-                <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rowsMax={10} />
+                <Field name="location.directions" label="Wskazówki dojazdu" component={TextField} {...commonProps} multiline rows={3} />
               </GridItem>
             </Grid>
             {(!hideButtons || (!hideErrors && errorMessage))
@@ -429,7 +446,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearError: sightEventsActions.clearError,
-  createItem: sightEventsActions.createItem,
+  createItem: sightEventCreationActions.createSightEvent,
   createTranslation: sightEventsActions.createTranslation,
   updateItem: sightEventsActions.updateItem,
 };

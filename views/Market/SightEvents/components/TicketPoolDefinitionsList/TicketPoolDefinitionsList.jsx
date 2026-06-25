@@ -44,8 +44,10 @@ class TicketPoolDefinitionsList extends React.Component {
     const { data } = this.props;
 
     this.state = {
+      createDialogOpen: false,
       dialogOpen: false,
       dialogProps: {},
+      newPoolData: null,
       tpdData: this.parseTPD(data),
     };
   }
@@ -93,6 +95,34 @@ class TicketPoolDefinitionsList extends React.Component {
 
   handleDialogOpen = dialogProps => this.setState({ dialogOpen: true, dialogProps });
 
+  handleCreateDialogClose = () => this.setState({
+    createDialogOpen: false,
+    newPoolData: null,
+  });
+
+  handleCreateDialogOpen = () => {
+    const { partnerId, sightEventId } = this.props;
+
+    this.setState({
+      createDialogOpen: true,
+      newPoolData: {
+        partnerId,
+        sightEventId,
+      },
+    });
+  };
+
+  handleNewPoolChange = newPoolData => this.setState({ newPoolData });
+
+  handleTPDCreate = () => {
+    const { newPoolData } = this.state;
+    const { onTPDCreate } = this.props;
+
+    if (onTPDCreate && newPoolData) {
+      onTPDCreate(newPoolData, this.handleCreateDialogClose);
+    }
+  };
+
   handleTPDChange = formData => this.setState(state => ({
     tpdData: {
       ...state.tpdData,
@@ -118,12 +148,23 @@ class TicketPoolDefinitionsList extends React.Component {
   };
 
   render() {
-    const { dialogOpen, dialogProps } = this.state;
-    const { classes, data, partnerId, canEdit  } = this.props;
+    const {
+      createDialogOpen, dialogOpen, dialogProps, newPoolData,
+    } = this.state;
+    const {
+      classes, data, partnerId, canEdit,
+    } = this.props;
 
     const poolDefinitions = data;
     return (
       <React.Fragment>
+        {canEdit && (
+          <Grid container justify="flex-end" className={classes.actionButtons}>
+            <Button color="primary" variant="contained" onClick={this.handleCreateDialogOpen}>
+              Dodaj pulę produktów
+            </Button>
+          </Grid>
+        )}
         {(!poolDefinitions || poolDefinitions.length === 0)
           && (
             <Grid container item direction="column" alignItems="center" justify="center">
@@ -158,20 +199,22 @@ class TicketPoolDefinitionsList extends React.Component {
                           canEdit={canEdit}
                         />
                       </Grid>
-                      <Grid container item className={classes.actionButtons} justify="flex-end">
-                        <Grid item>
-                          <Button onClick={() => this.handleDialogOpen({ itemId: poolId, name: poolName })} color="primary">
-                            Usuń
-                          </Button>
-                          <Button
-                            onClick={() => this.handleTPDUpdate(poolId)}
-                            color="primary"
-                            variant="contained"
-                          >
-                            Zapisz
-                          </Button>
+                      {canEdit && (
+                        <Grid container item className={classes.actionButtons} justify="flex-end">
+                          <Grid item>
+                            <Button onClick={() => this.handleDialogOpen({ itemId: poolId, name: poolName })} color="primary">
+                              Usuń
+                            </Button>
+                            <Button
+                              onClick={() => this.handleTPDUpdate(poolId)}
+                              color="primary"
+                              variant="contained"
+                            >
+                              Zapisz
+                            </Button>
+                          </Grid>
                         </Grid>
-                      </Grid>
+                      )}
                     </Grid>
                   </ExpansionPanelDetails>
                 </ExpansionPanel>
@@ -202,6 +245,29 @@ class TicketPoolDefinitionsList extends React.Component {
             </Button>
           </DialogActions>
         </Dialog>
+        <Dialog
+          fullWidth
+          maxWidth="md"
+          open={createDialogOpen}
+          onClose={this.handleCreateDialogClose}
+        >
+          <DialogTitle>Dodaj pulę produktów</DialogTitle>
+          <DialogContent>
+            <TicketPoolDefinitionForm
+              data={newPoolData}
+              onChange={this.handleNewPoolChange}
+              canEdit={canEdit}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleCreateDialogClose} color="primary">
+              Anuluj
+            </Button>
+            <Button onClick={this.handleTPDCreate} color="primary" variant="contained">
+              Zapisz
+            </Button>
+          </DialogActions>
+        </Dialog>
       </React.Fragment>
     );
   }
@@ -210,14 +276,17 @@ class TicketPoolDefinitionsList extends React.Component {
 TicketPoolDefinitionsList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   data: PropTypes.arrayOf(PropTypes.shape({})),
+  onTPDCreate: PropTypes.func,
   onTPDDelete: PropTypes.func,
   onTPDUpdate: PropTypes.func,
   partnerId: PropTypes.number.isRequired,
+  sightEventId: PropTypes.number.isRequired,
   canEdit: PropTypes.bool,
 };
 
 TicketPoolDefinitionsList.defaultProps = {
   data: null,
+  onTPDCreate: null,
   onTPDDelete: null,
   onTPDUpdate: null,
   canEdit: false,

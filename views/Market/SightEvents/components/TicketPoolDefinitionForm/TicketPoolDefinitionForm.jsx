@@ -22,10 +22,10 @@ class TicketPoolDefinitionForm extends React.Component {
 }
 
 TicketPoolDefinitionForm.propTypes = {
+  canEdit: PropTypes.bool,
   data: PropTypes.shape({
     id: PropTypes.number,
     sightEventId: PropTypes.number,
-    canEdit: PropTypes.bool,
   }),
   onChange: PropTypes.func.isRequired,
 };

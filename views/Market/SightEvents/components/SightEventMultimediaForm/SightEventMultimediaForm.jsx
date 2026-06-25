@@ -52,7 +52,7 @@ SightEventMultimediaForm.propTypes = {
   ImageGalleryProps: PropTypes.shape({
     item: PropTypes.shape({}),
   }),
-  itemId: PropTypes.number.isRequired,
+  itemId: PropTypes.number,
   MainImageProps: PropTypes.shape({
     item: PropTypes.shape({}),
   }),
@@ -66,6 +66,7 @@ SightEventMultimediaForm.defaultProps = {
   AttachmentProps: null,
   defaultTranslation: DEFAULT_LANGUAGE,
   ImageGalleryProps: null,
+  itemId: null,
   MainImageProps: null,
   onFailure: null,
   onSuccess: null,

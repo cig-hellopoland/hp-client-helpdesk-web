@@ -45,6 +45,12 @@ const styles = theme => ({
   actions: {
     minWidth: 150,
   },
+  addButton: {
+    fontSize: 0,
+  },
+  addButtonLabel: {
+    fontSize: 14,
+  },
   paper: {
     flex: 1,
     overflow: 'hidden',
@@ -309,36 +315,32 @@ const colorInactive = 'disabled';
      <Layout>
        <Grid container className={classes.root}>
           <Paper className={classes.paper}>
-            <Grid container direction="column" className={classes.toolbar}>
-  {hasItems && (
-    <Grid container item justify="flex-end" style={{ marginBottom: 8 }}>
-      <Grid item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label="Filtruj (nazwa, ID, e-mail, tel, P24, kod afiliacyjny)"
-          value={filterText}
-          onChange={this.handleFilterChange}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Grid>
-    </Grid>
-  )}
-              <Grid container item justify="flex-end">
-                <Grid item>
-                  <Link href={`${this.baseURL}/create`} passHref prefetch>
-                    <Button component="a">
-                      <AddIcon className={classes.icon} />
-                      Dodaj
-                    </Button>
-                  </Link>
-                </Grid>
+            <Grid container alignItems="flex-end" justify="space-between" className={classes.toolbar}>
+              <Grid item>
+                <Link href={`${this.baseURL}/create`} passHref prefetch>
+                  <Button component="a" className={classes.addButton}>
+                    <AddIcon className={classes.icon} />
+                    <span className={classes.addButtonLabel}>Dodaj</span>
+                  </Button>
+                </Link>
               </Grid>
+              {hasItems && (
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Filtruj (nazwa, ID, e-mail, tel, P24, kod afiliacyjny)"
+                    value={filterText}
+                    onChange={this.handleFilterChange}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              )}
             </Grid>
             {!hasItems && (
               <Grid container item className={classes.placeholder} direction="column" alignItems="center" justify="center">

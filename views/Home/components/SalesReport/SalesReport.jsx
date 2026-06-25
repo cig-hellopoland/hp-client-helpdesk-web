@@ -4,15 +4,21 @@ import { compose } from 'redux';
 import { connect, ReactReduxContext } from 'react-redux';
 import format from 'date-fns/format';
 import withStyles from '@material-ui/core/styles/withStyles';
-import Grid from '@material-ui/core/Grid';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Snackbar from '@material-ui/core/Snackbar';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { actions as bookingsActions } from '@hello-poland/commons/redux/bookings';
 
 const styles = theme => ({
@@ -55,19 +61,22 @@ const styles = theme => ({
     color: 'red',
     marginBottom: theme.spacing.unit,
   },
-  selectRoot: {
-    width: '100%',
-  },
-
-  selectValue: {
-    paddingRight: 32,
-    whiteSpace: 'nowrap',
-  },
-
-  selectIcon: {
+  partnerDropdown: {
+    left: 0,
+    maxHeight: 320,
+    overflowY: 'auto',
+    position: 'absolute',
     right: 0,
-    top: 'calc(50% - 12px)',
-    pointerEvents: 'none',
+    top: '100%',
+    zIndex: 10,
+  },
+  partnerDropdownButton: {
+    padding: 4,
+  },
+  partnerMenuItem: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
 });
 
@@ -76,6 +85,11 @@ const STATUS_MAP = {
   CANCELLED: 'Anulowany',
   BOOKED: 'Zarezerwowany',
 };
+
+const normalizeSearchValue = value => (value || '')
+  .toLocaleLowerCase('pl')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '');
 
 const getInitialFromDate = () => {
   const date = new Date();
@@ -118,18 +132,93 @@ class SalesReport extends React.Component {
     fromDate: getInitialFromDate(),
     toDate: getInitialToDate(),
     partnerId: '',
+    partnerQuery: 'Wszyscy',
+    partnerMenuOpen: false,
     partners: [],
     sales: [],
     error: false,
     loading: false,
+    emailDialogOpen: false,
+    selectedSale: null,
+    newEmail: '',
+    newEmailError: '',
+    sendingToNewEmail: false,
+    snackbarOpen: false,
+    snackbarMessage: '',
   };
 
   handleDateChange = key => event => {
     this.setState({ [key]: event.target.value });
   };
 
-  handlePartnerChange = event => {
-    this.setState({ partnerId: event.target.value });
+  handlePartnerSearchChange = (event) => {
+    this.setState({
+      partnerId: '',
+      partnerQuery: event.target.value,
+      partnerMenuOpen: true,
+    });
+  };
+
+  handlePartnerMenuToggle = () => {
+    this.setState(state => ({
+      partnerMenuOpen: !state.partnerMenuOpen,
+    }));
+  };
+
+  handlePartnerMenuClose = () => {
+    this.setState(state => ({
+      partnerMenuOpen: false,
+      partnerQuery: state.partnerId ? state.partnerQuery : 'Wszyscy',
+    }));
+  };
+
+  handlePartnerFocus = (event) => {
+    event.target.select();
+    this.setState({ partnerMenuOpen: true });
+  };
+
+  handlePartnerSelect = (partner) => {
+    this.setState({
+      partnerId: partner ? String(partner.id) : '',
+      partnerQuery: partner ? partner.name : 'Wszyscy',
+      partnerMenuOpen: false,
+    });
+  };
+
+  getFilteredPartners = () => {
+    const { partners, partnerId, partnerQuery } = this.state;
+    const selectedPartner = partners.find(
+      partner => String(partner.id) === partnerId,
+    );
+    const selectedPartnerName = selectedPartner && selectedPartner.name;
+    const query = partnerQuery === 'Wszyscy'
+      || partnerQuery === selectedPartnerName
+      ? ''
+      : normalizeSearchValue(partnerQuery.trim());
+
+    if (!query) {
+      return partners;
+    }
+
+    return partners.filter(partner => (
+      normalizeSearchValue(partner.name).includes(query)
+    ));
+  };
+
+  handlePartnerKeyDown = (event) => {
+    if (event.key === 'Escape') {
+      this.handlePartnerMenuClose();
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      const [firstPartner] = this.getFilteredPartners();
+
+      if (firstPartner) {
+        event.preventDefault();
+        this.handlePartnerSelect(firstPartner);
+      }
+    }
   };
 
   canResend = status => status === 'CONFIRMED';
@@ -140,7 +229,90 @@ class SalesReport extends React.Component {
     );
   };
 
-  fetchPartners = store => {
+  openEmailDialog = (row) => {
+    this.setState({
+      emailDialogOpen: true,
+      selectedSale: row,
+      newEmail: '',
+      newEmailError: '',
+    });
+  };
+
+  closeEmailDialog = () => {
+    const { sendingToNewEmail } = this.state;
+
+    if (sendingToNewEmail) {
+      return;
+    }
+
+    this.setState({
+      emailDialogOpen: false,
+      selectedSale: null,
+      newEmail: '',
+      newEmailError: '',
+    });
+  };
+
+  handleNewEmailChange = (event) => {
+    this.setState({
+      newEmail: event.target.value,
+      newEmailError: '',
+    });
+  };
+
+  sendToNewEmail = (store) => {
+    const { logicMiddleware } = store || {};
+    const { httpClient } = logicMiddleware || {};
+    const { selectedSale, newEmail, sendingToNewEmail } = this.state;
+    const normalizedEmail = newEmail.trim();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (sendingToNewEmail) {
+      return;
+    }
+
+    if (!emailPattern.test(normalizedEmail)) {
+      this.setState({ newEmailError: 'Podaj poprawny adres e-mail.' });
+      return;
+    }
+
+    if (!httpClient || !selectedSale) {
+      return;
+    }
+
+    this.setState({ sendingToNewEmail: true, newEmailError: '' });
+
+    httpClient
+      .post(
+        `/bookings/${encodeURIComponent(selectedSale.hash)}/sendTicketCopyToEmail`,
+        { email: normalizedEmail },
+      )
+      .then(() => {
+        this.setState({
+          emailDialogOpen: false,
+          selectedSale: null,
+          newEmail: '',
+          sendingToNewEmail: false,
+          snackbarOpen: true,
+          snackbarMessage: `Wysłano produkty na adres ${normalizedEmail}.`,
+        });
+      })
+      .catch((error) => {
+        const response = error && error.response;
+        const data = response && response.data;
+        this.setState({
+          sendingToNewEmail: false,
+          newEmailError: (data && data.message)
+            || 'Nie udało się wysłać wiadomości. Spróbuj ponownie.',
+        });
+      });
+  };
+
+  closeSnackbar = () => {
+    this.setState({ snackbarOpen: false, snackbarMessage: '' });
+  };
+
+  fetchPartners = (store) => {
     const { logicMiddleware } = store || {};
     const { httpClient } = logicMiddleware || {};
 
@@ -150,12 +322,18 @@ class SalesReport extends React.Component {
 
     httpClient
       .get('/partners')
-      .then(response => {
+      .then((response) => {
         const { data } = response;
 
-        this.setState({
-          partners: (data && data.items) || [],
-        });
+        const partners = ((data && data.items) || []).slice();
+
+        partners.sort((a, b) => (a.name || '').localeCompare(
+          b.name || '',
+          'pl',
+          { sensitivity: 'base' },
+        ));
+
+        this.setState({ partners });
       })
       .catch(() => {
         this.setState({ partners: [] });
@@ -279,6 +457,14 @@ class SalesReport extends React.Component {
                   >
                     WYŚLIJ PONOWNIE
                   </Button>
+                  <Button
+                    color="secondary"
+                    disabled={!this.canResend(row.status)}
+                    onClick={() => this.openEmailDialog(row)}
+                    style={{ fontSize: 12 }}
+                  >
+                    WYŚLIJ NA NOWY EMAIL
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -294,9 +480,18 @@ class SalesReport extends React.Component {
       fromDate,
       toDate,
       partnerId,
-      partners,
+      partnerQuery,
+      partnerMenuOpen,
       error,
+      emailDialogOpen,
+      selectedSale,
+      newEmail,
+      newEmailError,
+      sendingToNewEmail,
+      snackbarOpen,
+      snackbarMessage,
     } = this.state;
+    const filteredPartners = this.getFilteredPartners();
 
     return (
       <ReactReduxContext.Consumer>
@@ -352,37 +547,70 @@ class SalesReport extends React.Component {
                   />
                 </div>
 
-                <div style={{ width: 380, flex: '0 0 380px' }}>
-                  <FormControl fullWidth>
-                    <InputLabel shrink>Partner</InputLabel>
-                      <Select
-                        value={partnerId}
-                        onChange={this.handlePartnerChange}
-                        displayEmpty
-                        classes={{
-                          root: classes.selectRoot,
-                          select: classes.selectValue,
-                          icon: classes.selectIcon,
+                <div
+                  style={{
+                    width: 380,
+                    flex: '0 0 380px',
+                    position: 'relative',
+                  }}
+                >
+                  <ClickAwayListener onClickAway={this.handlePartnerMenuClose}>
+                    <div>
+                      <TextField
+                        fullWidth
+                        label="Partner"
+                        value={partnerQuery}
+                        onChange={this.handlePartnerSearchChange}
+                        onFocus={this.handlePartnerFocus}
+                        onKeyDown={this.handlePartnerKeyDown}
+                        InputLabelProps={{ shrink: true }}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                className={classes.partnerDropdownButton}
+                                onClick={this.handlePartnerMenuToggle}
+                                aria-label="Rozwiń listę partnerów"
+                              >
+                                <ArrowDropDownIcon />
+                              </IconButton>
+                            </InputAdornment>
+                          ),
                         }}
-                        MenuProps={{
-                          PaperProps: {
-                            style: {
-                              maxHeight: 320,
-                              maxWidth: 520,
-                            },
-                          },
-                          getContentAnchorEl: null,
-                        }}
-                      >
-                        <MenuItem value="">Wszyscy</MenuItem>
+                      />
 
-                        {partners.map(partner => (
-                          <MenuItem key={partner.id} value={String(partner.id)}>
-                            {partner.name}
+                      {partnerMenuOpen && (
+                        <Paper className={classes.partnerDropdown}>
+                          <MenuItem
+                            className={classes.partnerMenuItem}
+                            onClick={() => this.handlePartnerSelect(null)}
+                          >
+                            Wszyscy
                           </MenuItem>
-                        ))}
-                      </Select>
-                  </FormControl>
+
+                          {filteredPartners.map(partner => (
+                            <MenuItem
+                              key={partner.id}
+                              className={classes.partnerMenuItem}
+                              selected={String(partner.id) === partnerId}
+                              onClick={() => this.handlePartnerSelect(partner)}
+                            >
+                              {partner.name}
+                            </MenuItem>
+                          ))}
+
+                          {!filteredPartners.length && (
+                            <MenuItem
+                              className={classes.partnerMenuItem}
+                              disabled
+                            >
+                              Brak wyników
+                            </MenuItem>
+                          )}
+                        </Paper>
+                      )}
+                    </div>
+                  </ClickAwayListener>
                 </div>
 
                 <div style={{ flex: '0 0 auto', paddingBottom: 4 }}>
@@ -402,6 +630,63 @@ class SalesReport extends React.Component {
               )}
 
               {this.renderTable(store)}
+
+              <Dialog
+                open={emailDialogOpen}
+                onClose={this.closeEmailDialog}
+                aria-labelledby="send-to-new-email-title"
+              >
+                <DialogTitle id="send-to-new-email-title">
+                  Wyślij produkty na nowy e-mail
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText>
+                    {`Zamówienie ${
+                      selectedSale ? selectedSale.bookingId : ''
+                    }. Wpisz poprawny adres odbiorcy.`}
+                  </DialogContentText>
+                  <TextField
+                    autoFocus
+                    fullWidth
+                    label="Nowy adres e-mail"
+                    type="email"
+                    value={newEmail}
+                    onChange={this.handleNewEmailChange}
+                    error={Boolean(newEmailError)}
+                    helperText={newEmailError}
+                    disabled={sendingToNewEmail}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault();
+                        this.sendToNewEmail(store);
+                      }
+                    }}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={this.closeEmailDialog}
+                    disabled={sendingToNewEmail}
+                  >
+                    Anuluj
+                  </Button>
+                  <Button
+                    color="secondary"
+                    onClick={() => this.sendToNewEmail(store)}
+                    disabled={sendingToNewEmail}
+                  >
+                    {sendingToNewEmail ? 'Wysyłanie...' : 'Wyślij'}
+                  </Button>
+                </DialogActions>
+              </Dialog>
+
+              <Snackbar
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                open={snackbarOpen}
+                autoHideDuration={5000}
+                onClose={this.closeSnackbar}
+                message={snackbarMessage}
+              />
             </div>
           );
         }}

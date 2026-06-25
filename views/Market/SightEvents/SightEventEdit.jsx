@@ -4,6 +4,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import _sortedUniq from 'lodash/sortedUniq';
 import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -27,6 +28,7 @@ import {
   actions as ticketPoolDefinitionActions,
   selectors as ticketPoolDefinitionSelectors,
 } from '@hello-poland/commons/redux/ticketPoolDefinitions';
+import { selectors as profileSelectors } from 'redux/profile';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
@@ -36,7 +38,6 @@ import TagsForm from 'components/TagsForm';
 import SightEventForm from './components/SightEventForm';
 import SightEventMultimediaForm from './components/SightEventMultimediaForm';
 import TicketPoolDefinitionsList from './components/TicketPoolDefinitionsList';
-import { selectors as profileSelectors } from 'redux/profile';
 
 const ITEM_DATA_TYPES = {
   CATEGORY: 'CATEGORY',
@@ -51,6 +52,15 @@ const styles = theme => ({
   },
   section: {
     marginBottom: theme.spacing.unit * 3,
+  },
+  createSection: {
+    marginTop: theme.spacing.unit * 3,
+  },
+  createActions: {
+    bottom: theme.spacing.unit * 3,
+    position: 'fixed',
+    right: theme.spacing.unit * 3,
+    zIndex: 1200,
   },
 });
 
@@ -91,7 +101,7 @@ class SightEventEdit extends React.Component {
   }
 
   getFormValues = (item) => {
-    const { itemId } = this.props;
+    const { itemId, sightId } = this.props;
     const { selectedTranslation, formChanges } = this.state;
 
     if (item && itemId === item.id) {
@@ -112,7 +122,7 @@ class SightEventEdit extends React.Component {
       return { ...item };
     }
 
-    return null;
+    return itemId ? null : { sightId, categories: [], tags: [] };
   };
 
   getMultimediaFromItem = (item) => {
@@ -168,6 +178,86 @@ class SightEventEdit extends React.Component {
   clearFormChanges = () => {
     this.setState({ formChanges: null });
   }
+
+  getFormikBagSafe = () => {
+    const { current } = this.formikRef;
+
+    if (current && current.getFormikBag) {
+      return current.getFormikBag();
+    }
+
+    return null;
+  };
+
+  getFormikValues = () => {
+    const bag = this.getFormikBagSafe();
+
+    return bag ? bag.values : null;
+  };
+
+  handleSubmitClick = () => {
+    const { current } = this.formikRef;
+
+    if (current && current.submitForm) {
+      current.submitForm();
+    }
+  };
+
+  handleCancel = () => {
+    const { returnTo, router } = this.props;
+
+    router.push(returnTo || this.baseURL);
+  };
+
+  handleSubmitFailure = (actions, errorResponse) => {
+    const { clearError, error } = this.props;
+    const sourceError = errorResponse || error || {};
+    const { data: errorData } = sourceError || {};
+    const message = (errorData && errorData.message)
+      || (sourceError && sourceError.message)
+      || 'Nie udało się zapisać oferty.';
+
+    this.handleSnackbarOpen(message);
+
+    if (clearError) {
+      clearError();
+    }
+  };
+
+  handleLocalItemDataTypeSubmit = dataType => (dataTypeId) => {
+    const { categoriesList, tagsList } = this.props;
+    const bag = this.getFormikBagSafe();
+
+    if (!bag) {
+      return;
+    }
+
+    const field = dataType === ITEM_DATA_TYPES.CATEGORY ? 'categories' : 'tags';
+    const sourceList = dataType === ITEM_DATA_TYPES.CATEGORY
+      ? categoriesList
+      : tagsList;
+    const current = Array.isArray(bag.values[field]) ? bag.values[field] : [];
+    const selectedItem = sourceList.find(({ id }) => id === dataTypeId);
+
+    if (selectedItem && !current.some(({ id }) => id === dataTypeId)) {
+      bag.setFieldValue(field, [...current, selectedItem], false);
+      this.forceUpdate();
+    }
+  };
+
+  handleLocalItemDataTypeDelete = dataType => (dataTypeId) => {
+    const bag = this.getFormikBagSafe();
+
+    if (!bag) {
+      return;
+    }
+
+    const field = dataType === ITEM_DATA_TYPES.CATEGORY ? 'categories' : 'tags';
+    const current = Array.isArray(bag.values[field]) ? bag.values[field] : [];
+
+    bag.setFieldValue(field, current.filter(({ id }) => id !== dataTypeId), false);
+    this.forceUpdate();
+  };
 
   handleItemDataTypeDeleteFailure = () => this.handleRequestFailure();
 
@@ -400,24 +490,77 @@ class SightEventEdit extends React.Component {
     snackbarMessage: '',
   });
 
-  handleSubmitSuccess = (entityId, actions) => {
+  handleSubmitSuccess = (entity, actions) => {
     const { selectedTranslation } = this.state;
-    const { itemId } = this.props;
+    const {
+      itemId, returnTo, router, updateItemCategory, updateItemTag,
+    } = this.props;
     const { resetForm, setSubmitting } = actions;
 
-    this.handleFetchItem(itemId, selectedTranslation);
-
     setSubmitting(false);
-    resetForm();
+
+    if (itemId) {
+      this.handleFetchItem(itemId, selectedTranslation);
+      resetForm();
+    } else if (entity && entity.id) {
+      const values = this.getFormikValues() || {};
+      const { categories = [], tags = [] } = values;
+      const assignments = [
+        ...categories.map(({ id: categoryId }) => new Promise(resolve => updateItemCategory({
+          id: entity.id,
+          categoryId,
+          onFailure: resolve,
+          onSuccess: resolve,
+        }))),
+        ...tags.map(({ id: tagId }) => new Promise(resolve => updateItemTag({
+          id: entity.id,
+          tagId,
+          onFailure: resolve,
+          onSuccess: resolve,
+        }))),
+      ];
+
+      Promise.all(assignments).then(() => {
+        if (returnTo) {
+          router.push(returnTo);
+        } else {
+          router.push(
+            `${this.baseURL}/edit?itemId=${entity.id}`,
+            `${this.baseURL}/${entity.id}/edit`,
+          );
+        }
+      });
+    }
+  };
+
+  handleTPDCreate = (data, onSuccess) => {
+    const { selectedTranslation } = this.state;
+    const { createTicketPoolDefinition, itemId } = this.props;
+
+    createTicketPoolDefinition({
+      data,
+      onFailure: this.handleTPDError,
+      onSuccess: () => {
+        this.handleFetchItem(itemId, selectedTranslation);
+        if (onSuccess) {
+          onSuccess();
+        }
+      },
+    });
   };
 
   handleTPDDelete = (poolId) => {
     const { selectedTranslation } = this.state;
-    const { deleteTicketPoolDefinition, itemId } = this.props;
+    const { deleteTicketPoolDefinition, item, itemId } = this.props;
 
     if (poolId) {
       deleteTicketPoolDefinition({
         id: poolId,
+        options: {
+          params: {
+            partnerId: item.partnerId,
+          },
+        },
         onFailure: this.handleTPDError,
         onSuccess: () => this.handleFetchItem(itemId, selectedTranslation),
       });
@@ -453,16 +596,26 @@ class SightEventEdit extends React.Component {
       snackbarMessage, uploadedMultimedia,
     } = this.state;
     const {
-      categoriesList, classes, item, itemId, tagsList, profile,
+      categoriesList, classes, item, itemId, partnerId: initialPartnerId, tagsList, profile,
     } = this.props;
-    const { defaultLanguage, partnerId } = item || {};
+    const { defaultLanguage, partnerId: itemPartnerId } = item || {};
+    const partnerId = itemPartnerId || initialPartnerId || null;
+    const formikValues = this.getFormikValues();
+    const selectedCategories = (formikValues && formikValues.categories)
+      || (item && item.categories)
+      || [];
+    const selectedTags = (formikValues && formikValues.tags)
+      || (item && item.tags)
+      || [];
 
     const pageTitle = itemId ? 'Edycja oferty' : 'Nowa oferta';
     const hasLanguageActions = !!(item && item.id);
     const roles = (profile && profile.roles) || [];
     const canEditTicketPools = roles.includes('ADMIN') || roles.includes('SALESMAN');
 
-    const multimedia = this.getMultimediaFromItem(item);
+    const multimedia = item
+      ? this.getMultimediaFromItem(item)
+      : { images: [], mainImage: {}, pdfAttachment: {} };
 
     return (
       <Layout>
@@ -499,11 +652,11 @@ class SightEventEdit extends React.Component {
             value={selectedTab}
           >
             <Tab label="Szczegóły" />
-            <Tab label="Kategorie" />
-            <Tab label="Tagi" />
-            <Tab label="Multimedia" />
-            <Tab label="Pule produktów" />
-            <Tab label="Komentarze" disabled />
+            {itemId && <Tab label="Kategorie" />}
+            {itemId && <Tab label="Tagi" />}
+            {itemId && <Tab label="Multimedia" />}
+            {itemId && <Tab label="Pule produktów" />}
+            {itemId && <Tab label="Komentarze" disabled />}
           </Tabs>
           {selectedTab === 0
             && (
@@ -511,10 +664,77 @@ class SightEventEdit extends React.Component {
                 FormikProps={{ ref: this.formikRef }}
                 initialValues={this.getFormValues(item)}
                 language={selectedTranslation}
+                onSubmitFailure={this.handleSubmitFailure}
                 onSubmitSuccess={this.handleSubmitSuccess}
                 uploadedMultimedia={uploadedMultimedia}
                 clearFormChanges={this.clearFormChanges}
+                hideButtons={!itemId}
+                hideErrors={!itemId}
               />
+            )
+          }
+          {selectedTab === 0 && !itemId
+            && (
+              <React.Fragment>
+                <div className={classes.createSection}>
+                  <CategoriesForm
+                    categories={categoriesList}
+                    defaultTranslation={DEFAULT_LANGUAGE}
+                    items={selectedCategories}
+                    managePublic
+                    manageRestricted
+                    onSubmit={this.handleLocalItemDataTypeSubmit(ITEM_DATA_TYPES.CATEGORY)}
+                    onDelete={this.handleLocalItemDataTypeDelete(ITEM_DATA_TYPES.CATEGORY)}
+                    translation={selectedTranslation}
+                  />
+                </div>
+                <div className={classes.createSection}>
+                  <TagsForm
+                    tags={tagsList}
+                    defaultTranslation={DEFAULT_LANGUAGE}
+                    items={selectedTags}
+                    managePublic
+                    manageRestricted
+                    onSubmit={this.handleLocalItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)}
+                    onDelete={this.handleLocalItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
+                    translation={selectedTranslation}
+                  />
+                </div>
+                <div className={classes.createSection}>
+                  <SightEventMultimediaForm
+                    AttachmentProps={{
+                      item: uploadedMultimedia.pdfAttachment.id
+                        ? uploadedMultimedia.pdfAttachment : multimedia.pdfAttachment,
+                    }}
+                    ImageGalleryProps={{
+                      items: uploadedMultimedia.images.length
+                        ? uploadedMultimedia.images : multimedia.images || [],
+                    }}
+                    MainImageProps={{
+                      item: uploadedMultimedia.mainImage.id
+                        ? uploadedMultimedia.mainImage : multimedia.mainImage,
+                    }}
+                    defaultTranslation={DEFAULT_LANGUAGE}
+                    itemId={itemId}
+                    partnerId={partnerId}
+                    onFailure={() => this.handleRequestFailure()}
+                    onSuccess={data => this.fileActionSuccess(itemId, selectedTranslation, data)}
+                    translation={selectedTranslation}
+                  />
+                </div>
+                <Grid container spacing={16} justify="flex-end" className={classes.createActions}>
+                  <Grid item>
+                    <Button color="primary" onClick={this.handleCancel}>
+                      Anuluj
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                  <Button variant="contained" color="primary" onClick={this.handleSubmitClick}>
+                    Zapisz
+                  </Button>
+                  </Grid>
+                </Grid>
+              </React.Fragment>
             )
           }
           {selectedTab === 1
@@ -574,6 +794,8 @@ class SightEventEdit extends React.Component {
               <TicketPoolDefinitionsList
                 data={item.ticketPoolDefinitions}
                 partnerId={partnerId}
+                sightEventId={itemId}
+                onTPDCreate={this.handleTPDCreate}
                 onTPDDelete={this.handleTPDDelete}
                 onTPDUpdate={this.handleTPDUpdate}
                 canEdit={canEditTicketPools}
@@ -598,10 +820,13 @@ class SightEventEdit extends React.Component {
 SightEventEdit.propTypes = {
   categoriesList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   itemId: PropTypes.number,
+  partnerId: PropTypes.number,
+  sightId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
+  createTicketPoolDefinition: PropTypes.func.isRequired,
   deleteItemCategory: PropTypes.func.isRequired,
   deleteItemTag: PropTypes.func.isRequired,
   deleteTicketPoolDefinition: PropTypes.func.isRequired,
@@ -615,6 +840,7 @@ SightEventEdit.propTypes = {
     id: PropTypes.number,
     label: PropTypes.string,
   }),
+  returnTo: PropTypes.string,
   router: PropTypes.shape({}).isRequired,
   tagsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   updateItem: PropTypes.func.isRequired,
@@ -626,10 +852,13 @@ SightEventEdit.propTypes = {
 
 SightEventEdit.defaultProps = {
   itemId: null,
+  partnerId: null,
+  sightId: null,
   error: null,
   errorTPD: null,
   item: null,
   profile: null,
+  returnTo: null,
 };
 
 const mapStateToProps = state => ({
@@ -645,6 +874,7 @@ const mapDispatchToProps = {
   changeDefaultTranslation: sightEventsActions.changeDefaultTranslation,
   clearError: sightEventsActions.clearError,
   clearItem: sightEventsActions.clearItem,
+  createTicketPoolDefinition: ticketPoolDefinitionActions.createItem,
   deleteItemCategory: sightEventsActions.deleteItemCategory,
   deleteItemTag: sightEventsActions.deleteItemTag,
   deleteTicketPoolDefinition: ticketPoolDefinitionActions.deleteItem,

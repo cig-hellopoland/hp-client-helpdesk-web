@@ -22,10 +22,12 @@ const clear = () => ({
   type: CLEAR,
 });
 
-const fetchList = ({ options, onFailure, onSuccess } = {}) => ({
+const fetchList = ({
+  partnerId, options, onFailure, onSuccess,
+} = {}) => ({
   type: FETCH_LIST,
   payload: {
-    url: apiURL,
+    url: partnerId ? `${apiURL}?partnerId=${partnerId}` : apiURL,
     method: 'get',
     ...options,
   },

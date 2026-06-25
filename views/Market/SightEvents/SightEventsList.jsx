@@ -4,6 +4,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -19,13 +20,14 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import LocalPlayIcon from '@material-ui/icons/LocalPlay';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import LockIcon from '@material-ui/icons/Lock';
 import PublicIcon from '@material-ui/icons/Public';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Typography from '@material-ui/core/Typography';
+import AddIcon from '@material-ui/icons/Add';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import SearchIcon from '@material-ui/icons/Search';
 import EventIcon from '@material-ui/icons/Event';
 
@@ -34,6 +36,10 @@ import {
   actions as sightEventsActions,
   selectors as sightEventsSelectors,
 } from '@hello-poland/commons/redux/sightEvents';
+import {
+  actions as sightsActions,
+  selectors as sightsSelectors,
+} from '@hello-poland/commons/redux/sights';
 import withAuth from 'services/auth/withAuth';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
@@ -41,7 +47,7 @@ import EmptyView from 'components/EmptyView';
 import SortableTableHead from '../Partners/components/ListingViewTable/SortableTableHead';
 
 const tableColumns = [
-  { id: 'item-id', label: '# ID', sortable: true },
+  { id: 'item-id', label: '#\u00A0ID', sortable: true },
   { id: 'name', label: 'Nazwa oferty', sortable: true },
   { id: 'location', label: 'Lokalizacja', sortable: true },
   { id: 'partner', label: 'Partner', sortable: true },
@@ -55,6 +61,36 @@ const styles = theme => ({
   actions: {
     minWidth: 200,
   },
+  addButton: {
+    fontSize: 0,
+  },
+  addButtonLabel: {
+    fontSize: 14,
+  },
+  addDialogContent: {
+    minHeight: 360,
+    overflow: 'visible',
+  },
+  dropdown: {
+    left: 0,
+    maxHeight: 320,
+    overflowY: 'auto',
+    position: 'absolute',
+    right: 0,
+    top: '100%',
+    zIndex: 10,
+  },
+  dropdownButton: {
+    padding: 4,
+  },
+  icon: {
+    marginRight: theme.spacing.unit,
+  },
+  menuItem: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
   orderNunber: {
     minWidth: 110,
   },
@@ -64,17 +100,30 @@ const styles = theme => ({
   toolbar: {
     padding: theme.spacing.unit,
   },
+  sightSelector: {
+    position: 'relative',
+  },
 });
+
+const normalizeSearchValue = value => (value || '')
+  .toLocaleLowerCase('pl')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '');
 
 class SightEventsList extends React.Component {
   baseURL = '/market/sight-events';
 
   state = {
+    addDialogOpen: false,
     dialogOpen: false,
     dialogProps: {},
     isFetching: false,
+    isFetchingSights: false,
     menuAnchor: null,
     menuItemId: null,
+    selectedSightId: '',
+    sightMenuOpen: false,
+    sightQuery: '',
     snackbarOpen: false,
     snackbarMessage: '',
     order: 'asc',
@@ -83,7 +132,15 @@ class SightEventsList extends React.Component {
   };
 
   componentDidMount() {
+    const { router } = this.props;
+    const { successMessage } = (router && router.query) || {};
+
     this.handleFetchItems();
+    this.handleFetchSights();
+
+    if (successMessage) {
+      this.handleSnackbarOpen(successMessage);
+    }
   }
 
   getItemById = (itemId) => {
@@ -178,13 +235,96 @@ class SightEventsList extends React.Component {
     this.setState({ isFetching: true });
   };
 
+  handleFetchSightsFailure = () => this.setState({ isFetchingSights: false });
+
+  handleFetchSightsSuccess = () => this.setState({ isFetchingSights: false });
+
+  handleFetchSights = () => {
+    const { fetchSightsList } = this.props;
+
+    fetchSightsList({
+      options: {
+        headers: {
+          'Content-Language': DEFAULT_LANGUAGE,
+        },
+      },
+      onFailure: this.handleFetchSightsFailure,
+      onSuccess: this.handleFetchSightsSuccess,
+    });
+
+    this.setState({ isFetchingSights: true });
+  };
+
+  handleAddDialogOpen = () => this.setState({
+    addDialogOpen: true,
+    selectedSightId: '',
+    sightMenuOpen: false,
+    sightQuery: '',
+  });
+
+  handleAddDialogClose = () => this.setState({
+    addDialogOpen: false,
+    selectedSightId: '',
+    sightMenuOpen: false,
+    sightQuery: '',
+  });
+
+  handleSightSearchChange = event => this.setState({
+    selectedSightId: '',
+    sightMenuOpen: true,
+    sightQuery: event.target.value,
+  });
+
+  handleSightMenuToggle = () => this.setState(state => ({
+    sightMenuOpen: !state.sightMenuOpen,
+  }));
+
+  handleSightMenuClose = () => this.setState((state) => {
+    const { sights } = this.props;
+    const selectedSight = this.getSortedSights(sights)
+      .find(sight => String(sight.id) === String(state.selectedSightId));
+
+    return {
+      sightMenuOpen: false,
+      sightQuery: selectedSight ? this.getSightLabel(selectedSight) : '',
+    };
+  });
+
+  handleSightFocus = (event) => {
+    event.target.select();
+    this.setState({ sightMenuOpen: true });
+  };
+
+  handleSightSelect = sight => this.setState({
+    selectedSightId: sight ? sight.id : '',
+    sightMenuOpen: false,
+    sightQuery: sight ? this.getSightLabel(sight) : '',
+  });
+
+  handleSightEventCreate = () => {
+    const { router, sights } = this.props;
+    const { selectedSightId } = this.state;
+    const sight = sights.find(({ id }) => Number(id) === Number(selectedSightId));
+
+    if (!sight) {
+      return;
+    }
+
+    const { partnerId } = sight;
+    const successMessage = encodeURIComponent('Zapisano ofertę.');
+    const returnTo = encodeURIComponent(`${this.baseURL}?successMessage=${successMessage}`);
+    const href = `${this.baseURL}/create?sightId=${Number(selectedSightId)}&partnerId=${partnerId || ''}&returnTo=${returnTo}`;
+
+    router.push(href);
+    this.handleAddDialogClose();
+  };
+
   handleItemEdit = (itemId) => {
     const { router } = this.props;
 
     const href = `${this.baseURL}/edit?itemId=${itemId}`;
-    const pathname = `${this.baseURL}/${itemId}/edit`;
 
-    router.push(href, pathname);
+    router.push(href);
 
     this.handleMenuClose();
   };
@@ -270,6 +410,49 @@ class SightEventsList extends React.Component {
     });
   };
 
+  getSightLabel = sight => `${sight.partnerName || 'Brak partnera'} - ${sight.name || ''}`;
+
+  getSortedSights = sights => [...(sights || [])].sort((a, b) => (
+    this.getSightLabel(a).localeCompare(this.getSightLabel(b), 'pl', { sensitivity: 'base' })
+  ));
+
+  getFilteredSights = (sights, sightQuery, selectedSightId) => {
+    const sortedSights = this.getSortedSights(sights);
+    const selectedSight = sortedSights.find(
+      sight => String(sight.id) === String(selectedSightId),
+    );
+    const selectedSightName = selectedSight && this.getSightLabel(selectedSight);
+    const query = sightQuery === selectedSightName
+      ? ''
+      : normalizeSearchValue((sightQuery || '').trim());
+
+    if (!query) {
+      return sortedSights;
+    }
+
+    return sortedSights.filter(sight => (
+      normalizeSearchValue(this.getSightLabel(sight)).includes(query)
+    ));
+  };
+
+  handleSightKeyDown = (event) => {
+    if (event.key === 'Escape') {
+      this.handleSightMenuClose();
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      const { sights } = this.props;
+      const { selectedSightId, sightQuery } = this.state;
+      const [firstSight] = this.getFilteredSights(sights, sightQuery, selectedSightId);
+
+      if (firstSight) {
+        event.preventDefault();
+        this.handleSightSelect(firstSight);
+      }
+    }
+  };
+
   isItemBlocked = (itemId) => {
     const { items } = this.props;
     const selectedItem = items && items.find(item => item.id === itemId);
@@ -293,10 +476,11 @@ class SightEventsList extends React.Component {
   };
 
   render() {
-    const { classes, items } = this.props;
+    const { classes, items, sights } = this.props;
     const {
-      dialogOpen, dialogProps, isFetching, menuAnchor, menuItemId,
+      addDialogOpen, dialogOpen, dialogProps, isFetching, isFetchingSights, menuAnchor, menuItemId,
       snackbarMessage, snackbarOpen, order, orderBy, filterText,
+      selectedSightId, sightMenuOpen, sightQuery,
     } = this.state;
 
     const baseList = items || [];
@@ -354,13 +538,44 @@ class SightEventsList extends React.Component {
 
     const colorActive = 'primary';
     const colorInactive = 'disabled';
+    const sightOptions = this.getFilteredSights(sights, sightQuery, selectedSightId);
 
     return (
       <Layout>
         <Grid container className={classes.root}>
           <Paper className={classes.paper}>
-           {/* 1) Brak jakichkolwiek wydarzeń w systemie */}
-           {!hasItems && !isFetching && (
+            <Grid container justify="space-between" alignItems="flex-end" className={classes.toolbar}>
+              <Grid item>
+                <Button
+                  aria-label="Dodaj"
+                  className={classes.addButton}
+                  onClick={this.handleAddDialogOpen}
+                >
+                  <AddIcon className={classes.icon} />
+                  <span className={classes.addButtonLabel}>Dodaj</span>
+                  Dodaj ofertę
+                </Button>
+              </Grid>
+              {hasItems && (
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Filtruj (nazwa, lokalizacja, partner)"
+                    value={filterText}
+                    onChange={this.handleFilterChange}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              )}
+            </Grid>
+            {/* 1) Brak jakichkolwiek wydarzeń w systemie */}
+            {!hasItems && !isFetching && (
              <EmptyView
                image={EventIcon}
                label="Brak wydarzeń"
@@ -371,29 +586,10 @@ class SightEventsList extends React.Component {
            )}
 
            {/* 2) Mamy jakieś wydarzenia – pokazujemy filtr + tabelę / info o braku wyników */}
-           {hasItems && (
+           {(hasItems || addDialogOpen) && (
              <React.Fragment>
-               {/* Pasek filtrowania – zawsze widoczny, gdy są jakieś wydarzenia */}
-               <Grid container justify="flex-end" className={classes.toolbar}>
-                 <Grid item xs={12} sm={6} md={4}>
-                   <TextField
-                     fullWidth
-                     label="Filtruj (nazwa, lokalizacja, partner)"
-                     value={filterText}
-                     onChange={this.handleFilterChange}
-                     InputProps={{
-                       endAdornment: (
-                         <InputAdornment position="end">
-                           <SearchIcon />
-                         </InputAdornment>
-                       ),
-                     }}
-                   />
-                 </Grid>
-               </Grid>
-
-               {/* Jeśli filtr nic nie znalazł – komunikat zamiast tabeli */}
-               {sortedList.length === 0 ? (
+                {/* Jeśli filtr nic nie znalazł – komunikat zamiast tabeli */}
+                {sortedList.length === 0 ? (
                  <Grid container justify="center" style={{ padding: 16 }}>
                    <Typography variant="subtitle1">
                      Brak wyników dla filtra: "{filterText}"
@@ -492,6 +688,82 @@ class SightEventsList extends React.Component {
                 </DialogActions>
               </Dialog>
 
+              <Dialog
+                open={addDialogOpen}
+                onClose={this.handleAddDialogClose}
+                aria-labelledby="add-sight-event-dialog-title"
+                fullWidth
+                maxWidth="md"
+              >
+                <DialogTitle id="add-sight-event-dialog-title">
+                  Dodaj ofertę
+                </DialogTitle>
+                <DialogContent className={classes.addDialogContent}>
+                  <Grid container spacing={16}>
+                  <Grid item xs={12}>
+                    <ClickAwayListener onClickAway={this.handleSightMenuClose}>
+                      <div className={classes.sightSelector}>
+                        <TextField
+                          disabled={isFetchingSights}
+                          fullWidth
+                          label="Partner - obiekt"
+                          onChange={this.handleSightSearchChange}
+                          onFocus={this.handleSightFocus}
+                          onKeyDown={this.handleSightKeyDown}
+                          value={sightQuery}
+                          InputLabelProps={{ shrink: true }}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <IconButton
+                                  className={classes.dropdownButton}
+                                  onClick={this.handleSightMenuToggle}
+                                  aria-label="Rozwiń listę obiektów"
+                                >
+                                  <ArrowDropDownIcon />
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                        {sightMenuOpen && (
+                          <Paper className={classes.dropdown}>
+                            {sightOptions.map(sight => (
+                              <MenuItem
+                                key={sight.id}
+                                className={classes.menuItem}
+                                selected={String(sight.id) === String(selectedSightId)}
+                                onClick={() => this.handleSightSelect(sight)}
+                              >
+                                {this.getSightLabel(sight)}
+                              </MenuItem>
+                            ))}
+                            {!sightOptions.length && (
+                              <MenuItem className={classes.menuItem} disabled>
+                                Brak wyników
+                              </MenuItem>
+                            )}
+                          </Paper>
+                        )}
+                      </div>
+                    </ClickAwayListener>
+                  </Grid>
+                </Grid>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={this.handleAddDialogClose} color="primary">
+                    Anuluj
+                  </Button>
+                  <Button
+                    onClick={this.handleSightEventCreate}
+                    color="primary"
+                    disabled={!selectedSightId}
+                  >
+                    Dodaj
+                  </Button>
+                </DialogActions>
+              </Dialog>
+
               <Snackbar
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
                 open={snackbarOpen}
@@ -517,9 +789,11 @@ SightEventsList.propTypes = {
   deleteItem: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
   fetchList: PropTypes.func.isRequired,
+  fetchSightsList: PropTypes.func.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape({
   })).isRequired,
   router: PropTypes.shape({}).isRequired,
+  sights: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   updateItem: PropTypes.func.isRequired,
 };
 
@@ -530,11 +804,13 @@ SightEventsList.defaultProps = {
 const mapStateToProps = state => ({
   error: sightEventsSelectors.getError(state),
   items: sightEventsSelectors.getSightEvents(state),
+  sights: sightsSelectors.getSights(state),
 });
 
 const mapDispatchToProps = {
   deleteItem: sightEventsActions.deleteItem,
   fetchList: sightEventsActions.fetchList,
+  fetchSightsList: sightsActions.fetchList,
   updateItem: sightEventsActions.updateItem,
 };
 

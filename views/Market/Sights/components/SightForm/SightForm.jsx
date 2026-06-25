@@ -26,6 +26,7 @@ import {
   actions as sightsActions,
   selectors as sightsSelectors,
 } from '@hello-poland/commons/redux/sights';
+import { actions as sightCreationActions } from 'redux/sightCreation';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -47,6 +48,11 @@ const i18n = {
 const commonProps = {
   fullWidth: true,
 };
+
+const REQUIRED_FIELD_MESSAGE = 'To pole jest wymagane.';
+const MIN_LENGTH_MESSAGE = min => `Wpisz co najmniej ${min} znaków.`;
+const MAX_LENGTH_MESSAGE = max => `Wpisz maksymalnie ${max} znaków.`;
+const EMAIL_MESSAGE = 'Podaj poprawny adres e-mail.';
 
 // TODO: remove this function and change Switch implementation after it's fixed.
 // TODO: see https://github.com/stackworx/formik-material-ui/pull/42
@@ -93,13 +99,25 @@ class SightForm extends React.Component {
     // TODO: nested validation seems not working
     // TODO: see https://github.com/jaredpalmer/formik/issues/986
     this.validationSchema = yupObject().shape({
-      name: yupString().min(3).max(250).required(),
+      name: yupString()
+        .min(3, MIN_LENGTH_MESSAGE(3))
+        .max(250, MAX_LENGTH_MESSAGE(250))
+        .required(REQUIRED_FIELD_MESSAGE),
       published: yupBoolean(),
       // generalAdmission: yupBoolen(),
-      lead: yupString().min(10).max(250),
-      description: yupString().min(10).max(2500).required(),
-      email: yupString().email().trim(),
-      phone: yupString().min(9).trim(),
+      lead: yupString()
+        .min(10, MIN_LENGTH_MESSAGE(10))
+        .max(250, MAX_LENGTH_MESSAGE(250))
+        .required(REQUIRED_FIELD_MESSAGE),
+      description: yupString()
+        .min(10, MIN_LENGTH_MESSAGE(10))
+        .max(2500, MAX_LENGTH_MESSAGE(2500))
+        .required(REQUIRED_FIELD_MESSAGE),
+      email: yupString().email(EMAIL_MESSAGE).trim(),
+      phone: yupString()
+        .min(9, MIN_LENGTH_MESSAGE(9))
+        .trim()
+        .required(REQUIRED_FIELD_MESSAGE),
       // location: yupObject().shape({
       //   directions: yupString().min(5).max(255),
       //   street: yupString().min(5),
@@ -249,7 +267,9 @@ class SightForm extends React.Component {
   };
 
   handleSubmit = (values, actions) => {
-    const { initialValues, language, onSubmit } = this.props;
+    const {
+      initialValues, language, onSubmit, partnerId,
+    } = this.props;
 
     if (onSubmit) {
       onSubmit(values, actions);
@@ -266,6 +286,7 @@ class SightForm extends React.Component {
     const payload = {
       data: {
         ...data,
+        ...(!_isNumber(id) && partnerId ? { partnerId } : {}),
         mainImage: uploadedMultimedia.mainImage.id
           ? uploadedMultimedia.mainImage : values.mainImage,
         images: uploadedMultimedia.images.length ? uploadedMultimedia.images : values.images,
@@ -353,7 +374,7 @@ class SightForm extends React.Component {
     const { data: errorData } = requestError || {};
     const { message: errorMessage } = errorData || {};
     const { defaultLanguage, id: itemId } = itemValues || {};
-    const isDefaultTranslation = itemId && defaultLanguage === language;
+    const isDefaultTranslation = !itemId || defaultLanguage === language;
 
     return (
       <Formik
@@ -408,7 +429,7 @@ class SightForm extends React.Component {
                 )
               }
               <GridItem>
-                <Field name="lead" label="Wprowadzenie" component={TextField} {...commonProps} />
+                <Field name="lead" label="Wprowadzenie" required component={TextField} {...commonProps} />
               </GridItem>
               <GridItem>
                 <Field name="description" label="Opis oferty" required component={TextField} {...commonProps} multiline rowsMax={20} />
@@ -470,7 +491,7 @@ class SightForm extends React.Component {
                       <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem md={6} sm={6}>
-                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
+                      <Field name="phone" label="Numer telefonu" required component={TextField} {...commonProps} />
                     </GridItem>
                   </React.Fragment>
                 )
@@ -594,6 +615,7 @@ SightForm.propTypes = {
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
+  partnerId: PropTypes.number,
   requestError: PropTypes.shape({
     message: PropTypes.string,
   }),
@@ -610,6 +632,7 @@ SightForm.defaultProps = {
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,
+  partnerId: null,
   requestError: null,
   uploadedMultimedia: null,
 };
@@ -620,7 +643,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearError: sightsActions.clearError,
-  createItem: sightsActions.createItem,
+  createItem: sightCreationActions.createSight,
   createTranslation: sightsActions.createTranslation,
   updateItem: sightsActions.updateItem,
 };

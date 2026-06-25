@@ -309,7 +309,7 @@ class CalendarEventForm extends React.Component {
                 />
                 <div className={classNames(classes.section, classes.fullWidth)}>
                   <Typography variant="subtitle1" gutterBottom>
-                    Termin:
+                    Termin *:
                   </Typography>
                 </div>
                 <div className={classNames(classes.columns, classes.fullWidth)}>
@@ -507,7 +507,7 @@ class CalendarEventForm extends React.Component {
                 && (
                   <div className={classNames(classes.section, classes.fullWidth)}>
                     <Typography variant="h6" gutterBottom>
-                      Produkty
+                      Produkty *
                     </Typography>
                     {!hasNormalTicket
                     && (
@@ -602,6 +602,7 @@ class CalendarEventForm extends React.Component {
                         </Grid>
                         <TicketDefinitionForm
                           lockedTicketTypeCode={!hasNormalTicket ? NORMAL_TICKET_CODE : null}
+                          partnerId={formData.partnerId}
                           onSubmitSuccess={(ticketDefinitionId) => {
                             fetchTicketDefinitions({
                               partnerId: formData.partnerId,

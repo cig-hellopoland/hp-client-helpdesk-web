@@ -71,11 +71,11 @@ class CalendarEventController extends React.Component {
   }
 
   componentDidMount() {
-    const { ticketDefinitionsList } = this.props;
+    const { ticketDefinitionsList, formData } = this.props;
+    const { partnerId } = formData || {};
 
-    if (!ticketDefinitionsList || !ticketDefinitionsList.length) {
-      const { fetchTicketDefinitions, formData } = this.props;
-      const { partnerId } = formData || {};
+    if (partnerId || !ticketDefinitionsList || !ticketDefinitionsList.length) {
+      const { fetchTicketDefinitions } = this.props;
 
       fetchTicketDefinitions({ partnerId });
     }

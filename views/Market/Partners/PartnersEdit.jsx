@@ -19,6 +19,10 @@ import {
   actions as usersActions,
   selectors as usersSelectors,
 } from 'redux/users';
+import {
+  actions as sightsActions,
+  selectors as sightsSelectors,
+} from '@hello-poland/commons/redux/sights';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
@@ -154,11 +158,12 @@ class PartnersEdit extends React.Component {
     });
   };
 
-  handlePasswordChange = (userId, password) => {
-    const { changePassword } = this.props;
+  handlePasswordChange = (userId, password, callbacks = {}) => {
+    const { changePartnerUserPassword, itemId } = this.props;
 
-    if (changePassword) {
-      changePassword({
+    if (changePartnerUserPassword) {
+      changePartnerUserPassword({
+        partnerId: itemId,
         id: userId,
         data: {
           password,
@@ -172,7 +177,12 @@ class PartnersEdit extends React.Component {
           if (clearUsersError) {
             clearUsersError();
           }
+
+          if (callbacks.onFailure) {
+            callbacks.onFailure();
+          }
         },
+        onSuccess: callbacks.onSuccess,
       });
     }
   };
@@ -188,7 +198,7 @@ class PartnersEdit extends React.Component {
     }
   };
 
-  handleDeleteUserSuccess = () => {
+  handleDeleteUserSuccess = (callback) => {
     const { itemId } = this.props;
     const { selectedTranslation } = this.state;
 
@@ -197,18 +207,62 @@ class PartnersEdit extends React.Component {
     if (itemId) {
       this.handleFetchItem(itemId, selectedTranslation);
     }
+
+    if (callback) {
+      callback();
+    }
   };
 
-  handleDeleteUser = (userId) => {
-    const { deleteUser } = this.props;
+  handleDeleteUser = (userId, callbacks = {}) => {
+    const { deletePartnerUser, itemId } = this.props;
 
-    if (deleteUser) {
-      deleteUser({
+    if (deletePartnerUser) {
+      deletePartnerUser({
+        partnerId: itemId,
         id: userId,
-        onFailure: this.handleDeleteUserFailure,
-        onSuccess: this.handleDeleteUserSuccess,
+        onFailure: () => {
+          this.handleDeleteUserFailure();
+
+          if (callbacks.onFailure) {
+            callbacks.onFailure();
+          }
+        },
+        onSuccess: () => this.handleDeleteUserSuccess(callbacks.onSuccess),
       });
     }
+  };
+
+  handleCreatePartnerUser = (request) => {
+    const { createPartnerUser } = this.props;
+
+    createPartnerUser(request);
+  };
+
+  handleUpdatePartnerUser = (request) => {
+    const { updatePartnerUser } = this.props;
+
+    updatePartnerUser(request);
+  };
+
+  handleFetchPartnerUsers = (partnerId) => {
+    const { fetchPartnerUsers } = this.props;
+
+    fetchPartnerUsers({ partnerId });
+  };
+
+  handleFetchSights = (partnerId) => {
+    const { fetchSights } = this.props;
+
+    fetchSights({
+      options: {
+        headers: {
+          'Content-Language': DEFAULT_LANGUAGE,
+        },
+        params: {
+          partnerId,
+        },
+      },
+    });
   };
 
   handleRequestFailure = () => {
@@ -347,7 +401,7 @@ class PartnersEdit extends React.Component {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
     } = this.state;
     const {
-      classes, item, itemId,
+      classes, errorUsers, item, itemId, partnerUsers, sights,
     } = this.props;
     const { defaultLanguage } = item || {};
 
@@ -451,10 +505,16 @@ class PartnersEdit extends React.Component {
           {selectedTab === 5
             && (
               <PartnerUsersList
-                items={(item && item.users) || []}
-                onFetchItems={() => this.handleFetchItem(itemId, selectedTranslation)}
+                error={errorUsers}
+                items={partnerUsers}
+                partnerId={itemId}
+                sights={sights}
+                onCreateUser={this.handleCreatePartnerUser}
+                onFetchItems={() => this.handleFetchPartnerUsers(itemId)}
+                onFetchSights={this.handleFetchSights}
                 onPasswordChange={this.handlePasswordChange}
                 onDeleteItem={this.handleDeleteUser}
+                onUpdateUser={this.handleUpdatePartnerUser}
               />
             )
           }
@@ -476,25 +536,31 @@ class PartnersEdit extends React.Component {
 PartnersEdit.propTypes = {
   itemId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
-  changePassword: PropTypes.func.isRequired,
+  changePartnerUserPassword: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   clearUsersError: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
+  createPartnerUser: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
-  deleteUser: PropTypes.func.isRequired,
+  deletePartnerUser: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
   errorUsers: PropTypes.shape({}),
   fetchItem: PropTypes.func.isRequired,
+  fetchPartnerUsers: PropTypes.func.isRequired,
+  fetchSights: PropTypes.func.isRequired,
   item: PropTypes.shape({
     id: PropTypes.number,
     label: PropTypes.string,
     users: PropTypes.arrayOf(PropTypes.shape({})),
   }),
+  partnerUsers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   resetEmail: PropTypes.func.isRequired,
   router: PropTypes.shape({}).isRequired,
+  sights: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   successMessage: PropTypes.string,
   tab: PropTypes.string,
+  updatePartnerUser: PropTypes.func.isRequired,
 };
 
 PartnersEdit.defaultProps = {
@@ -510,18 +576,24 @@ const mapStateToProps = state => ({
   error: partnersSelectors.getError(state),
   errorUsers: usersSelectors.getErrors(state),
   item: partnersSelectors.getItem(state),
+  partnerUsers: usersSelectors.getUsers(state),
+  sights: sightsSelectors.getSights(state),
 });
 
 const mapDispatchToProps = {
   changeDefaultTranslation: partnersActions.changeDefaultTranslation,
-  changePassword: usersActions.changePassword,
+  changePartnerUserPassword: usersActions.changePartnerUserPassword,
   clearError: partnersActions.clearError,
   clearUsersError: usersActions.clearErrors,
   clearItem: partnersActions.clearItem,
+  createPartnerUser: usersActions.createPartnerUser,
+  deletePartnerUser: usersActions.deletePartnerUser,
   deleteTranslation: partnersActions.deleteTranslation,
-  deleteUser: usersActions.deleteUser,
   fetchItem: partnersActions.fetchItem,
+  fetchPartnerUsers: usersActions.fetchPartnerUsers,
+  fetchSights: sightsActions.fetchList,
   resetEmail: usersActions.resetEmail,
+  updatePartnerUser: usersActions.updatePartnerUser,
 };
 
 export default compose(

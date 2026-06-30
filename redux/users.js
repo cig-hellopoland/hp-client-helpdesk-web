@@ -94,6 +94,36 @@ const DELETE_USER_FAILURE = `${prefix}DELETE_USER_FAILURE`;
  */
 const DELETE_USER_SUCCESS = `${prefix}DELETE_USER_SUCCESS`;
 
+const CREATE_PARTNER_USER = `${prefix}CREATE_PARTNER_USER`;
+
+const CREATE_PARTNER_USER_FAILURE = `${prefix}CREATE_PARTNER_USER_FAILURE`;
+
+const CREATE_PARTNER_USER_SUCCESS = `${prefix}CREATE_PARTNER_USER_SUCCESS`;
+
+const UPDATE_PARTNER_USER = `${prefix}UPDATE_PARTNER_USER`;
+
+const UPDATE_PARTNER_USER_FAILURE = `${prefix}UPDATE_PARTNER_USER_FAILURE`;
+
+const UPDATE_PARTNER_USER_SUCCESS = `${prefix}UPDATE_PARTNER_USER_SUCCESS`;
+
+const CHANGE_PARTNER_USER_PASSWORD = `${prefix}CHANGE_PARTNER_USER_PASSWORD`;
+
+const CHANGE_PARTNER_USER_PASSWORD_FAILURE = `${prefix}CHANGE_PARTNER_USER_PASSWORD_FAILURE`;
+
+const CHANGE_PARTNER_USER_PASSWORD_SUCCESS = `${prefix}CHANGE_PARTNER_USER_PASSWORD_SUCCESS`;
+
+const DELETE_PARTNER_USER = `${prefix}DELETE_PARTNER_USER`;
+
+const DELETE_PARTNER_USER_FAILURE = `${prefix}DELETE_PARTNER_USER_FAILURE`;
+
+const DELETE_PARTNER_USER_SUCCESS = `${prefix}DELETE_PARTNER_USER_SUCCESS`;
+
+const FETCH_PARTNER_USERS = `${prefix}FETCH_PARTNER_USERS`;
+
+const FETCH_PARTNER_USERS_FAILURE = `${prefix}FETCH_PARTNER_USERS_FAILURE`;
+
+const FETCH_PARTNER_USERS_SUCCESS = `${prefix}FETCH_PARTNER_USERS_SUCCESS`;
+
 export const types = {
   CHANGE_PASSWORD,
   CHANGE_PASSWORD_FAILURE,
@@ -101,6 +131,11 @@ export const types = {
   CLEAR_ERROR,
   RESET_EMAIL,
   DELETE_USER,
+  CREATE_PARTNER_USER,
+  UPDATE_PARTNER_USER,
+  CHANGE_PARTNER_USER_PASSWORD,
+  DELETE_PARTNER_USER,
+  FETCH_PARTNER_USERS,
 };
 
 /*
@@ -257,17 +292,150 @@ const deleteUserSuccess = data => ({
   data,
 });
 
+const createPartnerUser = ({
+  partnerId, data, options, onFailure, onSuccess,
+} = {}) => ({
+  type: CREATE_PARTNER_USER,
+  payload: {
+    url: `/partners/${partnerId}/users`,
+    method: 'post',
+    ...options,
+    data,
+  },
+  onFailure,
+  onSuccess,
+});
+
+const createPartnerUserFailure = ({ data = defaultInitialState.errors } = {}) => ({
+  type: CREATE_PARTNER_USER_FAILURE,
+  errors: data,
+});
+
+const createPartnerUserSuccess = data => ({
+  type: CREATE_PARTNER_USER_SUCCESS,
+  data,
+});
+
+const updatePartnerUser = ({
+  partnerId, id, data, options, onFailure, onSuccess,
+} = {}) => ({
+  type: UPDATE_PARTNER_USER,
+  payload: {
+    url: `/partners/${partnerId}/users/${id}`,
+    method: 'put',
+    ...options,
+    data,
+  },
+  onFailure,
+  onSuccess,
+});
+
+const updatePartnerUserFailure = ({ data = defaultInitialState.errors } = {}) => ({
+  type: UPDATE_PARTNER_USER_FAILURE,
+  errors: data,
+});
+
+const updatePartnerUserSuccess = data => ({
+  type: UPDATE_PARTNER_USER_SUCCESS,
+  data,
+});
+
+const changePartnerUserPassword = ({
+  partnerId, id, data, options, onFailure, onSuccess,
+} = {}) => ({
+  type: CHANGE_PARTNER_USER_PASSWORD,
+  payload: {
+    url: `/partners/${partnerId}/users/${id}/password`,
+    method: 'patch',
+    ...options,
+    data,
+  },
+  onFailure,
+  onSuccess,
+});
+
+const changePartnerUserPasswordFailure = ({ data = defaultInitialState.errors } = {}) => ({
+  type: CHANGE_PARTNER_USER_PASSWORD_FAILURE,
+  errors: data,
+});
+
+const changePartnerUserPasswordSuccess = data => ({
+  type: CHANGE_PARTNER_USER_PASSWORD_SUCCESS,
+  data,
+});
+
+const deletePartnerUser = ({
+  partnerId, id, options, onFailure, onSuccess,
+} = {}) => ({
+  type: DELETE_PARTNER_USER,
+  payload: {
+    url: `/partners/${partnerId}/users/${id}`,
+    method: 'delete',
+    ...options,
+  },
+  onFailure,
+  onSuccess,
+});
+
+const deletePartnerUserFailure = ({ data = defaultInitialState.errors } = {}) => ({
+  type: DELETE_PARTNER_USER_FAILURE,
+  errors: data,
+});
+
+const deletePartnerUserSuccess = data => ({
+  type: DELETE_PARTNER_USER_SUCCESS,
+  data,
+});
+
+const fetchPartnerUsers = ({
+  partnerId, options, onFailure, onSuccess,
+} = {}) => ({
+  type: FETCH_PARTNER_USERS,
+  payload: {
+    url: `/partners/${partnerId}/users`,
+    method: 'get',
+    ...options,
+  },
+  onFailure,
+  onSuccess,
+});
+
+const fetchPartnerUsersFailure = ({ data = defaultInitialState.errors } = {}) => ({
+  type: FETCH_PARTNER_USERS_FAILURE,
+  errors: data,
+});
+
+const fetchPartnerUsersSuccess = data => ({
+  type: FETCH_PARTNER_USERS_SUCCESS,
+  data,
+});
+
 export const actions = {
+  changePartnerUserPassword,
+  changePartnerUserPasswordFailure,
+  changePartnerUserPasswordSuccess,
   changePassword,
   changePasswordFailure,
   changePasswordSuccess,
   clearErrors,
+  createPartnerUser,
+  createPartnerUserFailure,
+  createPartnerUserSuccess,
+  deletePartnerUser,
+  deletePartnerUserFailure,
+  deletePartnerUserSuccess,
   resetEmail,
   resetEmailFailure,
   resetEmailSuccess,
   deleteUser,
   deleteUserFailure,
   deleteUserSuccess,
+  fetchPartnerUsers,
+  fetchPartnerUsersFailure,
+  fetchPartnerUsersSuccess,
+  updatePartnerUser,
+  updatePartnerUserFailure,
+  updatePartnerUserSuccess,
 };
 
 /*
@@ -290,9 +458,12 @@ const getState = state => state[name];
  */
 const getErrors = state => getState(state).errors;
 
+const getUsers = state => getState(state).users;
+
 export const selectors = {
   getErrors,
   getState,
+  getUsers,
 };
 
 /*
@@ -417,10 +588,195 @@ const deleteUserLogic = createLogic({
   },
 });
 
+const createPartnerUserLogic = createLogic({
+  type: [CREATE_PARTNER_USER],
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 201) {
+        dispatch(createPartnerUserSuccess(data));
+
+        if (onSuccess) {
+          onSuccess(data);
+        }
+      } else {
+        dispatch(createPartnerUserFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(createPartnerUserFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
+  },
+});
+
+const updatePartnerUserLogic = createLogic({
+  type: [UPDATE_PARTNER_USER],
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 201) {
+        dispatch(updatePartnerUserSuccess(data));
+
+        if (onSuccess) {
+          onSuccess(data);
+        }
+      } else {
+        dispatch(updatePartnerUserFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(updatePartnerUserFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
+  },
+});
+
+const changePartnerUserPasswordLogic = createLogic({
+  type: [CHANGE_PARTNER_USER_PASSWORD],
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(changePartnerUserPasswordSuccess(data));
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(changePartnerUserPasswordFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(changePartnerUserPasswordFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
+  },
+});
+
+const deletePartnerUserLogic = createLogic({
+  type: [DELETE_PARTNER_USER],
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200 || status === 204) {
+        dispatch(deletePartnerUserSuccess(data));
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        dispatch(deletePartnerUserFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(deletePartnerUserFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
+  },
+});
+
+const fetchPartnerUsersLogic = createLogic({
+  type: [FETCH_PARTNER_USERS],
+  async process(
+    { action: { payload, onFailure, onSuccess }, httpClient, cancelled$ },
+    dispatch,
+    done,
+  ) {
+    try {
+      const response = await httpClient.cancellable(payload, cancelled$);
+      const { data, status } = response;
+
+      if (status === 200) {
+        dispatch(fetchPartnerUsersSuccess(data));
+
+        if (onSuccess) {
+          onSuccess(data);
+        }
+      } else {
+        dispatch(fetchPartnerUsersFailure(response));
+
+        if (onFailure) {
+          onFailure();
+        }
+      }
+    } catch ({ response }) {
+      dispatch(fetchPartnerUsersFailure(response));
+
+      if (onFailure) {
+        onFailure();
+      }
+    } finally {
+      done();
+    }
+  },
+});
+
 export const logic = {
+  changePartnerUserPasswordLogic,
   changePasswordLogic,
+  createPartnerUserLogic,
+  deletePartnerUserLogic,
   resetEmailLogic,
   deleteUserLogic,
+  fetchPartnerUsersLogic,
+  updatePartnerUserLogic,
 };
 
 /*
@@ -436,19 +792,34 @@ export const logic = {
 const reducer = (initialState = defaultInitialState) => (state = initialState, action) => {
   switch (action.type) {
     case CHANGE_PASSWORD_FAILURE:
+    case CHANGE_PARTNER_USER_PASSWORD_FAILURE:
+    case CREATE_PARTNER_USER_FAILURE:
+    case DELETE_PARTNER_USER_FAILURE:
+    case FETCH_PARTNER_USERS_FAILURE:
     case RESET_EMAIL_FAILURE:
     case DELETE_USER_FAILURE:
+    case UPDATE_PARTNER_USER_FAILURE:
       return {
         ...state,
         errors: action.errors,
       };
     case CHANGE_PASSWORD_SUCCESS:
+    case CHANGE_PARTNER_USER_PASSWORD_SUCCESS:
+    case CREATE_PARTNER_USER_SUCCESS:
+    case DELETE_PARTNER_USER_SUCCESS:
     case RESET_EMAIL_SUCCESS:
     case DELETE_USER_SUCCESS:
+    case UPDATE_PARTNER_USER_SUCCESS:
     case CLEAR_ERROR:
       return {
         ...state,
         errors: initialState.errors,
+      };
+    case FETCH_PARTNER_USERS_SUCCESS:
+      return {
+        ...state,
+        errors: initialState.errors,
+        users: action.data,
       };
     default:
       return state;

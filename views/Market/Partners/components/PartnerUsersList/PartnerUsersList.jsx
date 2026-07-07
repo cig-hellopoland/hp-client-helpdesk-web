@@ -40,6 +40,14 @@ const tableColumns = [
   { id: 'name', label: 'Imię i nazwisko' },
   { id: 'role', label: 'Rola' },
   { id: 'sights', label: 'Obiekty' },
+  { id: 'status', label: 'Status' },
+  { id: 'menu', label: '' },
+];
+
+const usherTableColumns = [
+  { id: 'email', label: 'E-mail' },
+  { id: 'name', label: 'Imie i nazwisko' },
+  { id: 'status', label: 'Status' },
   { id: 'menu', label: '' },
 ];
 
@@ -50,6 +58,13 @@ const emptyForm = {
   password: '',
   role: ROLE_ADMIN,
   allowedSightIds: [],
+};
+
+const emptyUsherForm = {
+  id: null,
+  name: '',
+  email: '',
+  password: '',
 };
 
 const styles = theme => ({
@@ -68,7 +83,15 @@ const styles = theme => ({
   icon: {
     marginRight: theme.spacing.unit,
   },
+  buttonGroup: {
+    '& > * + *': {
+      marginLeft: theme.spacing.unit,
+    },
+  },
   toolbar: {
+    padding: theme.spacing.unit,
+  },
+  sectionTitle: {
     padding: theme.spacing.unit,
   },
 });
@@ -79,6 +102,7 @@ class PartnerUsersList extends React.Component {
     deleteDialogProps: {},
     menuAnchor: null,
     menuItemId: null,
+    menuType: 'user',
     passwordDialogOpen: false,
     passwordDialogProps: {},
     snackbarOpen: false,
@@ -86,10 +110,14 @@ class PartnerUsersList extends React.Component {
     userDialogOpen: false,
     userDialogMode: 'create',
     userForm: { ...emptyForm },
+    usherDialogOpen: false,
+    usherDialogMode: 'create',
+    usherForm: { ...emptyUsherForm },
   };
 
   componentDidMount() {
     this.handleFetchItems();
+    this.handleFetchUshers();
     this.handleFetchSights();
   }
 
@@ -97,6 +125,7 @@ class PartnerUsersList extends React.Component {
     const { partnerId } = this.props;
     if (partnerId && partnerId !== prevProps.partnerId) {
       this.handleFetchItems();
+      this.handleFetchUshers();
       this.handleFetchSights();
     }
   }
@@ -105,6 +134,12 @@ class PartnerUsersList extends React.Component {
     const { items } = this.props;
 
     return (items || []).find(item => item.id === itemId);
+  };
+
+  getUsher = (itemId) => {
+    const { ushers } = this.props;
+
+    return (ushers || []).find(item => item.id === itemId);
   };
 
   getSightName = (sightId) => {
@@ -149,8 +184,8 @@ class PartnerUsersList extends React.Component {
   };
 
   getSelectedItem = () => {
-    const { menuItemId } = this.state;
-    return this.getItem(menuItemId);
+    const { menuItemId, menuType } = this.state;
+    return menuType === 'usher' ? this.getUsher(menuItemId) : this.getItem(menuItemId);
   };
 
   isPanelUser = item => item && [ROLE_ADMIN, ROLE_SALESMAN].includes(this.getRole(item));
@@ -161,6 +196,12 @@ class PartnerUsersList extends React.Component {
     userDialogOpen: true,
     userDialogMode: 'create',
     userForm: { ...emptyForm },
+  });
+
+  handleCreateUsher = () => this.setState({
+    usherDialogOpen: true,
+    usherDialogMode: 'create',
+    usherForm: { ...emptyUsherForm },
   });
 
   handleEditUser = (item) => {
@@ -183,9 +224,32 @@ class PartnerUsersList extends React.Component {
     this.handleMenuClose();
   };
 
+  handleEditUsher = (item) => {
+    if (!item) {
+      return;
+    }
+
+    this.setState({
+      usherDialogOpen: true,
+      usherDialogMode: 'edit',
+      usherForm: {
+        id: item.id,
+        name: item.name || '',
+        email: item.email || '',
+        password: '',
+      },
+    });
+    this.handleMenuClose();
+  };
+
   handleUserDialogClose = () => this.setState({
     userDialogOpen: false,
     userForm: { ...emptyForm },
+  });
+
+  handleUsherDialogClose = () => this.setState({
+    usherDialogOpen: false,
+    usherForm: { ...emptyUsherForm },
   });
 
   handleUserFormChange = name => (event) => {
@@ -193,6 +257,16 @@ class PartnerUsersList extends React.Component {
     this.setState(state => ({
       userForm: {
         ...state.userForm,
+        [name]: value,
+      },
+    }));
+  };
+
+  handleUsherFormChange = name => (event) => {
+    const { value } = event.target;
+    this.setState(state => ({
+      usherForm: {
+        ...state.usherForm,
         [name]: value,
       },
     }));
@@ -257,17 +331,55 @@ class PartnerUsersList extends React.Component {
     });
   };
 
+  handleUsherDialogAccept = () => {
+    const {
+      onCreateUsher, onUpdateUsher, partnerId,
+    } = this.props;
+    const { usherDialogMode, usherForm } = this.state;
+    const data = {
+      name: usherForm.name,
+      email: usherForm.email,
+      password: usherForm.password,
+    };
+    const callbacks = {
+      onFailure: this.handleRequestFailure,
+      onSuccess: () => {
+        this.handleSnackbarOpen('Zapisano biletera');
+        this.handleUsherDialogClose();
+        this.handleFetchUshers();
+      },
+    };
+
+    if (usherDialogMode === 'edit') {
+      onUpdateUsher({
+        partnerId,
+        id: usherForm.id,
+        data,
+        ...callbacks,
+      });
+      return;
+    }
+
+    onCreateUsher({
+      partnerId,
+      data,
+      ...callbacks,
+    });
+  };
+
   handlePasswordDialogOpen = (item) => {
     if (!item) {
       return;
     }
 
+    const { menuType } = this.state;
     this.setState({
       passwordDialogOpen: true,
       passwordDialogProps: {
         itemId: item.id,
         name: item.email,
         password: '',
+        type: menuType,
       },
     });
     this.handleMenuClose();
@@ -290,12 +402,13 @@ class PartnerUsersList extends React.Component {
   };
 
   handlePasswordDialogAccept = () => {
-    const { onPasswordChange } = this.props;
+    const { onPasswordChange, onUsherPasswordChange } = this.props;
     const { passwordDialogProps } = this.state;
-    const { itemId, password } = passwordDialogProps || {};
+    const { itemId, password, type } = passwordDialogProps || {};
+    const handler = type === 'usher' ? onUsherPasswordChange : onPasswordChange;
 
-    if (itemId && password && onPasswordChange) {
-      onPasswordChange(itemId, password, {
+    if (itemId && password && handler) {
+      handler(itemId, password, {
         onFailure: this.handleRequestFailure,
         onSuccess: () => {
           this.handleSnackbarOpen('Zmieniono hasło użytkownika partnera');
@@ -310,11 +423,13 @@ class PartnerUsersList extends React.Component {
       return;
     }
 
+    const { menuType } = this.state;
     this.setState({
       deleteDialogOpen: true,
       deleteDialogProps: {
         itemId: item.id,
         name: item.email,
+        type: menuType,
       },
     });
     this.handleMenuClose();
@@ -326,20 +441,49 @@ class PartnerUsersList extends React.Component {
   });
 
   handleDeleteAccept = () => {
-    const { onDeleteItem } = this.props;
+    const { onDeleteItem, onDeleteUsher } = this.props;
     const { deleteDialogProps } = this.state;
-    const { itemId } = deleteDialogProps || {};
+    const { itemId, type } = deleteDialogProps || {};
+    const handler = type === 'usher' ? onDeleteUsher : onDeleteItem;
 
-    if (itemId && onDeleteItem) {
-      onDeleteItem(itemId, {
+    if (itemId && handler) {
+      handler(itemId, {
         onFailure: this.handleRequestFailure,
         onSuccess: () => {
-          this.handleSnackbarOpen('Dezaktywowano użytkownika partnera');
+          this.handleSnackbarOpen('Usunięto użytkownika partnera');
           this.handleDeleteDialogClose();
-          this.handleFetchItems();
+          if (type === 'usher') {
+            this.handleFetchUshers();
+          } else {
+            this.handleFetchItems();
+          }
         },
       });
     }
+  };
+
+  handleBlockedChange = (item) => {
+    if (!item) {
+      return;
+    }
+
+    const { onSetUserBlocked, onSetUsherBlocked } = this.props;
+    const { menuType } = this.state;
+    const blocked = !item.blocked;
+    const handler = menuType === 'usher' ? onSetUsherBlocked : onSetUserBlocked;
+
+    handler(item.id, blocked, {
+      onFailure: this.handleRequestFailure,
+      onSuccess: () => {
+        this.handleSnackbarOpen(blocked ? 'Dezaktywowano uzytkownika' : 'Aktywowano uzytkownika');
+        this.handleMenuClose();
+        if (menuType === 'usher') {
+          this.handleFetchUshers();
+        } else {
+          this.handleFetchItems();
+        }
+      },
+    });
   };
 
   handleFetchItems = () => {
@@ -347,6 +491,14 @@ class PartnerUsersList extends React.Component {
 
     if (onFetchItems) {
       onFetchItems();
+    }
+  };
+
+  handleFetchUshers = () => {
+    const { onFetchUshers } = this.props;
+
+    if (onFetchUshers) {
+      onFetchUshers();
     }
   };
 
@@ -358,18 +510,22 @@ class PartnerUsersList extends React.Component {
     }
   };
 
-  handleMenuOpen = (event, itemId) => this.setState({
+  handleMenuOpen = (event, itemId, menuType = 'user') => this.setState({
     menuAnchor: event.currentTarget,
     menuItemId: itemId,
+    menuType,
   });
 
   handleMenuClose = () => this.setState({ menuAnchor: null });
 
   handleMenuExited = () => this.setState({ menuItemId: null });
 
-  handleRequestFailure = () => {
+  handleRequestFailure = (response) => {
     const { error } = this.props;
-    this.handleSnackbarOpen((error && error.message) || 'Wystąpił błąd podczas zapisu użytkownika');
+    const responseMessage = response && response.data && response.data.message;
+    this.handleSnackbarOpen(
+      responseMessage || (error && error.message) || 'Wystąpił błąd podczas zapisu użytkownika',
+    );
   };
 
   handleSnackbarOpen = message => this.setState({
@@ -387,19 +543,26 @@ class PartnerUsersList extends React.Component {
       deleteDialogOpen,
       deleteDialogProps,
       menuAnchor,
+      menuType,
       passwordDialogOpen,
       passwordDialogProps,
       snackbarOpen,
       snackbarMessage,
+      usherDialogMode,
+      usherDialogOpen,
+      usherForm,
       userDialogMode,
       userDialogOpen,
       userForm,
     } = this.state;
     const {
-      classes, items, sights,
+      classes, items, sights, ushers,
     } = this.props;
     const selectedItem = this.getSelectedItem();
     const sortedList = [...(items || [])].sort((a, b) => (
+      (a.email || '').localeCompare(b.email || '', 'pl', { sensitivity: 'base' })
+    ));
+    const sortedUshers = [...(ushers || [])].sort((a, b) => (
       (a.email || '').localeCompare(b.email || '', 'pl', { sensitivity: 'base' })
     ));
     const allowedSightIds = userForm.allowedSightIds || [];
@@ -407,10 +570,14 @@ class PartnerUsersList extends React.Component {
     return (
       <Grid container className={classes.root}>
         <Grid container alignItems="center" justify="space-between" className={classes.toolbar}>
-          <Grid item>
+          <Grid item className={classes.buttonGroup}>
             <Button onClick={this.handleCreateUser}>
               <AddIcon className={classes.icon} />
               Dodaj użytkownika
+            </Button>
+            <Button onClick={this.handleCreateUsher}>
+              <AddIcon className={classes.icon} />
+              Dodaj biletera
             </Button>
           </Grid>
         </Grid>
@@ -435,11 +602,12 @@ class PartnerUsersList extends React.Component {
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{this.getRoleLabel(item)}</TableCell>
                     <TableCell>{this.getAllowedSightsLabel(item)}</TableCell>
+                    <TableCell>{item.blocked ? 'Nieaktywny' : 'Aktywny'}</TableCell>
                     <TableCell align="right" className={classes.actions}>
                       <IconButton
                         aria-owns={menuAnchor ? 'item-menu' : undefined}
                         aria-haspopup="true"
-                        onClick={event => this.handleMenuOpen(event, item.id)}
+                        onClick={event => this.handleMenuOpen(event, item.id, 'user')}
                       >
                         <MoreVertIcon />
                       </IconButton>
@@ -452,7 +620,7 @@ class PartnerUsersList extends React.Component {
             <Menu
               id="item-menu"
               anchorEl={menuAnchor}
-              open={Boolean(menuAnchor)}
+              open={Boolean(menuAnchor) && menuType === 'user'}
               onClose={this.handleMenuClose}
               onExited={this.handleMenuExited}
             >
@@ -465,10 +633,75 @@ class PartnerUsersList extends React.Component {
                 Zmień hasło
               </MenuItem>
               {this.isPanelUser(selectedItem) && (
-                <MenuItem onClick={() => this.handleDeleteDialogOpen(selectedItem)}>
-                  Dezaktywuj
+                <MenuItem onClick={() => this.handleBlockedChange(selectedItem)}>
+                  {selectedItem && selectedItem.blocked ? 'Aktywuj' : 'Dezaktywuj'}
                 </MenuItem>
               )}
+              {this.isPanelUser(selectedItem) && (
+                <MenuItem onClick={() => this.handleDeleteDialogOpen(selectedItem)}>
+                  Usun
+                </MenuItem>
+              )}
+            </Menu>
+          </React.Fragment>
+        )}
+
+        <Grid item xs={12} className={classes.sectionTitle}>
+          <strong>Bileterzy</strong>
+        </Grid>
+
+        {sortedUshers.length === 0 && (
+          <EmptyView
+            image={LocalOfferIcon}
+            label="Brak bileterow"
+            message="Dodaj biletera lub ponow zapytanie aby wyswietlic liste."
+            onRefresh={this.handleFetchUshers}
+          />
+        )}
+
+        {sortedUshers.length > 0 && (
+          <React.Fragment>
+            <Table aria-labelledby="ushers-list">
+              <TableHead columns={usherTableColumns} />
+              <TableBody>
+                {sortedUshers.map(item => (
+                  <TableRow key={item.id} hover>
+                    <TableCell>{item.email}</TableCell>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.blocked ? 'Nieaktywny' : 'Aktywny'}</TableCell>
+                    <TableCell align="right" className={classes.actions}>
+                      <IconButton
+                        aria-owns={menuAnchor ? 'usher-menu' : undefined}
+                        aria-haspopup="true"
+                        onClick={event => this.handleMenuOpen(event, item.id, 'usher')}
+                      >
+                        <MoreVertIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            <Menu
+              id="usher-menu"
+              anchorEl={menuAnchor}
+              open={Boolean(menuAnchor) && menuType === 'usher'}
+              onClose={this.handleMenuClose}
+              onExited={this.handleMenuExited}
+            >
+              <MenuItem onClick={() => this.handleEditUsher(selectedItem)}>
+                Edytuj
+              </MenuItem>
+              <MenuItem onClick={() => this.handlePasswordDialogOpen(selectedItem)}>
+                Zmien haslo
+              </MenuItem>
+              <MenuItem onClick={() => this.handleBlockedChange(selectedItem)}>
+                {selectedItem && selectedItem.blocked ? 'Aktywuj' : 'Dezaktywuj'}
+              </MenuItem>
+              <MenuItem onClick={() => this.handleDeleteDialogOpen(selectedItem)}>
+                Usun
+              </MenuItem>
             </Menu>
           </React.Fragment>
         )}
@@ -565,6 +798,57 @@ class PartnerUsersList extends React.Component {
         </Dialog>
 
         <Dialog
+          open={usherDialogOpen}
+          onClose={this.handleUsherDialogClose}
+          aria-labelledby="partner-usher-dialog-title"
+          fullWidth
+          maxWidth="sm"
+        >
+          <DialogTitle id="partner-usher-dialog-title">
+            {usherDialogMode === 'edit' ? 'Edytuj biletera' : 'Dodaj biletera'}
+          </DialogTitle>
+          <DialogContent className={classes.dialogContent}>
+            <Grid container spacing={16}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Imie i nazwisko"
+                  onChange={this.handleUsherFormChange('name')}
+                  value={usherForm.name}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="E-mail"
+                  onChange={this.handleUsherFormChange('email')}
+                  value={usherForm.email}
+                />
+              </Grid>
+              {usherDialogMode === 'create' && (
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Haslo"
+                    onChange={this.handleUsherFormChange('password')}
+                    type="password"
+                    value={usherForm.password}
+                  />
+                </Grid>
+              )}
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleUsherDialogClose} color="primary">
+              Anuluj
+            </Button>
+            <Button onClick={this.handleUsherDialogAccept} color="primary">
+              Zapisz
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
           open={passwordDialogOpen}
           onClose={this.handlePasswordDialogClose}
           aria-labelledby="password-dialog-title"
@@ -601,11 +885,11 @@ class PartnerUsersList extends React.Component {
           aria-describedby="delete-dialog-description"
         >
           <DialogTitle id="delete-dialog-title">
-            Dezaktywacja użytkownika partnera
+            Usunięcie użytkownika
           </DialogTitle>
           <DialogContent>
             <DialogContentText id="delete-dialog-description">
-              {`Czy na pewno chcesz dezaktywować użytkownika o adresie e-mail "${deleteDialogProps.name}"?`}
+              {`Czy na pewno chcesz usunąć użytkownika o adresie e-mail "${deleteDialogProps.name}"?`}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -613,7 +897,7 @@ class PartnerUsersList extends React.Component {
               Anuluj
             </Button>
             <Button onClick={this.handleDeleteAccept} color="secondary">
-              Dezaktywuj
+              Usuń
             </Button>
           </DialogActions>
         </Dialog>
@@ -636,14 +920,22 @@ PartnerUsersList.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   error: PropTypes.shape({}),
   items: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  onCreateUsher: PropTypes.func.isRequired,
   onCreateUser: PropTypes.func.isRequired,
   onDeleteItem: PropTypes.func.isRequired,
+  onDeleteUsher: PropTypes.func.isRequired,
   onFetchItems: PropTypes.func.isRequired,
   onFetchSights: PropTypes.func.isRequired,
+  onFetchUshers: PropTypes.func.isRequired,
   onPasswordChange: PropTypes.func.isRequired,
+  onSetUserBlocked: PropTypes.func.isRequired,
+  onSetUsherBlocked: PropTypes.func.isRequired,
+  onUpdateUsher: PropTypes.func.isRequired,
+  onUsherPasswordChange: PropTypes.func.isRequired,
   onUpdateUser: PropTypes.func.isRequired,
   partnerId: PropTypes.number.isRequired,
   sights: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  ushers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
 
 PartnerUsersList.defaultProps = {

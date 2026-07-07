@@ -15,9 +15,6 @@ export default [
     label: 'Market',
   },
   {
-    disabled: true, label: 'Użytkownicy', href: '/market/users', Icon: PeopleIcon,
-  },
-  {
     label: 'Partnerzy', href: '/market/partners', Icon: DomainIcon,
   },
   {

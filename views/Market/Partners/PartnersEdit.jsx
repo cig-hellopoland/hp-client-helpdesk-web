@@ -187,6 +187,35 @@ class PartnersEdit extends React.Component {
     }
   };
 
+  handleUsherPasswordChange = (usherId, password, callbacks = {}) => {
+    const { changePartnerUsherPassword, itemId } = this.props;
+
+    if (changePartnerUsherPassword) {
+      changePartnerUsherPassword({
+        partnerId: itemId,
+        id: usherId,
+        data: {
+          password,
+        },
+        onFailure: () => {
+          const { clearUsersError, errorUsers } = this.props;
+          const { message } = errorUsers || {};
+
+          this.handleSnackbarOpen(message || 'WystÄ…piĹ‚ bĹ‚Ä…d podczas zmiany hasĹ‚a biletera');
+
+          if (clearUsersError) {
+            clearUsersError();
+          }
+
+          if (callbacks.onFailure) {
+            callbacks.onFailure();
+          }
+        },
+        onSuccess: callbacks.onSuccess,
+      });
+    }
+  };
+
   handleDeleteUserFailure = () => {
     const { clearUsersError, errorUsers } = this.props;
     const { message } = errorUsers || {};
@@ -232,6 +261,49 @@ class PartnersEdit extends React.Component {
     }
   };
 
+  handleSetPartnerUserBlocked = (userId, blocked, callbacks = {}) => {
+    const { itemId, setPartnerUserBlocked } = this.props;
+
+    setPartnerUserBlocked({
+      partnerId: itemId,
+      id: userId,
+      blocked,
+      onFailure: callbacks.onFailure,
+      onSuccess: callbacks.onSuccess,
+    });
+  };
+
+  handleSetPartnerUsherBlocked = (usherId, blocked, callbacks = {}) => {
+    const { itemId, setPartnerUsherBlocked } = this.props;
+
+    setPartnerUsherBlocked({
+      partnerId: itemId,
+      id: usherId,
+      blocked,
+      onFailure: callbacks.onFailure,
+      onSuccess: callbacks.onSuccess,
+    });
+  };
+
+  handleDeleteUsher = (usherId, callbacks = {}) => {
+    const { deletePartnerUsher, itemId } = this.props;
+
+    if (deletePartnerUsher) {
+      deletePartnerUsher({
+        partnerId: itemId,
+        id: usherId,
+        onFailure: () => {
+          this.handleDeleteUserFailure();
+
+          if (callbacks.onFailure) {
+            callbacks.onFailure();
+          }
+        },
+        onSuccess: callbacks.onSuccess,
+      });
+    }
+  };
+
   handleCreatePartnerUser = (request) => {
     const { createPartnerUser } = this.props;
 
@@ -244,10 +316,28 @@ class PartnersEdit extends React.Component {
     updatePartnerUser(request);
   };
 
+  handleCreatePartnerUsher = (request) => {
+    const { createPartnerUsher } = this.props;
+
+    createPartnerUsher(request);
+  };
+
+  handleUpdatePartnerUsher = (request) => {
+    const { updatePartnerUsher } = this.props;
+
+    updatePartnerUsher(request);
+  };
+
   handleFetchPartnerUsers = (partnerId) => {
     const { fetchPartnerUsers } = this.props;
 
     fetchPartnerUsers({ partnerId });
+  };
+
+  handleFetchPartnerUshers = (partnerId) => {
+    const { fetchPartnerUshers } = this.props;
+
+    fetchPartnerUshers({ partnerId });
   };
 
   handleFetchSights = (partnerId) => {
@@ -401,7 +491,7 @@ class PartnersEdit extends React.Component {
       availableTranslations, selectedTab, selectedTranslation, snackbarOpen, snackbarMessage,
     } = this.state;
     const {
-      classes, errorUsers, item, itemId, partnerUsers, sights,
+      classes, errorUsers, item, itemId, partnerUsers, partnerUshers, sights,
     } = this.props;
     const { defaultLanguage } = item || {};
 
@@ -508,12 +598,20 @@ class PartnersEdit extends React.Component {
                 error={errorUsers}
                 items={partnerUsers}
                 partnerId={itemId}
+                ushers={partnerUshers}
                 sights={sights}
+                onCreateUsher={this.handleCreatePartnerUsher}
                 onCreateUser={this.handleCreatePartnerUser}
                 onFetchItems={() => this.handleFetchPartnerUsers(itemId)}
+                onFetchUshers={() => this.handleFetchPartnerUshers(itemId)}
                 onFetchSights={this.handleFetchSights}
+                onUsherPasswordChange={this.handleUsherPasswordChange}
+                onDeleteUsher={this.handleDeleteUsher}
                 onPasswordChange={this.handlePasswordChange}
                 onDeleteItem={this.handleDeleteUser}
+                onSetUserBlocked={this.handleSetPartnerUserBlocked}
+                onSetUsherBlocked={this.handleSetPartnerUsherBlocked}
+                onUpdateUsher={this.handleUpdatePartnerUsher}
                 onUpdateUser={this.handleUpdatePartnerUser}
               />
             )
@@ -536,17 +634,21 @@ class PartnersEdit extends React.Component {
 PartnersEdit.propTypes = {
   itemId: PropTypes.number,
   changeDefaultTranslation: PropTypes.func.isRequired,
+  changePartnerUsherPassword: PropTypes.func.isRequired,
   changePartnerUserPassword: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
   clearError: PropTypes.func.isRequired,
   clearUsersError: PropTypes.func.isRequired,
   clearItem: PropTypes.func.isRequired,
+  createPartnerUsher: PropTypes.func.isRequired,
   createPartnerUser: PropTypes.func.isRequired,
   deleteTranslation: PropTypes.func.isRequired,
+  deletePartnerUsher: PropTypes.func.isRequired,
   deletePartnerUser: PropTypes.func.isRequired,
   error: PropTypes.shape({}),
   errorUsers: PropTypes.shape({}),
   fetchItem: PropTypes.func.isRequired,
+  fetchPartnerUshers: PropTypes.func.isRequired,
   fetchPartnerUsers: PropTypes.func.isRequired,
   fetchSights: PropTypes.func.isRequired,
   item: PropTypes.shape({
@@ -554,12 +656,16 @@ PartnersEdit.propTypes = {
     label: PropTypes.string,
     users: PropTypes.arrayOf(PropTypes.shape({})),
   }),
+  partnerUshers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   partnerUsers: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   resetEmail: PropTypes.func.isRequired,
   router: PropTypes.shape({}).isRequired,
+  setPartnerUserBlocked: PropTypes.func.isRequired,
+  setPartnerUsherBlocked: PropTypes.func.isRequired,
   sights: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   successMessage: PropTypes.string,
   tab: PropTypes.string,
+  updatePartnerUsher: PropTypes.func.isRequired,
   updatePartnerUser: PropTypes.func.isRequired,
 };
 
@@ -576,23 +682,31 @@ const mapStateToProps = state => ({
   error: partnersSelectors.getError(state),
   errorUsers: usersSelectors.getErrors(state),
   item: partnersSelectors.getItem(state),
+  partnerUshers: usersSelectors.getUshers(state),
   partnerUsers: usersSelectors.getUsers(state),
   sights: sightsSelectors.getSights(state),
 });
 
 const mapDispatchToProps = {
   changeDefaultTranslation: partnersActions.changeDefaultTranslation,
+  changePartnerUsherPassword: usersActions.changePartnerUsherPassword,
   changePartnerUserPassword: usersActions.changePartnerUserPassword,
   clearError: partnersActions.clearError,
   clearUsersError: usersActions.clearErrors,
   clearItem: partnersActions.clearItem,
+  createPartnerUsher: usersActions.createPartnerUsher,
   createPartnerUser: usersActions.createPartnerUser,
+  deletePartnerUsher: usersActions.deletePartnerUsher,
   deletePartnerUser: usersActions.deletePartnerUser,
   deleteTranslation: partnersActions.deleteTranslation,
   fetchItem: partnersActions.fetchItem,
+  fetchPartnerUshers: usersActions.fetchPartnerUshers,
   fetchPartnerUsers: usersActions.fetchPartnerUsers,
   fetchSights: sightsActions.fetchList,
   resetEmail: usersActions.resetEmail,
+  setPartnerUserBlocked: usersActions.setPartnerUserBlocked,
+  setPartnerUsherBlocked: usersActions.setPartnerUsherBlocked,
+  updatePartnerUsher: usersActions.updatePartnerUsher,
   updatePartnerUser: usersActions.updatePartnerUser,
 };
 

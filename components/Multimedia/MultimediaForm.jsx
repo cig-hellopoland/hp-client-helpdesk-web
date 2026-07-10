@@ -68,13 +68,14 @@ class MultimediaForm extends React.Component {
   };
 
   handleFileDelete = (fileId, type) => {
-    const { deleteFile } = this.props;
+    const { deleteFile, partnerId } = this.props;
 
     if (deleteFile) {
       deleteFile({
         id: fileId,
         options: {
           params: {
+            partner: partnerId,
             type: type === UPLOAD_TYPE.GALLERY_IMAGE ? 'image' : 'file',
           },
         },
@@ -219,7 +220,10 @@ class MultimediaForm extends React.Component {
       translation, createFile,
     } = this.props;
     const isDefaultTranslation = defaultTranslation === translation;
-    const attachmentItems = AttachmentProps && AttachmentProps.item  ? [{ ...AttachmentProps.item,name: AttachmentProps.item.originalName || AttachmentProps.item.name,}] : [];
+    const attachmentItems = AttachmentProps && AttachmentProps.item ? [{
+      ...AttachmentProps.item,
+      name: AttachmentProps.item.originalName || AttachmentProps.item.name,
+    }] : [];
 
     return (
       <React.Fragment>
@@ -274,33 +278,33 @@ class MultimediaForm extends React.Component {
             />
           </div>
         )}
-      {AttachmentProps && (
-        <div className={classes.section}>
-          <Grid container alignItems="center" justify="space-between">
-            <Grid item>
-              <Typography variant="h6">Pliki</Typography>
-            </Grid>
-            {createFile && (
+        {AttachmentProps && (
+          <div className={classes.section}>
+            <Grid container alignItems="center" justify="space-between">
               <Grid item>
-                <IconButton
-                  aria-label="Dodaj"
-                  disabled={!isDefaultTranslation}
-                  onClick={() => this.handleUploadModalOpen(itemId, UPLOAD_TYPE.ATTACHMENT)}
-                  title="Dodaj"
-                >
-                  <AddIcon />
-                </IconButton>
+                <Typography variant="h6">Pliki</Typography>
               </Grid>
-            )}
-          </Grid>
+              {createFile && (
+                <Grid item>
+                  <IconButton
+                    aria-label="Dodaj"
+                    disabled={!isDefaultTranslation}
+                    onClick={() => this.handleUploadModalOpen(itemId, UPLOAD_TYPE.ATTACHMENT)}
+                    title="Dodaj"
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </Grid>
+              )}
+            </Grid>
 
-          <MultimediaSection
-            items={attachmentItems}
-            sectionType={UPLOAD_TYPE.ATTACHMENT}
-            onDelete={this.handleDelete}
-          />
-        </div>
-      )}
+            <MultimediaSection
+              items={attachmentItems}
+              sectionType={UPLOAD_TYPE.ATTACHMENT}
+              onDelete={this.handleDelete}
+            />
+          </div>
+        )}
 
         <MediaManager
           disableBackdropClick

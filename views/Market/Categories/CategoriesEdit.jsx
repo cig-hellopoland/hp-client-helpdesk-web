@@ -13,6 +13,7 @@ import {
   actions as categoriesActions,
   selectors as categoriesSelectors,
 } from '@hello-poland/commons/redux/categories';
+import { selectors as profileSelectors } from 'redux/profile';
 import withAuth from 'services/auth/withAuth';
 import { CONTENT_LANGUAGES, DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
@@ -25,6 +26,11 @@ const styles = theme => ({
     padding: theme.spacing.unit * 2,
   },
 });
+
+const canManageDictionaries = profile => ((profile && profile.roles) || [])
+  .some(role => role === 'ADMIN' || role === 'ROOT');
+
+const hasKnownRoles = profile => !!(profile && profile.roles && profile.roles.length);
 
 class CategoriesEdit extends React.Component {
   baseURL = '/market/categories';
@@ -39,8 +45,13 @@ class CategoriesEdit extends React.Component {
 
   componentDidMount() {
     const {
-      itemId, clearError, clearItem, error, item,
+      itemId, clearError, clearItem, error, item, profile, router,
     } = this.props;
+
+    if (hasKnownRoles(profile) && !canManageDictionaries(profile)) {
+      router.replace(this.baseURL);
+      return;
+    }
 
     if (item) {
       clearItem();
@@ -56,8 +67,15 @@ class CategoriesEdit extends React.Component {
   }
 
   componentDidUpdate() {
-    const { item, itemId } = this.props;
+    const {
+      item, itemId, profile, router,
+    } = this.props;
     const { isFetching } = this.state;
+
+    if (hasKnownRoles(profile) && !canManageDictionaries(profile)) {
+      router.replace(this.baseURL);
+      return;
+    }
 
     if (itemId && !isFetching && (!item || item.id !== itemId)) {
       const { selectedTranslation } = this.state;
@@ -321,6 +339,7 @@ CategoriesEdit.propTypes = {
     id: PropTypes.number,
     label: PropTypes.string,
   }),
+  profile: PropTypes.shape({}).isRequired,
   router: PropTypes.shape({}).isRequired,
 };
 
@@ -333,6 +352,7 @@ CategoriesEdit.defaultProps = {
 const mapStateToProps = state => ({
   error: categoriesSelectors.getError(state),
   item: categoriesSelectors.getItem(state),
+  profile: profileSelectors.getProfile(state),
 });
 
 const mapDispatchToProps = {

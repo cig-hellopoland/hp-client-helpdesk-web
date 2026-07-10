@@ -611,6 +611,13 @@ class SightEventEdit extends React.Component {
     const pageTitle = itemId ? 'Edycja oferty' : 'Nowa oferta';
     const hasLanguageActions = !!(item && item.id);
     const roles = (profile && profile.roles) || [];
+    const canEditOfferContent = [
+      'ADMIN',
+      'ROOT',
+      'SALESMAN',
+      'HELPDESK_PARTNER_MANAGER',
+      'HELPDESK_CONTENT_MANAGER',
+    ].some(role => roles.includes(role));
     const canEditTicketPools = roles.includes('ADMIN') || roles.includes('SALESMAN');
 
     const multimedia = item
@@ -681,10 +688,14 @@ class SightEventEdit extends React.Component {
                     categories={categoriesList}
                     defaultTranslation={DEFAULT_LANGUAGE}
                     items={selectedCategories}
-                    managePublic
-                    manageRestricted
-                    onSubmit={this.handleLocalItemDataTypeSubmit(ITEM_DATA_TYPES.CATEGORY)}
-                    onDelete={this.handleLocalItemDataTypeDelete(ITEM_DATA_TYPES.CATEGORY)}
+                    managePublic={canEditOfferContent}
+                    manageRestricted={canEditOfferContent}
+                    onSubmit={canEditOfferContent
+                      ? this.handleLocalItemDataTypeSubmit(ITEM_DATA_TYPES.CATEGORY)
+                      : null}
+                    onDelete={canEditOfferContent
+                      ? this.handleLocalItemDataTypeDelete(ITEM_DATA_TYPES.CATEGORY)
+                      : null}
                     translation={selectedTranslation}
                   />
                 </div>
@@ -693,10 +704,14 @@ class SightEventEdit extends React.Component {
                     tags={tagsList}
                     defaultTranslation={DEFAULT_LANGUAGE}
                     items={selectedTags}
-                    managePublic
-                    manageRestricted
-                    onSubmit={this.handleLocalItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)}
-                    onDelete={this.handleLocalItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
+                    managePublic={canEditOfferContent}
+                    manageRestricted={canEditOfferContent}
+                    onSubmit={canEditOfferContent
+                      ? this.handleLocalItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)
+                      : null}
+                    onDelete={canEditOfferContent
+                      ? this.handleLocalItemDataTypeDelete(ITEM_DATA_TYPES.TAG)
+                      : null}
                     translation={selectedTranslation}
                   />
                 </div>
@@ -729,9 +744,9 @@ class SightEventEdit extends React.Component {
                     </Button>
                   </Grid>
                   <Grid item>
-                  <Button variant="contained" color="primary" onClick={this.handleSubmitClick}>
-                    Zapisz
-                  </Button>
+                    <Button variant="contained" color="primary" onClick={this.handleSubmitClick}>
+                      Zapisz
+                    </Button>
                   </Grid>
                 </Grid>
               </React.Fragment>
@@ -743,10 +758,14 @@ class SightEventEdit extends React.Component {
                 categories={categoriesList}
                 defaultTranslation={defaultLanguage}
                 items={item.categories}
-                managePublic
-                manageRestricted
-                onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.CATEGORY)}
-                onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.CATEGORY)}
+                managePublic={canEditOfferContent}
+                manageRestricted={canEditOfferContent}
+                onSubmit={canEditOfferContent
+                  ? this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.CATEGORY)
+                  : null}
+                onDelete={canEditOfferContent
+                  ? this.handleItemDataTypeDelete(ITEM_DATA_TYPES.CATEGORY)
+                  : null}
                 translation={selectedTranslation}
               />
             )
@@ -757,10 +776,14 @@ class SightEventEdit extends React.Component {
                 tags={tagsList}
                 defaultTranslation={defaultLanguage}
                 items={item.tags}
-                managePublic
-                manageRestricted
-                onSubmit={this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)}
-                onDelete={this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)}
+                managePublic={canEditOfferContent}
+                manageRestricted={canEditOfferContent}
+                onSubmit={canEditOfferContent
+                  ? this.handleItemDataTypeSubmit(ITEM_DATA_TYPES.TAG)
+                  : null}
+                onDelete={canEditOfferContent
+                  ? this.handleItemDataTypeDelete(ITEM_DATA_TYPES.TAG)
+                  : null}
                 translation={selectedTranslation}
               />
             )

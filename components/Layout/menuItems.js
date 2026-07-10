@@ -36,6 +36,6 @@ export default [
     label: 'Helpdesk',
   },
   {
-    disabled: true, label: 'Użytkownicy', href: '/helpdesk/users', Icon: PeopleIcon,
+    label: 'Użytkownicy', href: '/helpdesk/users', Icon: PeopleIcon, roles: ['ADMIN', 'ROOT'],
   },
 ];

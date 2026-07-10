@@ -105,10 +105,16 @@ class SignIn extends Component {
   };
 
   handleSnackbarOpen = (errors = []) => {
-    const credentialError = errors.filter(error => error.status === '401')[0];
+    const credentialError = errors.filter(error => String(error.status) === '401')[0]
+      || errors[0];
 
     if (credentialError) {
-      this.setState({ snackbar: { open: true, message: credentialError.detail } });
+      this.setState({
+        snackbar: {
+          open: true,
+          message: credentialError.detail || 'Nie udało się zalogować.',
+        },
+      });
     }
   };
 
@@ -122,13 +128,14 @@ class SignIn extends Component {
     });
   };
 
-  handleSubmitFailure = actions => () => {
+  handleSubmitFailure = actions => (failurePayload = {}) => {
     const { errors } = this.props;
     const { setSubmitting } = actions;
+    const currentErrors = failurePayload.errors || errors;
 
     setSubmitting(false);
 
-    this.handleSnackbarOpen(errors);
+    this.handleSnackbarOpen(currentErrors);
   };
 
   handleSubmitSuccess = () => {

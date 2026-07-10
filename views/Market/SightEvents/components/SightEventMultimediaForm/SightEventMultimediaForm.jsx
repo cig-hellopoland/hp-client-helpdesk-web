@@ -79,7 +79,6 @@ const mapDispatchToProps = {
   createFile: filesActions.createFile,
   createFileCancel: filesActions.createFileCancel,
   deleteFile: filesActions.deleteFile,
-  partnerId: null,
 };
 
 export default connect(null, mapDispatchToProps)(SightEventMultimediaForm);

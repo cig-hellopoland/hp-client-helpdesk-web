@@ -109,6 +109,30 @@ export const types = {
   REFRESH_ACCESS_TOKEN_SUCCESS,
 };
 
+const getFailurePayload = (response, fallbackMessage) => {
+  const { data, status } = response || {};
+
+  if (data && Array.isArray(data.errors)) {
+    return { errors: data.errors };
+  }
+
+  if (data && data.status && data.detail) {
+    return {
+      errors: [{
+        status: String(data.status),
+        detail: data.detail,
+      }],
+    };
+  }
+
+  return {
+    errors: [{
+      status: String(status || 401),
+      detail: fallbackMessage,
+    }],
+  };
+};
+
 
 /*
  * ACTIONS
@@ -421,39 +445,30 @@ const fetchProfileLogic = createLogic({
           onSuccess();
         }
       } else {
-        dispatch(fetchProfileFailure(data));
+        const failurePayload = getFailurePayload(
+          response,
+          'Nie udało się pobrać profilu użytkownika.',
+        );
+
+        dispatch(fetchProfileFailure(failurePayload));
 
         if (onFailure) {
-          onFailure();
+          onFailure(failurePayload);
         }
       }
     } catch ({ response }) {
-      const { data } = response;
+      const failurePayload = getFailurePayload(
+        response,
+        'Nie udało się pobrać profilu użytkownika.',
+      );
 
-      dispatch(fetchProfileFailure(data));
+      dispatch(fetchProfileFailure(failurePayload));
 
       if (onFailure) {
-        onFailure();
+        onFailure(failurePayload);
       }
     }
 
-    done();
-  },
-});
-
-/**
- * Logic used for handling profile fetching on successful login attempt.
- * @method
- */
-const fetchProfileOnLoginSuccessLogic = createLogic({
-  type: [
-    LOGIN_SUCCESS,
-  ],
-  cancelType: [
-    FETCH_PROFILE_CANCEL,
-  ],
-  async process(options, dispatch, done) {
-    dispatch(fetchProfile());
     done();
   },
 });
@@ -477,24 +492,39 @@ const loginLogic = createLogic({
 
       if (status === 200 || status === 204) {
         dispatch(loginSuccess(data));
+        dispatch(fetchProfile({
+          onSuccess,
+          onFailure: (failurePayload) => {
+            dispatch(logoutSuccess());
+            dispatch(loginFailure(failurePayload));
 
-        if (onSuccess) {
-          onSuccess();
-        }
+            if (onFailure) {
+              onFailure(failurePayload);
+            }
+          },
+        }));
       } else {
-        dispatch(loginFailure(data));
+        const failurePayload = getFailurePayload(
+          response,
+          'Nie udało się zalogować. Sprawdź login i hasło.',
+        );
+
+        dispatch(loginFailure(failurePayload));
 
         if (onFailure) {
-          onFailure();
+          onFailure(failurePayload);
         }
       }
     } catch ({ response }) {
-      const { data } = response;
+      const failurePayload = getFailurePayload(
+        response,
+        'Nie udało się zalogować. Sprawdź login i hasło.',
+      );
 
-      dispatch(loginFailure(data));
+      dispatch(loginFailure(failurePayload));
 
       if (onFailure) {
-        onFailure();
+        onFailure(failurePayload);
       }
     }
 
@@ -557,7 +587,6 @@ const unauthorizedLogic = createLogic({
 
 export const logic = {
   fetchProfileLogic,
-  fetchProfileOnLoginSuccessLogic,
   loginLogic,
   logoutLogic,
   unauthorizedLogic,

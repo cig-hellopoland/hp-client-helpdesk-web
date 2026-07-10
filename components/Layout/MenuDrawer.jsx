@@ -8,6 +8,8 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Link from 'next/link';
+import { connect } from 'react-redux';
+import { selectors as profileSelectors } from 'redux/profile';
 
 const drawerWidth = 240;
 
@@ -23,36 +25,46 @@ const styles = theme => ({
 });
 
 const MenuDrawer = ({
-  classes, currentPath, menuItems,
-}) => (
-  <Drawer variant="permanent" className={classes.root} classes={{ paper: classes.drawerPaper }}>
-    <div className={classes.toolbar} />
-    <nav>
-      <List>
-        {menuItems.map(({
-          disabled, label, href, Icon,
-        }) => {
-          if (!href) {
-            return <ListSubheader key={label}>{label}</ListSubheader>;
-          }
+  classes, currentPath, menuItems, profile,
+}) => {
+  const profileRoles = (profile && profile.roles) || [];
+  const visibleItems = menuItems.filter((item) => {
+    if (!item.roles || !item.roles.length) {
+      return true;
+    }
+    return item.roles.some(role => profileRoles.includes(role));
+  });
 
-          const isSelected = href.length === 1
-            ? currentPath === href
-            : currentPath.includes(href);
+  return (
+    <Drawer variant="permanent" className={classes.root} classes={{ paper: classes.drawerPaper }}>
+      <div className={classes.toolbar} />
+      <nav>
+        <List>
+          {visibleItems.map(({
+            disabled, label, href, Icon,
+          }) => {
+            if (!href) {
+              return <ListSubheader key={label}>{label}</ListSubheader>;
+            }
 
-          return (
-            <Link key={`${label}-${href}`} href={href} passHref>
-              <ListItem button disabled={disabled} selected={isSelected}>
-                <ListItemIcon><Icon /></ListItemIcon>
-                <ListItemText primary={label} />
-              </ListItem>
-            </Link>
-          );
-        })}
-      </List>
-    </nav>
-  </Drawer>
-);
+            const isSelected = href.length === 1
+              ? currentPath === href
+              : currentPath.includes(href);
+
+            return (
+              <Link key={`${label}-${href}`} href={href} passHref>
+                <ListItem button disabled={disabled} selected={isSelected}>
+                  <ListItemIcon><Icon /></ListItemIcon>
+                  <ListItemText primary={label} />
+                </ListItem>
+              </Link>
+            );
+          })}
+        </List>
+      </nav>
+    </Drawer>
+  );
+};
 
 MenuDrawer.propTypes = {
   classes: PropTypes.shape({}).isRequired,
@@ -62,6 +74,11 @@ MenuDrawer.propTypes = {
     href: PropTypes.string,
     Icon: PropTypes.func,
   })).isRequired,
+  profile: PropTypes.shape({}).isRequired,
 };
 
-export default withStyles(styles)(MenuDrawer);
+const mapStateToProps = state => ({
+  profile: profileSelectors.getProfile(state),
+});
+
+export default connect(mapStateToProps)(withStyles(styles)(MenuDrawer));

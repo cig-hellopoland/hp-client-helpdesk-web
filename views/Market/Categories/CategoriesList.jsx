@@ -39,6 +39,7 @@ import {
   actions as categoriesOrderActions,
   selectors as categoriesOrderSelectors,
 } from 'redux/categoriesOrder';
+import { selectors as profileSelectors } from 'redux/profile';
 import withAuth from 'services/auth/withAuth';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 
@@ -103,6 +104,9 @@ const styles = theme => ({
     textAlign: 'center',
   },
 });
+
+const canManageDictionaries = profile => ((profile && profile.roles) || [])
+  .some(role => role === 'ADMIN' || role === 'ROOT');
 
 class CategoriesList extends React.Component {
   baseURL = '/market/categories';
@@ -357,7 +361,10 @@ handleFilterChange = (event) => {
       dialogOpen, dialogProps, isFetching, menuAnchor, snackbarMessage, snackbarOpen,
       order, orderBy, filterText, orderDialogOpen, orderItems,
     } = this.state;
-    const { classes, items, orderSaving } = this.props;
+    const {
+      classes, items, orderSaving, profile,
+    } = this.props;
+    const canManage = canManageDictionaries(profile);
     const baseList = items || [];
     const hasItems = baseList.length > 0;
 
@@ -402,28 +409,29 @@ handleFilterChange = (event) => {
       return 0;
     });
 
-    const colorActive = 'primary';
-    const colorInactive = 'disabled';
-
     return (
       <Layout>
         <Grid container className={classes.root}>
           <Paper className={classes.paper}>
             <Grid container direction="column" className={classes.toolbar}>
               <Grid container item justify="flex-end">
-                <Grid item>
-                  <Button onClick={this.handleOrderDialogOpen}>
+                {canManage && (
+                  <React.Fragment>
+                    <Grid item>
+                      <Button onClick={this.handleOrderDialogOpen}>
                     Ustal kolejność
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Link href={`${this.baseURL}/create`} passHref>
-                    <Button component="a">
-                      <AddIcon className={classes.icon} />
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Link href={`${this.baseURL}/create`} passHref>
+                        <Button component="a">
+                          <AddIcon className={classes.icon} />
                       Dodaj
-                    </Button>
-                  </Link>
-                </Grid>
+                        </Button>
+                      </Link>
+                    </Grid>
+                  </React.Fragment>
+                )}
               </Grid>
             </Grid>
             <Grid container justify="flex-end" className={classes.toolbar}>
@@ -490,28 +498,32 @@ handleFilterChange = (event) => {
                           <TableCell align="right">
                             <IconButton disabled><LockIcon color={restricted ? 'primary' : 'disabled'} /></IconButton>
                             <IconButton disabled><StarIcon color={recommended ? 'primary' : 'disabled'} /></IconButton>
-                            <IconButton onClick={event => this.handleMenuOpen(event, id)}>
-                              <MoreVertIcon />
-                            </IconButton>
+                            {canManage && (
+                              <IconButton onClick={event => this.handleMenuOpen(event, id)}>
+                                <MoreVertIcon />
+                              </IconButton>
+                            )}
                           </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                 )}
-                  <Menu
-                    id="item-menu"
-                    anchorEl={menuAnchor}
-                    open={Boolean(menuAnchor)}
-                    onClose={this.handleMenuClose}
-                  >
-                    <MenuItem onClick={this.handleItemEdit}>
-                      Edytuj
-                    </MenuItem>
-                    <MenuItem onClick={this.handleDialogOpen}>
-                      Usuń
-                    </MenuItem>
-                  </Menu>
+                  {canManage && (
+                    <Menu
+                      id="item-menu"
+                      anchorEl={menuAnchor}
+                      open={Boolean(menuAnchor)}
+                      onClose={this.handleMenuClose}
+                    >
+                      <MenuItem onClick={this.handleItemEdit}>
+                        Edytuj
+                      </MenuItem>
+                      <MenuItem onClick={this.handleDialogOpen}>
+                        Usuń
+                      </MenuItem>
+                    </Menu>
+                  )}
                   <Dialog
                     open={dialogOpen}
                     onClose={this.handleDialogClose}
@@ -621,6 +633,7 @@ CategoriesList.propTypes = {
     recommended: PropTypes.bool,
   })).isRequired,
   orderSaving: PropTypes.bool.isRequired,
+  profile: PropTypes.shape({}).isRequired,
   router: PropTypes.shape({}).isRequired,
   saveOrder: PropTypes.func.isRequired,
 };
@@ -633,6 +646,7 @@ const mapStateToProps = state => ({
   error: categoriesSelectors.getError(state),
   items: categoriesSelectors.getList(state),
   orderSaving: categoriesOrderSelectors.isSaving(state),
+  profile: profileSelectors.getProfile(state),
 });
 
 const mapDispatchToProps = {

@@ -35,6 +35,7 @@ import {
   actions as tagsActions,
   selectors as tagsSelectors,
 } from '@hello-poland/commons/redux/tags';
+import { selectors as profileSelectors } from 'redux/profile';
 import withAuth from 'services/auth/withAuth';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 
@@ -67,6 +68,9 @@ const styles = theme => ({
     padding: theme.spacing.unit,
   },
 });
+
+const canManageDictionaries = profile => ((profile && profile.roles) || [])
+  .some(role => role === 'ADMIN' || role === 'ROOT');
 
 class TagsList extends React.Component {
   baseURL = '/market/tags';
@@ -219,7 +223,8 @@ class TagsList extends React.Component {
       dialogOpen, dialogProps, isFetching, menuAnchor, snackbarMessage, snackbarOpen,
       order, orderBy, filterText,
     } = this.state;
-    const { classes, items } = this.props;
+    const { classes, items, profile } = this.props;
+    const canManage = canManageDictionaries(profile);
     const baseList = items || [];
     const hasItems = baseList.length > 0;
 
@@ -260,24 +265,22 @@ class TagsList extends React.Component {
       return 0;
     });
 
-
-    const colorActive = 'primary';
-    const colorInactive = 'disabled';
-
     return (
       <Layout>
         <Grid container className={classes.root}>
           <Paper className={classes.paper}>
             <Grid container direction="column" className={classes.toolbar}>
               <Grid container item justify="flex-end">
-                <Grid item>
-                  <Link href={`${this.baseURL}/create`} passHref>
-                    <Button component="a">
-                      <AddIcon className={classes.icon} />
-                      Dodaj
-                    </Button>
-                  </Link>
-                </Grid>
+                {canManage && (
+                  <Grid item>
+                    <Link href={`${this.baseURL}/create`} passHref>
+                      <Button component="a">
+                        <AddIcon className={classes.icon} />
+                        Dodaj
+                      </Button>
+                    </Link>
+                  </Grid>
+                )}
               </Grid>
             </Grid>
             <Grid container justify="flex-end" className={classes.toolbar}>
@@ -347,13 +350,15 @@ class TagsList extends React.Component {
                            <IconButton disabled>
                              <StarIcon color={recommended ? 'primary' : 'disabled'} />
                            </IconButton>
-                           <IconButton
-                             aria-owns={menuAnchor ? 'item-menu' : undefined}
-                             aria-haspopup="true"
-                             onClick={event => this.handleMenuOpen(event, listItemId)}
-                           >
-                             <MoreVertIcon />
-                           </IconButton>
+                           {canManage && (
+                             <IconButton
+                               aria-owns={menuAnchor ? 'item-menu' : undefined}
+                               aria-haspopup="true"
+                               onClick={event => this.handleMenuOpen(event, listItemId)}
+                             >
+                               <MoreVertIcon />
+                             </IconButton>
+                           )}
                          </TableCell>
                        </TableRow>
                      ))}
@@ -361,6 +366,7 @@ class TagsList extends React.Component {
                  </Table>
                )}
 
+               {canManage && (
                <Menu
                  id="item-menu"
                  anchorEl={menuAnchor}
@@ -374,6 +380,7 @@ class TagsList extends React.Component {
                    Usuń
                  </MenuItem>
                </Menu>
+               )}
                <Dialog
                  open={dialogOpen}
                  onClose={this.handleDialogClose}
@@ -429,6 +436,7 @@ TagsList.propTypes = {
     restricted: PropTypes.bool,
     recommended: PropTypes.bool,
   })).isRequired,
+  profile: PropTypes.shape({}).isRequired,
   router: PropTypes.shape({}).isRequired,
 };
 
@@ -439,6 +447,7 @@ TagsList.defaultProps = {
 const mapStateToProps = state => ({
   error: tagsSelectors.getError(state),
   items: tagsSelectors.getList(state),
+  profile: profileSelectors.getProfile(state),
 });
 
 const mapDispatchToProps = {

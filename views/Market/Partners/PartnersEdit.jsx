@@ -454,14 +454,26 @@ class PartnersEdit extends React.Component {
     }
   }
 
-  handleEmailReset = ({ email, partnerId }) => {
+  handleEmailReset = ({
+    email, partnerId, onFailure, onSuccess,
+  }) => {
     const { resetEmail } = this.props;
 
     resetEmail({
       id: partnerId,
       data: { email },
-      onFailure: this.handleEmailResetFailure,
-      onSuccess: this.handleEmailResetSuccess,
+      onFailure: () => {
+        this.handleEmailResetFailure();
+        if (onFailure) {
+          onFailure();
+        }
+      },
+      onSuccess: () => {
+        this.handleEmailResetSuccess();
+        if (onSuccess) {
+          onSuccess();
+        }
+      },
     });
   }
 

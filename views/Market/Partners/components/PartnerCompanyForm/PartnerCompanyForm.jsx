@@ -230,7 +230,9 @@ class PartnerCompanyForm extends Component {
   handleChange = fieldName => event => this.setState({ [fieldName]: event.target.value });
 
   handleSubmit = (values, actions) => {
-    const { initialValues, language, onSubmit } = this.props;
+    const {
+      initialValues, language, onResetEmailSuccess, onSubmit,
+    } = this.props;
 
     // businessType może być liczbą albo obiektem {label, value}
     const bt =
@@ -272,13 +274,31 @@ class PartnerCompanyForm extends Component {
 
       submitAction = updateItem;
       payload.id = id;
+      const initialEmail = String((initialValues && initialValues.email) || '').trim().toLowerCase();
+      const currentEmail = String(data.email || '').trim().toLowerCase();
+      const emailChanged = initialEmail !== currentEmail;
       payload.data = _merge({}, initialValues, data);
+      if (emailChanged && onResetEmailSuccess) {
+        payload.data.email = initialValues.email;
+        payload.onSuccess = this.handleSubmitAndResetEmailSuccess(actions, id, data.email);
+      }
       payload.pathParams = {
         languageVersion: language,
       };
     }
 
     submitAction(payload);
+  };
+
+  handleSubmitAndResetEmailSuccess = (actions, partnerId, email) => () => {
+    const { onResetEmailSuccess } = this.props;
+
+    onResetEmailSuccess({
+      email,
+      partnerId,
+      onFailure: this.handleSubmitFailure(actions),
+      onSuccess: this.handleSubmitSuccess(actions),
+    });
   };
 
 
@@ -533,6 +553,7 @@ PartnerCompanyForm.propTypes = {
   hideErrors: PropTypes.bool,
   initialValues: PropTypes.shape({}),
   language: PropTypes.string,
+  onResetEmailSuccess: PropTypes.func,
   onSubmit: PropTypes.func,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
@@ -549,6 +570,7 @@ PartnerCompanyForm.defaultProps = {
   hideErrors: false,
   initialValues: null,
   language: DEFAULT_LANGUAGE,
+  onResetEmailSuccess: null,
   onSubmit: null,
   onSubmitFailure: null,
   onSubmitSuccess: null,

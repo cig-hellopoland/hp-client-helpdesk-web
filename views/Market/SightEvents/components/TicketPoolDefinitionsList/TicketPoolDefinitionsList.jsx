@@ -177,6 +177,8 @@ class TicketPoolDefinitionsList extends React.Component {
         {(poolDefinitions && poolDefinitions.length > 0)
           && poolDefinitions.map((poolDefinition) => {
             const { id: poolId, name: poolName } = poolDefinition;
+            const isPromotionalPool = poolDefinition.poolType === 'PROMOTIONAL';
+            const poolCanEdit = canEdit && !isPromotionalPool;
 
             return (
               <React.Fragment key={`${poolId}-${poolName}`}>
@@ -196,10 +198,11 @@ class TicketPoolDefinitionsList extends React.Component {
                             partnerId,
                           }}
                           onChange={this.handleTPDChange}
-                          canEdit={canEdit}
+                          canEdit={poolCanEdit}
+                          readOnly={isPromotionalPool}
                         />
                       </Grid>
-                      {canEdit && (
+                      {poolCanEdit && (
                         <Grid container item className={classes.actionButtons} justify="flex-end">
                           <Grid item>
                             <Button onClick={() => this.handleDialogOpen({ itemId: poolId, name: poolName })} color="primary">

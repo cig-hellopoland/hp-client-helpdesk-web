@@ -36,6 +36,8 @@ import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import withAuth from 'services/auth/withAuth';
 import { selectors as profileSelectors } from 'redux/profile';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
@@ -196,12 +198,15 @@ class UsersList extends React.Component {
     menuAnchor: null,
     menuUserId: null,
     passwordDialogOpen: false,
-    passwordForm: { id: null, password: '' },
+    passwordForm: { id: null, password: '', confirmPassword: '' },
     partnerScopeFilter: '',
     partnerScopeOpen: false,
     partners: [],
     sightScopeFilter: '',
     sightScopeOpen: false,
+    showFormPassword: false,
+    showPasswordDialogConfirmPassword: false,
+    showPasswordDialogPassword: false,
     snackbarOpen: false,
     snackbarMessage: '',
     sights: [],
@@ -285,6 +290,7 @@ class UsersList extends React.Component {
     partnerScopeOpen: false,
     sightScopeFilter: '',
     sightScopeOpen: false,
+    showFormPassword: false,
   });
 
   openEditForm = (user) => {
@@ -310,15 +316,28 @@ class UsersList extends React.Component {
       partnerScopeOpen: false,
       sightScopeFilter: '',
       sightScopeOpen: false,
+      showFormPassword: false,
     });
     this.closeMenu();
   };
 
-  closeForm = () => this.setState({ formOpen: false, form: { ...emptyForm } });
+  closeForm = () => this.setState({
+    formOpen: false,
+    form: { ...emptyForm },
+    showFormPassword: false,
+  });
 
   handleFormChange = name => (event) => {
     const { value } = event.target;
     this.setState(state => ({ form: { ...state.form, [name]: value } }));
+  };
+
+  togglePasswordVisibility = name => () => this.setState(state => ({
+    [name]: !state[name],
+  }));
+
+  preventMouseDown = (event) => {
+    event.preventDefault();
   };
 
   handleScopeFilterChange = name => (event) => {
@@ -457,24 +476,39 @@ class UsersList extends React.Component {
     }
     this.setState({
       passwordDialogOpen: true,
-      passwordForm: { id: user.id, password: '' },
+      passwordForm: { id: user.id, password: '', confirmPassword: '' },
+      showPasswordDialogConfirmPassword: false,
+      showPasswordDialogPassword: false,
     });
     this.closeMenu();
   };
 
   closePasswordDialog = () => this.setState({
     passwordDialogOpen: false,
-    passwordForm: { id: null, password: '' },
+    passwordForm: { id: null, password: '', confirmPassword: '' },
+    showPasswordDialogConfirmPassword: false,
+    showPasswordDialogPassword: false,
   });
 
-  handlePasswordChange = (event) => {
+  handlePasswordChange = name => (event) => {
     const { value } = event.target;
-    this.setState(state => ({ passwordForm: { ...state.passwordForm, password: value } }));
+    this.setState(state => ({ passwordForm: { ...state.passwordForm, [name]: value } }));
   };
 
   savePassword = () => {
     const httpClient = this.getHttpClient();
     const { passwordForm } = this.state;
+
+    if (!passwordForm.password || !passwordForm.confirmPassword) {
+      this.openSnackbar('Podaj i potwierdź nowe hasło');
+      return;
+    }
+
+    if (passwordForm.password !== passwordForm.confirmPassword) {
+      this.openSnackbar('Hasła nie są takie same');
+      return;
+    }
+
     httpClient.patch(`/users/${passwordForm.id}/password`, { password: passwordForm.password })
       .then(() => {
         this.openSnackbar('Zmieniono hasło');
@@ -637,6 +671,9 @@ class UsersList extends React.Component {
       partners,
       sightScopeFilter,
       sightScopeOpen,
+      showFormPassword,
+      showPasswordDialogConfirmPassword,
+      showPasswordDialogPassword,
       snackbarMessage,
       snackbarOpen,
       users,
@@ -766,22 +803,58 @@ class UsersList extends React.Component {
           </Menu>
 
           <Dialog
+            disableBackdropClick
+            disableEscapeKeyDown
             open={formOpen}
-            onClose={this.closeForm}
             PaperProps={{ style: styles.userDialogPaper }}
           >
             <DialogTitle>{formMode === 'create' ? 'Dodaj użytkownika' : 'Edytuj użytkownika'}</DialogTitle>
             <DialogContent style={styles.userDialogContent}>
               <Grid container spacing={16}>
                 <Grid item xs={12}>
-                  <TextField fullWidth label="Imię i nazwisko" value={form.name} onChange={this.handleFormChange('name')} />
+                  <TextField
+                    fullWidth
+                    autoComplete="off"
+                    label="Imię i nazwisko"
+                    name="helpdesk-user-display-name"
+                    value={form.name}
+                    onChange={this.handleFormChange('name')}
+                  />
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField fullWidth label="Email" value={form.email} onChange={this.handleFormChange('email')} />
+                  <TextField
+                    fullWidth
+                    autoComplete="off"
+                    label="Email"
+                    name="helpdesk-user-contact"
+                    value={form.email}
+                    onChange={this.handleFormChange('email')}
+                  />
                 </Grid>
                 {formMode === 'create' && (
                   <Grid item xs={12}>
-                    <TextField fullWidth label="Hasło" type="password" value={form.password} onChange={this.handleFormChange('password')} />
+                    <TextField
+                      fullWidth
+                      autoComplete="new-password"
+                      label="Hasło"
+                      name="helpdesk-user-new-password"
+                      type={showFormPassword ? 'text' : 'password'}
+                      value={form.password}
+                      onChange={this.handleFormChange('password')}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label={showFormPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                              onClick={this.togglePasswordVisibility('showFormPassword')}
+                              onMouseDown={this.preventMouseDown}
+                            >
+                              {showFormPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
                   </Grid>
                 )}
                 <Grid item xs={12}>
@@ -980,10 +1053,54 @@ class UsersList extends React.Component {
             </DialogActions>
           </Dialog>
 
-          <Dialog open={passwordDialogOpen} onClose={this.closePasswordDialog}>
+          <Dialog
+            disableBackdropClick
+            disableEscapeKeyDown
+            open={passwordDialogOpen}
+          >
             <DialogTitle>Zmiana hasła</DialogTitle>
             <DialogContent style={styles.dialogContent}>
-              <TextField fullWidth label="Nowe hasło" type="password" value={passwordForm.password} onChange={this.handlePasswordChange} />
+              <TextField
+                fullWidth
+                label="Nowe hasło"
+                type={showPasswordDialogPassword ? 'text' : 'password'}
+                value={passwordForm.password}
+                onChange={this.handlePasswordChange('password')}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={showPasswordDialogPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                        onClick={this.togglePasswordVisibility('showPasswordDialogPassword')}
+                        onMouseDown={this.preventMouseDown}
+                      >
+                        {showPasswordDialogPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                fullWidth
+                label="Potwierdź nowe hasło"
+                type={showPasswordDialogConfirmPassword ? 'text' : 'password'}
+                value={passwordForm.confirmPassword}
+                onChange={this.handlePasswordChange('confirmPassword')}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={showPasswordDialogConfirmPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                        onClick={this.togglePasswordVisibility('showPasswordDialogConfirmPassword')}
+                        onMouseDown={this.preventMouseDown}
+                      >
+                        {showPasswordDialogConfirmPassword
+                          ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
             </DialogContent>
             <DialogActions>
               <Button onClick={this.closePasswordDialog}>Anuluj</Button>

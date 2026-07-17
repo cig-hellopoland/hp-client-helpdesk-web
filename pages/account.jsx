@@ -5,11 +5,15 @@ import { connect, ReactReduxContext } from 'react-redux';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import Layout from 'components/Layout';
 import Paper from '@material-ui/core/Paper';
 import Snackbar from '@material-ui/core/Snackbar';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import withAuth from 'services/auth/withAuth';
 import {
   actions as profileActions,
@@ -58,6 +62,8 @@ class AccountPage extends React.Component {
   state = {
     oldPassword: '',
     password: '',
+    showOldPassword: false,
+    showPassword: false,
     avatarUploading: false,
     snackbarOpen: false,
     snackbarMessage: '',
@@ -72,6 +78,14 @@ class AccountPage extends React.Component {
   handleChange = name => (event) => {
     const { value } = event.target;
     this.setState({ [name]: value });
+  };
+
+  togglePasswordVisibility = name => () => this.setState(state => ({
+    [name]: !state[name],
+  }));
+
+  preventMouseDown = (event) => {
+    event.preventDefault();
   };
 
   closeSnackbar = () => this.setState({ snackbarOpen: false, snackbarMessage: '' });
@@ -131,7 +145,8 @@ class AccountPage extends React.Component {
   render() {
     const { profile } = this.props;
     const {
-      avatarUploading, oldPassword, password, snackbarMessage, snackbarOpen,
+      avatarUploading, oldPassword, password, showOldPassword, showPassword,
+      snackbarMessage, snackbarOpen,
     } = this.state;
     const roles = (profile && profile.roles) || [];
     const name = profile && profile.name;
@@ -172,8 +187,21 @@ class AccountPage extends React.Component {
                     fullWidth
                     label="Obecne hasło"
                     onChange={this.handleChange('oldPassword')}
-                    type="password"
+                    type={showOldPassword ? 'text' : 'password'}
                     value={oldPassword}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label={showOldPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                            onClick={this.togglePasswordVisibility('showOldPassword')}
+                            onMouseDown={this.preventMouseDown}
+                          >
+                            {showOldPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -181,8 +209,21 @@ class AccountPage extends React.Component {
                     fullWidth
                     label="Nowe hasło"
                     onChange={this.handleChange('password')}
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                            onClick={this.togglePasswordVisibility('showPassword')}
+                            onMouseDown={this.preventMouseDown}
+                          >
+                            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12}>

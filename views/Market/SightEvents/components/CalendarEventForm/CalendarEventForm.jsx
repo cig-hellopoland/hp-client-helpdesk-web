@@ -503,20 +503,18 @@ class CalendarEventForm extends React.Component {
                   )
                   }
                 </div>
-                {!readOnly
-                && (
-                  <div className={classNames(classes.section, classes.fullWidth)}>
+                <div className={classNames(classes.section, classes.fullWidth)}>
                     <Typography variant="h6" gutterBottom>
                       Produkty *
                     </Typography>
-                    {!hasNormalTicket
+                    {!readOnly && canEdit && !hasNormalTicket
                     && (
                       <Typography color="error" gutterBottom>
                         Najpierw dodaj do puli bilet typu Normalny. Potem mozna dodac pozostale typy biletow.
                       </Typography>
                     )
                     }
-                    {!readOnly
+                    {!readOnly && canEdit
                     && (
                       <div className={classNames(classes.columns, classes.fullWidth)}>
                         <TextField
@@ -573,19 +571,22 @@ class CalendarEventForm extends React.Component {
                         }
                         items={formData.ticketDefinitions}
                         onChange={handleTicketDefinitionChange}
-                        onDelete={ticketDefinition => this.handleAlertDialogOpen({
-                          content: `Próbujesz usunąć produkt o nazwie "${ticketDefinition.name}". Kontynuować?`,
-                          onSuccess: () => {
-                            handleTicketDefinitionDelete(ticketDefinition.id);
-                            this.handleAlertDialogCancel();
-                          },
-                          open: true,
-                          title: 'Czy na pewno usunąć wybrany produkt?',
-                        })}
-                        readOnly={readOnly}
+                        onDelete={!readOnly && canEdit
+                          ? ticketDefinition => this.handleAlertDialogOpen({
+                            content: `Próbujesz usunąć produkt o nazwie "${ticketDefinition.name}". Kontynuować?`,
+                            onSuccess: () => {
+                              handleTicketDefinitionDelete(ticketDefinition.id);
+                              this.handleAlertDialogCancel();
+                            },
+                            open: true,
+                            title: 'Czy na pewno usunąć wybrany produkt?',
+                          })
+                          : null
+                        }
+                        readOnly={readOnly || !canEdit}
                       />
                     )}
-                    {isDefinitionFormVisible && !readOnly
+                    {isDefinitionFormVisible && !readOnly && canEdit
                     && (
                       <div className={classNames(classes.section, classes.fullWidth)}>
                         <Grid container direction="row" alignItems="center">
@@ -614,9 +615,7 @@ class CalendarEventForm extends React.Component {
                       </div>
                     )
                     }
-                  </div>
-                )
-                }
+                </div>
                 <div className={classNames(classes.section, classes.fullWidth)}>
                   <Typography variant="subtitle1">Sprawdzanie produktów:</Typography>
                   <TextField

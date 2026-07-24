@@ -1,0 +1,2192 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import { compose } from 'redux';
+import { connect, ReactReduxContext } from 'react-redux';
+import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import ListItemText from '@material-ui/core/ListItemText';
+import MenuItem from '@material-ui/core/MenuItem';
+import Paper from '@material-ui/core/Paper';
+import Popper from '@material-ui/core/Popper';
+import Snackbar from '@material-ui/core/Snackbar';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import Stepper from '@material-ui/core/Stepper';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import AddIcon from '@material-ui/icons/Add';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import BlockIcon from '@material-ui/icons/Block';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import SearchIcon from '@material-ui/icons/Search';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import Layout from 'components/Layout';
+import EmptyView from 'components/EmptyView';
+import withAuth from 'services/auth/withAuth';
+import { selectors as profileSelectors } from 'redux/profile';
+
+const emptyCampaignForm = {
+  name: '',
+  promotionType: 'TICKET',
+  scopeType: 'TAG',
+  validFrom: '',
+  validTo: '',
+  globalLimit: '',
+  codeLimit: '',
+  customerLimit: '',
+  dailyLimit: '',
+  requiredTicketQuantity: '1',
+  grantedTicketQuantity: '1',
+  discountPercent: '',
+  discountAmountGrossPln: '',
+  tagIds: [],
+  sightEventIds: [],
+};
+
+const emptyCodeForm = {
+  mode: 'GENERATE',
+  codes: '',
+  fixedCode: '',
+  generateCount: '2000',
+  generatedCodeLength: '12',
+  generatedCodePrefix: '',
+  generatedCodeSeparator: '-',
+  codeType: 'ONE_TIME',
+  maxRedemptions: '',
+  maxRedemptionsPerCustomer: '',
+  maxRedemptionsPerDay: '',
+  fileName: '',
+};
+
+const emptyTargetForm = {
+  tagIds: [],
+  partnerIds: '',
+  sightIds: '',
+  sightEventIds: [],
+  ticketPricePln: '0',
+  availableTicketsNumber: '100',
+  ticketName: '',
+  poolName: '',
+};
+
+const promotionTypeLabels = {
+  TICKET: 'Bilet promocyjny',
+  PERCENT: 'Rabat procentowy',
+  AMOUNT: 'Rabat kwotowy',
+};
+
+const promotionTypeHints = {
+  TICKET: 'kod dodaje do koszyka specjalny bilet z puli promocyjnej',
+  PERCENT: 'kod obniża wartość koszyka o wskazany procent',
+  AMOUNT: 'kod obniża wartość koszyka o wskazaną kwotę brutto',
+};
+
+const scopeLabels = {
+  TAG: 'Po tagu',
+  MANUAL: 'Wybrane oferty',
+  GLOBAL: 'Globalna',
+};
+
+const statusLabels = {
+  DRAFT: 'Robocza',
+  ACTIVE: 'Aktywna',
+  DISABLED: 'Wyłączona',
+  ARCHIVED: 'Archiwalna',
+};
+
+const codeModeLabels = {
+  GENERATE: 'Wygeneruj kody',
+  IMPORT: 'Wczytaj CSV',
+  FIXED: 'Jeden kod stały',
+};
+
+const codeTypeLabels = {
+  ONE_TIME: 'Jednorazowy',
+  FIXED: 'Wielorazowy',
+};
+
+const codeStatusLabels = {
+  ACTIVE: 'Aktywny',
+  RESERVED: 'Zarezerwowany',
+  USED: 'Użyty',
+  DISABLED: 'Wyłączony',
+};
+
+const ticketPoolStatusLabels = {
+  NOT_REQUIRED: 'Nie wymaga puli',
+  NOT_CREATED: 'Brak puli',
+  CONFIG_REQUIRED: 'Wymaga konfiguracji',
+  CREATED: 'Gotowa',
+  ERROR: 'Błąd tworzenia',
+};
+
+const promotionMessages = {
+  PROMOTION_CODES_REQUIRED: 'Nie można uruchomić promocji bez kodów.',
+  PROMOTION_TICKET_TARGETS_REQUIRED: 'Nie można uruchomić promocji TICKET bez ofert.',
+  PROMOTION_TICKET_POOLS_REQUIRED:
+    'Nie można uruchomić promocji TICKET. Najpierw utwórz pule promocyjne dla wszystkich ofert.',
+  PROMOTION_TICKET_POOLS_REQUIRED_FRONT:
+    'Nie można uruchomić promocji TICKET. Część ofert nie ma gotowej puli promocyjnej.',
+  PROMOTION_TARGETS_PREVIEW_FAILED: 'Nie udało się pobrać ofert promocji.',
+};
+
+const steps = ['Promocja', 'Kody', 'Zakres'];
+const codesRowsPerPageOptions = [10, 25, 50, 100];
+const targetListLimit = 30;
+
+const styles = {
+  content: {
+    padding: 16,
+    width: '100%',
+  },
+  paper: {
+    flex: 1,
+    overflowX: 'auto',
+  },
+  toolbar: {
+    padding: 8,
+  },
+  icon: {
+    marginRight: 8,
+  },
+  actions: {
+    minWidth: 120,
+  },
+  dialogContent: {
+    maxHeight: 'calc(100vh - 220px)',
+    minHeight: 420,
+    overflowY: 'auto',
+  },
+  dialogActions: {
+    background: '#fff',
+    borderTop: '1px solid #e0e0e0',
+  },
+  fieldHint: {
+    marginTop: 8,
+  },
+  detailsSection: {
+    marginTop: 24,
+  },
+  hiddenInput: {
+    display: 'none',
+  },
+  targetPicker: {
+    position: 'relative',
+  },
+  targetDropdown: {
+    maxHeight: 260,
+    overflowY: 'auto',
+  },
+  targetPopper: {
+    zIndex: 1500,
+  },
+  targetDropdownButton: {
+    padding: 4,
+  },
+  targetMenuItem: {
+    fontSize: 14,
+    minHeight: 36,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  targetMenuCheckbox: {
+    height: 32,
+    width: 32,
+  },
+  targetMenuText: {
+    fontSize: 14,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  codesPagination: {
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    padding: '12px 0',
+  },
+  codesPaginationSelect: {
+    marginLeft: 12,
+    marginRight: 24,
+    width: 84,
+  },
+  codesPaginationRange: {
+    marginRight: 12,
+  },
+};
+
+const canManagePromotions = profile => ((profile && profile.roles) || [])
+  .some(role => role === 'ADMIN' || role === 'ROOT');
+
+const normalizeSearchValue = value => (value || '')
+  .toLocaleLowerCase('pl')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '');
+
+const toNumberOrNull = (value) => {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+  const parsed = Number(String(value).replace(',', '.'));
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+const plnToCents = (value) => {
+  const amount = toNumberOrNull(value);
+  return amount === null ? null : Math.round(amount * 100);
+};
+
+const centsToPln = value => ((value || 0) / 100).toFixed(2);
+
+const parseIds = value => (value || '')
+  .toString()
+  .split(',')
+  .map(item => item.trim())
+  .filter(Boolean)
+  .map(Number)
+  .filter(item => !Number.isNaN(item));
+
+const parseCodes = value => (value || '')
+  .split(/\r?\n/)
+  .map(item => item.trim())
+  .filter(Boolean);
+
+const dateToPayload = value => (value ? new Date(value).toISOString() : null);
+
+const formatDate = value => (value ? String(value).replace('T', ' ').slice(0, 16) : '-');
+
+class PromotionsView extends React.Component {
+  static contextType = ReactReduxContext;
+
+  state = {
+    addDialogOpen: false,
+    detailsDialogOpen: false,
+    activeStep: 0,
+    campaigns: [],
+    selectedCampaign: null,
+    codes: [],
+    redemptions: [],
+    targetPreview: [],
+    campaignTargetsPreview: [],
+    campaignTargetsVisible: false,
+    campaignTargetsLoading: false,
+    tagOptions: [],
+    sightEventOptions: [],
+    campaignForm: { ...emptyCampaignForm },
+    codeForm: { ...emptyCodeForm },
+    addCodeForm: { ...emptyCodeForm },
+    targetForm: { ...emptyTargetForm },
+    filterText: '',
+    campaignTagQuery: '',
+    campaignTagOpen: false,
+    campaignSightEventQuery: '',
+    campaignSightEventOpen: false,
+    poolTagQuery: '',
+    poolTagOpen: false,
+    poolSightEventQuery: '',
+    poolSightEventOpen: false,
+    codesPage: 0,
+    codesRowsPerPage: 25,
+    disablingCodeId: null,
+    loading: false,
+    snackbarOpen: false,
+    snackbarMessage: '',
+  };
+
+  componentDidMount() {
+    this.fetchCampaigns();
+    this.fetchTargetOptions();
+  }
+
+  getHttpClient = () => {
+    const { store } = this.context || {};
+    const { logicMiddleware } = store || {};
+    return logicMiddleware && logicMiddleware.httpClient;
+  };
+
+  openSnackbar = snackbarMessage => this.setState({ snackbarOpen: true, snackbarMessage });
+
+  closeSnackbar = () => this.setState({ snackbarOpen: false, snackbarMessage: '' });
+
+  resolveErrorMessage = (data, fallback) => (
+    (data && data.code && promotionMessages[data.code])
+    || (data && data.message)
+    || fallback
+  );
+
+  handleError = fallback => (error) => {
+    const responseData = error
+      && error.response
+      && error.response.data
+      && error.response.data;
+    this.setState({ loading: false });
+    this.openSnackbar(this.resolveErrorMessage(responseData, fallback));
+  };
+
+  fetchCampaigns = () => {
+    const httpClient = this.getHttpClient();
+    if (!httpClient) {
+      return;
+    }
+    this.setState({ loading: true });
+    httpClient.get('/promotions')
+      .then(({ data }) => this.setState({ campaigns: data || [], loading: false }))
+      .catch(this.handleError('Nie udało się pobrać promocji'));
+  };
+
+  normalizeListResponse = data => (Array.isArray(data) ? data : (data && data.items) || []);
+
+  fetchTargetOptions = () => {
+    const httpClient = this.getHttpClient();
+    if (!httpClient) {
+      return;
+    }
+    Promise.all([
+      httpClient.get('/tags'),
+      httpClient.get('/sight-events'),
+    ])
+      .then(([tagsResponse, sightEventsResponse]) => this.setState({
+        tagOptions: this.normalizeListResponse(tagsResponse.data),
+        sightEventOptions: this.normalizeListResponse(sightEventsResponse.data),
+      }))
+      .catch(() => this.openSnackbar('Nie udało się pobrać listy tagów lub ofert'));
+  };
+
+  optionLabel = (options, id) => {
+    const option = options.find(item => String(item.id) === String(id));
+    if (!option) {
+      return id;
+    }
+    return option.label || option.name || `#${id}`;
+  };
+
+  optionText = option => (option ? (option.label || option.name || `#${option.id}`) : '');
+
+  filteredOptions = (options, query) => {
+    const normalizedQuery = normalizeSearchValue(query);
+    if (!normalizedQuery) {
+      return options.slice(0, targetListLimit);
+    }
+    return options.filter(option => (
+      normalizeSearchValue(`${option.id} ${this.optionText(option)}`).includes(normalizedQuery)
+    )).slice(0, targetListLimit);
+  };
+
+  targetSummary = (ids, emptyLabel, options) => {
+    const selectedIds = parseIds(ids);
+    if (!selectedIds.length) {
+      return emptyLabel;
+    }
+    if (selectedIds.length <= 2) {
+      return selectedIds.map(id => this.optionLabel(options, id)).join(', ');
+    }
+    return `${selectedIds.length} wybranych`;
+  };
+
+  campaignTagSummary = () => {
+    const { selectedCampaign, tagOptions } = this.state;
+    if (!selectedCampaign || !selectedCampaign.tagIds || !selectedCampaign.tagIds.length) {
+      return '-';
+    }
+    return selectedCampaign.tagIds.map(id => this.optionLabel(tagOptions, id)).join(', ');
+  };
+
+  campaignTargetForm = (campaign) => {
+    const form = { ...emptyTargetForm };
+    if (!campaign) {
+      return form;
+    }
+    if (campaign.scopeType === 'TAG') {
+      form.tagIds = campaign.tagIds || [];
+    }
+    if (campaign.scopeType === 'MANUAL') {
+      form.sightEventIds = ((campaign.sightEvents || [])
+        .filter(item => item.active !== false)
+        .map(item => item.sightEventId)
+        .filter(Boolean));
+    }
+    form.poolName = campaign.name || '';
+    return form;
+  };
+
+  hasTargetSelection = targetSetup => !!(
+    (targetSetup.tagIds && targetSetup.tagIds.length)
+    || (targetSetup.partnerIds && targetSetup.partnerIds.length)
+    || (targetSetup.sightIds && targetSetup.sightIds.length)
+    || (targetSetup.sightEventIds && targetSetup.sightEventIds.length)
+  );
+
+  getTargetDropdownStyle = anchor => ({
+    ...styles.targetDropdown,
+    width: anchor ? anchor.clientWidth : undefined,
+  });
+
+  toggleFormTarget = (formName, fieldName, id) => () => {
+    const normalizedId = Number(id);
+    this.setState((state) => {
+      const currentIds = parseIds(state[formName][fieldName]);
+      const nextIds = currentIds.includes(normalizedId)
+        ? currentIds.filter(item => item !== normalizedId)
+        : currentIds.concat(normalizedId);
+      return {
+        [formName]: {
+          ...state[formName],
+          [fieldName]: nextIds,
+        },
+      };
+    });
+  };
+
+  handleAddDialogOpen = () => this.setState({
+    addDialogOpen: true,
+    activeStep: 0,
+    campaignForm: { ...emptyCampaignForm },
+    codeForm: { ...emptyCodeForm },
+    campaignTagQuery: '',
+    campaignTagOpen: false,
+    campaignSightEventQuery: '',
+    campaignSightEventOpen: false,
+  });
+
+  handleAddDialogClose = () => this.setState({
+    addDialogOpen: false,
+    activeStep: 0,
+  });
+
+  handleDetailsDialogClose = () => this.setState({
+    detailsDialogOpen: false,
+    selectedCampaign: null,
+    codes: [],
+    redemptions: [],
+    targetPreview: [],
+    campaignTargetsPreview: [],
+    campaignTargetsVisible: false,
+    campaignTargetsLoading: false,
+    addCodeForm: { ...emptyCodeForm },
+    targetForm: { ...emptyTargetForm },
+    poolTagQuery: '',
+    poolTagOpen: false,
+    poolSightEventQuery: '',
+    poolSightEventOpen: false,
+  });
+
+  handlePreviousStep = () => this.setState(state => ({ activeStep: state.activeStep - 1 }));
+
+  handleFilterChange = event => this.setState({ filterText: event.target.value });
+
+  handleQueryChange = name => event => this.setState({ [name]: event.target.value });
+
+  openTargetMenu = name => () => this.setState({ [name]: true });
+
+  closeTargetMenu = name => () => this.setState({ [name]: false });
+
+  toggleTargetMenu = name => (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    this.setState(state => ({ [name]: !state[name] }));
+  };
+
+  handleTargetKeyDown = name => (event) => {
+    if (event.key === 'Escape') {
+      this.setState({ [name]: false });
+    }
+  };
+
+  keepTargetMenuOpen = (event) => {
+    event.preventDefault();
+  };
+
+  validateCampaignStep = () => {
+    const { campaignForm } = this.state;
+    const requiredTicketQuantity = toNumberOrNull(campaignForm.requiredTicketQuantity);
+    const grantedTicketQuantity = toNumberOrNull(campaignForm.grantedTicketQuantity);
+    if (!campaignForm.name.trim()) {
+      return 'Podaj nazwę promocji.';
+    }
+    if (!campaignForm.validFrom || !campaignForm.validTo) {
+      return 'Podaj datę początku i końca promocji.';
+    }
+    if (new Date(campaignForm.validTo) <= new Date(campaignForm.validFrom)) {
+      return 'Data końca promocji musi być późniejsza niż data początku.';
+    }
+    if (campaignForm.promotionType === 'TICKET'
+        && (!requiredTicketQuantity || requiredTicketQuantity <= 0
+          || !grantedTicketQuantity || grantedTicketQuantity <= 0)) {
+      return 'Podaj poprawną liczbę kupowanych i przyznawanych biletów.';
+    }
+    if (campaignForm.promotionType === 'PERCENT') {
+      const discountPercent = toNumberOrNull(campaignForm.discountPercent);
+      if (discountPercent === null || discountPercent <= 0 || discountPercent > 100) {
+        return 'Podaj rabat procentowy od 0 do 100.';
+      }
+    }
+    if (campaignForm.promotionType === 'AMOUNT') {
+      const discountAmount = toNumberOrNull(campaignForm.discountAmountGrossPln);
+      if (discountAmount === null || discountAmount <= 0) {
+        return 'Podaj rabat kwotowy w PLN.';
+      }
+    }
+    return null;
+  };
+
+  validateCodeStep = (form) => {
+    const { codeForm } = this.state;
+    const checkedForm = form || codeForm;
+    if (checkedForm.mode === 'GENERATE') {
+      const generateCount = toNumberOrNull(checkedForm.generateCount);
+      const generatedCodeLength = toNumberOrNull(checkedForm.generatedCodeLength);
+      if (!generateCount || generateCount <= 0) {
+        return 'Podaj liczbę kodów do wygenerowania.';
+      }
+      if (!generatedCodeLength || generatedCodeLength <= 0) {
+        return 'Podaj długość generowanego kodu.';
+      }
+    }
+    if (checkedForm.mode === 'IMPORT' && !parseCodes(checkedForm.codes).length) {
+      return 'Wczytaj albo wklej listę kodów.';
+    }
+    if (checkedForm.mode === 'FIXED' && !checkedForm.fixedCode.trim()) {
+      return 'Podaj kod stały.';
+    }
+    return null;
+  };
+
+  validateTargetStep = () => {
+    const { campaignForm } = this.state;
+    if (campaignForm.scopeType === 'TAG' && !parseIds(campaignForm.tagIds).length) {
+      return 'Wybierz co najmniej jeden tag.';
+    }
+    if (campaignForm.scopeType === 'MANUAL' && !parseIds(campaignForm.sightEventIds).length) {
+      return 'Wybierz co najmniej jedną ofertę.';
+    }
+    return null;
+  };
+
+  validateStep = (step) => {
+    if (step === 0) {
+      return this.validateCampaignStep();
+    }
+    if (step === 1) {
+      return this.validateCodeStep();
+    }
+    return this.validateTargetStep();
+  };
+
+  validateAllSteps = () => this.validateCampaignStep()
+    || this.validateCodeStep()
+    || this.validateTargetStep();
+
+  handleNextStep = () => {
+    const { activeStep } = this.state;
+    const error = this.validateStep(activeStep);
+    if (error) {
+      this.openSnackbar(error);
+      return;
+    }
+    this.setState(state => ({ activeStep: state.activeStep + 1 }));
+  };
+
+  handleCodesPageChange = (event, codesPage) => this.setState({ codesPage });
+
+  handleCodesRowsPerPageChange = (event) => {
+    this.setState({
+      codesPage: 0,
+      codesRowsPerPage: Number(event.target.value),
+    });
+  };
+
+  goToPreviousCodesPage = () => {
+    this.setState(state => ({
+      codesPage: Math.max(0, state.codesPage - 1),
+    }));
+  };
+
+  goToNextCodesPage = () => {
+    this.setState((state) => {
+      const lastPage = Math.max(0, Math.ceil(state.codes.length / state.codesRowsPerPage) - 1);
+      return {
+        codesPage: Math.min(lastPage, state.codesPage + 1),
+      };
+    });
+  };
+
+  handleCampaignFormChange = name => (event) => {
+    const { value } = event.target;
+    this.setState((state) => {
+      const nextForm = {
+        ...state.campaignForm,
+        [name]: value,
+      };
+      if (name === 'promotionType' && value === 'TICKET' && nextForm.scopeType === 'GLOBAL') {
+        nextForm.scopeType = 'TAG';
+      }
+      return { campaignForm: nextForm };
+    });
+  };
+
+  handleCodeFormChange = name => (event) => {
+    const { value } = event.target;
+    this.setState(state => ({
+      codeForm: {
+        ...state.codeForm,
+        [name]: value,
+      },
+    }));
+  };
+
+  handleAddCodeFormChange = name => (event) => {
+    const { value } = event.target;
+    this.setState(state => ({
+      addCodeForm: {
+        ...state.addCodeForm,
+        [name]: value,
+      },
+    }));
+  };
+
+  handleTargetFormChange = name => (event) => {
+    const { value } = event.target;
+    this.setState(state => ({
+      targetForm: {
+        ...state.targetForm,
+        [name]: value,
+      },
+    }));
+  };
+
+  handleCodesFileChange = formName => (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const codes = parseCodes(reader.result);
+      this.setState(state => ({
+        [formName]: {
+          ...state[formName],
+          mode: 'IMPORT',
+          codes: codes.join('\n'),
+          fileName: file.name,
+        },
+      }));
+      this.openSnackbar(`Wczytano ${codes.length} kodów z pliku`);
+    };
+    reader.readAsText(file);
+  };
+
+  selectCampaign = (campaign) => {
+    const httpClient = this.getHttpClient();
+    if (!httpClient || !campaign) {
+      return;
+    }
+    this.setState({
+      loading: true,
+      selectedCampaign: campaign,
+      detailsDialogOpen: true,
+      targetPreview: [],
+      campaignTargetsPreview: [],
+      campaignTargetsVisible: false,
+      codesPage: 0,
+    });
+    Promise.all([
+      httpClient.get(`/promotions/${campaign.id}`),
+      httpClient.get(`/promotions/${campaign.id}/codes`),
+      httpClient.get(`/promotions/${campaign.id}/redemptions`),
+    ])
+      .then(([campaignResponse, codesResponse, redemptionsResponse]) => {
+        const campaignData = campaignResponse.data;
+        this.setState({
+          selectedCampaign: campaignData,
+          codes: codesResponse.data || [],
+          redemptions: redemptionsResponse.data || [],
+          targetForm: this.campaignTargetForm(campaignData),
+          loading: false,
+        });
+      })
+      .catch(this.handleError('Nie udało się pobrać szczegółów promocji'));
+  };
+
+  codeSetupPayload = (form) => {
+    const codeType = form.mode === 'FIXED' ? 'FIXED' : form.codeType;
+    const payload = {
+      fileName: form.fileName || null,
+      codeType,
+      maxRedemptions: codeType === 'FIXED' ? toNumberOrNull(form.maxRedemptions) : null,
+      maxRedemptionsPerCustomer: codeType === 'FIXED'
+        ? toNumberOrNull(form.maxRedemptionsPerCustomer)
+        : null,
+      maxRedemptionsPerDay: codeType === 'FIXED'
+        ? toNumberOrNull(form.maxRedemptionsPerDay)
+        : null,
+    };
+    if (form.mode === 'IMPORT') {
+      payload.codes = parseCodes(form.codes);
+    } else if (form.mode === 'FIXED') {
+      payload.fixedCode = form.fixedCode;
+      payload.codeType = 'FIXED';
+    } else {
+      payload.generateCount = toNumberOrNull(form.generateCount);
+      payload.generatedCodeLength = toNumberOrNull(form.generatedCodeLength);
+      payload.generatedCodePrefix = form.generatedCodePrefix || null;
+      payload.generatedCodeSeparator = form.generatedCodeSeparator || null;
+    }
+    return payload;
+  };
+
+  campaignPayload = () => {
+    const { campaignForm, codeForm } = this.state;
+    const { promotionType } = campaignForm;
+    const payload = {
+      name: campaignForm.name,
+      promotionType,
+      scopeType: campaignForm.scopeType,
+      status: 'DRAFT',
+      validFrom: dateToPayload(campaignForm.validFrom),
+      validTo: dateToPayload(campaignForm.validTo),
+      globalLimit: toNumberOrNull(campaignForm.globalLimit),
+      codeLimit: toNumberOrNull(campaignForm.codeLimit),
+      customerLimit: toNumberOrNull(campaignForm.customerLimit),
+      dailyLimit: toNumberOrNull(campaignForm.dailyLimit),
+      codeSetup: this.codeSetupPayload(codeForm),
+    };
+
+    if (campaignForm.scopeType === 'TAG') {
+      payload.tagIds = parseIds(campaignForm.tagIds);
+    }
+    if (campaignForm.scopeType === 'MANUAL') {
+      payload.targetSetup = {
+        sightEventIds: parseIds(campaignForm.sightEventIds),
+      };
+    }
+    if (promotionType === 'TICKET') {
+      payload.requiredTicketQuantity = toNumberOrNull(campaignForm.requiredTicketQuantity);
+      payload.grantedTicketQuantity = toNumberOrNull(campaignForm.grantedTicketQuantity);
+    }
+    if (promotionType === 'PERCENT') {
+      payload.discountPercent = toNumberOrNull(campaignForm.discountPercent);
+    }
+    if (promotionType === 'AMOUNT') {
+      payload.discountAmountGross = plnToCents(campaignForm.discountAmountGrossPln);
+    }
+    return payload;
+  };
+
+  createCampaign = () => {
+    const httpClient = this.getHttpClient();
+    if (!httpClient) {
+      return;
+    }
+    const error = this.validateAllSteps();
+    if (error) {
+      this.openSnackbar(error);
+      return;
+    }
+
+    this.setState({ loading: true });
+    httpClient.post('/promotions', this.campaignPayload())
+      .then(({ data: campaign }) => {
+        this.setState({ loading: false, addDialogOpen: false, activeStep: 0 });
+        this.openSnackbar('Utworzono promocję roboczą');
+        this.fetchCampaigns();
+        this.selectCampaign(campaign);
+      })
+      .catch(this.handleError('Nie udało się utworzyć promocji'));
+  };
+
+  replaceCodes = () => {
+    const httpClient = this.getHttpClient();
+    const { selectedCampaign, addCodeForm } = this.state;
+    if (!httpClient || !selectedCampaign) {
+      return;
+    }
+    const error = this.validateCodeStep(addCodeForm);
+    if (error) {
+      this.openSnackbar(error);
+      return;
+    }
+
+    this.setState({ loading: true });
+    httpClient.put(`/promotions/${selectedCampaign.id}/codes`, this.codeSetupPayload(addCodeForm))
+      .then(() => {
+        this.setState({ addCodeForm: { ...emptyCodeForm }, loading: false });
+        this.openSnackbar('Zastąpiono kody promocji');
+        this.selectCampaign(selectedCampaign);
+      })
+      .catch(this.handleError('Nie udało się zastąpić kodów'));
+  };
+
+  disableCode = (code) => {
+    const httpClient = this.getHttpClient();
+    const { selectedCampaign } = this.state;
+    if (!httpClient || !selectedCampaign || !code) {
+      return;
+    }
+    this.setState({ disablingCodeId: code.id });
+    httpClient.put(`/promotions/${selectedCampaign.id}/codes/${code.id}`, {
+      status: 'DISABLED',
+    })
+      .then(() => {
+        this.setState({ disablingCodeId: null });
+        this.openSnackbar('Kod został wyłączony');
+        this.selectCampaign(selectedCampaign);
+      })
+      .catch((error) => {
+        this.setState({ disablingCodeId: null });
+        this.handleError('Nie udało się wyłączyć kodu')(error);
+      });
+  };
+
+  exportCodes = () => {
+    const httpClient = this.getHttpClient();
+    const { selectedCampaign } = this.state;
+    if (!httpClient || !selectedCampaign) {
+      return;
+    }
+    httpClient.get(`/promotions/${selectedCampaign.id}/codes/export`, { responseType: 'blob' })
+      .then(({ data }) => {
+        const url = window.URL.createObjectURL(new Blob([data], { type: 'text/csv' }));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `promotion-${selectedCampaign.id}-codes.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(this.handleError('Nie udało się wyeksportować kodów'));
+  };
+
+  targetPayload = () => {
+    const { selectedCampaign, targetForm } = this.state;
+    const targetSetup = {
+      tagIds: parseIds(targetForm.tagIds),
+      partnerIds: parseIds(targetForm.partnerIds),
+      sightIds: parseIds(targetForm.sightIds),
+      sightEventIds: parseIds(targetForm.sightEventIds),
+    };
+    if (!this.hasTargetSelection(targetSetup) && selectedCampaign) {
+      if (selectedCampaign.scopeType === 'TAG') {
+        targetSetup.tagIds = parseIds(selectedCampaign.tagIds);
+      }
+      if (selectedCampaign.scopeType === 'MANUAL') {
+        targetSetup.sightEventIds = ((selectedCampaign.sightEvents || [])
+          .filter(item => item.active !== false)
+          .map(item => item.sightEventId)
+          .filter(Boolean));
+      }
+    }
+    return {
+      targetSetup,
+      ticketPoolSetup: {
+        ticketPrice: plnToCents(targetForm.ticketPricePln),
+        availableTicketsNumber: toNumberOrNull(targetForm.availableTicketsNumber),
+        ticketName: targetForm.ticketName || null,
+        poolName: targetForm.poolName || null,
+      },
+    };
+  };
+
+  previewTargets = () => {
+    const httpClient = this.getHttpClient();
+    const { selectedCampaign } = this.state;
+    if (!httpClient || !selectedCampaign) {
+      return;
+    }
+    this.setState({ loading: true });
+    httpClient.post(`/promotions/${selectedCampaign.id}/ticket-pools/preview`, this.targetPayload())
+      .then(({ data }) => this.setState({
+        targetPreview: (data && data.sightEvents) || [],
+        loading: false,
+      }))
+      .catch(this.handleError('Nie udało się pobrać podglądu ofert'));
+  };
+
+  toggleCampaignTargetsPreview = () => {
+    const httpClient = this.getHttpClient();
+    const {
+      campaignTargetsPreview,
+      campaignTargetsVisible,
+      selectedCampaign,
+    } = this.state;
+    if (campaignTargetsVisible) {
+      this.setState({ campaignTargetsVisible: false });
+      return;
+    }
+    if (campaignTargetsPreview.length) {
+      this.setState({ campaignTargetsVisible: true });
+      return;
+    }
+    if (!httpClient || !selectedCampaign || selectedCampaign.scopeType === 'GLOBAL') {
+      return;
+    }
+    this.setState({ campaignTargetsLoading: true });
+    this.fetchCampaignTargetsPreview()
+      .then(({ data }) => this.setState({
+        campaignTargetsPreview: (data && data.sightEvents) || [],
+        campaignTargetsVisible: true,
+        campaignTargetsLoading: false,
+      }))
+      .catch((error) => {
+        this.setState({ campaignTargetsLoading: false });
+        this.handleError(promotionMessages.PROMOTION_TARGETS_PREVIEW_FAILED)(error);
+      });
+  };
+
+  fetchCampaignTargetsPreview = () => {
+    const httpClient = this.getHttpClient();
+    const { selectedCampaign } = this.state;
+    if (!httpClient || !selectedCampaign) {
+      return Promise.reject(new Error('Missing selected campaign'));
+    }
+    return httpClient.post(`/promotions/${selectedCampaign.id}/ticket-pools/preview`, {
+      targetSetup: {},
+    });
+  };
+
+  ticketTargetReady = item => item
+    && item.ticketPoolStatus === 'CREATED'
+    && item.hptAtnaId;
+
+  validateTicketPromotionBeforeActivation = () => (
+    this.fetchCampaignTargetsPreview()
+      .then(({ data }) => {
+        const sightEvents = (data && data.sightEvents) || [];
+        const missingPools = sightEvents.filter(item => !this.ticketTargetReady(item));
+        this.setState({
+          campaignTargetsPreview: sightEvents,
+          campaignTargetsVisible: true,
+        });
+        if (!sightEvents.length) {
+          this.openSnackbar(promotionMessages.PROMOTION_TICKET_TARGETS_REQUIRED);
+          return false;
+        }
+        if (missingPools.length) {
+          this.openSnackbar(promotionMessages.PROMOTION_TICKET_POOLS_REQUIRED_FRONT);
+          return false;
+        }
+        return true;
+      })
+      .catch((error) => {
+        this.handleError(promotionMessages.PROMOTION_TARGETS_PREVIEW_FAILED)(error);
+        return false;
+      })
+  );
+
+  generatePools = () => {
+    const httpClient = this.getHttpClient();
+    const { selectedCampaign } = this.state;
+    if (!httpClient || !selectedCampaign) {
+      return;
+    }
+    this.setState({ loading: true });
+    httpClient.post(`/promotions/${selectedCampaign.id}/ticket-pools/generate`, this.targetPayload())
+      .then(({ data }) => {
+        this.setState({ selectedCampaign: data, loading: false });
+        this.openSnackbar('Wygenerowano pule promocyjne');
+        this.selectCampaign(data);
+      })
+      .catch(this.handleError('Nie udało się wygenerować pul'));
+  };
+
+  activateCampaign = () => {
+    const httpClient = this.getHttpClient();
+    const { selectedCampaign } = this.state;
+    if (!httpClient || !selectedCampaign) {
+      return;
+    }
+    if (selectedCampaign.promotionType === 'TICKET') {
+      this.validateTicketPromotionBeforeActivation()
+        .then((canActivate) => {
+          if (canActivate) {
+            this.activateCampaignRequest();
+          }
+        });
+      return;
+    }
+    this.activateCampaignRequest();
+  };
+
+  activateCampaignRequest = () => {
+    const httpClient = this.getHttpClient();
+    const { selectedCampaign } = this.state;
+    if (!httpClient || !selectedCampaign) {
+      return;
+    }
+    this.setState({ loading: true });
+    httpClient.patch(`/promotions/${selectedCampaign.id}/status`, { status: 'ACTIVE' })
+      .then(({ data }) => {
+        this.setState({ selectedCampaign: data, loading: false });
+        this.openSnackbar('Uruchomiono promocję');
+        this.fetchCampaigns();
+      })
+      .catch(this.handleError('Nie udało się uruchomić promocji'));
+  };
+
+  endCampaign = () => {
+    const httpClient = this.getHttpClient();
+    const { selectedCampaign } = this.state;
+    if (!httpClient || !selectedCampaign) {
+      return;
+    }
+    this.setState({ loading: true });
+    httpClient.patch(`/promotions/${selectedCampaign.id}/status`, { status: 'DISABLED' })
+      .then(({ data }) => {
+        this.setState({ selectedCampaign: data, loading: false });
+        this.openSnackbar('Promocja została zakończona');
+        this.fetchCampaigns();
+      })
+      .catch(this.handleError('Nie udało się zakończyć promocji'));
+  };
+
+  filteredCampaigns = () => {
+    const { campaigns, filterText } = this.state;
+    const query = normalizeSearchValue(filterText);
+    if (!query) {
+      return campaigns;
+    }
+    return campaigns.filter(item => (
+      normalizeSearchValue(item.name).includes(query)
+      || normalizeSearchValue(item.promotionType).includes(query)
+      || normalizeSearchValue(item.status).includes(query)
+    ));
+  };
+
+  renderCampaignSpecificFields() {
+    const { campaignForm } = this.state;
+    if (campaignForm.promotionType === 'TICKET') {
+      return (
+        <React.Fragment>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              helperText="Ile zwykłych biletów musi mieć klient w koszyku"
+              label="Wymagana liczba biletów"
+              onChange={this.handleCampaignFormChange('requiredTicketQuantity')}
+              value={campaignForm.requiredTicketQuantity}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              helperText="Ile biletów promocyjnych dostanie po użyciu kodu"
+              label="Przyznawana liczba biletów"
+              onChange={this.handleCampaignFormChange('grantedTicketQuantity')}
+              value={campaignForm.grantedTicketQuantity}
+            />
+          </Grid>
+        </React.Fragment>
+      );
+    }
+    if (campaignForm.promotionType === 'PERCENT') {
+      return (
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            helperText="Np. 20 oznacza rabat 20% od wartości koszyka"
+            label="Rabat procentowy"
+            onChange={this.handleCampaignFormChange('discountPercent')}
+            value={campaignForm.discountPercent}
+          />
+        </Grid>
+      );
+    }
+    return (
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          helperText="Kwota brutto w złotówkach, np. 50 albo 50.00. System zapisze ją w groszach."
+          label="Rabat kwota PLN"
+          onChange={this.handleCampaignFormChange('discountAmountGrossPln')}
+          value={campaignForm.discountAmountGrossPln}
+        />
+      </Grid>
+    );
+  }
+
+  renderTargetPicker({
+    label,
+    helperText,
+    emptyLabel,
+    options,
+    selectedIds,
+    query,
+    queryName,
+    open,
+    openName,
+    anchorName,
+    formName,
+    fieldName,
+  }) {
+    const filteredOptions = this.filteredOptions(options, query);
+    const selectedNumbers = parseIds(selectedIds);
+    const inputValue = open ? query : this.targetSummary(selectedIds, emptyLabel, options);
+    return (
+      <ClickAwayListener onClickAway={this.closeTargetMenu(openName)}>
+        <div
+          ref={(element) => { this[anchorName] = element; }}
+          style={styles.targetPicker}
+        >
+          <TextField
+            fullWidth
+            helperText={helperText}
+            InputLabelProps={{ shrink: true }}
+            label={label}
+            onChange={this.handleQueryChange(queryName)}
+            onFocus={this.openTargetMenu(openName)}
+            onKeyDown={this.handleTargetKeyDown(openName)}
+            value={inputValue}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={`Rozwiń listę: ${label}`}
+                    onClick={this.toggleTargetMenu(openName)}
+                    style={styles.targetDropdownButton}
+                  >
+                    <ArrowDropDownIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Popper
+            anchorEl={this[anchorName]}
+            open={open}
+            placement="bottom-start"
+            style={styles.targetPopper}
+          >
+            <Paper
+              onMouseUp={this.keepTargetMenuOpen}
+              style={this.getTargetDropdownStyle(this[anchorName])}
+            >
+              {filteredOptions.map(option => (
+                <MenuItem
+                  key={option.id}
+                  onClick={this.toggleFormTarget(formName, fieldName, option.id)}
+                  style={styles.targetMenuItem}
+                >
+                  <Checkbox
+                    checked={selectedNumbers.includes(Number(option.id))}
+                    style={styles.targetMenuCheckbox}
+                  />
+                  <ListItemText
+                    primary={this.optionText(option)}
+                    primaryTypographyProps={{ style: styles.targetMenuText }}
+                  />
+                </MenuItem>
+              ))}
+              {!filteredOptions.length && (
+                <MenuItem disabled style={styles.targetMenuItem}>
+                  Brak wyników
+                </MenuItem>
+              )}
+            </Paper>
+          </Popper>
+        </div>
+      </ClickAwayListener>
+    );
+  }
+
+  renderScopeFields() {
+    const {
+      campaignForm,
+      campaignSightEventOpen,
+      campaignSightEventQuery,
+      campaignTagOpen,
+      campaignTagQuery,
+      sightEventOptions,
+      tagOptions,
+    } = this.state;
+    if (campaignForm.scopeType === 'GLOBAL') {
+      return (
+        <Grid item xs={12}>
+          <Typography color="textSecondary">
+            Promocja globalna działa na cały koszyk zgodnie z warunkami promocji.
+          </Typography>
+        </Grid>
+      );
+    }
+    if (campaignForm.scopeType === 'TAG') {
+      return (
+        <Grid item xs={12}>
+          {this.renderTargetPicker({
+            label: 'Tagi objęte promocją',
+            helperText: 'Wpisz nazwę i wybierz tagi, których oferty mają brać udział w promocji',
+            emptyLabel: 'Wybierz tagi',
+            options: tagOptions,
+            selectedIds: campaignForm.tagIds,
+            query: campaignTagQuery,
+            queryName: 'campaignTagQuery',
+            open: campaignTagOpen,
+            openName: 'campaignTagOpen',
+            anchorName: 'campaignTagAnchor',
+            formName: 'campaignForm',
+            fieldName: 'tagIds',
+          })}
+        </Grid>
+      );
+    }
+    return (
+      <Grid item xs={12}>
+        {this.renderTargetPicker({
+          label: 'Oferty objęte promocją',
+          helperText: 'Wpisz nazwę i wybierz konkretne oferty, które mają brać udział w promocji',
+          emptyLabel: 'Wybierz oferty',
+          options: sightEventOptions,
+          selectedIds: campaignForm.sightEventIds,
+          query: campaignSightEventQuery,
+          queryName: 'campaignSightEventQuery',
+          open: campaignSightEventOpen,
+          openName: 'campaignSightEventOpen',
+          anchorName: 'campaignSightEventAnchor',
+          formName: 'campaignForm',
+          fieldName: 'sightEventIds',
+        })}
+      </Grid>
+    );
+  }
+
+  renderCampaignStep() {
+    const { campaignForm } = this.state;
+    const allowedScopes = campaignForm.promotionType === 'TICKET'
+      ? ['TAG', 'MANUAL']
+      : ['TAG', 'MANUAL', 'GLOBAL'];
+
+    return (
+      <Grid container spacing={16}>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            helperText="Nazwa widoczna w Helpdesku i raportach"
+            label="Nazwa promocji"
+            onChange={this.handleCampaignFormChange('name')}
+            value={campaignForm.name}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            select
+            fullWidth
+            helperText={promotionTypeHints[campaignForm.promotionType]}
+            label="Typ promocji"
+            onChange={this.handleCampaignFormChange('promotionType')}
+            value={campaignForm.promotionType}
+          >
+            {Object.keys(promotionTypeLabels).map(type => (
+              <MenuItem key={type} value={type}>
+                {promotionTypeLabels[type]}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            select
+            fullWidth
+            helperText="Określa, na jakie oferty może zadziałać kod"
+            label="Zakres promocji"
+            onChange={this.handleCampaignFormChange('scopeType')}
+            value={campaignForm.scopeType}
+          >
+            {allowedScopes.map(scope => (
+              <MenuItem key={scope} value={scope}>
+                {scopeLabels[scope]}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            helperText="Od kiedy kod może zostać zastosowany"
+            label="Ważna od"
+            onChange={this.handleCampaignFormChange('validFrom')}
+            type="datetime-local"
+            value={campaignForm.validFrom}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            helperText="Do końca wskazanego dnia/godziny"
+            label="Ważna do"
+            onChange={this.handleCampaignFormChange('validTo')}
+            type="datetime-local"
+            value={campaignForm.validTo}
+          />
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <TextField
+            fullWidth
+            helperText="Maksymalna liczba użyć w całej promocji, niezależnie od liczby kodów"
+            label="Limit promocji"
+            onChange={this.handleCampaignFormChange('globalLimit')}
+            value={campaignForm.globalLimit}
+          />
+        </Grid>
+        {this.renderCampaignSpecificFields()}
+      </Grid>
+    );
+  }
+
+  renderCodeFields(form, handleChange, fileInputId, formName) {
+    const effectiveCodeType = form.mode === 'FIXED' ? 'FIXED' : form.codeType;
+    return (
+      <Grid container spacing={16}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            select
+            fullWidth
+            helperText="Wybierz, czy system ma wygenerować kody, wczytać CSV albo użyć jednego kodu"
+            label="Sposób przygotowania kodów"
+            onChange={handleChange('mode')}
+            value={form.mode}
+          >
+            {Object.keys(codeModeLabels).map(mode => (
+              <MenuItem key={mode} value={mode}>
+                {codeModeLabels[mode]}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        {form.mode !== 'FIXED' && (
+          <Grid item xs={12} sm={6}>
+            <TextField
+              select
+              fullWidth
+              helperText="Jednorazowy kod blokuje się po opłaceniu zamówienia"
+              label="Rodzaj kodu"
+              onChange={handleChange('codeType')}
+              value={form.codeType}
+            >
+              {Object.keys(codeTypeLabels).map(type => (
+                <MenuItem key={type} value={type}>
+                  {codeTypeLabels[type]}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+        )}
+        {form.mode === 'GENERATE' && (
+          <React.Fragment>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                helperText="Ile kodów system ma utworzyć"
+                label="Liczba kodów"
+                onChange={handleChange('generateCount')}
+                value={form.generateCount}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                helperText="Długość losowej części kodu"
+                label="Długość kodu"
+                onChange={handleChange('generatedCodeLength')}
+                value={form.generatedCodeLength}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                helperText="Opcjonalny prefiks, np. VISA"
+                label="Prefiks"
+                onChange={handleChange('generatedCodePrefix')}
+                value={form.generatedCodePrefix}
+              />
+            </Grid>
+          </React.Fragment>
+        )}
+        {form.mode === 'IMPORT' && (
+          <React.Fragment>
+            <Grid item xs={12}>
+              <input
+                accept=".csv,text/csv,text/plain"
+                id={fileInputId}
+                onChange={this.handleCodesFileChange(formName)}
+                style={styles.hiddenInput}
+                type="file"
+              />
+              <Button component="label" htmlFor={fileInputId}>
+                <CloudUploadIcon style={styles.icon} />
+                <span>Wczytaj CSV z kodami</span>
+              </Button>
+              <Typography color="textSecondary" style={styles.fieldHint}>
+                Plik CSV powinien mieć jedną kolumnę bez nagłówka. Jeden kod w jednej linii.
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                multiline
+                helperText="Tu możesz wkleić kody ręcznie, po jednym w linii"
+                label="Lista kodów"
+                onChange={handleChange('codes')}
+                rows={5}
+                value={form.codes}
+              />
+            </Grid>
+          </React.Fragment>
+        )}
+        {form.mode === 'FIXED' && (
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              helperText="Np. WAKAJKI2026. Kod może być używany wiele razy zgodnie z limitami."
+              label="Kod stały"
+              onChange={handleChange('fixedCode')}
+              value={form.fixedCode}
+            />
+          </Grid>
+        )}
+        {effectiveCodeType === 'ONE_TIME' ? (
+          <Grid item xs={12}>
+            <Typography color="textSecondary">
+              Kod jednorazowy może zostać wykorzystany tylko raz, więc limit użyć kodu wynosi 1
+              i nie wymaga dodatkowej konfiguracji.
+            </Typography>
+          </Grid>
+        ) : (
+          <React.Fragment>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                helperText="Limit dla tego jednego kodu. Puste pole oznacza brak dodatkowego limitu."
+                label="Limit użyć kodu"
+                onChange={handleChange('maxRedemptions')}
+                value={form.maxRedemptions}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                helperText="Ile razy jeden klient może użyć kodu"
+                label="Limit na klienta"
+                onChange={handleChange('maxRedemptionsPerCustomer')}
+                value={form.maxRedemptionsPerCustomer}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                helperText="Opcjonalny limit użyć jednego kodu dziennie"
+                label="Limit dzienny"
+                onChange={handleChange('maxRedemptionsPerDay')}
+                value={form.maxRedemptionsPerDay}
+              />
+            </Grid>
+          </React.Fragment>
+        )}
+      </Grid>
+    );
+  }
+
+  renderTargetStep() {
+    return (
+      <Grid container spacing={16}>
+        {this.renderScopeFields()}
+        <Grid item xs={12}>
+          <Typography color="textSecondary">
+            Promocja zostanie utworzona jako robocza. Eksport kodów, generowanie pul i uruchomienie
+            są dostępne w podglądzie szczegółów promocji.
+          </Typography>
+        </Grid>
+      </Grid>
+    );
+  }
+
+  renderAddDialogContent() {
+    const { activeStep, codeForm } = this.state;
+    if (activeStep === 0) {
+      return this.renderCampaignStep();
+    }
+    if (activeStep === 1) {
+      return this.renderCodeFields(
+        codeForm,
+        this.handleCodeFormChange,
+        'promotion-codes-create-file',
+        'codeForm',
+      );
+    }
+    return this.renderTargetStep();
+  }
+
+  renderAddDialog() {
+    const { activeStep, addDialogOpen, loading } = this.state;
+    return (
+      <Dialog
+        fullWidth
+        maxWidth="md"
+        open={addDialogOpen}
+      >
+        <DialogTitle>Dodaj promocję</DialogTitle>
+        <DialogContent style={styles.dialogContent}>
+          <Stepper activeStep={activeStep}>
+            {steps.map(step => (
+              <Step key={step}>
+                <StepLabel>{step}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+          {this.renderAddDialogContent()}
+        </DialogContent>
+        <DialogActions>
+          <Button disabled={loading} onClick={this.handleAddDialogClose}>
+            Anuluj
+          </Button>
+          <Button disabled={loading || activeStep === 0} onClick={this.handlePreviousStep}>
+            Wstecz
+          </Button>
+          {activeStep < steps.length - 1 ? (
+            <Button color="secondary" disabled={loading} onClick={this.handleNextStep}>
+              Dalej
+            </Button>
+          ) : (
+            <Button color="secondary" disabled={loading} onClick={this.createCampaign}>
+              Utwórz promocję
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
+  renderCampaignsTable() {
+    const campaigns = this.filteredCampaigns();
+    const { filterText, loading } = this.state;
+    return (
+      <Paper style={styles.paper}>
+        <Grid container justify="space-between" alignItems="flex-end" style={styles.toolbar}>
+          <Grid item>
+            <Button aria-label="Dodaj" onClick={this.handleAddDialogOpen}>
+              <AddIcon style={styles.icon} />
+              <span>DODAJ</span>
+            </Button>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <TextField
+              fullWidth
+              label="Filtruj promocje"
+              onChange={this.handleFilterChange}
+              value={filterText}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+        </Grid>
+        {!campaigns.length ? (
+          <EmptyView
+            image={SearchIcon}
+            label="Brak promocji"
+            loading={loading}
+            message="Dodaj pierwszą promocję."
+          />
+        ) : (
+          <Table aria-labelledby="promotions-list">
+            <TableHead>
+              <TableRow>
+                <TableCell># ID</TableCell>
+                <TableCell>Nazwa</TableCell>
+                <TableCell>Typ</TableCell>
+                <TableCell>Zakres</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Okres</TableCell>
+                <TableCell>Użycia</TableCell>
+                <TableCell align="right" />
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {campaigns.map(item => (
+                <TableRow key={item.id} hover>
+                  <TableCell>{item.id}</TableCell>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>
+                    {promotionTypeLabels[item.promotionType] || item.promotionType}
+                  </TableCell>
+                  <TableCell>{scopeLabels[item.scopeType] || item.scopeType}</TableCell>
+                  <TableCell>{statusLabels[item.status] || item.status}</TableCell>
+                  <TableCell>
+                    {`${formatDate(item.validFrom)} - ${formatDate(item.validTo)}`}
+                  </TableCell>
+                  <TableCell>{item.usedRedemptionsCount || 0}</TableCell>
+                  <TableCell align="right" style={styles.actions}>
+                    <IconButton onClick={() => this.selectCampaign(item)}>
+                      <VisibilityIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </Paper>
+    );
+  }
+
+  renderCodesPagination() {
+    const { codes, codesPage, codesRowsPerPage } = this.state;
+    const from = codes.length ? (codesPage * codesRowsPerPage) + 1 : 0;
+    const to = Math.min(codes.length, (codesPage + 1) * codesRowsPerPage);
+    const lastPage = Math.max(0, Math.ceil(codes.length / codesRowsPerPage) - 1);
+    return (
+      <div style={styles.codesPagination}>
+        <Typography color="textSecondary">Wierszy</Typography>
+        <TextField
+          select
+          margin="dense"
+          onChange={this.handleCodesRowsPerPageChange}
+          style={styles.codesPaginationSelect}
+          value={codesRowsPerPage}
+        >
+          {codesRowsPerPageOptions.map(option => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </TextField>
+        <Typography color="textSecondary" style={styles.codesPaginationRange}>
+          {`${from}-${to} z ${codes.length}`}
+        </Typography>
+        <IconButton
+          disabled={codesPage <= 0}
+          onClick={this.goToPreviousCodesPage}
+          title="Poprzednia strona"
+        >
+          <ChevronLeftIcon />
+        </IconButton>
+        <IconButton
+          disabled={codesPage >= lastPage}
+          onClick={this.goToNextCodesPage}
+          title="Następna strona"
+        >
+          <ChevronRightIcon />
+        </IconButton>
+      </div>
+    );
+  }
+
+  renderCodesPreview() {
+    const {
+      codes, codesPage, codesRowsPerPage, disablingCodeId,
+    } = this.state;
+    const pagedCodes = codes.slice(
+      codesPage * codesRowsPerPage,
+      codesPage * codesRowsPerPage + codesRowsPerPage,
+    );
+    return (
+      <React.Fragment>
+        {this.renderCodesPagination()}
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Kod</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Rodzaj</TableCell>
+              <TableCell>Użycia</TableCell>
+              <TableCell align="right">Akcje</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {pagedCodes.map(code => (
+              <TableRow key={code.id}>
+                <TableCell>{code.code}</TableCell>
+                <TableCell>{codeStatusLabels[code.status] || code.status}</TableCell>
+                <TableCell>{codeTypeLabels[code.codeType] || code.codeType}</TableCell>
+                <TableCell>{code.usedRedemptionsCount || 0}</TableCell>
+                <TableCell align="right">
+                  {code.status === 'ACTIVE' ? (
+                    <Button
+                      disabled={disablingCodeId === code.id}
+                      onClick={() => this.disableCode(code)}
+                      size="small"
+                      title="Zablokuj kod"
+                    >
+                      <BlockIcon style={styles.icon} />
+                      <span>Zablokuj</span>
+                    </Button>
+                  ) : (
+                    <Typography color="textSecondary">
+                      {codeStatusLabels[code.status] || code.status}
+                    </Typography>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        {this.renderCodesPagination()}
+      </React.Fragment>
+    );
+  }
+
+  renderTicketPoolsSection() {
+    const {
+      loading,
+      poolSightEventOpen,
+      poolSightEventQuery,
+      poolTagOpen,
+      poolTagQuery,
+      selectedCampaign,
+      sightEventOptions,
+      tagOptions,
+      targetForm,
+      targetPreview,
+    } = this.state;
+    const ticketPoolSightEventOptions = sightEventOptions
+      .filter(item => item.hptId !== null && item.hptId !== undefined);
+    if (!selectedCampaign
+        || selectedCampaign.promotionType !== 'TICKET'
+        || selectedCampaign.status !== 'DRAFT') {
+      return null;
+    }
+    return (
+      <div style={styles.detailsSection}>
+        <Typography variant="subtitle1" gutterBottom>
+          Pule promocyjne
+        </Typography>
+        <Grid container spacing={16}>
+          <Grid item xs={12} sm={6}>
+            {this.renderTargetPicker({
+              label: 'Tagi',
+              helperText: 'Wpisz nazwę i wybierz tagi dla generowania pul',
+              emptyLabel: 'Wybierz tagi',
+              options: tagOptions,
+              selectedIds: targetForm.tagIds,
+              query: poolTagQuery,
+              queryName: 'poolTagQuery',
+              open: poolTagOpen,
+              openName: 'poolTagOpen',
+              anchorName: 'poolTagAnchor',
+              formName: 'targetForm',
+              fieldName: 'tagIds',
+            })}
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            {this.renderTargetPicker({
+              label: 'Oferty',
+              helperText: 'Wpisz nazwę i wybierz konkretne oferty zsynchronizowane z HT',
+              emptyLabel: 'Wybierz oferty',
+              options: ticketPoolSightEventOptions,
+              selectedIds: targetForm.sightEventIds,
+              query: poolSightEventQuery,
+              queryName: 'poolSightEventQuery',
+              open: poolSightEventOpen,
+              openName: 'poolSightEventOpen',
+              anchorName: 'poolSightEventAnchor',
+              formName: 'targetForm',
+              fieldName: 'sightEventIds',
+            })}
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              helperText="ID partnerów po przecinku"
+              label="Partnerzy"
+              onChange={this.handleTargetFormChange('partnerIds')}
+              value={targetForm.partnerIds}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              helperText="ID obiektów po przecinku"
+              label="Obiekty"
+              onChange={this.handleTargetFormChange('sightIds')}
+              value={targetForm.sightIds}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              helperText="Cena biletu specjalnego, np. 1.00"
+              label="Cena biletu PLN"
+              onChange={this.handleTargetFormChange('ticketPricePln')}
+              value={targetForm.ticketPricePln}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              helperText="Liczba biletów w puli dla każdej oferty"
+              label="Liczba biletów"
+              onChange={this.handleTargetFormChange('availableTicketsNumber')}
+              value={targetForm.availableTicketsNumber}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              helperText="Opcjonalnie, domyślnie nazwa promocji"
+              label="Nazwa puli"
+              onChange={this.handleTargetFormChange('poolName')}
+              value={targetForm.poolName}
+            />
+          </Grid>
+        </Grid>
+        <Grid container spacing={16} style={styles.fieldHint}>
+          <Grid item>
+            <Button disabled={loading} onClick={this.previewTargets}>
+              <SearchIcon style={styles.icon} />
+              <span>Podgląd ofert</span>
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button color="secondary" disabled={loading} onClick={this.generatePools}>
+              <PlayArrowIcon style={styles.icon} />
+              <span>Generuj pule</span>
+            </Button>
+          </Grid>
+        </Grid>
+        {!!targetPreview.length && (
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Oferta</TableCell>
+                <TableCell>Obiekt</TableCell>
+                <TableCell>Partner</TableCell>
+                <TableCell>Status puli</TableCell>
+                <TableCell>ATNA</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {targetPreview.map(item => (
+                <TableRow key={item.sightEventId}>
+                  <TableCell>{item.sightEventName}</TableCell>
+                  <TableCell>{item.sightName}</TableCell>
+                  <TableCell>{item.partnerName}</TableCell>
+                  <TableCell>{item.ticketPoolStatus}</TableCell>
+                  <TableCell>{item.hptAtnaId || '-'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </div>
+    );
+  }
+
+  renderCampaignDetailsData() {
+    const { selectedCampaign } = this.state;
+    if (!selectedCampaign) {
+      return null;
+    }
+    return (
+      <div style={styles.detailsSection}>
+        <Typography variant="subtitle1" gutterBottom>
+          Dane promocji
+        </Typography>
+        <Grid container spacing={16}>
+          <Grid item xs={12} sm={3}>
+            <Typography color="textSecondary">Okres ważności</Typography>
+            <Typography>
+              {`${formatDate(selectedCampaign.validFrom)} - ${formatDate(selectedCampaign.validTo)}`}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <Typography color="textSecondary">Zakres</Typography>
+            <Typography>{scopeLabels[selectedCampaign.scopeType]}</Typography>
+          </Grid>
+          {selectedCampaign.scopeType === 'TAG' && (
+            <Grid item xs={12} sm={3}>
+              <Typography color="textSecondary">Tag promocji</Typography>
+              <Typography>{this.campaignTagSummary()}</Typography>
+            </Grid>
+          )}
+          <Grid item xs={12} sm={3}>
+            <Typography color="textSecondary">Limit promocji</Typography>
+            <Typography>{selectedCampaign.globalLimit || 'Brak'}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <Typography color="textSecondary">Limit klienta</Typography>
+            <Typography>{selectedCampaign.customerLimit || 'Brak'}</Typography>
+          </Grid>
+          {selectedCampaign.promotionType === 'TICKET' && (
+            <React.Fragment>
+              <Grid item xs={12} sm={3}>
+                <Typography color="textSecondary">Wymagana liczba biletów</Typography>
+                <Typography>{selectedCampaign.requiredTicketQuantity || '-'}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={3}>
+                <Typography color="textSecondary">Przyznawana liczba biletów</Typography>
+                <Typography>{selectedCampaign.grantedTicketQuantity || '-'}</Typography>
+              </Grid>
+            </React.Fragment>
+          )}
+          {selectedCampaign.promotionType === 'PERCENT' && (
+            <Grid item xs={12} sm={3}>
+              <Typography color="textSecondary">Rabat procentowy</Typography>
+              <Typography>{`${selectedCampaign.discountPercent || 0}%`}</Typography>
+            </Grid>
+          )}
+          {selectedCampaign.promotionType === 'AMOUNT' && (
+            <Grid item xs={12} sm={3}>
+              <Typography color="textSecondary">Rabat kwota PLN</Typography>
+              <Typography>{`${centsToPln(selectedCampaign.discountAmountGross)} PLN`}</Typography>
+            </Grid>
+          )}
+        </Grid>
+      </div>
+    );
+  }
+
+  renderCampaignTargetsPreview() {
+    const {
+      campaignTargetsLoading,
+      campaignTargetsPreview,
+      campaignTargetsVisible,
+      selectedCampaign,
+    } = this.state;
+    if (!selectedCampaign || selectedCampaign.scopeType === 'GLOBAL') {
+      return null;
+    }
+    return (
+      <div style={styles.detailsSection}>
+        <Grid container alignItems="center" justify="space-between">
+          <Grid item>
+            <Typography variant="subtitle1">Oferty objęte promocją</Typography>
+            <Typography color="textSecondary" style={styles.fieldHint}>
+              Podgląd pokazuje oferty wynikające z aktualnego zakresu promocji.
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Button
+              disabled={campaignTargetsLoading}
+              onClick={this.toggleCampaignTargetsPreview}
+            >
+              <VisibilityIcon style={styles.icon} />
+              <span>{campaignTargetsVisible ? 'Ukryj oferty' : 'Podgląd ofert'}</span>
+            </Button>
+          </Grid>
+        </Grid>
+        {campaignTargetsVisible && (
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Partner</TableCell>
+                <TableCell>Oferta</TableCell>
+                {selectedCampaign.promotionType === 'TICKET' && (
+                  <React.Fragment>
+                    <TableCell>Status puli</TableCell>
+                    <TableCell>ATNA</TableCell>
+                  </React.Fragment>
+                )}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {campaignTargetsPreview.map(item => (
+                <TableRow key={item.sightEventId}>
+                  <TableCell>{item.partnerName || '-'}</TableCell>
+                  <TableCell>{item.sightEventName || '-'}</TableCell>
+                  {selectedCampaign.promotionType === 'TICKET' && (
+                    <React.Fragment>
+                      <TableCell>
+                        {ticketPoolStatusLabels[item.ticketPoolStatus] || item.ticketPoolStatus || '-'}
+                      </TableCell>
+                      <TableCell>{item.hptAtnaId || '-'}</TableCell>
+                    </React.Fragment>
+                  )}
+                </TableRow>
+              ))}
+              {!campaignTargetsPreview.length && (
+                <TableRow>
+                  <TableCell colSpan={selectedCampaign.promotionType === 'TICKET' ? 4 : 2}>
+                    Brak ofert dla aktualnego zakresu promocji.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
+      </div>
+    );
+  }
+
+  renderDetailsDialog() {
+    const {
+      addCodeForm, codes, detailsDialogOpen, loading, redemptions, selectedCampaign,
+    } = this.state;
+    if (!selectedCampaign) {
+      return null;
+    }
+    const isDraft = selectedCampaign.status === 'DRAFT';
+    const isActive = selectedCampaign.status === 'ACTIVE';
+    return (
+      <Dialog
+        fullWidth
+        maxWidth="md"
+        onClose={this.handleDetailsDialogClose}
+        open={detailsDialogOpen}
+      >
+        <DialogTitle>{selectedCampaign.name}</DialogTitle>
+        <DialogContent style={styles.dialogContent}>
+          <Grid container spacing={16}>
+            <Grid item xs={12} sm={3}>
+              <Typography color="textSecondary">Status</Typography>
+              <Typography>
+                {statusLabels[selectedCampaign.status] || selectedCampaign.status}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <Typography color="textSecondary">Typ</Typography>
+              <Typography>
+                {promotionTypeLabels[selectedCampaign.promotionType]}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <Typography color="textSecondary">Użycia</Typography>
+              <Typography>{selectedCampaign.usedRedemptionsCount || 0}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <Typography color="textSecondary">Rezerwacje</Typography>
+              <Typography>{selectedCampaign.reservedRedemptionsCount || 0}</Typography>
+            </Grid>
+          </Grid>
+          {selectedCampaign.promotionType === 'AMOUNT' && (
+            <Typography color="textSecondary" style={styles.fieldHint}>
+              {`Rabat kwotowy: ${centsToPln(selectedCampaign.discountAmountGross)} PLN`}
+            </Typography>
+          )}
+          {this.renderCampaignDetailsData()}
+          {this.renderCampaignTargetsPreview()}
+          <div style={styles.detailsSection}>
+            <Typography variant="subtitle1">Kody</Typography>
+            {isDraft && (
+              <React.Fragment>
+                <Typography color="textSecondary" style={styles.fieldHint}>
+                  Ponowne zapisanie kodów w promocji roboczej zastąpi całą poprzednią listę kodów.
+                </Typography>
+                {this.renderCodeFields(
+                  addCodeForm,
+                  this.handleAddCodeFormChange,
+                  'promotion-codes-details-file',
+                  'addCodeForm',
+                )}
+                <Button
+                  color="secondary"
+                  disabled={loading}
+                  onClick={this.replaceCodes}
+                  style={styles.fieldHint}
+                >
+                  <AddIcon style={styles.icon} />
+                  <span>{codes.length ? 'Zastąp kody' : 'Zapisz kody'}</span>
+                </Button>
+              </React.Fragment>
+            )}
+            {!isDraft && (
+              <Typography color="textSecondary" style={styles.fieldHint}>
+                Po uruchomieniu promocji można blokować aktywne kody,
+                ale nie można generować ani zmieniać listy.
+              </Typography>
+            )}
+            {this.renderCodesPreview()}
+          </div>
+          {this.renderTicketPoolsSection()}
+          <Typography color="textSecondary" style={styles.detailsSection}>
+            {`Realizacje: ${redemptions.length}`}
+          </Typography>
+        </DialogContent>
+        <DialogActions style={styles.dialogActions}>
+          <Button disabled={!codes.length || loading} onClick={this.exportCodes}>
+            <CloudDownloadIcon style={styles.icon} />
+            <span>Eksportuj kody</span>
+          </Button>
+          <Button disabled={loading} onClick={this.handleDetailsDialogClose}>
+            Zamknij
+          </Button>
+          {isDraft && (
+            <Button
+              color="secondary"
+              disabled={loading}
+              onClick={this.activateCampaign}
+            >
+              Uruchom promocję
+            </Button>
+          )}
+          {isActive && (
+            <Button
+              color="secondary"
+              disabled={loading}
+              onClick={this.endCampaign}
+            >
+              Zakończ promocję
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
+  render() {
+    const { snackbarMessage, snackbarOpen } = this.state;
+    const { profile } = this.props;
+
+    if (!canManagePromotions(profile)) {
+      return (
+        <Layout>
+          <div style={styles.content}>
+            <Paper style={styles.paper}>
+              <Typography>Brak dostępu.</Typography>
+            </Paper>
+          </div>
+        </Layout>
+      );
+    }
+
+    return (
+      <Layout>
+        <div style={styles.content}>
+          {this.renderCampaignsTable()}
+          {this.renderAddDialog()}
+          {this.renderDetailsDialog()}
+          <Snackbar
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            autoHideDuration={4000}
+            message={snackbarMessage}
+            onClose={this.closeSnackbar}
+            open={snackbarOpen}
+          />
+        </div>
+      </Layout>
+    );
+  }
+}
+
+PromotionsView.propTypes = {
+  profile: PropTypes.shape({}).isRequired,
+};
+
+const mapStateToProps = state => ({
+  profile: profileSelectors.getProfile(state),
+});
+
+export default compose(
+  withAuth(),
+  connect(mapStateToProps),
+)(PromotionsView);

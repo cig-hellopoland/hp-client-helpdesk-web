@@ -28,7 +28,6 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import SearchIcon from '@material-ui/icons/Search';
 import EventIcon from '@material-ui/icons/Event';
 
 import { withRouter } from 'next/router';
@@ -44,6 +43,15 @@ import withAuth from 'services/auth/withAuth';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import EmptyView from 'components/EmptyView';
+import ListingFilters, {
+  getCollectionOptions,
+  getEntityOptions,
+  matchesCollectionFilter,
+  matchesIdFilter,
+  matchesLocationFilters,
+  matchesSearchText,
+  matchesStatusFilter,
+} from 'components/ListingFilters';
 import SortableTableHead from '../Partners/components/ListingViewTable/SortableTableHead';
 
 const tableColumns = [
@@ -96,6 +104,7 @@ const styles = theme => ({
   },
   paper: {
     flex: 1,
+    overflow: 'hidden',
   },
   toolbar: {
     padding: theme.spacing.unit,
@@ -129,6 +138,14 @@ class SightEventsList extends React.Component {
     order: 'asc',
     orderBy: 'item-id',
     filterText: '',
+    voivodeship: '',
+    county: '',
+    city: '',
+    status: '',
+    partnerFilterId: '',
+    sightFilterId: '',
+    categoryId: '',
+    tagId: '',
   };
 
   componentDidMount() {
@@ -405,10 +422,30 @@ class SightEventsList extends React.Component {
   };
 
   handleFilterChange = (event) => {
-    this.setState({
-      filterText: event.target.value,
+    const { name, value } = event.target;
+    this.setState(() => {
+      const nextState = { [name]: value };
+      if (name === 'voivodeship') {
+        nextState.county = '';
+        nextState.city = '';
+      } else if (name === 'county') {
+        nextState.city = '';
+      }
+      return nextState;
     });
   };
+
+  handleClearFilters = () => this.setState({
+    filterText: '',
+    voivodeship: '',
+    county: '',
+    city: '',
+    status: '',
+    partnerFilterId: '',
+    sightFilterId: '',
+    categoryId: '',
+    tagId: '',
+  });
 
   getSightLabel = sight => `${sight.partnerName || 'Brak partnera'} - ${sight.name || ''}`;
 
@@ -481,29 +518,26 @@ class SightEventsList extends React.Component {
       addDialogOpen, dialogOpen, dialogProps, isFetching, isFetchingSights, menuAnchor, menuItemId,
       snackbarMessage, snackbarOpen, order, orderBy, filterText,
       selectedSightId, sightMenuOpen, sightQuery,
+      voivodeship, county, city, status, partnerFilterId, sightFilterId, categoryId, tagId,
     } = this.state;
 
     const baseList = items || [];
     const hasItems = baseList.length > 0;
 
-    const query = (filterText || '').toLowerCase();
-
     const filteredList = baseList.filter((item) => {
-      if (!query) return true;
+      const location = item.location || {};
+      const matchesText = matchesSearchText([
+        item.id, item.name, item.partnerName, item.sightName, location.city,
+        location.county, location.voivodeship,
+      ], filterText);
 
-      const name = (item.name || '').toLowerCase();
-      const city = (item.location && item.location.city || '').toLowerCase();
-      const partner = (item.partnerName || '').toLowerCase();
-
-      // jeśli w wydarzeniach masz np. powiązanie z obiektem (sightName), możesz też dorzucić:
-      const sightName = (item.sightName || '').toLowerCase();
-
-      return (
-        name.includes(query)
-        || city.includes(query)
-        || partner.includes(query)
-        || sightName.includes(query)
-      );
+      return matchesText
+        && matchesLocationFilters(item, { voivodeship, county, city })
+        && matchesStatusFilter(item, status)
+        && matchesIdFilter(item.partnerId, partnerFilterId)
+        && matchesIdFilter(item.sightId, sightFilterId)
+        && matchesCollectionFilter(item.categories, categoryId)
+        && matchesCollectionFilter(item.tags, tagId);
     });
 
     const sortedList = [...filteredList].sort((a, b) => {
@@ -539,12 +573,46 @@ class SightEventsList extends React.Component {
     const colorActive = 'primary';
     const colorInactive = 'disabled';
     const sightOptions = this.getFilteredSights(sights, sightQuery, selectedSightId);
+    const filterValues = {
+      filterText,
+      voivodeship,
+      county,
+      city,
+      status,
+      partnerFilterId,
+      sightFilterId,
+      categoryId,
+      tagId,
+    };
+    const extraFilters = [
+      {
+        key: 'status',
+        label: 'Status',
+        options: [
+          { label: 'Opublikowane', value: 'published' },
+          { label: 'Nieopublikowane', value: 'unpublished' },
+          { label: 'Zablokowane', value: 'blocked' },
+        ],
+      },
+      {
+        key: 'partnerFilterId',
+        label: 'Partner',
+        options: getEntityOptions(baseList, 'partnerId', 'partnerName'),
+      },
+      {
+        key: 'sightFilterId',
+        label: 'Obiekt',
+        options: getEntityOptions(baseList, 'sightId', 'sightName'),
+      },
+      { key: 'categoryId', label: 'Kategoria', options: getCollectionOptions(baseList, 'categories') },
+      { key: 'tagId', label: 'Tag', options: getCollectionOptions(baseList, 'tags') },
+    ];
 
     return (
       <Layout>
         <Grid container className={classes.root}>
           <Paper className={classes.paper}>
-            <Grid container justify="space-between" alignItems="flex-end" className={classes.toolbar}>
+            <Grid container justify="space-between" alignItems="center" className={classes.toolbar}>
               <Grid item>
                 <Button
                   aria-label="Dodaj"
@@ -556,24 +624,19 @@ class SightEventsList extends React.Component {
                   Dodaj ofertę
                 </Button>
               </Grid>
-              {hasItems && (
-                <Grid item xs={12} sm={6} md={4}>
-                  <TextField
-                    fullWidth
-                    label="Filtruj (nazwa, lokalizacja, partner)"
-                    value={filterText}
-                    onChange={this.handleFilterChange}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-              )}
             </Grid>
+            {hasItems && (
+              <ListingFilters
+                extraFilters={extraFilters}
+                items={baseList}
+                onChange={this.handleFilterChange}
+                onClear={this.handleClearFilters}
+                searchLabel="Szukaj oferty (nazwa, ID, obiekt, partner, lokalizacja)"
+                totalCount={baseList.length}
+                values={filterValues}
+                visibleCount={sortedList.length}
+              />
+            )}
             {/* 1) Brak jakichkolwiek wydarzeń w systemie */}
             {!hasItems && !isFetching && (
              <EmptyView
@@ -591,9 +654,7 @@ class SightEventsList extends React.Component {
                 {/* Jeśli filtr nic nie znalazł – komunikat zamiast tabeli */}
                 {sortedList.length === 0 ? (
                  <Grid container justify="center" style={{ padding: 16 }}>
-                   <Typography variant="subtitle1">
-                     Brak wyników dla filtra: "{filterText}"
-                   </Typography>
+                   <Typography variant="subtitle1">Brak wyników dla wybranych filtrów.</Typography>
                  </Grid>
                ) : (
                  <Table aria-labelledby="items-list">

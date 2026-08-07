@@ -7,17 +7,17 @@ import { selectors as profileSelectors } from 'redux/profile';
 export default ({ redirectURL } = { redirectURL: '/sign-in' }) => (View) => {
   class ViewWithAuth extends React.Component {
     componentDidMount() {
-      const { isAuthenticated } = this.props;
+      const { allowAnonymous, isAuthenticated } = this.props;
 
-      if (!isAuthenticated) {
+      if (!allowAnonymous && !isAuthenticated) {
         this.redirect();
       }
     }
 
     componentDidUpdate() {
-      const { isAuthenticated } = this.props;
+      const { allowAnonymous, isAuthenticated } = this.props;
 
-      if (!isAuthenticated) {
+      if (!allowAnonymous && !isAuthenticated) {
         this.redirect();
       }
     }
@@ -32,7 +32,12 @@ export default ({ redirectURL } = { redirectURL: '/sign-in' }) => (View) => {
   }
 
   ViewWithAuth.propTypes = {
+    allowAnonymous: PropTypes.bool,
     isAuthenticated: PropTypes.bool.isRequired,
+  };
+
+  ViewWithAuth.defaultProps = {
+    allowAnonymous: false,
   };
 
   const mapStateToProps = state => ({

@@ -29,6 +29,7 @@ import {
 import { actions as sightCreationActions } from 'redux/sightCreation';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
+import VoivodeshipSelect, { POLISH_VOIVODESHIPS } from 'components/VoivodeshipSelect';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormGroup from '@material-ui/core/FormGroup';
 
@@ -107,17 +108,22 @@ class SightForm extends React.Component {
       // generalAdmission: yupBoolen(),
       lead: yupString()
         .min(10, MIN_LENGTH_MESSAGE(10))
-        .max(250, MAX_LENGTH_MESSAGE(250))
-        .required(REQUIRED_FIELD_MESSAGE),
+        .max(250, MAX_LENGTH_MESSAGE(250)),
       description: yupString()
         .min(10, MIN_LENGTH_MESSAGE(10))
         .max(2500, MAX_LENGTH_MESSAGE(2500))
         .required(REQUIRED_FIELD_MESSAGE),
       email: yupString().email(EMAIL_MESSAGE).trim(),
+      googlePlaceId: yupString().trim(),
       phone: yupString()
         .min(9, MIN_LENGTH_MESSAGE(9))
         .trim()
         .required(REQUIRED_FIELD_MESSAGE),
+      location: yupObject().shape({
+        voivodeship: yupString()
+          .oneOf(POLISH_VOIVODESHIPS, 'Wybierz województwo z listy.')
+          .required(REQUIRED_FIELD_MESSAGE),
+      }),
       // location: yupObject().shape({
       //   directions: yupString().min(5).max(255),
       //   street: yupString().min(5),
@@ -185,6 +191,7 @@ class SightForm extends React.Component {
       description: details.description || '',
       email: details.email || '',
       phone: details.phone || '',
+      googlePlaceId: details.googlePlaceId || '',
       animalsAllowed: details.animalsAllowed || false,
       carParkAvailable: details.carParkAvailable || false,
       foodAndDrinkAvailable: details.foodAndDrinkAvailable || false,
@@ -202,7 +209,9 @@ class SightForm extends React.Component {
         longitude: location.longitude || '',
         commune: location.commune || '',
         county: location.county || '',
-        voivodeship: location.voivodeship || '',
+        voivodeship: location.voivodeship
+          ? location.voivodeship.toLocaleLowerCase('pl')
+          : '',
       },
       mainImage,
       images,
@@ -554,7 +563,7 @@ class SightForm extends React.Component {
                       <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem md={4} sm={4}>
-                      <Field name="location.voivodeship"  label="Województwo" component={TextField} {...commonProps} />
+                      <VoivodeshipSelect />
                     </GridItem>
                     <GridItem md={4} sm={4}>
                       <Field name="location.county" label="Powiat" component={TextField} {...commonProps} />
@@ -567,6 +576,9 @@ class SightForm extends React.Component {
                     </GridItem>
                     <GridItem md={6} sm={6}>
                       <Field  name="location.longitude"  label="Długość geograficzna (lon)" component={TextField}  inputProps={{ inputMode: "decimal",  pattern: "[0-9\\.-]*", }}  {...commonProps} />
+                    </GridItem>
+                    <GridItem>
+                      <Field name="googlePlaceId" label="Google Place ID" component={TextField} {...commonProps} />
                     </GridItem>
                   </React.Fragment>
                 )

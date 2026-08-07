@@ -23,6 +23,7 @@ import {
 import { actions as sightEventCreationActions } from 'redux/sightEventCreation';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
+import VoivodeshipSelect, { POLISH_VOIVODESHIPS } from 'components/VoivodeshipSelect';
 
 const commonProps = {
   fullWidth: true,
@@ -81,8 +82,7 @@ class SightEventForm extends React.Component {
       // generalAdmission: yupBoolen(),
       lead: yupString()
         .min(10, MIN_LENGTH_MESSAGE(10))
-        .max(250, MAX_LENGTH_MESSAGE(250))
-        .required(REQUIRED_FIELD_MESSAGE),
+        .max(250, MAX_LENGTH_MESSAGE(250)),
       description: yupString()
         .min(10, MIN_LENGTH_MESSAGE(10))
         .max(2500, MAX_LENGTH_MESSAGE(2500))
@@ -95,6 +95,9 @@ class SightEventForm extends React.Component {
       location: yupObject().shape({
         directions: yupString()
           .max(1000, MAX_LENGTH_MESSAGE(1000)),
+        voivodeship: yupString()
+          .oneOf(POLISH_VOIVODESHIPS, 'Wybierz województwo z listy.')
+          .required(REQUIRED_FIELD_MESSAGE),
       }),
     });
   }
@@ -135,7 +138,9 @@ class SightEventForm extends React.Component {
         longitude: location.longitude || '',
         commune: location.commune || '',
         county: location.county || '',
-        voivodeship: location.voivodeship || '',
+        voivodeship: location.voivodeship
+          ? location.voivodeship.toLocaleLowerCase('pl')
+          : '',
       },
       mainImage,
       images,
@@ -355,7 +360,7 @@ class SightEventForm extends React.Component {
                       <Field name="location.country" label="Kraj" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem md={4} sm={4}>
-                      <Field name="location.voivodeship" label="Województwo" component={TextField} {...commonProps} />
+                      <VoivodeshipSelect />
                     </GridItem>
                     <GridItem md={4} sm={4}>
                       <Field name="location.county" label="Powiat" component={TextField} {...commonProps} />

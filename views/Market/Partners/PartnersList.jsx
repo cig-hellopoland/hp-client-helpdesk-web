@@ -24,11 +24,6 @@ import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import DomainIcon from '@material-ui/icons/Domain';
 import LockIcon from '@material-ui/icons/Lock';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import SearchIcon from '@material-ui/icons/Search';
-
-
 import Link from 'next/link';
 import { withRouter } from 'next/router';
 import {
@@ -36,6 +31,11 @@ import {
   selectors as partnersSelectors,
 } from 'redux/partners';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
+import ListingFilters, {
+  matchesLocationFilters,
+  matchesSearchText,
+  matchesStatusFilter,
+} from 'components/ListingFilters';
 import SortableTableHead from './components/ListingViewTable/SortableTableHead';
 
 const styles = theme => ({
@@ -98,6 +98,10 @@ class PartnersList extends Component {
     order: 'asc',
     orderBy: 'item-id',
     filterText: '',
+    voivodeship: '',
+    county: '',
+    city: '',
+    status: '',
   };
 
   componentDidMount() {
@@ -140,11 +144,27 @@ class PartnersList extends Component {
     });
   };
 
-handleFilterChange = (event) => {
-    this.setState({
-      filterText: event.target.value,
+  handleFilterChange = (event) => {
+    const { name, value } = event.target;
+    this.setState((state) => {
+      const nextState = { [name]: value };
+      if (name === 'voivodeship') {
+        nextState.county = '';
+        nextState.city = '';
+      } else if (name === 'county') {
+        nextState.city = '';
+      }
+      return { ...state, ...nextState };
     });
   };
+
+  handleClearFilters = () => this.setState({
+    filterText: '',
+    voivodeship: '',
+    county: '',
+    city: '',
+    status: '',
+  });
 
 
   handleItemEdit = (itemId) => {
@@ -240,7 +260,7 @@ handleFilterChange = (event) => {
   render() {
 const {
   isFetching, menuAnchor, menuItemId, snackbarMessage, snackbarOpen,
-  order, orderBy, filterText,
+  order, orderBy, filterText, voivodeship, county, city, status,
 } = this.state;
 const { classes, items } = this.props;
 
@@ -248,27 +268,15 @@ const { classes, items } = this.props;
 const baseList = items || [];
 const hasItems = baseList.length > 0;
 
-// 2. filtrowanie po tekście
-const query = (filterText || '').toLowerCase();
-
 const filteredList = baseList.filter((partner) => {
-  if (!query) return true;
+  const matchesText = matchesSearchText([
+    partner.id, partner.name, partner.p24MerchantId, partner.commission,
+    partner.affiliateCode, partner.email, partner.phone,
+  ], filterText);
 
-  const name = (partner.name || '').toLowerCase();
-  const p24MerchantId = (partner.p24MerchantId != null ? String(partner.p24MerchantId) : '').toLowerCase();
-  const commission = (partner.commission != null ? String(partner.commission) : '').toLowerCase();
-  const affiliateCode = (partner.affiliateCode || '').toLowerCase();
-  const email = (partner.email || '').toLowerCase();
-  const phone = (partner.phone || '').toLowerCase();
-
-  return (
-    name.includes(query)
-    || p24MerchantId.includes(query)
-    || commission.includes(query)
-    || affiliateCode.includes(query)
-    || email.includes(query)
-    || phone.includes(query)
-  );
+  return matchesText
+    && matchesLocationFilters(partner, { voivodeship, county, city })
+    && matchesStatusFilter(partner, status);
 });
 
 // 3. sortowanie
@@ -311,11 +319,22 @@ const sortedList = [...filteredList].sort((a, b) => {
 
 const colorActive = 'primary';
 const colorInactive = 'disabled';
+const filterValues = {
+  filterText, voivodeship, county, city, status,
+};
+const extraFilters = [{
+  key: 'status',
+  label: 'Status',
+  options: [
+    { label: 'Aktywni', value: 'active' },
+    { label: 'Zablokowani', value: 'blocked' },
+  ],
+}];
     return (
      <Layout>
        <Grid container className={classes.root}>
           <Paper className={classes.paper}>
-            <Grid container alignItems="flex-end" justify="space-between" className={classes.toolbar}>
+            <Grid container alignItems="center" justify="space-between" className={classes.toolbar}>
               <Grid item>
                 <Link href={`${this.baseURL}/create`} passHref prefetch>
                   <Button component="a" className={classes.addButton}>
@@ -324,24 +343,19 @@ const colorInactive = 'disabled';
                   </Button>
                 </Link>
               </Grid>
-              {hasItems && (
-                <Grid item xs={12} sm={6} md={4}>
-                  <TextField
-                    fullWidth
-                    label="Filtruj (nazwa, ID, e-mail, tel, P24, kod afiliacyjny)"
-                    value={filterText}
-                    onChange={this.handleFilterChange}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-              )}
             </Grid>
+            {hasItems && (
+              <ListingFilters
+                extraFilters={extraFilters}
+                items={baseList}
+                onChange={this.handleFilterChange}
+                onClear={this.handleClearFilters}
+                searchLabel="Szukaj partnera (nazwa, ID, kontakt, P24, afiliacja)"
+                totalCount={baseList.length}
+                values={filterValues}
+                visibleCount={sortedList.length}
+              />
+            )}
             {!hasItems && (
               <Grid container item className={classes.placeholder} direction="column" alignItems="center" justify="center">
                 {isFetching
@@ -378,7 +392,7 @@ const colorInactive = 'disabled';
             >
               <Typography variant="h6">Brak wyników dla filtra</Typography>
               <Typography>
-                Zmień tekst w polu filtrowania powyżej.
+                Zmień lub wyczyść filtry powyżej.
               </Typography>
             </Grid>
           )}

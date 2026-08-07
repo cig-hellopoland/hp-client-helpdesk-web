@@ -26,6 +26,7 @@ import {
 } from 'redux/partners';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
+import VoivodeshipSelect, { POLISH_VOIVODESHIPS } from 'components/VoivodeshipSelect';
 import config from '../../../../../config';
 
 const commonProps = {
@@ -102,6 +103,9 @@ class PartnerCompanyForm extends Component {
         city: yupString().required(),
         country: yupString().required(),
         street: yupString().required(),
+        voivodeship: yupString()
+          .oneOf(POLISH_VOIVODESHIPS, 'Wybierz województwo z listy.')
+          .required(),
         zipCode: yupString().required(),
       }),
       name: yupString().required(),
@@ -166,7 +170,9 @@ class PartnerCompanyForm extends Component {
         zipCode: location.zipCode || '',
         commune: location.commune || '',
         county: location.county || '',
-        voivodeship: location.voivodeship || '',
+        voivodeship: location.voivodeship
+          ? location.voivodeship.toLocaleLowerCase('pl')
+          : '',
       },
       name: details.name || '',
       phone: details.phone || '',
@@ -410,7 +416,7 @@ class PartnerCompanyForm extends Component {
                 </FormControl>
               </GridItem>
               <GridItem md={4} sm={4}>
-                <Field  name="location.voivodeship" label="Województwo" component={TextField} {...commonProps} />
+                <VoivodeshipSelect disabled={disabled} />
               </GridItem>
               <GridItem md={4} sm={4}>
                 <Field name="location.county" label="Powiat" component={TextField} {...commonProps} />

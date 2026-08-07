@@ -33,7 +33,7 @@ const styles = theme => ({
     marginLeft: 'auto',
   },
   cardActions: {
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
   },
   close: {
     padding: theme.spacing.unit / 2,
@@ -55,6 +55,9 @@ const styles = theme => ({
   message: {
     display: 'flex',
     alignItems: 'center',
+  },
+  passwordResetButton: {
+    fontWeight: theme.typography.fontWeightRegular,
   },
 });
 
@@ -201,6 +204,14 @@ class SignIn extends Component {
                     />
                   </CardContent>
                   <CardActions className={classes.cardActions}>
+                    <Button
+                      className={classes.passwordResetButton}
+                      color="primary"
+                      component="a"
+                      href="/forgot-password"
+                    >
+                      Nie pamiętam hasła
+                    </Button>
                     <Button color="primary" disabled={isSubmitting} type="submit">
                       Zaloguj
                     </Button>

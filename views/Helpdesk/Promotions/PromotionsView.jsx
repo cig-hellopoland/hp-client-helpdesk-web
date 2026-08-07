@@ -34,7 +34,9 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import DeleteIcon from '@material-ui/icons/Delete';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import SaveIcon from '@material-ui/icons/Save';
 import SearchIcon from '@material-ui/icons/Search';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Layout from 'components/Layout';
@@ -182,7 +184,20 @@ const styles = {
     marginTop: 8,
   },
   detailsSection: {
-    marginTop: 24,
+    background: '#fafafa',
+    border: '1px solid #e0e0e0',
+    borderRadius: 4,
+    marginTop: 12,
+    padding: 12,
+  },
+  detailsSummary: {
+    background: '#fafafa',
+    border: '1px solid #e0e0e0',
+    borderRadius: 4,
+    padding: 12,
+  },
+  detailsSectionTitle: {
+    marginBottom: 8,
   },
   hiddenInput: {
     display: 'none',
@@ -264,6 +279,15 @@ const parseIds = value => (value || '')
   .map(Number)
   .filter(item => !Number.isNaN(item));
 
+const normalizeIds = ids => parseIds(ids).slice().sort((left, right) => left - right);
+
+const sameIds = (left, right) => {
+  const normalizedLeft = normalizeIds(left);
+  const normalizedRight = normalizeIds(right);
+  return normalizedLeft.length === normalizedRight.length
+    && normalizedLeft.every((id, index) => id === normalizedRight[index]);
+};
+
 const parseCodes = value => (value || '')
   .split(/\r?\n/)
   .map(item => item.trim())
@@ -284,6 +308,9 @@ class PromotionsView extends React.Component {
     selectedCampaign: null,
     codes: [],
     redemptions: [],
+    creationTargetsPreview: [],
+    creationTargetsLoading: false,
+    creationTargetsLoaded: false,
     targetPreview: [],
     campaignTargetsPreview: [],
     campaignTargetsVisible: false,
@@ -401,6 +428,86 @@ class PromotionsView extends React.Component {
     return `${selectedIds.length} wybranych`;
   };
 
+  targetOptionById = (id) => {
+    const { sightEventOptions } = this.state;
+    return sightEventOptions.find(item => String(item.id) === String(id));
+  };
+
+  targetPreviewById = (id) => {
+    const { creationTargetsPreview } = this.state;
+    return creationTargetsPreview.find(item => String(item.sightEventId) === String(id));
+  };
+
+  campaignTargetPreviewById = (id) => {
+    const { campaignTargetsPreview, selectedCampaign } = this.state;
+    const previewItem = campaignTargetsPreview
+      .find(item => String(item.sightEventId) === String(id));
+    if (previewItem) {
+      return previewItem;
+    }
+    const relation = selectedCampaign && (selectedCampaign.sightEvents || [])
+      .find(item => String(item.sightEventId) === String(id));
+    const optionTarget = this.targetFromOption(id);
+    return relation && {
+      ...optionTarget,
+      sightEventName: relation.sightEventName || optionTarget.sightEventName,
+      hptSightEventId: relation.hptSightEventId || optionTarget.hptSightEventId,
+      hptAtnaId: relation.hptAtnaId,
+      hptTicketDefinitionId: relation.hptTicketDefinitionId,
+      hptTicketPoolDefinitionId: relation.hptTicketPoolDefinitionId,
+      ticketPoolStatus: relation.ticketPoolStatus,
+    };
+  };
+
+  targetFromOption = (id) => {
+    const option = this.targetOptionById(id);
+    return (option && {
+      sightEventId: option.id,
+      sightEventName: option.name,
+      sightId: option.sightId || (option.sight && option.sight.id),
+      sightName: option.sightName || (option.sight && option.sight.name),
+      partnerId: option.partnerId || (option.partner && option.partner.id),
+      partnerName: option.partnerName || (option.partner && option.partner.name),
+      hptSightEventId: option.hptId,
+    }) || {
+      sightEventId: id,
+      sightEventName: `Oferta #${id}`,
+    };
+  };
+
+  selectedCreationTargets = () => {
+    const { campaignForm } = this.state;
+    const selectedIds = parseIds(campaignForm.sightEventIds);
+    return selectedIds.map((id) => {
+      const previewItem = this.targetPreviewById(id);
+      return previewItem || this.targetFromOption(id);
+    });
+  };
+
+  selectedCampaignTargets = () => {
+    const { targetForm } = this.state;
+    const selectedIds = parseIds(targetForm.sightEventIds);
+    return selectedIds.map((id) => {
+      const previewItem = this.campaignTargetPreviewById(id);
+      return previewItem || this.targetFromOption(id);
+    });
+  };
+
+  campaignTargetIds = (campaign) => {
+    if (!campaign) {
+      return [];
+    }
+    return ((campaign.sightEvents || [])
+      .filter(item => item.active !== false)
+      .map(item => item.sightEventId)
+      .filter(Boolean));
+  };
+
+  hasCampaignTargetChanges = () => {
+    const { selectedCampaign, targetForm } = this.state;
+    return !sameIds(targetForm.sightEventIds, this.campaignTargetIds(selectedCampaign));
+  };
+
   campaignTagSummary = () => {
     const { selectedCampaign, tagOptions } = this.state;
     if (!selectedCampaign || !selectedCampaign.tagIds || !selectedCampaign.tagIds.length) {
@@ -417,12 +524,10 @@ class PromotionsView extends React.Component {
     if (campaign.scopeType === 'TAG') {
       form.tagIds = campaign.tagIds || [];
     }
-    if (campaign.scopeType === 'MANUAL') {
-      form.sightEventIds = ((campaign.sightEvents || [])
-        .filter(item => item.active !== false)
-        .map(item => item.sightEventId)
-        .filter(Boolean));
-    }
+    form.sightEventIds = ((campaign.sightEvents || [])
+      .filter(item => item.active !== false)
+      .map(item => item.sightEventId)
+      .filter(Boolean));
     form.poolName = campaign.name || '';
     return form;
   };
@@ -441,17 +546,32 @@ class PromotionsView extends React.Component {
 
   toggleFormTarget = (formName, fieldName, id) => () => {
     const normalizedId = Number(id);
+    const { activeStep } = this.state;
+    const refreshCreationTargets = formName === 'campaignForm' && fieldName === 'tagIds'
+      && activeStep === 2;
     this.setState((state) => {
       const currentIds = parseIds(state[formName][fieldName]);
       const nextIds = currentIds.includes(normalizedId)
         ? currentIds.filter(item => item !== normalizedId)
         : currentIds.concat(normalizedId);
-      return {
-        [formName]: {
-          ...state[formName],
-          [fieldName]: nextIds,
-        },
+      const nextForm = {
+        ...state[formName],
+        [fieldName]: nextIds,
       };
+      if (refreshCreationTargets) {
+        nextForm.sightEventIds = [];
+      }
+      return {
+        [formName]: nextForm,
+        ...(refreshCreationTargets ? {
+          creationTargetsPreview: [],
+          creationTargetsLoaded: false,
+        } : {}),
+      };
+    }, () => {
+      if (refreshCreationTargets) {
+        this.refreshCreationTargetsPreview(true);
+      }
     });
   };
 
@@ -460,6 +580,9 @@ class PromotionsView extends React.Component {
     activeStep: 0,
     campaignForm: { ...emptyCampaignForm },
     codeForm: { ...emptyCodeForm },
+    creationTargetsPreview: [],
+    creationTargetsLoading: false,
+    creationTargetsLoaded: false,
     campaignTagQuery: '',
     campaignTagOpen: false,
     campaignSightEventQuery: '',
@@ -469,6 +592,9 @@ class PromotionsView extends React.Component {
   handleAddDialogClose = () => this.setState({
     addDialogOpen: false,
     activeStep: 0,
+    creationTargetsPreview: [],
+    creationTargetsLoading: false,
+    creationTargetsLoaded: false,
   });
 
   handleDetailsDialogClose = () => this.setState({
@@ -574,7 +700,8 @@ class PromotionsView extends React.Component {
     if (campaignForm.scopeType === 'TAG' && !parseIds(campaignForm.tagIds).length) {
       return 'Wybierz co najmniej jeden tag.';
     }
-    if (campaignForm.scopeType === 'MANUAL' && !parseIds(campaignForm.sightEventIds).length) {
+    if ((campaignForm.scopeType === 'TAG' || campaignForm.scopeType === 'MANUAL')
+        && !parseIds(campaignForm.sightEventIds).length) {
       return 'Wybierz co najmniej jedną ofertę.';
     }
     return null;
@@ -601,7 +728,15 @@ class PromotionsView extends React.Component {
       this.openSnackbar(error);
       return;
     }
-    this.setState(state => ({ activeStep: state.activeStep + 1 }));
+    this.setState(
+      state => ({ activeStep: state.activeStep + 1 }),
+      () => {
+        const { activeStep: nextStep } = this.state;
+        if (nextStep === 2) {
+          this.refreshCreationTargetsPreview(true);
+        }
+      },
+    );
   };
 
   handleCodesPageChange = (event, codesPage) => this.setState({ codesPage });
@@ -771,6 +906,11 @@ class PromotionsView extends React.Component {
 
     if (campaignForm.scopeType === 'TAG') {
       payload.tagIds = parseIds(campaignForm.tagIds);
+      if (parseIds(campaignForm.sightEventIds).length) {
+        payload.targetSetup = {
+          sightEventIds: parseIds(campaignForm.sightEventIds),
+        };
+      }
     }
     if (campaignForm.scopeType === 'MANUAL') {
       payload.targetSetup = {
@@ -905,6 +1045,144 @@ class PromotionsView extends React.Component {
     };
   };
 
+  creationTargetsPreviewPayload = (useScopeSource) => {
+    const { campaignForm } = this.state;
+    const targetSetup = {};
+    const selectedSightEventIds = parseIds(campaignForm.sightEventIds);
+    if (!useScopeSource && selectedSightEventIds.length) {
+      targetSetup.sightEventIds = selectedSightEventIds;
+    } else if (campaignForm.scopeType === 'TAG') {
+      targetSetup.tagIds = parseIds(campaignForm.tagIds);
+    } else if (campaignForm.scopeType === 'MANUAL') {
+      targetSetup.sightEventIds = selectedSightEventIds;
+    }
+    return {
+      promotionType: campaignForm.promotionType,
+      scopeType: campaignForm.scopeType,
+      tagIds: parseIds(campaignForm.tagIds),
+      targetSetup,
+    };
+  };
+
+  refreshCreationTargetsPreview = (useScopeSource = false) => {
+    const httpClient = this.getHttpClient();
+    const { campaignForm } = this.state;
+    if (!httpClient || campaignForm.scopeType === 'GLOBAL') {
+      return;
+    }
+    if (campaignForm.scopeType === 'TAG' && !parseIds(campaignForm.tagIds).length) {
+      this.setState({
+        creationTargetsPreview: [],
+        creationTargetsLoaded: false,
+      });
+      return;
+    }
+    if (campaignForm.scopeType === 'MANUAL' && !parseIds(campaignForm.sightEventIds).length) {
+      this.setState({
+        creationTargetsPreview: [],
+        creationTargetsLoaded: false,
+      });
+      return;
+    }
+    this.setState({ creationTargetsLoading: true });
+    httpClient.post('/promotions/targets/preview', this.creationTargetsPreviewPayload(useScopeSource))
+      .then(({ data }) => {
+        const sightEvents = (data && data.sightEvents) || [];
+        this.setState(state => ({
+          creationTargetsPreview: sightEvents,
+          creationTargetsLoading: false,
+          creationTargetsLoaded: true,
+          campaignForm: {
+            ...state.campaignForm,
+            sightEventIds: sightEvents.map(item => item.sightEventId).filter(Boolean),
+          },
+        }));
+      })
+      .catch((error) => {
+        this.setState({ creationTargetsLoading: false, creationTargetsLoaded: true });
+        this.handleError('Nie udało się pobrać ofert dla promocji')(error);
+      });
+  };
+
+  removeCreationTarget = sightEventId => () => {
+    const id = Number(sightEventId);
+    this.setState(state => ({
+      campaignForm: {
+        ...state.campaignForm,
+        sightEventIds: parseIds(state.campaignForm.sightEventIds).filter(item => item !== id),
+      },
+      creationTargetsPreview: state.creationTargetsPreview
+        .filter(item => Number(item.sightEventId) !== id),
+    }));
+  };
+
+  removeCampaignTarget = sightEventId => () => {
+    const id = Number(sightEventId);
+    this.setState(state => ({
+      targetForm: {
+        ...state.targetForm,
+        sightEventIds: parseIds(state.targetForm.sightEventIds).filter(item => item !== id),
+      },
+    }));
+  };
+
+  participantsPayload = () => {
+    const { selectedCampaign, targetForm } = this.state;
+    const payload = {
+      targetSetup: {
+        sightEventIds: parseIds(targetForm.sightEventIds),
+      },
+    };
+    if (selectedCampaign && selectedCampaign.promotionType === 'TICKET') {
+      payload.ticketPoolSetup = {
+        ticketPrice: plnToCents(targetForm.ticketPricePln),
+        availableTicketsNumber: toNumberOrNull(targetForm.availableTicketsNumber),
+        ticketName: targetForm.ticketName || null,
+        poolName: targetForm.poolName || null,
+      };
+    }
+    return payload;
+  };
+
+  saveCampaignTargets = () => {
+    const httpClient = this.getHttpClient();
+    const { selectedCampaign, targetForm } = this.state;
+    if (!httpClient || !selectedCampaign) {
+      return;
+    }
+    if (!this.hasCampaignTargetChanges()) {
+      this.openSnackbar('Lista ofert nie została zmieniona.');
+      return;
+    }
+    if (!parseIds(targetForm.sightEventIds).length) {
+      this.openSnackbar('Wybierz co najmniej jedną ofertę.');
+      return;
+    }
+    if (selectedCampaign.promotionType === 'TICKET') {
+      const ticketPrice = toNumberOrNull(targetForm.ticketPricePln);
+      const availableTicketsNumber = toNumberOrNull(targetForm.availableTicketsNumber);
+      if (ticketPrice === null || ticketPrice < 0
+          || !availableTicketsNumber || availableTicketsNumber <= 0) {
+        this.openSnackbar('Podaj poprawną cenę i liczbę biletów dla nowych pul promocyjnych.');
+        return;
+      }
+    }
+    this.setState({ loading: true });
+    httpClient.put(`/promotions/${selectedCampaign.id}/sight-events`, this.participantsPayload())
+      .then(({ data }) => {
+        this.setState({
+          selectedCampaign: data,
+          targetForm: this.campaignTargetForm(data),
+          campaignTargetsPreview: [],
+          campaignTargetsVisible: false,
+          loading: false,
+        });
+        this.openSnackbar('Zapisano listę ofert promocji');
+        this.fetchCampaigns();
+      })
+      .catch(this.handleError('Nie udało się zapisać listy ofert promocji'));
+  };
+
   previewTargets = () => {
     const httpClient = this.getHttpClient();
     const { selectedCampaign } = this.state;
@@ -940,11 +1218,18 @@ class PromotionsView extends React.Component {
     }
     this.setState({ campaignTargetsLoading: true });
     this.fetchCampaignTargetsPreview()
-      .then(({ data }) => this.setState({
-        campaignTargetsPreview: (data && data.sightEvents) || [],
-        campaignTargetsVisible: true,
-        campaignTargetsLoading: false,
-      }))
+      .then(({ data }) => {
+        const sightEvents = (data && data.sightEvents) || [];
+        this.setState(state => ({
+          campaignTargetsPreview: sightEvents,
+          campaignTargetsVisible: true,
+          campaignTargetsLoading: false,
+          targetForm: parseIds(state.targetForm.sightEventIds).length ? state.targetForm : {
+            ...state.targetForm,
+            sightEventIds: sightEvents.map(item => item.sightEventId).filter(Boolean),
+          },
+        }));
+      })
       .catch((error) => {
         this.setState({ campaignTargetsLoading: false });
         this.handleError(promotionMessages.PROMOTION_TARGETS_PREVIEW_FAILED)(error);
@@ -1135,10 +1420,17 @@ class PromotionsView extends React.Component {
     anchorName,
     formName,
     fieldName,
+    compactSummary = false,
   }) {
     const filteredOptions = this.filteredOptions(options, query);
     const selectedNumbers = parseIds(selectedIds);
-    const inputValue = open ? query : this.targetSummary(selectedIds, emptyLabel, options);
+    let inputValue = this.targetSummary(selectedIds, emptyLabel, options);
+    if (compactSummary && selectedNumbers.length) {
+      inputValue = `${selectedNumbers.length} wybranych`;
+    }
+    if (open) {
+      inputValue = query;
+    }
     return (
       <ClickAwayListener onClickAway={this.closeTargetMenu(openName)}>
         <div
@@ -1209,11 +1501,8 @@ class PromotionsView extends React.Component {
   renderScopeFields() {
     const {
       campaignForm,
-      campaignSightEventOpen,
-      campaignSightEventQuery,
       campaignTagOpen,
       campaignTagQuery,
-      sightEventOptions,
       tagOptions,
     } = this.state;
     if (campaignForm.scopeType === 'GLOBAL') {
@@ -1247,20 +1536,9 @@ class PromotionsView extends React.Component {
     }
     return (
       <Grid item xs={12}>
-        {this.renderTargetPicker({
-          label: 'Oferty objęte promocją',
-          helperText: 'Wpisz nazwę i wybierz konkretne oferty, które mają brać udział w promocji',
-          emptyLabel: 'Wybierz oferty',
-          options: sightEventOptions,
-          selectedIds: campaignForm.sightEventIds,
-          query: campaignSightEventQuery,
-          queryName: 'campaignSightEventQuery',
-          open: campaignSightEventOpen,
-          openName: 'campaignSightEventOpen',
-          anchorName: 'campaignSightEventAnchor',
-          formName: 'campaignForm',
-          fieldName: 'sightEventIds',
-        })}
+        <Typography color="textSecondary">
+          Wybierz konkretne oferty, które mają brać udział w promocji.
+        </Typography>
       </Grid>
     );
   }
@@ -1503,10 +1781,110 @@ class PromotionsView extends React.Component {
     );
   }
 
+  renderCreationTargetsTable() {
+    const targets = this.selectedCreationTargets();
+    const {
+      campaignForm,
+      creationTargetsLoaded,
+      creationTargetsLoading,
+    } = this.state;
+    if (campaignForm.scopeType === 'GLOBAL') {
+      return null;
+    }
+    return (
+      <Grid item xs={12} style={styles.detailsSection}>
+        <Grid container alignItems="center" justify="space-between" style={styles.fieldHint}>
+          <Grid item>
+            <Typography variant="subtitle1" style={styles.detailsSectionTitle}>
+              Wybrane oferty
+            </Typography>
+            <Typography color="textSecondary">
+              Lista zostanie zapisana przy promocji i można ją ręcznie zmienić przed utworzeniem.
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Button
+              disabled={creationTargetsLoading}
+              onClick={() => this.refreshCreationTargetsPreview(true)}
+            >
+              <SearchIcon style={styles.icon} />
+              <span>Pobierz oferty z tagu</span>
+            </Button>
+          </Grid>
+        </Grid>
+        {campaignForm.scopeType === 'TAG' && creationTargetsLoaded && !targets.length && (
+          <Typography color="error" style={styles.fieldHint}>
+            Pod wybranymi tagami nie ma aktywnych ofert.
+          </Typography>
+        )}
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Partner</TableCell>
+              <TableCell>Obiekt</TableCell>
+              <TableCell>Oferta</TableCell>
+              <TableCell>HT</TableCell>
+              <TableCell align="right">Akcje</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {targets.map(item => (
+              <TableRow key={item.sightEventId}>
+                <TableCell>{item.partnerName || '-'}</TableCell>
+                <TableCell>{item.sightName || '-'}</TableCell>
+                <TableCell>{item.sightEventName || '-'}</TableCell>
+                <TableCell>{item.hptSightEventId || '-'}</TableCell>
+                <TableCell align="right">
+                  <Button size="small" onClick={this.removeCreationTarget(item.sightEventId)}>
+                    <DeleteIcon style={styles.icon} />
+                    <span>Usuń</span>
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {!targets.length && (
+              <TableRow>
+                <TableCell colSpan={5}>
+                  {creationTargetsLoading ? 'Pobieranie ofert...' : 'Brak wybranych ofert.'}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Grid>
+    );
+  }
+
   renderTargetStep() {
+    const {
+      campaignForm,
+      campaignSightEventOpen,
+      campaignSightEventQuery,
+      sightEventOptions,
+    } = this.state;
     return (
       <Grid container spacing={16}>
         {this.renderScopeFields()}
+        {campaignForm.scopeType !== 'GLOBAL' && (
+          <Grid item xs={12}>
+            {this.renderTargetPicker({
+              label: 'Dodaj lub usuń oferty',
+              helperText: 'Wpisz nazwę i ręcznie skoryguj listę ofert objętych promocją',
+              emptyLabel: 'Wybierz oferty',
+              options: sightEventOptions,
+              selectedIds: campaignForm.sightEventIds,
+              query: campaignSightEventQuery,
+              queryName: 'campaignSightEventQuery',
+              open: campaignSightEventOpen,
+              openName: 'campaignSightEventOpen',
+              anchorName: 'campaignSightEventAnchor',
+              formName: 'campaignForm',
+              fieldName: 'sightEventIds',
+              compactSummary: true,
+            })}
+          </Grid>
+        )}
+        {this.renderCreationTargetsTable()}
         <Grid item xs={12}>
           <Typography color="textSecondary">
             Promocja zostanie utworzona jako robocza. Eksport kodów, generowanie pul i uruchomienie
@@ -1537,6 +1915,7 @@ class PromotionsView extends React.Component {
     const { activeStep, addDialogOpen, loading } = this.state;
     return (
       <Dialog
+        disableBackdropClick
         fullWidth
         maxWidth="md"
         open={addDialogOpen}
@@ -1802,6 +2181,7 @@ class PromotionsView extends React.Component {
               anchorName: 'poolSightEventAnchor',
               formName: 'targetForm',
               fieldName: 'sightEventIds',
+              compactSummary: true,
             })}
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -1899,7 +2279,7 @@ class PromotionsView extends React.Component {
     }
     return (
       <div style={styles.detailsSection}>
-        <Typography variant="subtitle1" gutterBottom>
+        <Typography variant="subtitle1" style={styles.detailsSectionTitle}>
           Dane promocji
         </Typography>
         <Grid container spacing={16}>
@@ -1961,18 +2341,35 @@ class PromotionsView extends React.Component {
       campaignTargetsLoading,
       campaignTargetsPreview,
       campaignTargetsVisible,
+      campaignSightEventOpen,
+      campaignSightEventQuery,
+      loading,
       selectedCampaign,
+      sightEventOptions,
+      targetForm,
     } = this.state;
     if (!selectedCampaign || selectedCampaign.scopeType === 'GLOBAL') {
       return null;
     }
+    const canEditTargets = selectedCampaign.status === 'DRAFT'
+      || selectedCampaign.status === 'ACTIVE';
+    const hasTargetChanges = this.hasCampaignTargetChanges();
+    const ticketPoolSightEventOptions = sightEventOptions
+      .filter(item => item.hptId !== null && item.hptId !== undefined);
+    const displayedTargets = canEditTargets
+      ? this.selectedCampaignTargets()
+      : campaignTargetsPreview;
+    const emptyColSpan = (selectedCampaign.promotionType === 'TICKET' ? 4 : 2)
+      + (canEditTargets ? 1 : 0);
     return (
       <div style={styles.detailsSection}>
         <Grid container alignItems="center" justify="space-between">
           <Grid item>
-            <Typography variant="subtitle1">Oferty objęte promocją</Typography>
+            <Typography variant="subtitle1" style={styles.detailsSectionTitle}>
+              Oferty objęte promocją
+            </Typography>
             <Typography color="textSecondary" style={styles.fieldHint}>
-              Podgląd pokazuje oferty wynikające z aktualnego zakresu promocji.
+              Zmień listę poniżej, a potem zapisz zmiany w ofertach.
             </Typography>
           </Grid>
           <Grid item>
@@ -1985,6 +2382,68 @@ class PromotionsView extends React.Component {
             </Button>
           </Grid>
         </Grid>
+        {canEditTargets && (
+          <Grid container spacing={16} style={styles.fieldHint}>
+            <Grid item xs={12}>
+              {this.renderTargetPicker({
+                label: 'Dodaj lub usuń oferty',
+                helperText: 'Wpisz nazwę i wybierz finalną listę ofert objętych promocją',
+                emptyLabel: 'Wybierz oferty',
+                options: ticketPoolSightEventOptions,
+                selectedIds: targetForm.sightEventIds,
+                query: campaignSightEventQuery,
+                queryName: 'campaignSightEventQuery',
+                open: campaignSightEventOpen,
+                openName: 'campaignSightEventOpen',
+                anchorName: 'campaignSightEventDetailsAnchor',
+                formName: 'targetForm',
+                fieldName: 'sightEventIds',
+                compactSummary: true,
+              })}
+            </Grid>
+            {selectedCampaign.promotionType === 'TICKET' && (
+              <React.Fragment>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    helperText="Cena biletu dla nowych pul promocyjnych, np. 1.00"
+                    label="Cena biletu PLN"
+                    onChange={this.handleTargetFormChange('ticketPricePln')}
+                    value={targetForm.ticketPricePln}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    helperText="Liczba biletów w nowej puli dla każdej dodanej oferty"
+                    label="Liczba biletów"
+                    onChange={this.handleTargetFormChange('availableTicketsNumber')}
+                    value={targetForm.availableTicketsNumber}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    helperText="Opcjonalnie, domyślnie nazwa promocji"
+                    label="Nazwa puli"
+                    onChange={this.handleTargetFormChange('poolName')}
+                    value={targetForm.poolName}
+                  />
+                </Grid>
+              </React.Fragment>
+            )}
+            <Grid item xs={12}>
+              <Button
+                color={hasTargetChanges ? 'secondary' : 'default'}
+                disabled={loading || !hasTargetChanges}
+                onClick={this.saveCampaignTargets}
+              >
+                <SaveIcon style={styles.icon} />
+                <span>Zapisz zmiany w ofertach</span>
+              </Button>
+            </Grid>
+          </Grid>
+        )}
         {campaignTargetsVisible && (
           <Table>
             <TableHead>
@@ -1997,10 +2456,11 @@ class PromotionsView extends React.Component {
                     <TableCell>ATNA</TableCell>
                   </React.Fragment>
                 )}
+                {canEditTargets && <TableCell align="right">Akcje</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
-              {campaignTargetsPreview.map(item => (
+              {displayedTargets.map(item => (
                 <TableRow key={item.sightEventId}>
                   <TableCell>{item.partnerName || '-'}</TableCell>
                   <TableCell>{item.sightEventName || '-'}</TableCell>
@@ -2012,11 +2472,19 @@ class PromotionsView extends React.Component {
                       <TableCell>{item.hptAtnaId || '-'}</TableCell>
                     </React.Fragment>
                   )}
+                  {canEditTargets && (
+                    <TableCell align="right">
+                      <Button size="small" onClick={this.removeCampaignTarget(item.sightEventId)}>
+                        <DeleteIcon style={styles.icon} />
+                        <span>Usuń</span>
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
-              {!campaignTargetsPreview.length && (
+              {!displayedTargets.length && (
                 <TableRow>
-                  <TableCell colSpan={selectedCampaign.promotionType === 'TICKET' ? 4 : 2}>
+                  <TableCell colSpan={emptyColSpan}>
                     Brak ofert dla aktualnego zakresu promocji.
                   </TableCell>
                 </TableRow>
@@ -2039,6 +2507,7 @@ class PromotionsView extends React.Component {
     const isActive = selectedCampaign.status === 'ACTIVE';
     return (
       <Dialog
+        disableBackdropClick
         fullWidth
         maxWidth="md"
         onClose={this.handleDetailsDialogClose}
@@ -2046,28 +2515,30 @@ class PromotionsView extends React.Component {
       >
         <DialogTitle>{selectedCampaign.name}</DialogTitle>
         <DialogContent style={styles.dialogContent}>
-          <Grid container spacing={16}>
-            <Grid item xs={12} sm={3}>
-              <Typography color="textSecondary">Status</Typography>
-              <Typography>
-                {statusLabels[selectedCampaign.status] || selectedCampaign.status}
-              </Typography>
+          <div style={styles.detailsSummary}>
+            <Grid container spacing={16}>
+              <Grid item xs={12} sm={3}>
+                <Typography color="textSecondary">Status</Typography>
+                <Typography>
+                  {statusLabels[selectedCampaign.status] || selectedCampaign.status}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={3}>
+                <Typography color="textSecondary">Typ</Typography>
+                <Typography>
+                  {promotionTypeLabels[selectedCampaign.promotionType]}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={3}>
+                <Typography color="textSecondary">Użycia</Typography>
+                <Typography>{selectedCampaign.usedRedemptionsCount || 0}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={3}>
+                <Typography color="textSecondary">Rezerwacje</Typography>
+                <Typography>{selectedCampaign.reservedRedemptionsCount || 0}</Typography>
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={3}>
-              <Typography color="textSecondary">Typ</Typography>
-              <Typography>
-                {promotionTypeLabels[selectedCampaign.promotionType]}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Typography color="textSecondary">Użycia</Typography>
-              <Typography>{selectedCampaign.usedRedemptionsCount || 0}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Typography color="textSecondary">Rezerwacje</Typography>
-              <Typography>{selectedCampaign.reservedRedemptionsCount || 0}</Typography>
-            </Grid>
-          </Grid>
+          </div>
           {selectedCampaign.promotionType === 'AMOUNT' && (
             <Typography color="textSecondary" style={styles.fieldHint}>
               {`Rabat kwotowy: ${centsToPln(selectedCampaign.discountAmountGross)} PLN`}
@@ -2076,7 +2547,9 @@ class PromotionsView extends React.Component {
           {this.renderCampaignDetailsData()}
           {this.renderCampaignTargetsPreview()}
           <div style={styles.detailsSection}>
-            <Typography variant="subtitle1">Kody</Typography>
+            <Typography variant="subtitle1" style={styles.detailsSectionTitle}>
+              Kody
+            </Typography>
             {isDraft && (
               <React.Fragment>
                 <Typography color="textSecondary" style={styles.fieldHint}>

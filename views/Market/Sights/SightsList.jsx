@@ -28,7 +28,6 @@ import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import AddIcon from '@material-ui/icons/Add';
-import SearchIcon from '@material-ui/icons/Search';
 import Typography from '@material-ui/core/Typography';
 
 import { withRouter } from 'next/router';
@@ -44,6 +43,15 @@ import withAuth from 'services/auth/withAuth';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import Layout from 'components/Layout';
 import EmptyView from 'components/EmptyView';
+import ListingFilters, {
+  getCollectionOptions,
+  getEntityOptions,
+  matchesCollectionFilter,
+  matchesIdFilter,
+  matchesLocationFilters,
+  matchesSearchText,
+  matchesStatusFilter,
+} from 'components/ListingFilters';
 import SortableTableHead from '../Partners/components/ListingViewTable/SortableTableHead';
 
 const tableColumns = [
@@ -96,6 +104,7 @@ const styles = theme => ({
   },
   paper: {
     flex: 1,
+    overflow: 'hidden',
   },
   toolbar: {
     padding: theme.spacing.unit,
@@ -129,7 +138,13 @@ class SightsList extends React.Component {
     order: 'asc',
     orderBy: 'item-id',
     filterText: '',
-
+    voivodeship: '',
+    county: '',
+    city: '',
+    status: '',
+    partnerFilterId: '',
+    categoryId: '',
+    tagId: '',
   };
 
   componentDidMount() {
@@ -450,10 +465,29 @@ class SightsList extends React.Component {
   };
 
   handleFilterChange = (event) => {
-    this.setState({
-      filterText: event.target.value,
+    const { name, value } = event.target;
+    this.setState(() => {
+      const nextState = { [name]: value };
+      if (name === 'voivodeship') {
+        nextState.county = '';
+        nextState.city = '';
+      } else if (name === 'county') {
+        nextState.city = '';
+      }
+      return nextState;
     });
   };
+
+  handleClearFilters = () => this.setState({
+    filterText: '',
+    voivodeship: '',
+    county: '',
+    city: '',
+    status: '',
+    partnerFilterId: '',
+    categoryId: '',
+    tagId: '',
+  });
 
   getSortedPartners = partners => [...(partners || [])].sort((a, b) => (
     (a.name || '').localeCompare(b.name || '', 'pl', { sensitivity: 'base' })
@@ -506,25 +540,27 @@ class SightsList extends React.Component {
     const {
       classes, embedded, items, partners, showPartner,
     } = this.props;
-    const { order, orderBy, filterText } = this.state;
+    const {
+      order, orderBy, filterText, voivodeship, county, city, status, partnerFilterId,
+      categoryId, tagId,
+    } = this.state;
 
     const baseList = items || [];
     const hasItems = baseList.length > 0;
 
-    // 1. filtrowanie po nazwie / mieście / partnerze
-    const query = (filterText || '').toLowerCase();
     const filteredList = baseList.filter((item) => {
-      if (!query) return true;
+      const location = item.location || {};
+      const matchesText = matchesSearchText([
+        item.id, item.name, item.partnerName, location.city, location.county,
+        location.voivodeship,
+      ], filterText);
 
-      const name = (item.name || '').toLowerCase();
-      const city = ((item.location && item.location.city) || '').toLowerCase();
-      const partner = (item.partnerName || '').toLowerCase();
-
-      return (
-        name.includes(query)
-        || city.includes(query)
-        || partner.includes(query)
-      );
+      return matchesText
+        && matchesLocationFilters(item, { voivodeship, county, city })
+        && matchesStatusFilter(item, status)
+        && matchesIdFilter(item.partnerId, partnerFilterId)
+        && matchesCollectionFilter(item.categories, categoryId)
+        && matchesCollectionFilter(item.tags, tagId);
     });
 
     // 2. sortowanie
@@ -562,38 +598,63 @@ class SightsList extends React.Component {
       ? tableColumns
       : tableColumns.filter(column => column.id !== 'partner');
     const partnerOptions = this.getFilteredPartners(partners, partnerQuery, selectedPartnerId);
+    const filterValues = {
+      filterText,
+      voivodeship,
+      county,
+      city,
+      status,
+      partnerFilterId,
+      categoryId,
+      tagId,
+    };
+    const extraFilters = [
+      {
+        key: 'status',
+        label: 'Status',
+        options: [
+          { label: 'Opublikowane', value: 'published' },
+          { label: 'Nieopublikowane', value: 'unpublished' },
+          { label: 'Zablokowane', value: 'blocked' },
+        ],
+      },
+      {
+        key: 'partnerFilterId',
+        label: 'Partner',
+        options: getEntityOptions(baseList, 'partnerId', 'partnerName'),
+      },
+      { key: 'categoryId', label: 'Kategoria', options: getCollectionOptions(baseList, 'categories') },
+      { key: 'tagId', label: 'Tag', options: getCollectionOptions(baseList, 'tags') },
+    ];
 
 
     const content = (
       <Grid container className={classes.root}>
         <Paper className={classes.paper}>
-          <Grid container alignItems="flex-end" justify="space-between" className={classes.toolbar}>
+          <Grid container alignItems="center" justify="space-between" className={classes.toolbar}>
             <Grid item>
               <Button className={classes.addButton} onClick={this.handleItemCreate}>
                 <AddIcon className={classes.icon} />
                 <span className={classes.addButtonLabel}>Dodaj</span>
               </Button>
             </Grid>
-            {hasItems && (
-              <Grid item xs={12} sm={6} md={4}>
-                <TextField
-                  fullWidth
-                  label={showPartner
-                    ? 'Filtruj (nazwa, lokalizacja, partner)'
-                    : 'Filtruj (nazwa, lokalizacja)'}
-                  value={filterText}
-                  onChange={this.handleFilterChange}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-            )}
           </Grid>
+          {hasItems && (
+            <ListingFilters
+              extraFilters={showPartner
+                ? extraFilters
+                : extraFilters.filter(filter => filter.key !== 'partnerFilterId')}
+              items={baseList}
+              onChange={this.handleFilterChange}
+              onClear={this.handleClearFilters}
+              searchLabel={showPartner
+                ? 'Szukaj obiektu (nazwa, ID, lokalizacja, partner)'
+                : 'Szukaj obiektu (nazwa, ID, lokalizacja)'}
+              totalCount={baseList.length}
+              values={filterValues}
+              visibleCount={sortedList.length}
+            />
+          )}
           {/* 1) Brak jakichkolwiek obiektów w systemie */}
           {!hasItems && !isFetching && (
             <EmptyView
@@ -612,9 +673,7 @@ class SightsList extends React.Component {
               {/* Jeśli filtr nic nie znalazł – nie pokazujemy EmptyView, tylko komunikat */}
               {sortedList.length === 0 ? (
                 <Grid container justify="center" style={{ padding: 16 }}>
-                  <Typography variant="subtitle1">
-                    {`Brak wyników dla filtra: "${filterText}"`}
-                  </Typography>
+                  <Typography variant="subtitle1">Brak wyników dla wybranych filtrów.</Typography>
                 </Grid>
               ) : (
                 <Table aria-labelledby="items-list">

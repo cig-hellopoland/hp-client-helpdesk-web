@@ -58,6 +58,7 @@ const emptyCampaignForm = {
   grantedTicketQuantity: '1',
   discountPercent: '',
   discountAmountGrossPln: '',
+  markerTagId: '',
   tagIds: [],
   sightEventIds: [],
 };
@@ -321,6 +322,7 @@ class PromotionsView extends React.Component {
     codeForm: { ...emptyCodeForm },
     addCodeForm: { ...emptyCodeForm },
     targetForm: { ...emptyTargetForm },
+    markerTagId: '',
     filterText: '',
     campaignTagQuery: '',
     campaignTagOpen: false,
@@ -836,6 +838,7 @@ class PromotionsView extends React.Component {
     this.setState({
       loading: true,
       selectedCampaign: campaign,
+      markerTagId: campaign.markerTagId || '',
       detailsDialogOpen: true,
       targetPreview: [],
       campaignTargetsPreview: [],
@@ -851,6 +854,7 @@ class PromotionsView extends React.Component {
         const campaignData = campaignResponse.data;
         this.setState({
           selectedCampaign: campaignData,
+          markerTagId: campaignData.markerTagId || '',
           codes: codesResponse.data || [],
           redemptions: redemptionsResponse.data || [],
           targetForm: this.campaignTargetForm(campaignData),
@@ -901,6 +905,7 @@ class PromotionsView extends React.Component {
       codeLimit: toNumberOrNull(campaignForm.codeLimit),
       customerLimit: toNumberOrNull(campaignForm.customerLimit),
       dailyLimit: toNumberOrNull(campaignForm.dailyLimit),
+      markerTagId: toNumberOrNull(campaignForm.markerTagId),
       codeSetup: this.codeSetupPayload(codeForm),
     };
 
@@ -950,6 +955,33 @@ class PromotionsView extends React.Component {
         this.selectCampaign(campaign);
       })
       .catch(this.handleError('Nie udało się utworzyć promocji'));
+  };
+
+  handleMarkerTagChange = (event) => {
+    this.setState({ markerTagId: event.target.value });
+  };
+
+  saveMarkerTag = () => {
+    const httpClient = this.getHttpClient();
+    const { markerTagId, selectedCampaign } = this.state;
+    if (!httpClient || !selectedCampaign) {
+      return;
+    }
+    this.setState({ loading: true });
+    httpClient.patch(`/promotions/${selectedCampaign.id}/marker-tag`, {
+      markerTagId: toNumberOrNull(markerTagId),
+    })
+      .then(({ data }) => {
+        this.setState(state => ({
+          selectedCampaign: data,
+          markerTagId: data.markerTagId || '',
+          campaigns: state.campaigns.map(campaign => (
+            campaign.id === data.id ? { ...campaign, markerTagId: data.markerTagId } : campaign
+          )),
+          loading: false,
+        }), () => this.openSnackbar('Zapisano oznaczenie promocji'));
+      })
+      .catch(this.handleError('Nie udało się zapisać oznaczenia promocji'));
   };
 
   replaceCodes = () => {
@@ -1544,7 +1576,7 @@ class PromotionsView extends React.Component {
   }
 
   renderCampaignStep() {
-    const { campaignForm } = this.state;
+    const { campaignForm, tagOptions } = this.state;
     const allowedScopes = campaignForm.promotionType === 'TICKET'
       ? ['TAG', 'MANUAL']
       : ['TAG', 'MANUAL', 'GLOBAL'];
@@ -1572,6 +1604,23 @@ class PromotionsView extends React.Component {
             {Object.keys(promotionTypeLabels).map(type => (
               <MenuItem key={type} value={type}>
                 {promotionTypeLabels[type]}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            select
+            fullWidth
+            helperText="TAG służy wyłącznie do wizualnego oznaczenia ofert i nie zmienia zakresu promocji"
+            label="Oznacz promocję tagiem"
+            onChange={this.handleCampaignFormChange('markerTagId')}
+            value={campaignForm.markerTagId}
+          >
+            <MenuItem value="">Bez oznaczenia</MenuItem>
+            {tagOptions.map(tag => (
+              <MenuItem key={tag.id} value={tag.id}>
+                {this.optionText(tag)}
               </MenuItem>
             ))}
           </TextField>
@@ -2273,7 +2322,9 @@ class PromotionsView extends React.Component {
   }
 
   renderCampaignDetailsData() {
-    const { selectedCampaign } = this.state;
+    const {
+      loading, markerTagId, selectedCampaign, tagOptions,
+    } = this.state;
     if (!selectedCampaign) {
       return null;
     }
@@ -2299,6 +2350,32 @@ class PromotionsView extends React.Component {
               <Typography>{this.campaignTagSummary()}</Typography>
             </Grid>
           )}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              select
+              fullWidth
+              helperText="Nie przypisuje TAG-u do ofert; oznacza tylko oferty, które już go mają"
+              label="Oznacz promocję tagiem"
+              onChange={this.handleMarkerTagChange}
+              value={markerTagId}
+            >
+              <MenuItem value="">Bez oznaczenia</MenuItem>
+              {tagOptions.map(tag => (
+                <MenuItem key={tag.id} value={tag.id}>
+                  {this.optionText(tag)}
+                </MenuItem>
+              ))}
+            </TextField>
+            <Button
+              color="secondary"
+              disabled={loading}
+              onClick={this.saveMarkerTag}
+              style={styles.fieldHint}
+            >
+              <SaveIcon style={styles.icon} />
+              <span>Zapisz oznaczenie</span>
+            </Button>
+          </Grid>
           <Grid item xs={12} sm={3}>
             <Typography color="textSecondary">Limit promocji</Typography>
             <Typography>{selectedCampaign.globalLimit || 'Brak'}</Typography>

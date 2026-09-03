@@ -30,6 +30,12 @@ class PartnerCreate extends Component {
     };
   }
 
+  componentDidMount() {
+    const { clearError } = this.props;
+
+    clearError();
+  }
+
   handleSubmitSuccess = (sightId, actions) => {
     const { resetForm, setSubmitting } = actions;
     const { clearError } = this.props;

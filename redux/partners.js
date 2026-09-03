@@ -909,7 +909,7 @@ const createItemLogic = createLogic({
           onSuccess();
         }
       } else {
-        dispatch(createItemFailure({ data }));
+        dispatch(createItemFailure(response));
 
         if (onFailure) {
           onFailure();
@@ -917,9 +917,8 @@ const createItemLogic = createLogic({
       }
     } catch (error) {
       const { response = {} } = error;
-      const { data } = response;
 
-      dispatch(createItemFailure({ data }));
+      dispatch(createItemFailure(response));
 
       if (onFailure) {
         onFailure();

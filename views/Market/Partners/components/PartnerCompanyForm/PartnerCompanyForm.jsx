@@ -27,6 +27,7 @@ import {
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
 import VoivodeshipSelect, { POLISH_VOIVODESHIPS } from 'components/VoivodeshipSelect';
+import getPartnerErrorMessage from '../../utils/partnerErrorMessage';
 import config from '../../../../../config';
 
 const commonProps = {
@@ -63,14 +64,20 @@ const fieldToSwitch = ({
   checked: field.value,
 });
 
-const styles = {
+const styles = theme => ({
+  errorBox: {
+    backgroundColor: '#ffebee',
+    borderLeft: `4px solid ${theme.palette.error.main}`,
+    padding: theme.spacing.unit * 2,
+    width: '100%',
+  },
   formControl: {
     width: '100%',
   },
   section: {
     marginTop: 40,
   },
-};
+});
 
 class PartnerCompanyForm extends Component {
   constructor(props) {
@@ -83,45 +90,55 @@ class PartnerCompanyForm extends Component {
     };
 
     this.validationSchema = yupObject().shape({
-      affiliation: yupBoolean().required(),
+      affiliation: yupBoolean().required('Określ, czy wygenerować kod afiliacyjny.'),
       bankAccount: yupString().trim(),
-      businessType: yupNumber().transform((v, orig) => (orig === '' || orig == null ? undefined : Number(orig))).required(),
-      commission: yupNumber().transform((v, orig) => (orig === '' || orig == null ? undefined : Number(orig))).min(0).max(100).required(),
+      businessType: yupNumber()
+        .transform((v, orig) => (orig === '' || orig == null ? undefined : Number(orig)))
+        .typeError('Wybierz rodzaj działalności.')
+        .required('Wybierz rodzaj działalności.'),
+      commission: yupNumber()
+        .transform((v, orig) => (orig === '' || orig == null ? undefined : Number(orig)))
+        .typeError('Prowizja musi być liczbą.')
+        .min(0, 'Prowizja nie może być mniejsza niż 0%.')
+        .max(100, 'Prowizja nie może być większa niż 100%.')
+        .required('Podaj prowizję.'),
       contactPerson: yupObject().shape({
-        email: yupString().email().trim().required(),
-        name: yupString().required(),
-        phone: yupString().trim().required(),
+        email: yupString().email('Wpisz poprawny adres e-mail.').trim().required('Podaj adres e-mail osoby reprezentującej.'),
+        name: yupString().required('Podaj imię i nazwisko osoby reprezentującej.'),
+        phone: yupString().trim().required('Podaj telefon osoby reprezentującej.'),
       }),
-      email: yupString().email().trim().required(),
-      invoiceEmail: yupString().email().trim(),
+      email: yupString().email('Wpisz poprawny adres e-mail.').trim().required('Podaj adres e-mail partnera.'),
+      invoiceEmail: yupString().email('Wpisz poprawny adres e-mail.').trim(),
       krs: yupString().when('businessType', {
-      is: businessType => Number(businessType) > 3 && Number(businessType) !== 11 && Number(businessType) !== 12,
-      then: yupString().required(),
-      otherwise: yupString().nullable(true),
+        is: businessType => Number(businessType) > 3
+          && Number(businessType) !== 11
+          && Number(businessType) !== 12,
+        then: yupString().required('Podaj numer KRS.'),
+        otherwise: yupString().nullable(true),
       }),
       location: yupObject().shape({
-        city: yupString().required(),
-        country: yupString().required(),
-        street: yupString().required(),
+        city: yupString().required('Podaj miejscowość.'),
+        country: yupString().required('Wybierz kraj.'),
+        street: yupString().required('Podaj ulicę i numer.'),
         voivodeship: yupString()
           .oneOf(POLISH_VOIVODESHIPS, 'Wybierz województwo z listy.')
-          .required(),
-        zipCode: yupString().required(),
+          .required('Wybierz województwo.'),
+        zipCode: yupString().required('Podaj kod pocztowy.'),
       }),
-      name: yupString().required(),
-      phone: yupString().trim().required(),
+      name: yupString().required('Podaj nazwę partnera.'),
+      phone: yupString().trim(),
       regon: yupString().when('businessType', {
         is: businessType => businessType > 1,
-        then: yupString().required(),
+        then: yupString().required('Podaj numer REGON.'),
       }),
       servicesDescription: yupString(),
       socialNumber: yupString().when('businessType', {
         is: businessType => businessType === 1,
-        then: yupString().required(),
+        then: yupString().required('Podaj numer PESEL.'),
       }),
       taxNumber: yupString().when('businessType', {
         is: businessType => businessType > 1,
-        then: yupString().required(),
+        then: yupString().required('Podaj numer NIP.'),
       }),
     });
   }
@@ -237,8 +254,10 @@ class PartnerCompanyForm extends Component {
 
   handleSubmit = (values, actions) => {
     const {
-      initialValues, language, onResetEmailSuccess, onSubmit,
+      clearError, initialValues, language, onResetEmailSuccess, onSubmit,
     } = this.props;
+
+    clearError();
 
     // businessType może być liczbą albo obiektem {label, value}
     const bt =
@@ -340,8 +359,7 @@ class PartnerCompanyForm extends Component {
       classes, disabled, requestError, FormikProps, hideButtons, hideErrors,
     } = this.props;
     const { initialValues } = this.state;
-    const { data: errorData } = requestError || {};
-    const { message: errorMessage } = errorData || {};
+    const errorMessage = getPartnerErrorMessage(requestError);
     const { brandName } = (config && config.public) || {};
 
     return (
@@ -426,7 +444,7 @@ class PartnerCompanyForm extends Component {
               </GridItem>
 
               <GridItem md={4} sm={4}>
-                <Field disabled={disabled} name="phone" type="tel" label="Telefon" required component={TextField} {...commonProps} />
+                <Field disabled={disabled} name="phone" type="tel" label="Telefon" component={TextField} {...commonProps} />
               </GridItem>
               <GridItem md={4} sm={4}>
                 <Field disabled={disabled} name="email" type="email" label="E-mail (login partnera)" required component={TextField} {...commonProps} />
@@ -524,8 +542,13 @@ class PartnerCompanyForm extends Component {
                 <Grid container spacing={16} justify="flex-end" className={classes.section}>
                   {!hideErrors && errorMessage
                     && (
-                      <GridItem container md={9} sm={9}>
-                        <Typography color="error">{errorMessage}</Typography>
+                      <GridItem md={9} sm={9}>
+                        <div className={classes.errorBox} role="alert" aria-live="assertive">
+                          <Typography color="error" variant="subtitle1">
+                            Nie udało się zapisać danych partnera
+                          </Typography>
+                          <Typography color="error">{errorMessage}</Typography>
+                        </div>
                       </GridItem>
                     )
                   }
@@ -564,7 +587,12 @@ PartnerCompanyForm.propTypes = {
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
   requestError: PropTypes.shape({
+    data: PropTypes.oneOfType([
+      PropTypes.shape({}),
+      PropTypes.string,
+    ]),
     message: PropTypes.string,
+    status: PropTypes.number,
   }),
   updateItem: PropTypes.func.isRequired,
 };

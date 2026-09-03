@@ -20,6 +20,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Snackbar from '@material-ui/core/Snackbar';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { actions as bookingsActions } from '@hello-poland/commons/redux/bookings';
+import formatPrice from '../../../../utils/formatPrice';
 
 const styles = theme => ({
   title: {
@@ -125,6 +126,39 @@ const formatDateOnly = value => {
   }
 
   return format(date, 'dd.MM.yyyy');
+};
+
+const escapeCsvValue = value => `"${String(value == null ? '' : value).replace(/"/g, '""')}"`;
+
+const buildSalesCsv = (sales) => {
+  const rows = [
+    [
+      'ID',
+      'Data zakupu',
+      'Data wydarzenia',
+      'Wydarzenie',
+      'Obiekt',
+      'Cena biletu kupionego',
+      'Klient',
+      'Email',
+      'Status',
+    ],
+    ...sales.map(row => [
+      row.bookingId,
+      formatDateTime(row.purchaseDate),
+      formatDateOnly(row.eventDate),
+      row.sightEventName,
+      row.objectName,
+      row.ticketPrice == null ? '' : formatPrice(row.ticketPrice),
+      row.customerName,
+      row.customerEmail,
+      STATUS_MAP[row.status] || row.status || '',
+    ]),
+  ];
+
+  return rows
+    .map(row => row.map(escapeCsvValue).join(';'))
+    .join('\r\n');
 };
 
 class SalesReport extends React.Component {
@@ -340,7 +374,22 @@ class SalesReport extends React.Component {
       });
   };
 
-  fetchSales = store => {
+  downloadSalesCsv = (sales) => {
+    const { fromDate, toDate } = this.state;
+    const csv = buildSalesCsv(sales);
+    const blob = new Blob(['\ufeff', csv], { type: 'text/csv;charset=utf-8' });
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+
+    anchor.href = objectUrl;
+    anchor.download = `hp-ostatnia-sprzedaz_${fromDate.replace(/-/g, '')}-${toDate.replace(/-/g, '')}.csv`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(objectUrl);
+  };
+
+  fetchSales = (store, downloadFile = false) => {
     const { logicMiddleware } = store || {};
     const { httpClient } = logicMiddleware || {};
     const { fromDate, toDate, partnerId } = this.state;
@@ -373,6 +422,10 @@ class SalesReport extends React.Component {
         );
 
         this.setState({ sales });
+
+        if (downloadFile) {
+          this.downloadSalesCsv(sales);
+        }
       })
       .catch(() => {
         this.setState({
@@ -424,7 +477,7 @@ class SalesReport extends React.Component {
               <th style={headerCellStyle}>Data wydarzenia</th>
               <th style={headerCellStyle}>Wydarzenie</th>
               <th style={headerCellStyle}>Obiekt</th>
-              <th style={headerCellStyle}>Partner</th>
+              <th style={headerCellStyle}>Cena biletu kupionego</th>
               <th style={headerCellStyle}>Klient</th>
               <th style={headerCellStyle}>Email</th>
               <th style={headerCellStyle}>Status</th>
@@ -443,7 +496,9 @@ class SalesReport extends React.Component {
                 <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{formatDateOnly(row.eventDate)}</td>
                 <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{row.sightEventName || '-'}</td>
                 <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{row.objectName || '-'}</td>
-                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{row.partnerName || '-'}</td>
+                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
+                  {row.ticketPrice == null ? '-' : formatPrice(row.ticketPrice)}
+                </td>
                 <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{row.customerName || '-'}</td>
                 <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{row.customerEmail || '-'}</td>
                 <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
@@ -483,6 +538,7 @@ class SalesReport extends React.Component {
       partnerQuery,
       partnerMenuOpen,
       error,
+      loading,
       emailDialogOpen,
       selectedSale,
       newEmail,
@@ -616,9 +672,10 @@ class SalesReport extends React.Component {
                 <div style={{ flex: '0 0 auto', paddingBottom: 4 }}>
                   <Button
                     color="secondary"
-                    onClick={() => this.fetchSales(store)}
+                    disabled={loading}
+                    onClick={() => this.fetchSales(store, true)}
                   >
-                    Pobierz
+                    {loading ? 'Pobieranie...' : 'Pobierz'}
                   </Button>
                 </div>
               </div>

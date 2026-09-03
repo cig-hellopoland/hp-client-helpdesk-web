@@ -35,6 +35,8 @@ class SalesExport extends React.Component {
     fromDate: (new Date()).setMonth((new Date()).getMonth() - 1),
     toDate: new Date(),
     instanceFromDate: new Date(),
+    downloadingReportType: null,
+    errorMessage: '',
   };
 
   csvPeriodRef = React.createRef();
@@ -65,20 +67,40 @@ class SalesExport extends React.Component {
       downloadSuffix = `${formattedFromDate.replace(/-/g, '')}-${formattedToDate.replace(/-/g, '')}`;
     }
 
+    this.setState({
+      downloadingReportType: type,
+      errorMessage: '',
+    });
+
     httpClient
       .get(href, { responseType: 'blob' })
       .then((response) => {
         const hiddenAnchor = csvRef.current;
         const blob = new Blob([response.data], { type: 'application/octet-stream' });
+        const objectUrl = URL.createObjectURL(blob);
 
-        hiddenAnchor.href = URL.createObjectURL(blob);
+        hiddenAnchor.href = objectUrl;
         hiddenAnchor.download = `hp-sales_${downloadSuffix}.csv`;
         hiddenAnchor.click();
+        URL.revokeObjectURL(objectUrl);
+        this.setState({ downloadingReportType: null });
+      })
+      .catch(() => {
+        this.setState({
+          downloadingReportType: null,
+          errorMessage: 'Nie udało się pobrać raportu sprzedaży.',
+        });
       });
   };
 
   render() {
-    const { fromDate, instanceFromDate, toDate } = this.state;
+    const {
+      downloadingReportType,
+      errorMessage,
+      fromDate,
+      instanceFromDate,
+      toDate,
+    } = this.state;
     const { classes } = this.props;
 
     return (
@@ -110,11 +132,12 @@ class SalesExport extends React.Component {
               <Button
                 className={classes.downloadBtn}
                 color="secondary"
+                disabled={Boolean(downloadingReportType)}
                 onClick={() => {
                   this.handleSubmit(REPORT_TYPES.PERIOD, this.csvPeriodRef, store);
                 }}
               >
-                Pobierz
+                {downloadingReportType === REPORT_TYPES.PERIOD ? 'Pobieranie...' : 'Pobierz'}
               </Button>
               <a style={{ display: 'none' }} href="/" ref={this.csvPeriodRef}>ref</a>
             </Grid>
@@ -133,14 +156,20 @@ class SalesExport extends React.Component {
               <Button
                 className={classes.downloadBtn}
                 color="secondary"
+                disabled={Boolean(downloadingReportType)}
                 onClick={() => {
                   this.handleSubmit(REPORT_TYPES.INSTANCE, this.csvInstanceRef, store);
                 }}
               >
-                Pobierz
+                {downloadingReportType === REPORT_TYPES.INSTANCE ? 'Pobieranie...' : 'Pobierz'}
               </Button>
               <a style={{ display: 'none' }} href="/" ref={this.csvInstanceRef}>ref</a>
             </Grid>
+            {errorMessage && (
+              <Typography color="error">
+                {errorMessage}
+              </Typography>
+            )}
           </MuiPickersUtilsProvider>
         )}
       </ReactReduxContext.Consumer>

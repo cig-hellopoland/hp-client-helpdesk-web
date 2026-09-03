@@ -73,6 +73,11 @@ const ROLE_OPTIONS = [
     label: 'Support',
     description: 'Podstawowa obsługa i podgląd w przypisanym zakresie.',
   },
+  {
+    value: 'HELPDESK_TECHNICAL',
+    label: 'Operator techniczny',
+    description: 'Wyłącznie stan systemu, ograniczone logi i odzyskiwanie WordPressa.',
+  },
 ];
 
 const emptyForm = {
@@ -81,6 +86,7 @@ const emptyForm = {
   email: '',
   password: '',
   role: 'HELPDESK_SUPPORT',
+  technicalAccess: false,
   allowedHelpdeskPartnerIds: [],
   allowedHelpdeskSightIds: [],
 };
@@ -184,7 +190,14 @@ const getRoleDescription = role => (
   (ROLE_OPTIONS.find(option => option.value === role) || {}).description || ''
 );
 
-const getRolesForSave = role => (role === 'ROOT' ? ['ROOT', 'ADMIN'] : [role]);
+const getRolesForSave = (role, technicalAccess) => {
+  const roles = role === 'ROOT' ? ['ROOT', 'ADMIN'] : [role];
+  if ((technicalAccess || role === 'HELPDESK_TECHNICAL')
+      && !roles.includes('HELPDESK_TECHNICAL')) {
+    roles.push('HELPDESK_TECHNICAL');
+  }
+  return roles;
+};
 
 class UsersList extends React.Component {
   static contextType = ReactReduxContext;
@@ -307,6 +320,9 @@ class UsersList extends React.Component {
         role: user.roles && user.roles.includes('ROOT') ? 'ROOT' : (
           roleOptions.find(option => (user.roles || []).includes(option.value)) || roleOptions[0]
         ).value,
+        technicalAccess: Boolean(
+          user.roles && user.roles.includes('HELPDESK_TECHNICAL'),
+        ),
         allowedHelpdeskPartnerIds: user.allowedHelpdeskPartnerIds || [],
         allowedHelpdeskSightIds: user.allowedHelpdeskSightIds || [],
       },
@@ -377,6 +393,9 @@ class UsersList extends React.Component {
       form: {
         ...state.form,
         role: value,
+        technicalAccess: value === 'HELPDESK_TECHNICAL'
+          ? true
+          : state.form.technicalAccess,
         allowedHelpdeskPartnerIds: this.isScopedRole(value)
           ? state.form.allowedHelpdeskPartnerIds
           : [],
@@ -384,6 +403,13 @@ class UsersList extends React.Component {
           ? state.form.allowedHelpdeskSightIds
           : [],
       },
+    }));
+  };
+
+  handleTechnicalAccessChange = (event) => {
+    const { checked } = event.target;
+    this.setState(state => ({
+      form: { ...state.form, technicalAccess: checked },
     }));
   };
 
@@ -446,7 +472,7 @@ class UsersList extends React.Component {
     const data = {
       email: form.email,
       name: form.name,
-      roles: getRolesForSave(form.role),
+      roles: getRolesForSave(form.role, form.technicalAccess),
       allowedHelpdeskPartnerIds: this.isScopedRole(form.role)
         ? form.allowedHelpdeskPartnerIds
         : [],
@@ -575,7 +601,7 @@ class UsersList extends React.Component {
   };
 
   isAdminLevelUser = user => ((user && user.roles) || [])
-    .some(role => role === 'ADMIN' || role === 'ROOT');
+    .some(role => role === 'ADMIN' || role === 'ROOT' || role === 'HELPDESK_TECHNICAL');
 
   canModifyUser = user => Boolean(user && (this.isCurrentRoot() || !this.isAdminLevelUser(user)));
 
@@ -653,7 +679,9 @@ class UsersList extends React.Component {
     if (this.isCurrentRoot()) {
       return ROLE_OPTIONS;
     }
-    return ROLE_OPTIONS.filter(option => option.value !== 'ROOT' && option.value !== 'ADMIN');
+    return ROLE_OPTIONS.filter(option => ![
+      'ROOT', 'ADMIN', 'HELPDESK_TECHNICAL',
+    ].includes(option.value));
   };
 
   render() {
@@ -875,6 +903,17 @@ class UsersList extends React.Component {
                     <FormHelperText>{getRoleDescription(form.role)}</FormHelperText>
                   </FormControl>
                 </Grid>
+                {this.isCurrentRoot() && form.role !== 'HELPDESK_TECHNICAL' && (
+                  <Grid item xs={12}>
+                    <Checkbox
+                      checked={Boolean(form.technicalAccess)}
+                      onChange={this.handleTechnicalAccessChange}
+                    />
+                    <Typography component="span">
+                      Dostęp do ekranu technicznego i odzyskiwania WordPressa
+                    </Typography>
+                  </Grid>
+                )}
                 <Grid item xs={12}>
                   <Typography variant="subtitle1">Zakres uprawnień</Typography>
                   <Typography variant="caption" color="textSecondary">

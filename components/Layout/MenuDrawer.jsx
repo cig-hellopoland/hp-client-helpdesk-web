@@ -28,7 +28,12 @@ const MenuDrawer = ({
   classes, currentPath, menuItems, profile,
 }) => {
   const profileRoles = (profile && profile.roles) || [];
+  const technicalOnly = profileRoles.length === 1
+    && profileRoles.includes('HELPDESK_TECHNICAL');
   const visibleItems = menuItems.filter((item) => {
+    if (technicalOnly) {
+      return Boolean(item.roles && item.roles.includes('HELPDESK_TECHNICAL'));
+    }
     if (!item.roles || !item.roles.length) {
       return true;
     }

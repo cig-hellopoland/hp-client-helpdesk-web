@@ -7,6 +7,7 @@ import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import PeopleIcon from '@material-ui/icons/People';
 import PlaceIcon from '@material-ui/icons/Place';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications';
 
 export default [
   {
@@ -41,5 +42,14 @@ export default [
   },
   {
     label: 'Użytkownicy', href: '/helpdesk/users', Icon: PeopleIcon, roles: ['ADMIN', 'ROOT'],
+  },
+  {
+    label: 'Techniczne', roles: ['HELPDESK_TECHNICAL'],
+  },
+  {
+    label: 'Stan systemu',
+    href: '/helpdesk/technical',
+    Icon: SettingsApplicationsIcon,
+    roles: ['HELPDESK_TECHNICAL'],
   },
 ];

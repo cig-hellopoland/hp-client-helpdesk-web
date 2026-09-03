@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* Add CSV download for the "Ostatnia sprzedaż" report and show its loading state.
+* Show readable Polish validation and API error messages when saving a partner.
+
 ## 1.0.6
 * Replace `enzyme` with `react-testing-library` [#40](https://git.fream.pl/fream/web/react-web-app/merge_requests/40)
 * Update `jest` [#40](https://git.fream.pl/fream/web/react-web-app/merge_requests/40)

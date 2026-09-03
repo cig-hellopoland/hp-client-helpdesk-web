@@ -50,6 +50,7 @@ const emptyCampaignForm = {
   scopeType: 'TAG',
   validFrom: '',
   validTo: '',
+  ticketValidTo: '',
   globalLimit: '',
   codeLimit: '',
   customerLimit: '',
@@ -83,7 +84,7 @@ const emptyTargetForm = {
   partnerIds: '',
   sightIds: '',
   sightEventIds: [],
-  ticketPricePln: '0',
+  ticketPricePln: '1.00',
   availableTicketsNumber: '100',
   ticketName: '',
   poolName: '',
@@ -145,13 +146,16 @@ const promotionMessages = {
   PROMOTION_TICKET_TARGETS_REQUIRED: 'Nie można uruchomić promocji TICKET bez ofert.',
   PROMOTION_TICKET_POOLS_REQUIRED:
     'Nie można uruchomić promocji TICKET. Najpierw utwórz pule promocyjne dla wszystkich ofert.',
-  PROMOTION_TICKET_POOLS_REQUIRED_FRONT:
-    'Nie można uruchomić promocji TICKET. Część ofert nie ma gotowej puli promocyjnej.',
+  PROMOTION_TICKET_POOLS_NOT_GENERATED:
+    'Pule promocyjne nie zostały jeszcze wygenerowane. Uzupełnij cenę i liczbę biletów, a następnie kliknij „Generuj pule”.',
+  PROMOTION_TICKET_POOLS_ERROR:
+    'Nie udało się utworzyć części pul promocyjnych. Sprawdź listę ofert i ponów generowanie.',
   PROMOTION_TARGETS_PREVIEW_FAILED: 'Nie udało się pobrać ofert promocji.',
 };
 
 const steps = ['Promocja', 'Kody', 'Zakres'];
 const codesRowsPerPageOptions = [10, 25, 50, 100];
+const maxGeneratedCodes = 100000;
 const targetListLimit = 30;
 
 const styles = {
@@ -265,6 +269,11 @@ const toNumberOrNull = (value) => {
   return Number.isNaN(parsed) ? null : parsed;
 };
 
+const toIntegerOrNull = (value) => {
+  const parsed = toNumberOrNull(value);
+  return parsed !== null && Number.isInteger(parsed) ? parsed : null;
+};
+
 const plnToCents = (value) => {
   const amount = toNumberOrNull(value);
   return amount === null ? null : Math.round(amount * 100);
@@ -296,7 +305,19 @@ const parseCodes = value => (value || '')
 
 const dateToPayload = value => (value ? new Date(value).toISOString() : null);
 
+const dateToEndOfDayPayload = value => (
+  value ? new Date(`${value}T23:59:59.999`).toISOString() : null
+);
+
 const formatDate = value => (value ? String(value).replace('T', ' ').slice(0, 16) : '-');
+
+const formatDateOnly = (value) => {
+  if (!value) {
+    return '-';
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '-' : date.toLocaleDateString('pl-PL');
+};
 
 class PromotionsView extends React.Component {
   static contextType = ReactReduxContext;
@@ -510,6 +531,12 @@ class PromotionsView extends React.Component {
     return !sameIds(targetForm.sightEventIds, this.campaignTargetIds(selectedCampaign));
   };
 
+  canSaveCampaignTargets = () => {
+    const { selectedCampaign } = this.state;
+    return this.hasCampaignTargetChanges()
+      || (selectedCampaign && selectedCampaign.promotionType === 'TICKET');
+  };
+
   campaignTagSummary = () => {
     const { selectedCampaign, tagOptions } = this.state;
     if (!selectedCampaign || !selectedCampaign.tagIds || !selectedCampaign.tagIds.length) {
@@ -655,6 +682,14 @@ class PromotionsView extends React.Component {
     if (new Date(campaignForm.validTo) <= new Date(campaignForm.validFrom)) {
       return 'Data końca promocji musi być późniejsza niż data początku.';
     }
+    if (campaignForm.promotionType === 'TICKET' && !campaignForm.ticketValidTo) {
+      return 'Podaj graniczną datę ważności biletów promocyjnych.';
+    }
+    if (campaignForm.promotionType === 'TICKET'
+        && new Date(`${campaignForm.ticketValidTo}T23:59:59.999`)
+          < new Date(campaignForm.validTo)) {
+      return 'Bilety muszą być ważne co najmniej do końca promocji.';
+    }
     if (campaignForm.promotionType === 'TICKET'
         && (!requiredTicketQuantity || requiredTicketQuantity <= 0
           || !grantedTicketQuantity || grantedTicketQuantity <= 0)) {
@@ -679,13 +714,13 @@ class PromotionsView extends React.Component {
     const { codeForm } = this.state;
     const checkedForm = form || codeForm;
     if (checkedForm.mode === 'GENERATE') {
-      const generateCount = toNumberOrNull(checkedForm.generateCount);
-      const generatedCodeLength = toNumberOrNull(checkedForm.generatedCodeLength);
-      if (!generateCount || generateCount <= 0) {
-        return 'Podaj liczbę kodów do wygenerowania.';
+      const generateCount = toIntegerOrNull(checkedForm.generateCount);
+      const generatedCodeLength = toIntegerOrNull(checkedForm.generatedCodeLength);
+      if (!generateCount || generateCount <= 0 || generateCount > maxGeneratedCodes) {
+        return `Podaj całkowitą liczbę kodów od 1 do ${maxGeneratedCodes}.`;
       }
-      if (!generatedCodeLength || generatedCodeLength <= 0) {
-        return 'Podaj długość generowanego kodu.';
+      if (!generatedCodeLength || generatedCodeLength <= 0 || generatedCodeLength > 64) {
+        return 'Długość losowej części kodu musi być liczbą całkowitą od 1 do 64.';
       }
     }
     if (checkedForm.mode === 'IMPORT' && !parseCodes(checkedForm.codes).length) {
@@ -883,8 +918,8 @@ class PromotionsView extends React.Component {
       payload.fixedCode = form.fixedCode;
       payload.codeType = 'FIXED';
     } else {
-      payload.generateCount = toNumberOrNull(form.generateCount);
-      payload.generatedCodeLength = toNumberOrNull(form.generatedCodeLength);
+      payload.generateCount = toIntegerOrNull(form.generateCount);
+      payload.generatedCodeLength = toIntegerOrNull(form.generatedCodeLength);
       payload.generatedCodePrefix = form.generatedCodePrefix || null;
       payload.generatedCodeSeparator = form.generatedCodeSeparator || null;
     }
@@ -901,6 +936,8 @@ class PromotionsView extends React.Component {
       status: 'DRAFT',
       validFrom: dateToPayload(campaignForm.validFrom),
       validTo: dateToPayload(campaignForm.validTo),
+      ticketValidTo: promotionType === 'TICKET'
+        ? dateToEndOfDayPayload(campaignForm.ticketValidTo) : null,
       globalLimit: toNumberOrNull(campaignForm.globalLimit),
       codeLimit: toNumberOrNull(campaignForm.codeLimit),
       customerLimit: toNumberOrNull(campaignForm.customerLimit),
@@ -999,7 +1036,7 @@ class PromotionsView extends React.Component {
     this.setState({ loading: true });
     httpClient.put(`/promotions/${selectedCampaign.id}/codes`, this.codeSetupPayload(addCodeForm))
       .then(() => {
-        this.setState({ addCodeForm: { ...emptyCodeForm }, loading: false });
+        this.setState({ loading: false });
         this.openSnackbar('Zastąpiono kody promocji');
         this.selectCampaign(selectedCampaign);
       })
@@ -1182,7 +1219,7 @@ class PromotionsView extends React.Component {
     if (!httpClient || !selectedCampaign) {
       return;
     }
-    if (!this.hasCampaignTargetChanges()) {
+    if (!this.canSaveCampaignTargets()) {
       this.openSnackbar('Lista ofert nie została zmieniona.');
       return;
     }
@@ -1193,9 +1230,9 @@ class PromotionsView extends React.Component {
     if (selectedCampaign.promotionType === 'TICKET') {
       const ticketPrice = toNumberOrNull(targetForm.ticketPricePln);
       const availableTicketsNumber = toNumberOrNull(targetForm.availableTicketsNumber);
-      if (ticketPrice === null || ticketPrice < 0
+      if (ticketPrice === null || ticketPrice <= 0
           || !availableTicketsNumber || availableTicketsNumber <= 0) {
-        this.openSnackbar('Podaj poprawną cenę i liczbę biletów dla nowych pul promocyjnych.');
+        this.openSnackbar('Cena biletu musi być większa od 0 PLN. Podaj też liczbę biletów dla nowych pul.');
         return;
       }
     }
@@ -1209,7 +1246,9 @@ class PromotionsView extends React.Component {
           campaignTargetsVisible: false,
           loading: false,
         });
-        this.openSnackbar('Zapisano listę ofert promocji');
+        this.openSnackbar(selectedCampaign.promotionType === 'TICKET'
+          ? 'Zapisano oferty i zaktualizowano ich bilety promocyjne.'
+          : 'Zapisano listę ofert promocji');
         this.fetchCampaigns();
       })
       .catch(this.handleError('Nie udało się zapisać listy ofert promocji'));
@@ -1283,6 +1322,19 @@ class PromotionsView extends React.Component {
     && item.ticketPoolStatus === 'CREATED'
     && item.hptAtnaId;
 
+  ticketPoolsActivationMessage = (sightEvents, missingPools) => {
+    if (missingPools.some(item => item.ticketPoolStatus === 'ERROR')) {
+      return promotionMessages.PROMOTION_TICKET_POOLS_ERROR;
+    }
+    const noGenerationWasStarted = missingPools.length === sightEvents.length
+      && missingPools.every(item => item.ticketPoolStatus === 'NOT_CREATED' && !item.hptAtnaId);
+    if (noGenerationWasStarted) {
+      return promotionMessages.PROMOTION_TICKET_POOLS_NOT_GENERATED;
+    }
+    const readyPoolsCount = sightEvents.length - missingPools.length;
+    return `Gotowe pule: ${readyPoolsCount} z ${sightEvents.length}. Wygeneruj brakujące pule przed uruchomieniem promocji.`;
+  };
+
   validateTicketPromotionBeforeActivation = () => (
     this.fetchCampaignTargetsPreview()
       .then(({ data }) => {
@@ -1297,7 +1349,7 @@ class PromotionsView extends React.Component {
           return false;
         }
         if (missingPools.length) {
-          this.openSnackbar(promotionMessages.PROMOTION_TICKET_POOLS_REQUIRED_FRONT);
+          this.openSnackbar(this.ticketPoolsActivationMessage(sightEvents, missingPools));
           return false;
         }
         return true;
@@ -1663,6 +1715,19 @@ class PromotionsView extends React.Component {
             value={campaignForm.validTo}
           />
         </Grid>
+        {campaignForm.promotionType === 'TICKET' && (
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              helperText="Najpóźniejszy termin wizyty możliwy do kupienia z biletem promocyjnym"
+              label="Bilety ważne maksymalnie do"
+              onChange={this.handleCampaignFormChange('ticketValidTo')}
+              type="date"
+              value={campaignForm.ticketValidTo}
+            />
+          </Grid>
+        )}
         <Grid item xs={12} sm={4}>
           <TextField
             fullWidth
@@ -1721,8 +1786,10 @@ class PromotionsView extends React.Component {
               <TextField
                 fullWidth
                 helperText="Ile kodów system ma utworzyć"
+                inputProps={{ min: 1, max: maxGeneratedCodes, step: 1 }}
                 label="Liczba kodów"
                 onChange={handleChange('generateCount')}
+                type="number"
                 value={form.generateCount}
               />
             </Grid>
@@ -1730,8 +1797,10 @@ class PromotionsView extends React.Component {
               <TextField
                 fullWidth
                 helperText="Długość losowej części kodu"
+                inputProps={{ min: 1, max: 64, step: 1 }}
                 label="Długość kodu"
                 onChange={handleChange('generatedCodeLength')}
+                type="number"
                 value={form.generatedCodeLength}
               />
             </Grid>
@@ -2061,7 +2130,12 @@ class PromotionsView extends React.Component {
                   <TableCell>{scopeLabels[item.scopeType] || item.scopeType}</TableCell>
                   <TableCell>{statusLabels[item.status] || item.status}</TableCell>
                   <TableCell>
-                    {`${formatDate(item.validFrom)} - ${formatDate(item.validTo)}`}
+                    <div>{`${formatDate(item.validFrom)} - ${formatDate(item.validTo)}`}</div>
+                    {item.promotionType === 'TICKET' && (
+                      <Typography color="textSecondary" variant="caption">
+                        {`Bilety do: ${formatDateOnly(item.ticketValidTo)}`}
+                      </Typography>
+                    )}
                   </TableCell>
                   <TableCell>{item.usedRedemptionsCount || 0}</TableCell>
                   <TableCell align="right" style={styles.actions}>
@@ -2335,11 +2409,17 @@ class PromotionsView extends React.Component {
         </Typography>
         <Grid container spacing={16}>
           <Grid item xs={12} sm={3}>
-            <Typography color="textSecondary">Okres ważności</Typography>
+            <Typography color="textSecondary">Okres użycia kodów</Typography>
             <Typography>
               {`${formatDate(selectedCampaign.validFrom)} - ${formatDate(selectedCampaign.validTo)}`}
             </Typography>
           </Grid>
+          {selectedCampaign.promotionType === 'TICKET' && (
+            <Grid item xs={12} sm={3}>
+              <Typography color="textSecondary">Bilety ważne maksymalnie do</Typography>
+              <Typography>{formatDateOnly(selectedCampaign.ticketValidTo)}</Typography>
+            </Grid>
+          )}
           <Grid item xs={12} sm={3}>
             <Typography color="textSecondary">Zakres</Typography>
             <Typography>{scopeLabels[selectedCampaign.scopeType]}</Typography>
@@ -2430,7 +2510,7 @@ class PromotionsView extends React.Component {
     }
     const canEditTargets = selectedCampaign.status === 'DRAFT'
       || selectedCampaign.status === 'ACTIVE';
-    const hasTargetChanges = this.hasCampaignTargetChanges();
+    const canSaveTargets = this.canSaveCampaignTargets();
     const ticketPoolSightEventOptions = sightEventOptions
       .filter(item => item.hptId !== null && item.hptId !== undefined);
     const displayedTargets = canEditTargets
@@ -2446,7 +2526,10 @@ class PromotionsView extends React.Component {
               Oferty objęte promocją
             </Typography>
             <Typography color="textSecondary" style={styles.fieldHint}>
-              Zmień listę poniżej, a potem zapisz zmiany w ofertach.
+              Zmień listę poniżej, a potem zapisz konfigurację ofert.
+              {selectedCampaign.promotionType === 'TICKET'
+                ? ' Zapis aktualizuje też cenę i ważność istniejących biletów promocyjnych.'
+                : ''}
             </Typography>
           </Grid>
           <Grid item>
@@ -2483,7 +2566,7 @@ class PromotionsView extends React.Component {
                 <Grid item xs={12} sm={4}>
                   <TextField
                     fullWidth
-                    helperText="Cena biletu dla nowych pul promocyjnych, np. 1.00"
+                    helperText="Cena nowych i istniejących biletów promocyjnych, domyślnie 1.00"
                     label="Cena biletu PLN"
                     onChange={this.handleTargetFormChange('ticketPricePln')}
                     value={targetForm.ticketPricePln}
@@ -2507,16 +2590,22 @@ class PromotionsView extends React.Component {
                     value={targetForm.poolName}
                   />
                 </Grid>
+                <Grid item xs={12}>
+                  <Typography color="textSecondary" style={styles.fieldHint}>
+                    Okres promocji określa czas użycia kodu podczas zakupu. Ważność biletu kończy
+                    się w granicznej dacie ustawionej w konfiguracji promocji.
+                  </Typography>
+                </Grid>
               </React.Fragment>
             )}
             <Grid item xs={12}>
               <Button
-                color={hasTargetChanges ? 'secondary' : 'default'}
-                disabled={loading || !hasTargetChanges}
+                color={canSaveTargets ? 'secondary' : 'default'}
+                disabled={loading || !canSaveTargets}
                 onClick={this.saveCampaignTargets}
               >
                 <SaveIcon style={styles.icon} />
-                <span>Zapisz zmiany w ofertach</span>
+                <span>Zapisz konfigurację ofert</span>
               </Button>
             </Grid>
           </Grid>

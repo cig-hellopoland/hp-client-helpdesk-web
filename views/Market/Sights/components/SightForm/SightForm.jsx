@@ -116,9 +116,9 @@ class SightForm extends React.Component {
       email: yupString().email(EMAIL_MESSAGE).trim(),
       googlePlaceId: yupString().trim(),
       phone: yupString()
-        .min(9, MIN_LENGTH_MESSAGE(9))
         .trim()
-        .required(REQUIRED_FIELD_MESSAGE),
+        .transform(value => value || undefined)
+        .min(9, MIN_LENGTH_MESSAGE(9)),
       location: yupObject().shape({
         voivodeship: yupString()
           .oneOf(POLISH_VOIVODESHIPS, 'Wybierz województwo z listy.')
@@ -500,7 +500,7 @@ class SightForm extends React.Component {
                       <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem md={6} sm={6}>
-                      <Field name="phone" label="Numer telefonu" required component={TextField} {...commonProps} />
+                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
                     </GridItem>
                   </React.Fragment>
                 )

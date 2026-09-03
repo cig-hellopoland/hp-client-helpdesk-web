@@ -89,9 +89,9 @@ class SightEventForm extends React.Component {
         .required(REQUIRED_FIELD_MESSAGE),
       email: yupString().email(EMAIL_MESSAGE).trim(),
       phone: yupString()
-        .min(9, MIN_LENGTH_MESSAGE(9))
         .trim()
-        .required(REQUIRED_FIELD_MESSAGE),
+        .transform(value => value || undefined)
+        .min(9, MIN_LENGTH_MESSAGE(9)),
       location: yupObject().shape({
         directions: yupString()
           .max(1000, MAX_LENGTH_MESSAGE(1000)),
@@ -336,7 +336,7 @@ class SightEventForm extends React.Component {
                       <Field name="email" label="Adres e-mail" type="email" component={TextField} {...commonProps} />
                     </GridItem>
                     <GridItem md={6} sm={6}>
-                      <Field name="phone" label="Numer telefonu" required component={TextField} {...commonProps} />
+                      <Field name="phone" label="Numer telefonu" component={TextField} {...commonProps} />
                     </GridItem>
                   </React.Fragment>
                 )

@@ -100,6 +100,14 @@ class SightEventEdit extends React.Component {
     this.handleFetchTagsList(DEFAULT_LANGUAGE);
   }
 
+  componentDidUpdate(prevProps) {
+    const { errorTPD } = this.props;
+
+    if (errorTPD && errorTPD !== prevProps.errorTPD) {
+      this.handleTPDError(errorTPD);
+    }
+  }
+
   getFormValues = (item) => {
     const { itemId, sightId } = this.props;
     const { selectedTranslation, formChanges } = this.state;
@@ -539,7 +547,6 @@ class SightEventEdit extends React.Component {
 
     createTicketPoolDefinition({
       data,
-      onFailure: this.handleTPDError,
       onSuccess: () => {
         this.handleFetchItem(itemId, selectedTranslation);
         if (onSuccess) {
@@ -561,7 +568,6 @@ class SightEventEdit extends React.Component {
             partnerId: item.partnerId,
           },
         },
-        onFailure: this.handleTPDError,
         onSuccess: () => this.handleFetchItem(itemId, selectedTranslation),
       });
     }
@@ -577,17 +583,24 @@ class SightEventEdit extends React.Component {
       updateTicketPoolDefinition({
         id,
         data,
-        onFailure: this.handleTPDError,
-        onSuccess: () => this.handleFetchItem(itemId, selectedTranslation),
+        onSuccess: () => {
+          this.handleSnackbarOpen('Pula produktów została zapisana.');
+          this.handleFetchItem(itemId, selectedTranslation);
+        },
       });
     }
   };
 
-  handleTPDError = () => {
+  handleTPDError = (requestError) => {
     const { errorTPD } = this.props;
-    const { data: errorData } = errorTPD || {};
+    const sourceError = requestError || errorTPD || {};
+    const { data: errorData } = sourceError;
 
-    this.handleSnackbarOpen(errorData.message || 'Wystąpił błąd podczas edycji puli produktów');
+    this.handleSnackbarOpen(
+      (errorData && errorData.message)
+      || sourceError.message
+      || 'Wystąpił błąd podczas edycji puli produktów',
+    );
   };
 
   render() {

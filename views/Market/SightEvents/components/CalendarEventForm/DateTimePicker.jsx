@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
-import DatePicker from 'material-ui-pickers/DatePicker';
+import TextField from '@material-ui/core/TextField';
 import TimePicker from 'material-ui-pickers/TimePicker';
+import format from 'date-fns/format';
 import getHours from 'date-fns/getHours';
 import getMinutes from 'date-fns/getMinutes';
+import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import setHours from 'date-fns/setHours';
 import setMinutes from 'date-fns/setMinutes';
 
 const styles = {
   datePicker: {
-    width: 90,
+    width: 140,
   },
   timePicker: {
     marginLeft: 10,
@@ -29,6 +31,41 @@ const changeTypes = {
 };
 
 class DateTimePicker extends Component {
+  getDate = (value) => {
+    const date = typeof value === 'string' ? parseISO(value) : value;
+
+    return date && isValid(date) ? date : null;
+  };
+
+  getDateInputValue = (value) => {
+    const date = this.getDate(value);
+
+    return date ? format(date, 'yyyy-MM-dd') : '';
+  };
+
+  getMinDateInputValue = () => {
+    const { DatePickerProps } = this.props;
+    const { disablePast = true, minDate } = DatePickerProps || {};
+    const dates = [
+      minDate && this.getDate(minDate),
+      disablePast && new Date(),
+    ].filter(Boolean);
+
+    if (!dates.length) {
+      return undefined;
+    }
+
+    return format(new Date(Math.max(...dates.map(date => date.getTime()))), 'yyyy-MM-dd');
+  };
+
+  handleNativeDateChange = (event) => {
+    const date = this.getDate(event.target.value);
+
+    if (date) {
+      this.handleChange(changeTypes.DATE)(date);
+    }
+  };
+
   handleChange = type => (dateObj) => {
     const { name, onChange } = this.props;
     let nextDateObj;
@@ -51,22 +88,44 @@ class DateTimePicker extends Component {
 
   render() {
     const {
-      classes, date, DatePickerProps, fullDay, hasDate, hasTime, label, TimePickerProps,
+      classes, date, DatePickerProps, disabled, fullDay, hasDate, hasTime, label, TimePickerProps,
     } = this.props;
+    const dateInputValue = this.getDateInputValue(date);
+    const minDateInputValue = this.getMinDateInputValue();
+    const maxDateInputValue = this.getDateInputValue(
+      DatePickerProps && DatePickerProps.maxDate,
+    ) || undefined;
+    const dateBeforeMin = minDateInputValue && dateInputValue < minDateInputValue;
+    const dateAfterMax = maxDateInputValue && dateInputValue > maxDateInputValue;
+    const dateError = dateBeforeMin || dateAfterMax;
+    let dateHelperText;
+
+    if (dateBeforeMin) {
+      dateHelperText = 'Data jest wcześniejsza niż dozwolona';
+    } else if (dateAfterMax) {
+      dateHelperText = 'Data jest późniejsza niż dozwolona';
+    }
 
     return (
       <div className={classes.wrapper}>
         {hasDate
         && (
-          <DatePicker
+          <TextField
             className={classes.datePicker}
-            disablePast
-            format="dd MMM yyyy"
+            disabled={disabled || (DatePickerProps && DatePickerProps.disabled)}
+            error={Boolean(dateError)}
+            helperText={dateHelperText}
+            InputLabelProps={{ shrink: true }}
+            inputProps={{
+              max: maxDateInputValue,
+              min: minDateInputValue,
+            }}
             label={label}
-            margin="normal"
-            onChange={this.handleChange(changeTypes.DATE)}
-            value={date}
-            {...DatePickerProps}
+            margin={(DatePickerProps && DatePickerProps.margin) || 'normal'}
+            onChange={this.handleNativeDateChange}
+            required
+            type="date"
+            value={dateInputValue}
           />
         )
         }

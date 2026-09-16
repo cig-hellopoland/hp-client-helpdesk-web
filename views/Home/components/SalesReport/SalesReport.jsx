@@ -21,6 +21,8 @@ import Snackbar from '@material-ui/core/Snackbar';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { actions as bookingsActions } from '@hello-poland/commons/redux/bookings';
 import formatPrice from '../../../../utils/formatPrice';
+import { filterSales, getSalesFilterError, normalizeSearchValue } from './salesFilters';
+import { buildSalesCsv, loadCsvColumns, saveCsvColumns } from './salesCsv';
 
 const styles = theme => ({
   title: {
@@ -87,11 +89,6 @@ const STATUS_MAP = {
   BOOKED: 'Zarezerwowany',
 };
 
-const normalizeSearchValue = value => (value || '')
-  .toLocaleLowerCase('pl')
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '');
-
 const getInitialFromDate = () => {
   const date = new Date();
   date.setDate(date.getDate() - 7);
@@ -100,7 +97,7 @@ const getInitialFromDate = () => {
 
 const getInitialToDate = () => format(new Date(), 'yyyy-MM-dd');
 
-const formatDateTime = value => {
+const formatDateTime = (value) => {
   if (!value) {
     return '-';
   }
@@ -114,7 +111,7 @@ const formatDateTime = value => {
   return format(date, 'yyyy-MM-dd HH:mm');
 };
 
-const formatDateOnly = value => {
+const formatDateOnly = (value) => {
   if (!value) {
     return '-';
   }
@@ -128,37 +125,45 @@ const formatDateOnly = value => {
   return format(date, 'dd.MM.yyyy');
 };
 
-const escapeCsvValue = value => `"${String(value == null ? '' : value).replace(/"/g, '""')}"`;
+const SALES_COLUMNS = [
+  { key: 'bookingId', label: 'ID', value: row => row.bookingId },
+  { key: 'purchaseDate', label: 'Data zakupu', value: row => formatDateTime(row.purchaseDate) },
+  { key: 'eventDate', label: 'Data wydarzenia', value: row => formatDateOnly(row.eventDate) },
+  { key: 'sightEventName', label: 'Wydarzenie', value: row => row.sightEventName },
+  { key: 'objectName', label: 'Obiekt', value: row => row.objectName },
+  {
+    key: 'ticketPrice',
+    label: 'Cena biletu kupionego',
+    value: row => (row.ticketPrice == null ? '' : formatPrice(row.ticketPrice)),
+  },
+  { key: 'customerName', label: 'Klient', value: row => row.customerName },
+  { key: 'customerEmail', label: 'Email', value: row => row.customerEmail },
+  { key: 'status', label: 'Status', value: row => STATUS_MAP[row.status] || row.status || '' },
+];
 
-const buildSalesCsv = (sales) => {
-  const rows = [
-    [
-      'ID',
-      'Data zakupu',
-      'Data wydarzenia',
-      'Wydarzenie',
-      'Obiekt',
-      'Cena biletu kupionego',
-      'Klient',
-      'Email',
-      'Status',
-    ],
-    ...sales.map(row => [
-      row.bookingId,
-      formatDateTime(row.purchaseDate),
-      formatDateOnly(row.eventDate),
-      row.sightEventName,
-      row.objectName,
-      row.ticketPrice == null ? '' : formatPrice(row.ticketPrice),
-      row.customerName,
-      row.customerEmail,
-      STATUS_MAP[row.status] || row.status || '',
-    ]),
-  ];
+const CSV_COLUMN_KEYS = SALES_COLUMNS.map(column => column.key);
 
-  return rows
-    .map(row => row.map(escapeCsvValue).join(';'))
-    .join('\r\n');
+const SALES_COLUMN_WIDTHS = [90, 165, 190, 280, 260, 185, 185, 230, 195, 340];
+
+const reportInputProps = {
+  style: { height: 32, marginTop: 16 },
+};
+
+const columnInputStyle = {
+  display: 'block',
+  width: '100%',
+  minWidth: 0,
+  height: 28,
+  boxSizing: 'border-box',
+  padding: '6px 0 7px',
+  border: 0,
+  borderBottom: '1px solid rgba(0, 0, 0, 0.42)',
+  borderRadius: 0,
+  backgroundColor: 'transparent',
+  color: 'rgba(0, 0, 0, 0.87)',
+  fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+  fontSize: 12,
+  fontWeight: 400,
 };
 
 class SalesReport extends React.Component {
@@ -170,8 +175,12 @@ class SalesReport extends React.Component {
     partnerMenuOpen: false,
     partners: [],
     sales: [],
+    columnFilters: {},
+    csvColumns: CSV_COLUMN_KEYS.slice(),
+    csvColumnsDialogOpen: false,
     error: false,
     loading: false,
+    downloading: false,
     emailDialogOpen: false,
     selectedSale: null,
     newEmail: '',
@@ -181,8 +190,51 @@ class SalesReport extends React.Component {
     snackbarMessage: '',
   };
 
-  handleDateChange = key => event => {
+  componentDidMount() {
+    this.setState({ csvColumns: loadCsvColumns(CSV_COLUMN_KEYS) });
+  }
+
+  openCsvColumnsDialog = () => {
+    this.setState({ csvColumnsDialogOpen: true });
+  };
+
+  closeCsvColumnsDialog = () => {
+    this.setState({ csvColumnsDialogOpen: false });
+  };
+
+  setCsvColumns = (selectedKeys) => {
+    const { downloading } = this.state;
+    if (downloading) return;
+    const csvColumns = CSV_COLUMN_KEYS.filter(key => selectedKeys.includes(key));
+    this.setState({ csvColumns });
+    saveCsvColumns(csvColumns);
+  };
+
+  handleCsvColumnChange = key => (event) => {
+    const { csvColumns } = this.state;
+    this.setCsvColumns(event.target.checked
+      ? [...csvColumns, key]
+      : csvColumns.filter(selectedKey => selectedKey !== key));
+  };
+
+  handleDateChange = key => (event) => {
     this.setState({ [key]: event.target.value });
+  };
+
+  handleColumnFilterChange = key => (event) => {
+    const { value } = event.target;
+    this.setState(state => ({
+      columnFilters: { ...state.columnFilters, [key]: value },
+    }));
+  };
+
+  clearColumnFilters = () => {
+    this.setState({ columnFilters: {} });
+  };
+
+  getFilteredSales = (rows) => {
+    const { columnFilters, sales } = this.state;
+    return filterSales(rows || sales, columnFilters);
   };
 
   handlePartnerSearchChange = (event) => {
@@ -375,8 +427,9 @@ class SalesReport extends React.Component {
   };
 
   downloadSalesCsv = (sales) => {
-    const { fromDate, toDate } = this.state;
-    const csv = buildSalesCsv(sales);
+    const { fromDate, toDate, csvColumns } = this.state;
+    const csv = buildSalesCsv(sales, SALES_COLUMNS, csvColumns);
+    if (!csv) return;
     const blob = new Blob(['\ufeff', csv], { type: 'text/csv;charset=utf-8' });
     const objectUrl = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
@@ -392,14 +445,18 @@ class SalesReport extends React.Component {
   fetchSales = (store, downloadFile = false) => {
     const { logicMiddleware } = store || {};
     const { httpClient } = logicMiddleware || {};
-    const { fromDate, toDate, partnerId } = this.state;
+    const {
+      fromDate, toDate, partnerId, loading, columnFilters, csvColumns,
+    } = this.state;
 
-    if (!httpClient) {
+    if (!httpClient || loading
+      || (downloadFile && (!csvColumns.length || getSalesFilterError(columnFilters)))) {
       return;
     }
 
     this.setState({
       loading: true,
+      downloading: downloadFile,
       error: false,
     });
 
@@ -414,7 +471,7 @@ class SalesReport extends React.Component {
 
     httpClient
       .get(`/analytics/sales?${query.join('&')}`)
-      .then(response => {
+      .then((response) => {
         const sales = (response.data || []).slice();
 
         sales.sort(
@@ -424,7 +481,7 @@ class SalesReport extends React.Component {
         this.setState({ sales });
 
         if (downloadFile) {
-          this.downloadSalesCsv(sales);
+          this.downloadSalesCsv(this.getFilteredSales(sales));
         }
       })
       .catch(() => {
@@ -434,12 +491,156 @@ class SalesReport extends React.Component {
         });
       })
       .finally(() => {
-        this.setState({ loading: false });
+        this.setState({ loading: false, downloading: false });
       });
   };
 
+  renderCsvColumnsDialog() {
+    const { csvColumns, csvColumnsDialogOpen, downloading } = this.state;
+    return (
+      <Dialog
+        open={csvColumnsDialogOpen}
+        onClose={this.closeCsvColumnsDialog}
+        aria-labelledby="sales-csv-columns-title"
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle id="sales-csv-columns-title">Kolumny CSV</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Wybierz kolumny do pobrania. Eksport uwzględni aktywne filtry raportu.
+          </DialogContentText>
+          <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 8 }}>
+            <Button
+              size="small"
+              disabled={downloading || csvColumns.length === CSV_COLUMN_KEYS.length}
+              onClick={() => this.setCsvColumns(CSV_COLUMN_KEYS)}
+            >
+              Zaznacz wszystkie
+            </Button>
+            <Button
+              size="small"
+              disabled={downloading || !csvColumns.length}
+              onClick={() => this.setCsvColumns([])}
+            >
+              Odznacz wszystkie
+            </Button>
+          </div>
+          <div role="group" aria-label="Kolumny do eksportu">
+            {SALES_COLUMNS.map(column => (
+              <label
+                key={column.key}
+                htmlFor={`sales-csv-column-${column.key}`}
+                style={{
+                  display: 'flex', alignItems: 'center', minHeight: 34, cursor: 'pointer',
+                }}
+              >
+                <input
+                  id={`sales-csv-column-${column.key}`}
+                  type="checkbox"
+                  checked={csvColumns.includes(column.key)}
+                  disabled={downloading}
+                  onChange={this.handleCsvColumnChange(column.key)}
+                  style={{ width: 16, height: 16, margin: '0 12px 0 0' }}
+                />
+                <Typography style={{ fontSize: 14 }}>{column.label}</Typography>
+              </label>
+            ))}
+          </div>
+          <Typography
+            role="status"
+            style={{ fontSize: 12, marginTop: 12, color: csvColumns.length ? '#616161' : '#b71c1c' }}
+          >
+            {csvColumns.length
+              ? `Wybrane kolumny: ${csvColumns.length} z ${CSV_COLUMN_KEYS.length}`
+              : 'Wybierz co najmniej jedną kolumnę, aby pobrać CSV.'}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button color="secondary" onClick={this.closeCsvColumnsDialog}>Gotowe</Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
+  renderColumnFilter(column) {
+    const { columnFilters } = this.state;
+    if (column.key === 'purchaseDate') {
+      return (
+        <span style={{
+          fontSize: 12, fontWeight: 400, whiteSpace: 'normal', color: '#616161',
+        }}
+        >
+          Zakres „Od–Do” nad raportem
+        </span>
+      );
+    }
+    if (column.key === 'eventDate' || column.key === 'ticketPrice') {
+      const isDate = column.key === 'eventDate';
+      const fields = isDate
+        ? [['eventDateFrom', 'Od'], ['eventDateTo', 'Do']]
+        : [['ticketPriceMin', 'Min zł'], ['ticketPriceMax', 'Max zł']];
+      return fields.map(([key, label]) => (
+        <label
+          key={key}
+          htmlFor={`sales-filter-${key}`}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 400,
+          }}
+        >
+          <span style={{ flex: isDate ? '0 0 20px' : '0 0 40px' }}>{label}</span>
+          <input
+            id={`sales-filter-${key}`}
+            aria-label={`Filtr: ${column.label} — ${label}`}
+            type={isDate ? 'date' : 'text'}
+            inputMode={isDate ? undefined : 'decimal'}
+            placeholder={isDate ? undefined : 'Bez limitu'}
+            value={columnFilters[key] || ''}
+            onChange={this.handleColumnFilterChange(key)}
+            style={columnInputStyle}
+          />
+        </label>
+      ));
+    }
+    if (column.key === 'status') {
+      return (
+        <select
+          aria-label="Filtr: Status"
+          value={columnFilters.status || ''}
+          onChange={this.handleColumnFilterChange('status')}
+          style={{ ...columnInputStyle, appearance: 'auto', cursor: 'pointer' }}
+        >
+          <option value="">Wszystkie</option>
+          {Object.keys(STATUS_MAP).map(status => (
+            <option key={status} value={status}>{STATUS_MAP[status]}</option>
+          ))}
+        </select>
+      );
+    }
+    return (
+      <TextField
+        fullWidth
+        value={columnFilters[column.key] || ''}
+        onChange={this.handleColumnFilterChange(column.key)}
+        placeholder={column.key === 'bookingId' ? 'Numer ID' : 'Filtruj...'}
+        InputProps={{
+          style: { fontSize: 12, fontWeight: 400, height: 28 },
+          inputProps: {
+            'aria-label': `Filtr: ${column.label}`,
+            inputMode: column.key === 'bookingId' ? 'numeric' : undefined,
+            style: { fontSize: 12, fontWeight: 400 },
+          },
+        }}
+        style={{ display: 'block' }}
+      />
+    );
+  }
+
   renderTable(store) {
-    const { sales } = this.state;
+    const { sales, columnFilters, loading } = this.state;
+    const filteredSales = this.getFilteredSales();
+    const hasColumnFilters = Object.values(columnFilters).some(value => value.trim());
+    const filterError = getSalesFilterError(columnFilters);
 
     const headerCellStyle = {
       textAlign: 'left',
@@ -450,81 +651,123 @@ class SalesReport extends React.Component {
       background: '#fff',
       zIndex: 2,
       borderBottom: '1px solid #e0e0e0',
+      verticalAlign: 'bottom',
     };
 
     return (
       <div
         style={{
           marginTop: 16,
+          border: '1px solid #bdbdbd',
+          borderRadius: 4,
+          overflow: 'hidden',
+        }}
+      >
+        <div style={{
           maxHeight: 360,
           overflowY: 'auto',
           overflowX: 'auto',
-          borderTop: '1px solid #e0e0e0',
         }}
-      >
+        >
           <table
             style={{
               width: '100%',
+              minWidth: SALES_COLUMN_WIDTHS.reduce((total, width) => total + width, 0),
+              tableLayout: 'fixed',
               borderCollapse: 'separate',
               borderSpacing: 0,
               fontSize: 12,
             }}
           >
-          <thead>
-            <tr>
-              <th style={headerCellStyle}>ID</th>
-              <th style={headerCellStyle}>Data zakupu</th>
-              <th style={headerCellStyle}>Data wydarzenia</th>
-              <th style={headerCellStyle}>Wydarzenie</th>
-              <th style={headerCellStyle}>Obiekt</th>
-              <th style={headerCellStyle}>Cena biletu kupionego</th>
-              <th style={headerCellStyle}>Klient</th>
-              <th style={headerCellStyle}>Email</th>
-              <th style={headerCellStyle}>Status</th>
-              <th style={headerCellStyle} />
-            </tr>
-          </thead>
+            <colgroup>
+              {SALES_COLUMNS.map((column, index) => (
+                <col key={column.key} style={{ width: SALES_COLUMN_WIDTHS[index] }} />
+              ))}
+              <col style={{ width: SALES_COLUMN_WIDTHS[SALES_COLUMNS.length] }} />
+            </colgroup>
+            <thead>
+              <tr>
+                {SALES_COLUMNS.map(column => (
+                  <th key={column.key} scope="col" style={headerCellStyle}>
+                    {column.label}
+                    <div style={{ marginTop: 8, height: 56 }}>
+                      {this.renderColumnFilter(column)}
+                    </div>
+                  </th>
+                ))}
+                <th style={headerCellStyle} />
+              </tr>
+            </thead>
 
-          <tbody>
-            {sales.map((row, index) => (
-              <tr
-                key={`${row.bookingId}-${index}`}
-                style={{ borderTop: '1px solid #e0e0e0' }}
-              >
-                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{row.bookingId}</td>
-                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{formatDateTime(row.purchaseDate)}</td>
-                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{formatDateOnly(row.eventDate)}</td>
-                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{row.sightEventName || '-'}</td>
-                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{row.objectName || '-'}</td>
-                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
-                  {row.ticketPrice == null ? '-' : formatPrice(row.ticketPrice)}
-                </td>
-                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{row.customerName || '-'}</td>
-                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{row.customerEmail || '-'}</td>
-                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
-                  {STATUS_MAP[row.status] || row.status || '-'}
-                </td>
-                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
-                  <Button
-                    disabled={!this.canResend(row.status)}
-                    onClick={() => this.resend(store, row.hash)}
-                    style={{ fontSize: 12 }}
-                  >
+            <tbody>
+              {filteredSales.map((row, index) => (
+                <tr
+                  key={`${row.bookingId}-${index}`}
+                  style={{ borderTop: '1px solid #e0e0e0' }}
+                >
+                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{row.bookingId}</td>
+                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{formatDateTime(row.purchaseDate)}</td>
+                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{formatDateOnly(row.eventDate)}</td>
+                  <td style={{ padding: '10px 12px', overflowWrap: 'break-word' }}>{row.sightEventName || '-'}</td>
+                  <td style={{ padding: '10px 12px', overflowWrap: 'break-word' }}>{row.objectName || '-'}</td>
+                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
+                    {row.ticketPrice == null ? '-' : formatPrice(row.ticketPrice)}
+                  </td>
+                  <td style={{ padding: '10px 12px', overflowWrap: 'break-word' }}>{row.customerName || '-'}</td>
+                  <td style={{ padding: '10px 12px', overflowWrap: 'break-word' }}>{row.customerEmail || '-'}</td>
+                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
+                    {STATUS_MAP[row.status] || row.status || '-'}
+                  </td>
+                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
+                    <Button
+                      disabled={!this.canResend(row.status)}
+                      onClick={() => this.resend(store, row.hash)}
+                      style={{ fontSize: 12 }}
+                    >
                     WYŚLIJ PONOWNIE
-                  </Button>
-                  <Button
-                    color="secondary"
-                    disabled={!this.canResend(row.status)}
-                    onClick={() => this.openEmailDialog(row)}
-                    style={{ fontSize: 12 }}
-                  >
+                    </Button>
+                    <Button
+                      color="secondary"
+                      disabled={!this.canResend(row.status)}
+                      onClick={() => this.openEmailDialog(row)}
+                      style={{ fontSize: 12 }}
+                    >
                     WYŚLIJ NA NOWY EMAIL
-                  </Button>
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+              {!filteredSales.length && (
+              <tr>
+                <td colSpan={10} style={{ padding: 24, textAlign: 'center' }}>
+                  {loading ? 'Ładowanie danych...' : (filterError || 'Brak sprzedaży dla wybranych filtrów.')}
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
+        {filterError && (
+          <Typography role="alert" style={{ color: '#b71c1c', padding: '8px 12px', fontSize: 12 }}>
+            {filterError}
+          </Typography>
+        )}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '8px 12px',
+          borderTop: '1px solid #bdbdbd',
+          background: '#f5f5f5',
+        }}
+        >
+          <Typography variant="caption" role="status">
+            {`Widoczne pozycje: ${filteredSales.length} z ${sales.length}`}
+          </Typography>
+          <Button size="small" onClick={this.clearColumnFilters} disabled={!hasColumnFilters}>
+            Wyczyść filtry kolumn
+          </Button>
+        </div>
       </div>
     );
   }
@@ -539,6 +782,7 @@ class SalesReport extends React.Component {
       partnerMenuOpen,
       error,
       loading,
+      downloading,
       emailDialogOpen,
       selectedSale,
       newEmail,
@@ -546,6 +790,8 @@ class SalesReport extends React.Component {
       sendingToNewEmail,
       snackbarOpen,
       snackbarMessage,
+      columnFilters,
+      csvColumns,
     } = this.state;
     const filteredPartners = this.getFilteredPartners();
 
@@ -576,7 +822,7 @@ class SalesReport extends React.Component {
                   alignItems: 'flex-end',
                   gap: 24,
                   marginBottom: 16,
-                  flexWrap: 'nowrap',
+                  flexWrap: 'wrap',
                 }}
               >
                 <div style={{ width: 170, flex: '0 0 170px' }}>
@@ -587,7 +833,8 @@ class SalesReport extends React.Component {
                     value={fromDate}
                     onChange={this.handleDateChange('fromDate')}
                     InputLabelProps={{ shrink: true }}
-                    style={{ width: '100%' }}
+                    InputProps={reportInputProps}
+                    style={{ width: '100%', height: 48 }}
                   />
                 </div>
 
@@ -599,7 +846,8 @@ class SalesReport extends React.Component {
                     value={toDate}
                     onChange={this.handleDateChange('toDate')}
                     InputLabelProps={{ shrink: true }}
-                    style={{ width: '100%' }}
+                    InputProps={reportInputProps}
+                    style={{ width: '100%', height: 48 }}
                   />
                 </div>
 
@@ -620,11 +868,14 @@ class SalesReport extends React.Component {
                         onFocus={this.handlePartnerFocus}
                         onKeyDown={this.handlePartnerKeyDown}
                         InputLabelProps={{ shrink: true }}
+                        style={{ height: 48 }}
                         InputProps={{
+                          ...reportInputProps,
                           endAdornment: (
-                            <InputAdornment position="end">
+                            <InputAdornment position="end" style={{ height: 32, maxHeight: 32 }}>
                               <IconButton
                                 className={classes.partnerDropdownButton}
+                                style={{ width: 32, height: 32, padding: 4 }}
                                 onClick={this.handlePartnerMenuToggle}
                                 aria-label="Rozwiń listę partnerów"
                               >
@@ -673,9 +924,25 @@ class SalesReport extends React.Component {
                   <Button
                     color="secondary"
                     disabled={loading}
+                    onClick={() => this.fetchSales(store)}
+                  >
+                    {loading && !downloading ? 'Odświeżanie...' : 'Odśwież'}
+                  </Button>
+                  <Button
+                    color="secondary"
+                    disabled={loading || !csvColumns.length
+                      || Boolean(getSalesFilterError(columnFilters))}
                     onClick={() => this.fetchSales(store, true)}
                   >
-                    {loading ? 'Pobieranie...' : 'Pobierz'}
+                    {downloading ? 'Pobieranie...' : 'Pobierz'}
+                  </Button>
+                  <Button
+                    color="secondary"
+                    disabled={downloading}
+                    onClick={this.openCsvColumnsDialog}
+                    aria-haspopup="dialog"
+                  >
+                    {`Kolumny CSV (${csvColumns.length}/${CSV_COLUMN_KEYS.length})`}
                   </Button>
                 </div>
               </div>
@@ -687,6 +954,7 @@ class SalesReport extends React.Component {
               )}
 
               {this.renderTable(store)}
+              {this.renderCsvColumnsDialog()}
 
               <Dialog
                 open={emailDialogOpen}

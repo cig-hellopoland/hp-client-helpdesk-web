@@ -3,6 +3,10 @@
 ## Unreleased
 
 * Discourage saved-login autofill in the partner usher form and add a show/hide password button that resets when the dialog closes.
+* Add a CSV column chooser with browser-saved preferences and keep exports in report column order; require at least one selected column.
+* Use exact booking IDs, inclusive event date and price ranges, and the existing purchase date controls in sales filters; validate ranges and apply them to CSV exports.
+* Reduce sales column filter text to 12px and keep column widths stable when filtering, including empty results.
+* Add a separate refresh button, combined column filters (also applied to CSV), and a bordered footer with row counts to the "Ostatnia sprzedaż" report.
 * Improve the user editor layout by grouping technical access and hiding irrelevant scope fields for global roles.
 * Add CSV download for the "Ostatnia sprzedaż" report and show its loading state.
 * Show readable Polish validation and API error messages when saving a partner.

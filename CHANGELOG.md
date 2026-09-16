@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Discourage saved-login autofill in the partner usher form and add a show/hide password button that resets when the dialog closes.
+* Improve the user editor layout by grouping technical access and hiding irrelevant scope fields for global roles.
 * Add CSV download for the "Ostatnia sprzedaż" report and show its loading state.
 * Show readable Polish validation and API error messages when saving a partner.
 

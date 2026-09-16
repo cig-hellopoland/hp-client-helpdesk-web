@@ -12,6 +12,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
@@ -133,6 +134,32 @@ const styles = {
   },
   userDialogContent: {
     minWidth: 620,
+  },
+  technicalAccessPanel: {
+    backgroundColor: '#fafafa',
+    border: '1px solid #e0e0e0',
+    borderRadius: 4,
+    padding: '8px 12px',
+  },
+  technicalAccessControl: {
+    alignItems: 'flex-start',
+    margin: 0,
+    width: '100%',
+  },
+  technicalAccessCheckbox: {
+    marginTop: -2,
+    paddingLeft: 0,
+  },
+  technicalAccessDescription: {
+    display: 'block',
+    lineHeight: '18px',
+    marginTop: 2,
+  },
+  scopeHeader: {
+    marginTop: 8,
+  },
+  hidden: {
+    display: 'none',
   },
   scopePicker: {
     position: 'relative',
@@ -905,22 +932,45 @@ class UsersList extends React.Component {
                 </Grid>
                 {this.isCurrentRoot() && form.role !== 'HELPDESK_TECHNICAL' && (
                   <Grid item xs={12}>
-                    <Checkbox
-                      checked={Boolean(form.technicalAccess)}
-                      onChange={this.handleTechnicalAccessChange}
-                    />
-                    <Typography component="span">
-                      Dostęp do ekranu technicznego i odzyskiwania WordPressa
-                    </Typography>
+                    <div style={styles.technicalAccessPanel}>
+                      <FormControlLabel
+                        style={styles.technicalAccessControl}
+                        control={(
+                          <Checkbox
+                            checked={Boolean(form.technicalAccess)}
+                            color="secondary"
+                            onChange={this.handleTechnicalAccessChange}
+                            style={styles.technicalAccessCheckbox}
+                          />
+                        )}
+                        label={(
+                          <div>
+                            <Typography variant="subtitle1">Dostęp techniczny</Typography>
+                            <Typography
+                              color="textSecondary"
+                              style={styles.technicalAccessDescription}
+                              variant="caption"
+                            >
+                              Podgląd stanu systemu i logów oraz bezpieczne odzyskiwanie WordPressa.
+                            </Typography>
+                          </div>
+                        )}
+                      />
+                    </div>
                   </Grid>
                 )}
-                <Grid item xs={12}>
+                <Grid
+                  item
+                  xs={12}
+                  style={scopedRole ? styles.scopeHeader : styles.hidden}
+                >
                   <Typography variant="subtitle1">Zakres uprawnień</Typography>
                   <Typography variant="caption" color="textSecondary">
-                    Brak wyboru oznacza dostęp do wszystkich partnerów albo obiektów w ramach roli.
+                    Brak wyboru oznacza dostęp do wszystkich partnerów albo obiektów
+                    w ramach roli.
                   </Typography>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} style={scopedRole ? undefined : styles.hidden}>
                   <ClickAwayListener onClickAway={this.closeScopeMenu('partnerScopeOpen')}>
                     <div
                       ref={(element) => { this.partnerScopeAnchor = element; }}
@@ -928,7 +978,6 @@ class UsersList extends React.Component {
                     >
                       <TextField
                         fullWidth
-                        disabled={!scopedRole}
                         label="Partnerzy"
                         value={partnerInputValue}
                         onChange={this.handleScopeFilterChange('partnerScopeFilter')}
@@ -940,7 +989,6 @@ class UsersList extends React.Component {
                             <InputAdornment position="end">
                               <IconButton
                                 aria-label="Rozwiń listę partnerów"
-                                disabled={!scopedRole}
                                 onClick={this.toggleScopeMenu('partnerScopeOpen')}
                                 style={styles.scopeDropdownButton}
                               >
@@ -997,12 +1045,12 @@ class UsersList extends React.Component {
                         </Paper>
                       </Popper>
                       <FormHelperText>
-                        {scopedRole ? 'Ogranicza pracę użytkownika do wybranych partnerów.' : 'Ta rola ma zakres globalny.'}
+                        Ogranicza pracę użytkownika do wybranych partnerów.
                       </FormHelperText>
                     </div>
                   </ClickAwayListener>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} style={scopedRole ? undefined : styles.hidden}>
                   <ClickAwayListener onClickAway={this.closeScopeMenu('sightScopeOpen')}>
                     <div
                       ref={(element) => { this.sightScopeAnchor = element; }}
@@ -1010,7 +1058,6 @@ class UsersList extends React.Component {
                     >
                       <TextField
                         fullWidth
-                        disabled={!scopedRole}
                         label="Obiekty"
                         value={sightInputValue}
                         onChange={this.handleScopeFilterChange('sightScopeFilter')}
@@ -1022,7 +1069,6 @@ class UsersList extends React.Component {
                             <InputAdornment position="end">
                               <IconButton
                                 aria-label="Rozwiń listę obiektów"
-                                disabled={!scopedRole}
                                 onClick={this.toggleScopeMenu('sightScopeOpen')}
                                 style={styles.scopeDropdownButton}
                               >
@@ -1079,7 +1125,7 @@ class UsersList extends React.Component {
                         </Paper>
                       </Popper>
                       <FormHelperText>
-                      Obiekty zawężają zakres dodatkowo względem partnerów.
+                        Obiekty zawężają zakres dodatkowo względem partnerów.
                       </FormHelperText>
                     </div>
                   </ClickAwayListener>

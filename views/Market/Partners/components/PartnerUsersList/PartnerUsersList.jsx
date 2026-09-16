@@ -13,6 +13,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import Input from '@material-ui/core/Input';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import InputLabel from '@material-ui/core/InputLabel';
 import ListItemText from '@material-ui/core/ListItemText';
 import Menu from '@material-ui/core/Menu';
@@ -27,6 +28,8 @@ import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
 import EmptyView from 'components/EmptyView';
 import TableHead from 'components/Table/TableHead';
@@ -113,6 +116,7 @@ class PartnerUsersList extends React.Component {
     usherDialogOpen: false,
     usherDialogMode: 'create',
     usherForm: { ...emptyUsherForm },
+    showUsherPassword: false,
   };
 
   componentDidMount() {
@@ -202,6 +206,7 @@ class PartnerUsersList extends React.Component {
     usherDialogOpen: true,
     usherDialogMode: 'create',
     usherForm: { ...emptyUsherForm },
+    showUsherPassword: false,
   });
 
   handleEditUser = (item) => {
@@ -232,6 +237,7 @@ class PartnerUsersList extends React.Component {
     this.setState({
       usherDialogOpen: true,
       usherDialogMode: 'edit',
+      showUsherPassword: false,
       usherForm: {
         id: item.id,
         name: item.name || '',
@@ -250,7 +256,14 @@ class PartnerUsersList extends React.Component {
   handleUsherDialogClose = () => this.setState({
     usherDialogOpen: false,
     usherForm: { ...emptyUsherForm },
+    showUsherPassword: false,
   });
+
+  handleToggleUsherPassword = () => this.setState(state => ({
+    showUsherPassword: !state.showUsherPassword,
+  }));
+
+  handlePasswordMouseDown = event => event.preventDefault();
 
   handleUserFormChange = name => (event) => {
     const { value } = event.target;
@@ -551,6 +564,7 @@ class PartnerUsersList extends React.Component {
       usherDialogMode,
       usherDialogOpen,
       usherForm,
+      showUsherPassword,
       userDialogMode,
       userDialogOpen,
       userForm,
@@ -813,6 +827,9 @@ class PartnerUsersList extends React.Component {
                 <TextField
                   fullWidth
                   label="Imie i nazwisko"
+                  id="partner-usher-display-name"
+                  name="partner-usher-display-name"
+                  autoComplete="off"
                   onChange={this.handleUsherFormChange('name')}
                   value={usherForm.name}
                 />
@@ -822,6 +839,9 @@ class PartnerUsersList extends React.Component {
                   fullWidth
                   label="E-mail"
                   onChange={this.handleUsherFormChange('email')}
+                  id="partner-usher-contact"
+                  name="partner-usher-contact"
+                  autoComplete="off"
                   value={usherForm.email}
                 />
               </Grid>
@@ -829,10 +849,29 @@ class PartnerUsersList extends React.Component {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="Haslo"
+                    label="Hasło"
+                    id="partner-usher-new-password"
+                    name="partner-usher-new-password"
+                    autoComplete="new-password"
                     onChange={this.handleUsherFormChange('password')}
-                    type="password"
+                    type={showUsherPassword ? 'text' : 'password'}
                     value={usherForm.password}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            type="button"
+                            aria-label={showUsherPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                            aria-pressed={showUsherPassword}
+                            title={showUsherPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                            onClick={this.handleToggleUsherPassword}
+                            onMouseDown={this.handlePasswordMouseDown}
+                          >
+                            {showUsherPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
               )}

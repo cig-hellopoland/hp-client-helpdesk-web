@@ -20,6 +20,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
+import sortByLabel from 'utils/sortByLabel';
 import config from 'config';
 
 /*
@@ -80,7 +81,7 @@ class CategoriesForm extends React.Component {
   // wcześniej: function getCategoriesByRestriction(...)
   getCategoriesByRestriction = (originalItems, isRestricted) => {
     if (Array.isArray(originalItems)) {
-      return originalItems.filter(({ restricted }) => restricted === isRestricted);
+      return sortByLabel(originalItems.filter(({ restricted }) => restricted === isRestricted));
     }
 
     return [];
@@ -283,7 +284,7 @@ class CategoriesForm extends React.Component {
                   id: 'category-select',
                 }}
               >
-                {categories.filter(({ id: categoryId, restricted }) => {
+                {sortByLabel(categories).filter(({ id: categoryId, restricted }) => {
                   const publicAssigned = this.getCategoriesByRestriction(items, false);
                   const restrictedAssigned = this.getCategoriesByRestriction(items, true);
 

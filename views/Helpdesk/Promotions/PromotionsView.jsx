@@ -43,6 +43,7 @@ import Layout from 'components/Layout';
 import EmptyView from 'components/EmptyView';
 import withAuth from 'services/auth/withAuth';
 import { selectors as profileSelectors } from 'redux/profile';
+import sortByLabel from 'utils/sortByLabel';
 
 const emptyCampaignForm = {
   name: '',
@@ -414,7 +415,7 @@ class PromotionsView extends React.Component {
       httpClient.get('/sight-events'),
     ])
       .then(([tagsResponse, sightEventsResponse]) => this.setState({
-        tagOptions: this.normalizeListResponse(tagsResponse.data),
+        tagOptions: sortByLabel(this.normalizeListResponse(tagsResponse.data), this.optionText),
         sightEventOptions: this.normalizeListResponse(sightEventsResponse.data),
       }))
       .catch(() => this.openSnackbar('Nie udało się pobrać listy tagów lub ofert'));

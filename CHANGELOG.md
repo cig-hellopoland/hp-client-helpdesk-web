@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+* Add the full order value after discounts to the sales table and CSV, with amount filters and a note about repeated totals for the same order.
+
+* Add ticket name and quantity to the "Ostatnia sprzedaż" table, column filters and CSV export.
+
+* Shorten the promoted-offer add button to "Dodaj ofertę" and show "Spróbuj ponownie" only after a list-loading failure instead of a permanent refresh button.
+* Separate promoted-offer addition from drag-and-drop ordering, matching category ordering; append new offers and disable adding at eight, re-enabling it after removal.
+* Load the authoritative promoted list separately from available offers, prevent duplicate submissions, and preserve the list and dialog when a save fails.
+* Increase the "Ostatnia sprzedaż" table viewport from 360px to 600px to show approximately eight standard-height rows before scrolling.
+* Support up to eight promoted offers without manually entering position numbers.
+* Sort tag and category choices and assigned items alphabetically using Polish collation; also sort tag choices in promotions.
 * Discourage saved-login autofill in the partner usher form and add a show/hide password button that resets when the dialog closes.
 * Add a CSV column chooser with browser-saved preferences and keep exports in report column order; require at least one selected column.
 * Use exact booking IDs, inclusive event date and price ranges, and the existing purchase date controls in sales filters; validate ranges and apply them to CSV exports.

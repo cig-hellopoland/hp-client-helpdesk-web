@@ -22,6 +22,7 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
+import sortByLabel from 'utils/sortByLabel';
 import config from 'config';
 
 const DIALOG_TYPE = {
@@ -65,7 +66,7 @@ class TagsForm extends React.Component {
 
   getItemsByRestriction = (originalItems, isRestricted) => {
     if (Array.isArray(originalItems)) {
-      return originalItems.filter(({ restricted }) => restricted === isRestricted);
+      return sortByLabel(originalItems.filter(({ restricted }) => restricted === isRestricted));
     }
 
     return [];
@@ -282,7 +283,7 @@ class TagsForm extends React.Component {
                 onChange={this.handleSelectChange}
                 input={<Input id="tag" />}
               >
-                {tags
+                {sortByLabel(tags)
                   .filter(({ id: categoryId, restricted }) => {
                     const isExistingCategory = items.some(item => item.id === categoryId);
 

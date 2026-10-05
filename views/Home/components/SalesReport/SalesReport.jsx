@@ -125,16 +125,23 @@ const formatDateOnly = (value) => {
   return format(date, 'dd.MM.yyyy');
 };
 
-const SALES_COLUMNS = [
+export const SALES_COLUMNS = [
   { key: 'bookingId', label: 'ID', value: row => row.bookingId },
   { key: 'purchaseDate', label: 'Data zakupu', value: row => formatDateTime(row.purchaseDate) },
   { key: 'eventDate', label: 'Data wydarzenia', value: row => formatDateOnly(row.eventDate) },
   { key: 'sightEventName', label: 'Wydarzenie', value: row => row.sightEventName },
   { key: 'objectName', label: 'Obiekt', value: row => row.objectName },
+  { key: 'ticketName', label: 'Nazwa biletu', value: row => row.ticketName },
+  { key: 'ticketQuantity', label: 'Liczba biletów', value: row => row.ticketQuantity },
   {
     key: 'ticketPrice',
     label: 'Cena biletu kupionego',
     value: row => (row.ticketPrice == null ? '' : formatPrice(row.ticketPrice)),
+  },
+  {
+    key: 'orderValue',
+    label: 'Wartość zamówienia',
+    value: row => (row.orderValue == null ? '' : formatPrice(row.orderValue)),
   },
   { key: 'customerName', label: 'Klient', value: row => row.customerName },
   { key: 'customerEmail', label: 'Email', value: row => row.customerEmail },
@@ -143,7 +150,7 @@ const SALES_COLUMNS = [
 
 const CSV_COLUMN_KEYS = SALES_COLUMNS.map(column => column.key);
 
-const SALES_COLUMN_WIDTHS = [90, 165, 190, 280, 260, 185, 185, 230, 195, 340];
+const SALES_COLUMN_WIDTHS = [90, 165, 190, 280, 260, 185, 120, 185, 185, 185, 230, 195, 340];
 
 const reportInputProps = {
   style: { height: 32, marginTop: 16 },
@@ -166,7 +173,7 @@ const columnInputStyle = {
   fontWeight: 400,
 };
 
-class SalesReport extends React.Component {
+export class SalesReport extends React.Component {
   state = {
     fromDate: getInitialFromDate(),
     toDate: getInitialToDate(),
@@ -575,11 +582,11 @@ class SalesReport extends React.Component {
         </span>
       );
     }
-    if (column.key === 'eventDate' || column.key === 'ticketPrice') {
+    if (['eventDate', 'ticketPrice', 'orderValue'].includes(column.key)) {
       const isDate = column.key === 'eventDate';
       const fields = isDate
         ? [['eventDateFrom', 'Od'], ['eventDateTo', 'Do']]
-        : [['ticketPriceMin', 'Min zł'], ['ticketPriceMax', 'Max zł']];
+        : [[`${column.key}Min`, 'Min zł'], [`${column.key}Max`, 'Max zł']];
       return fields.map(([key, label]) => (
         <label
           key={key}
@@ -627,7 +634,7 @@ class SalesReport extends React.Component {
           style: { fontSize: 12, fontWeight: 400, height: 28 },
           inputProps: {
             'aria-label': `Filtr: ${column.label}`,
-            inputMode: column.key === 'bookingId' ? 'numeric' : undefined,
+            inputMode: ['bookingId', 'ticketQuantity'].includes(column.key) ? 'numeric' : undefined,
             style: { fontSize: 12, fontWeight: 400 },
           },
         }}
@@ -664,7 +671,7 @@ class SalesReport extends React.Component {
         }}
       >
         <div style={{
-          maxHeight: 360,
+          maxHeight: 600,
           overflowY: 'auto',
           overflowX: 'auto',
         }}
@@ -710,8 +717,15 @@ class SalesReport extends React.Component {
                   <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{formatDateOnly(row.eventDate)}</td>
                   <td style={{ padding: '10px 12px', overflowWrap: 'break-word' }}>{row.sightEventName || '-'}</td>
                   <td style={{ padding: '10px 12px', overflowWrap: 'break-word' }}>{row.objectName || '-'}</td>
+                  <td style={{ padding: '10px 12px', overflowWrap: 'break-word' }}>{row.ticketName || '-'}</td>
+                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
+                    {row.ticketQuantity == null ? '-' : row.ticketQuantity}
+                  </td>
                   <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
                     {row.ticketPrice == null ? '-' : formatPrice(row.ticketPrice)}
+                  </td>
+                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
+                    {row.orderValue == null ? '-' : formatPrice(row.orderValue)}
                   </td>
                   <td style={{ padding: '10px 12px', overflowWrap: 'break-word' }}>{row.customerName || '-'}</td>
                   <td style={{ padding: '10px 12px', overflowWrap: 'break-word' }}>{row.customerEmail || '-'}</td>
@@ -739,7 +753,7 @@ class SalesReport extends React.Component {
               ))}
               {!filteredSales.length && (
               <tr>
-                <td colSpan={10} style={{ padding: 24, textAlign: 'center' }}>
+                <td colSpan={SALES_COLUMNS.length + 1} style={{ padding: 24, textAlign: 'center' }}>
                   {loading ? 'Ładowanie danych...' : (filterError || 'Brak sprzedaży dla wybranych filtrów.')}
                 </td>
               </tr>
@@ -768,6 +782,10 @@ class SalesReport extends React.Component {
             Wyczyść filtry kolumn
           </Button>
         </div>
+        <Typography variant="caption" style={{ padding: '8px 12px' }}>
+          Wartość zamówienia uwzględnia rabaty i wszystkie jego pozycje.
+          Kwota powtarza się przy tym samym ID — należy liczyć ją tylko raz na zamówienie.
+        </Typography>
       </div>
     );
   }

@@ -1,6 +1,9 @@
+import React from 'react';
 import SightEdit from 'views/Market/Sights/SightEdit';
 
-SightEdit.getInitialProps = ({ query }) => {
+const SightEditPage = props => <SightEdit {...props} />;
+
+SightEditPage.getInitialProps = ({ query }) => {
   const {
     itemId, partnerId, successMessage, tab,
   } = query;
@@ -13,4 +16,4 @@ SightEdit.getInitialProps = ({ query }) => {
   };
 };
 
-export default SightEdit;
+export default SightEditPage;

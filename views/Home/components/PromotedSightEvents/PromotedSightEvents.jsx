@@ -1,8 +1,12 @@
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
+import { ReactReduxContext } from 'react-redux';
 import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import Divider from '@material-ui/core/Divider';
-import Grid from '@material-ui/core/Grid';
-import IconBlock from '@material-ui/icons/Block';
 import IconClear from '@material-ui/icons/Clear';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
@@ -11,189 +15,296 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
-import PropTypes from 'prop-types';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import {
-  actions as sightEventsActions,
-  selectors as sightEventsSelectors,
-} from '@hello-poland/commons/redux/sightEvents';
-import AlertDialog from 'components/AlertDialog';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import PromotionDialog from './PromotionDialog';
 
-const styles = {
-  error: {
-    color: 'red',
+const MAX_OFFERS = 8;
+const options = { headers: { 'Content-Language': DEFAULT_LANGUAGE } };
+const styles = theme => ({
+  orderItem: {
+    alignItems: 'center',
+    borderBottom: '1px solid #e0e0e0',
+    cursor: 'move',
+    display: 'flex',
+    minHeight: 56,
+    padding: `${theme.spacing.unit}px 0`,
   },
-  list: {
-    marginBottom: 10,
-  },
+  orderIndex: { color: theme.palette.text.secondary, width: 48 },
+  orderName: { flex: 1 },
+  orderHandle: { color: theme.palette.text.secondary, paddingRight: theme.spacing.unit },
+  dropZone: { padding: '16px 0', textAlign: 'center', color: theme.palette.text.secondary },
+});
+
+const errorMessage = (error, fallback) => {
+  const data = error && error.response && error.response.data;
+  return data && typeof data.message === 'string' ? data.message : fallback;
 };
 
-class PromotedSightEvents extends Component {
-  initialState = {
-    alertDialog: {
-      content: null,
-      onSuccess: null,
-      open: false,
-      title: null,
-    },
-    promotionDialog: {
-      open: false,
-      erros: false,
-    },
-    error: false,
+export class PromotedSightEvents extends Component {
+  state = {
+    items: [],
+    available: [],
+    loading: true,
+    saving: false,
+    loaded: false,
+    error: '',
+    dialogError: '',
+    adding: false,
+    ordering: false,
+    removing: null,
+    orderItems: [],
+    draggedId: null,
   };
-
-  state = this.initialState;
 
   componentDidMount() {
-    this.handleFetchSightEvents();
+    this.mounted = true;
+    this.load();
   }
 
-  handleClose = () => {
-    this.setState({
-      ...this.initialState,
-    });
+  componentWillUnmount() {
+    this.mounted = false;
+  }
+
+  load = async () => {
+    const { httpClient } = this.props;
+    this.setState({ loading: true, error: '' });
+    try {
+      const [promoted, all] = await Promise.all([
+        httpClient.get('/sight-events/promoted', options),
+        httpClient.get('/sight-events', options),
+      ]);
+      if (!Array.isArray(promoted.data.items) || !Array.isArray(all.data.items)) {
+        throw new Error('Invalid offers response');
+      }
+      if (!this.mounted) return;
+      this.setState({
+        items: promoted.data.items.slice().sort((a, b) => a.promotion - b.promotion),
+        available: all.data.items.slice().sort((a, b) => (a.name || '').localeCompare(
+          b.name || '', 'pl', { sensitivity: 'base' },
+        )),
+        loaded: true,
+        loading: false,
+      });
+    } catch (error) {
+      if (this.mounted) {
+        this.setState({
+          loading: false,
+          loaded: false,
+          error: 'Nie udało się pobrać listy promowanych ofert.',
+        });
+      }
+    }
   };
 
-  handleFetchSightEvents = () => {
-    const { fetchSightEventsList } = this.props;
-
-    fetchSightEventsList({
-      options: {
-        headers: {
-          'Content-Language': DEFAULT_LANGUAGE,
-        },
-      },
-    });
+  mutate = async (method, url, data) => {
+    const { httpClient } = this.props;
+    const { loading, loaded } = this.state;
+    if (this.pending || loading || !loaded) return;
+    this.pending = true;
+    this.setState({ saving: true, dialogError: '' });
+    try {
+      await httpClient({
+        method, url, data, ...options,
+      });
+      if (!this.mounted) return;
+      this.setState({ adding: false, ordering: false, removing: null });
+      await this.load();
+    } catch (error) {
+      if (this.mounted) {
+        this.setState({
+          dialogError: errorMessage(error, 'Nie udało się zapisać zmiany. Spróbuj ponownie.'),
+        });
+      }
+    } finally {
+      this.pending = false;
+      if (this.mounted) this.setState({ saving: false });
+    }
   };
 
-  handlePromotionChange = (id, value) => {
-    const { changePromotion } = this.props;
-    const { promotionDialog } = this.state;
-    const pathParams = { promotion: value };
-    changePromotion({
-      id,
-      pathParams,
-      options: {
-        headers: {
-          'Content-Language': DEFAULT_LANGUAGE,
-        },
-      },
-      onSuccess: () => {
-        this.handleFetchSightEvents();
-        this.handleClose();
-      },
-      onFailure: () => {
-        this.setState({ promotionDialog: { ...promotionDialog, error: true } });
-      },
-    });
+  add = (id) => {
+    const { items, available } = this.state;
+    if (items.length >= MAX_OFFERS || items.some(item => String(item.id) === String(id))
+      || !available.some(item => String(item.id) === String(id))) return;
+    this.mutate('post', `/sight-events/${encodeURIComponent(id)}/promotion`);
   };
 
-  handleRemovePromotion = (id) => {
-    const { deletePromotion } = this.props;
-    deletePromotion({
-      id,
-      options: {
-        headers: {
-          'Content-Language': DEFAULT_LANGUAGE,
-        },
-      },
-      onSuccess: () => {
-        this.handleFetchSightEvents();
-        this.handleClose();
-      },
-      onFailure: () => {
-        this.setState({ listError: true });
-      },
-    });
+  closeDialogs = () => {
+    if (!this.pending) {
+      this.setState({
+        adding: false, ordering: false, removing: null, dialogError: '', draggedId: null,
+      });
+    }
   };
 
-  handleRemovePromotionDialogOpen = (id, name) => this.setState({
-    alertDialog: {
-      open: true,
-      onCancel: this.handleClose,
-      onSuccess: () => this.handleRemovePromotion(id),
-      title: 'Uwaga',
-      content: `Oferta "${name}" przestanie być promowana, czy chcesz kontynuować?`,
-    },
-  });
+  dragStart = id => (event) => {
+    const { dataTransfer } = event;
+    if (dataTransfer) {
+      dataTransfer.effectAllowed = 'move';
+      dataTransfer.setData('text/plain', String(id));
+    }
+    this.setState({ draggedId: id });
+  };
 
-  handlePromotionDialogOpen = () => this.setState({ promotionDialog: { open: true } });
+  dragOver = (event) => {
+    event.preventDefault();
+    const { dataTransfer } = event;
+    if (dataTransfer) dataTransfer.dropEffect = 'move';
+  };
+
+  drop = targetId => (event) => {
+    event.preventDefault();
+    if (this.pending) return;
+    this.setState(({ orderItems, draggedId }) => {
+      if (draggedId === null || draggedId === targetId) return { draggedId: null };
+      const next = orderItems.slice();
+      const from = next.findIndex(item => item.id === draggedId);
+      if (from < 0) return { draggedId: null };
+      const [moved] = next.splice(from, 1);
+      const to = targetId === null ? next.length : next.findIndex(item => item.id === targetId);
+      if (to < 0) return { draggedId: null };
+      next.splice(to, 0, moved);
+      return { orderItems: next, draggedId: null };
+    });
+  };
 
   render() {
-    const { sightEventsList, classes } = this.props;
-    const promotedSightEvents = sightEventsList.filter(
-      item => item.promotion,
-    ).sort((a, b) => a.promotion - b.promotion);
+    const { classes } = this.props;
     const {
-      alertDialog, listError, promotionDialog: { open, error },
+      items, available, loading, loaded, saving, error, adding, ordering,
+      removing, dialogError, orderItems,
     } = this.state;
-
+    const busy = loading || saving;
+    const candidates = available.filter(item => !items.some(promoted => promoted.id === item.id));
     return (
       <Fragment>
-        <Grid>
-          <Typography className={classes.error}>{ listError ? 'Wystąpił błąd' : ' '}</Typography>
-          <List dense className={classes.list}>
-            { promotedSightEvents.length > 0
-              ? (promotedSightEvents.map(({ name, promotion, id }) => (
-                <Fragment key={id}>
-                  <ListItem>
-                    <ListItemText primary={name} secondary={`Kolejność na liście: ${promotion}`}>{name}</ListItemText>
-                    <ListItemSecondaryAction>
-                      <IconButton
-                        onClick={() => this.handleRemovePromotionDialogOpen(id, name)}
-                      >
-                        <IconClear />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <Divider />
-                </Fragment>
-              ))) : (
-                <Grid container alignItems="center">
-                  <IconBlock />
-                  <Typography variant="subtitle2">Brak promowanych ofert</Typography>
-                </Grid>
-              )
-            }
-          </List>
-          <Button onClick={this.handlePromotionDialogOpen}>Ustal kolejność</Button>
-        </Grid>
-        <PromotionDialog
-          onSubmit={this.handlePromotionChange}
-          onClose={this.handleClose}
-          open={open}
-          error={error}
-          sightEvents={sightEventsList}
-        />
-        <AlertDialog {...alertDialog} />
+        {error && <Typography color="error" role="alert">{error}</Typography>}
+        <Typography variant="caption">
+          {loading ? 'Ładowanie ofert…' : `Promowane oferty: ${items.length} / ${MAX_OFFERS}`}
+        </Typography>
+        <List dense>
+          {items.map(item => (
+            <Fragment key={item.id}>
+              <ListItem>
+                <ListItemText primary={item.name} secondary={`Kolejność na liście: ${item.promotion}`} />
+                <ListItemSecondaryAction>
+                  <IconButton
+                    aria-label={`Usuń promocję: ${item.name}`}
+                    disabled={busy || !loaded}
+                    onClick={() => this.setState({ removing: item, dialogError: '' })}
+                  >
+                    <IconClear />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+              <Divider />
+            </Fragment>
+          ))}
+        </List>
+        {loaded && !items.length && <Typography>Brak promowanych ofert</Typography>}
+        <Button
+          color="primary"
+          disabled={busy || !loaded || items.length >= MAX_OFFERS}
+          onClick={() => this.setState({ adding: true, dialogError: '' })}
+        >
+          Dodaj ofertę
+        </Button>
+        <Button
+          disabled={busy || !loaded || items.length < 2}
+          onClick={() => this.setState({ ordering: true, orderItems: items.slice(), dialogError: '' })}
+        >
+          Ustal kolejność
+        </Button>
+        {error && <Button onClick={this.load} disabled={busy}>Spróbuj ponownie</Button>}
+        {adding && (
+          <PromotionDialog
+            open
+            onClose={this.closeDialogs}
+            onSubmit={this.add}
+            sightEvents={candidates}
+            saving={saving}
+            error={dialogError}
+          />
+        )}
+        <Dialog
+          open={ordering}
+          onClose={this.closeDialogs}
+          fullWidth
+          maxWidth="sm"
+          aria-labelledby="promoted-order-title"
+        >
+          <DialogTitle id="promoted-order-title">Ustal kolejność promowanych ofert</DialogTitle>
+          <DialogContent>
+            {orderItems.map((item, index) => (
+              <div
+                key={item.id}
+                className={classes.orderItem}
+                draggable={!saving}
+                onDragStart={this.dragStart(item.id)}
+                onDragOver={this.dragOver}
+                onDrop={this.drop(item.id)}
+                onDragEnd={() => this.setState({ draggedId: null })}
+              >
+                <Typography className={classes.orderIndex}>{index + 1}</Typography>
+                <Typography className={classes.orderName}>{item.name}</Typography>
+                <Typography className={classes.orderHandle}>::</Typography>
+              </div>
+            ))}
+            <div className={classes.dropZone} onDragOver={this.dragOver} onDrop={this.drop(null)}>
+              Upuść na koniec listy
+            </div>
+            {dialogError && <Typography color="error" role="alert">{dialogError}</Typography>}
+          </DialogContent>
+          <DialogActions>
+            <Button disabled={saving} onClick={this.closeDialogs}>Anuluj</Button>
+            <Button
+              color="primary"
+              disabled={saving}
+              onClick={() => this.mutate('put', '/sight-events/promoted/order',
+                orderItems.map(item => item.id))}
+            >
+              Zapisz
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={Boolean(removing)}
+          onClose={this.closeDialogs}
+          aria-labelledby="remove-promoted-title"
+        >
+          <DialogTitle id="remove-promoted-title">Usuń promowaną ofertę</DialogTitle>
+          <DialogContent>
+            <Typography>{`Usunąć ofertę „${removing ? removing.name : ''}” z promowanych?`}</Typography>
+            {dialogError && <Typography color="error" role="alert">{dialogError}</Typography>}
+          </DialogContent>
+          <DialogActions>
+            <Button disabled={saving} onClick={this.closeDialogs}>Anuluj</Button>
+            <Button
+              color="primary"
+              disabled={saving || !removing}
+              onClick={() => this.mutate('delete', `/sight-events/${removing.id}/promotion`)}
+            >
+              Usuń
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Fragment>
     );
   }
 }
 
 PromotedSightEvents.propTypes = {
-  changePromotion: PropTypes.func.isRequired,
   classes: PropTypes.shape({}).isRequired,
-  deletePromotion: PropTypes.func.isRequired,
-  fetchSightEventsList: PropTypes.func.isRequired,
-  sightEventsList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  httpClient: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({
-  sightEventsList: sightEventsSelectors.getSightEvents(state),
-});
+const StyledPromotedSightEvents = withStyles(styles)(PromotedSightEvents);
 
-const mapDispatchToProps = {
-  changePromotion: sightEventsActions.changePromotion,
-  deletePromotion: sightEventsActions.deletePromotion,
-  fetchSightEventsList: sightEventsActions.fetchList,
-};
-
-export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  withStyles(styles),
-)(PromotedSightEvents);
+export default function ConnectedPromotedSightEvents() {
+  return (
+    <ReactReduxContext.Consumer>
+      {({ store }) => (
+        <StyledPromotedSightEvents httpClient={store.logicMiddleware.httpClient} />
+      )}
+    </ReactReduxContext.Consumer>
+  );
+}

@@ -1,5 +1,9 @@
 # Hello! Poland – Helpdesk Web
 
+**Dokumentacja techniczna:** [architektura, routing, stan, HTTP i referencja frontendu](docs/technical.md).
+
+Przegląd lokalnego kodu: **31.10.2026**. Szczegóły architektury, konfiguracji, pracy lokalnej i testów: [przewodnik modułu](docs/development.md). [Mapa systemu](https://github.com/cig-hellopoland/hellopoland-docs/blob/main/README.md) prowadzi do repozytorium dokumentacji na GitHubie.
+
 Aplikacja webowa typu **frontend (Next.js)** przeznaczona dla zespołu operacyjnego **Hello! Poland**.  
 Helpdesk Web służy do zarządzania ofertami, partnerami, wydarzeniami, biletami oraz do obsługi procesów administracyjnych i integracyjnych w ekosystemie Hello! Poland.
 
@@ -82,7 +86,7 @@ W środowiskach serwerowych wymagane jest:
 ## Uruchomienie lokalne
 
 ### Wymagania
-- Node.js (LTS)
+- Wersja Node.js zgodna ze sprawdzonym środowiskiem tego projektu: `package.json` deklaruje `^10`, a `Dockerfile.release` domyślnie Node 14. Nie potwierdzono w tym przeglądzie wspólnej wersji dla wszystkich sposobów budowania; nie zakładamy zgodności z najnowszym LTS.
 - npm
 - dostęp do backendów API
 
@@ -112,8 +116,10 @@ config/develop.config.js
 
 Przykład uruchomienia z inną konfiguracją:
 ```bash
-CONFIG_PATH=/path/to/config.prod.js npm run start
+CONFIG_PATH=/absolute/path/to/config.tst.js npm run dev
 ```
+
+To składnia powłoki POSIX. W PowerShell użyj `$env:CONFIG_PATH = 'D:\config\helpdesk-tst.js'`, a następnie `npm run dev`. Plik musi mieć strukturę `server` / `public`; szczegóły i oddzielenie build/start opisano w [przewodniku](docs/development.md).
 
 ---
 

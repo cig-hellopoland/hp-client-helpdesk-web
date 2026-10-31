@@ -29,6 +29,8 @@ import {
 import { actions as sightCreationActions } from 'redux/sightCreation';
 import { DEFAULT_LANGUAGE } from 'utils/translations';
 import GridItem from 'components/GridItem';
+import SeasonalClosureFields from 'components/SeasonalClosureFields';
+import seasonalClosureSchema from 'components/SeasonalClosureFields/validation';
 import VoivodeshipSelect, { POLISH_VOIVODESHIPS } from 'components/VoivodeshipSelect';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormGroup from '@material-ui/core/FormGroup';
@@ -105,6 +107,7 @@ class SightForm extends React.Component {
         .max(250, MAX_LENGTH_MESSAGE(250))
         .required(REQUIRED_FIELD_MESSAGE),
       published: yupBoolean(),
+      ...seasonalClosureSchema,
       // generalAdmission: yupBoolen(),
       lead: yupString()
         .min(10, MIN_LENGTH_MESSAGE(10))
@@ -187,6 +190,9 @@ class SightForm extends React.Component {
       name: details.name || '',
       blocked: details.blocked || false,
       published: details.published || false,
+      seasonallyClosed: details.seasonallyClosed || false,
+      seasonalClosureFrom: details.seasonalClosureFrom || '',
+      seasonalClosureTo: details.seasonalClosureTo || '',
       lead: details.lead || '',
       description: details.description || '',
       email: details.email || '',
@@ -437,6 +443,7 @@ class SightForm extends React.Component {
                   </GridItem>
                 )
               }
+              {isDefaultTranslation && <SeasonalClosureFields />}
               <GridItem>
                 <Field name="lead" label="Wprowadzenie" required component={TextField} {...commonProps} />
               </GridItem>

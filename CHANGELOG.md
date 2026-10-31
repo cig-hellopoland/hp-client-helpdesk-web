@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* Add a "Sezonowo nieczynne" switch and optional inclusive date range to attraction and offer forms in the default language; validate dates and explain that the notice does not block ticket purchases.
+* Refresh assigned categories and tags after Formik finishes updating the offer form state, so additions and removals appear immediately.
+* Add regression tests for seasonal closure fields, date validation and category/tag updates.
+
 * Add the full order value after discounts to the sales table and CSV, with amount filters and a note about repeated totals for the same order.
 
 * Add ticket name and quantity to the "Ostatnia sprzedaż" table, column filters and CSV export.

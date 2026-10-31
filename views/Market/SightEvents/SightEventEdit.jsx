@@ -64,7 +64,7 @@ const styles = theme => ({
   },
 });
 
-class SightEventEdit extends React.Component {
+export class SightEventEdit extends React.Component {
   baseURL = '/market/sight-events';
 
   formikRef = React.createRef();
@@ -248,8 +248,12 @@ class SightEventEdit extends React.Component {
     const selectedItem = sourceList.find(({ id }) => id === dataTypeId);
 
     if (selectedItem && !current.some(({ id }) => id === dataTypeId)) {
-      bag.setFieldValue(field, [...current, selectedItem], false);
-      this.forceUpdate();
+      bag.setFormikState(prevState => ({
+        values: {
+          ...prevState.values,
+          [field]: [...current, selectedItem],
+        },
+      }), () => this.forceUpdate());
     }
   };
 
@@ -263,8 +267,12 @@ class SightEventEdit extends React.Component {
     const field = dataType === ITEM_DATA_TYPES.CATEGORY ? 'categories' : 'tags';
     const current = Array.isArray(bag.values[field]) ? bag.values[field] : [];
 
-    bag.setFieldValue(field, current.filter(({ id }) => id !== dataTypeId), false);
-    this.forceUpdate();
+    bag.setFormikState(prevState => ({
+      values: {
+        ...prevState.values,
+        [field]: current.filter(({ id }) => id !== dataTypeId),
+      },
+    }), () => this.forceUpdate());
   };
 
   handleItemDataTypeDeleteFailure = () => this.handleRequestFailure();
